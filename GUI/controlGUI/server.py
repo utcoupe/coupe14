@@ -29,16 +29,20 @@ def update():
 		ret = -1
 		while ret == -1:
 			ret = com.readOrdersAPI(addr)
-		print(ret[2])
+		data = ":".join(str(el) for el in ret[2])
+		print(data)
+		connection.send(bytes(data, 'utf-8'))
 		time.sleep(1)
 
 
 while 1:
 	# wait for next client to connect
 	print("Ready, waiting for socket connection")
-	threading.Thread(target=update).start()
+	global connection
+	global address
 	connection, address = sock.accept()   # connection is a new socket
 	print("Connection established")
+	threading.Thread(target=update).start()
 	while 1:
 		data_rec = connection.recv(1024)  # receive up to 1K bytes
 		if data_rec:
