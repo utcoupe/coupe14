@@ -47,7 +47,7 @@ void loop(){
 	}
 	for(int i = 0; i < available; i++) {
 		// recuperer l'octet courant
-		executeCmd(serial_read());
+		executeCmd(generic_serial_read());
 	}
 
 	/* fin zone de programmation libre */

@@ -351,7 +351,7 @@ class communicationGlobale():
 						index += size
 					elif returnType == 'long':
 						size = 32
-						retour = conversion.binaryToLong(argumentData[index:index+size])
+						retour = conversion.binaryToInt(argumentData[index:index+size])
 						print(("Retour long: ", retour))
 						arguments.append(retour)
 						index += size
@@ -374,7 +374,7 @@ class communicationGlobale():
 			if typeToGet == 'int':
 				rawBinary += conversion.intToBinary(data[i])
 			elif typeToGet == 'long':
-				rawBinary += conversion.longToBinary(data[i])
+				rawBinary += conversion.intToBinary(data[i])
 			elif typeToGet == 'float':
 				rawBinary += conversion.floatToBinary(data[i])
 			else:

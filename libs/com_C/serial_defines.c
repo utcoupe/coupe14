@@ -35,5 +35,6 @@ void initSize()
 	ordreSize[O_BAISSER_ASC]=0;
 
 	ordreSize[GET_CAM]=0;
+	ordreSize[GET_HOKUYO]=0;
 	//FINPARSE
 }

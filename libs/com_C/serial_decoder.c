@@ -12,8 +12,8 @@
 extern unsigned char ordreSize[MAX_ORDRES];
 
 void executeCmd(char serial_data){
-	static char ID_recu;
 	static char ID_attendu = 0;
+	static char ID_recu;
 	static unsigned char data[MAX_DATA];
 	static int data_counter = 0;
 	static bool doublon = false;
@@ -199,10 +199,15 @@ void sendInvalid() {//renvoit le code de message invalide (dépend de la platefo
 }
 
 void protocol_reset(){
-	while(serial_read() != (RESET_CONF | LOCAL_ADDR)){
-		serial_send(RESET | LOCAL_ADDR);
+	int reset = 0;
+	while (!reset) {
 		long t = timeMillis();
-		while (timeMillis() - t < 500);
+		serial_send(RESET | LOCAL_ADDR);
+		while (timeMillis() - t < 1000 && !reset) {
+			if (generic_serial_read() == (RESET_CONF | LOCAL_ADDR)) {
+				reset = 1;
+			}
+		}
 	}
 	PDEBUGLN("RESET");
 }

@@ -41,7 +41,7 @@ void loop(){
 	}
 	for(int i = 0; i < available; i++) {
 		// recuperer l'octet courant
-		char data = Serial.read();
+		char data = generic_serial_read();
 		executeCmd(data);
 	}
 	//Action asserv
