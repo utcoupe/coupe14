@@ -5,13 +5,13 @@
 		<name>Tirangle en haut à gauche</name>
 		<type>triangle</type>
 		<concerned_robot>ALL</concerned_robot>
-		<x>600</x>
-		<y>2000</y>
+		<x>900</x>
+		<y>1400</y>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x>400</x>
-				<y>0</y>
+				<x>800</x>
+				<y>1400</y>
 				<angle>0.0</angle>
 				<points>1</points>
 				<priority>1</priority>
@@ -20,9 +20,9 @@
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
-				<x>800</x>
-				<y>2000</y>
-				<angle>0.0</angle>
+				<x>1000</x>
+				<y>600</y>
+				<angle>1.55</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -35,13 +35,13 @@
 		<name>Tirangle en haut à droite</name>
 		<type>triangle</type>
 		<concerned_robot>ALL</concerned_robot>
-		<x>2000</x>
-		<y>2000</y>
+		<x>2100</x>
+		<y>1400</y>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x>1800</x>
-				<y>2000</y>
+				<x>2000</x>
+				<y>1400</y>
 				<angle>0.0</angle>
 				<points>1</points>
 				<priority>1</priority>
@@ -51,8 +51,8 @@
 			<elem_goal>
 				<id>1</id>
 				<x>2200</x>
-				<y>2000</y>
-				<angle>0.0</angle>
+				<y>1400</y>
+				<angle>1.55</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -62,46 +62,16 @@
 	</goal>
 	<goal>
 		<id>2</id>
-		<name>Tirangle en bas à gauche</name>
-		<type>triangle</type>
-		<concerned_robot>ALL</concerned_robot>
-		<x>600</x>
-		<y>200</y>
-		<elem_goals>
-			<elem_goal>
-				<id>0</id>
-				<x>400</x>
-				<y>200</y>
-				<angle>0.0</angle>
-				<points>1</points>
-				<priority>1</priority>
-				<duration>1</duration>
-				<id_script>0</id_script>
-			</elem_goal>
-			<elem_goal>
-				<id>1</id>
-				<x>800</x>
-				<y>200</y>
-				<angle>0.0</angle>
-				<points>1</points>
-				<priority>1</priority>
-				<duration>1</duration>
-				<id_script>0</id_script>
-			</elem_goal>
-		</elem_goals>
-	</goal>
-	<goal>
-		<id>3</id>
 		<name>Tirangle en bas à droite</name>
 		<type>triangle</type>
 		<concerned_robot>ALL</concerned_robot>
-		<x>2000</x>
-		<y>200</y>
+		<x>2100</x>
+		<y>400</y>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x>1800</x>
-				<y>200</y>
+				<x>2000</x>
+				<y>400</y>
 				<angle>0.0</angle>
 				<points>1</points>
 				<priority>1</priority>
@@ -111,8 +81,38 @@
 			<elem_goal>
 				<id>1</id>
 				<x>2200</x>
-				<y>200</y>
+				<y>400</y>
+				<angle>1.55</angle>
+				<points>1</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<id_script>0</id_script>
+			</elem_goal>
+		</elem_goals>
+	</goal>
+	<goal>
+		<id>3</id>
+		<name>Tirangle en bas à gauche</name>
+		<type>triangle</type>
+		<concerned_robot>ALL</concerned_robot>
+		<x>900</x>
+		<y>400</y>
+		<elem_goals>
+			<elem_goal>
+				<id>0</id>
+				<x>800</x>
+				<y>400</y>
 				<angle>0.0</angle>
+				<points>1</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<id_script>0</id_script>
+			</elem_goal>
+			<elem_goal>
+				<id>1</id>
+				<x>1000</x>
+				<y>400</y>
+				<angle>1.55</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
