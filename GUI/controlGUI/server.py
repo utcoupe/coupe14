@@ -32,7 +32,7 @@ def update():
 		data = ":".join(str(el) for el in ret[2])
 		print(data)
 		connection.send(bytes(data, 'utf-8'))
-		time.sleep(1)
+		time.sleep(0.1)
 
 
 while 1:
