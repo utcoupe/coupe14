@@ -17,7 +17,7 @@ initHokuyoUrg(char* device, double angleMin, double angleMax){
 
 	if(error < 0){
 		urg_close(urg);
-		fprintf(stderr, "%s%s :: %s\n", PREFIX, "connection failed on open", urg_error(urg));
+		fprintf(stderr, "%s%s :: %s on %s\n", PREFIX, "connection failed on open", urg_error(urg), device);
 		exit(EXIT_FAILURE);
 	}
 	
@@ -32,7 +32,7 @@ initHokuyoUrg(char* device, double angleMin, double angleMax){
 
 	if(error < 0){
 		urg_close(urg);
-		fprintf(stderr, "%s%s :: %s\n", "connection failed on starting", PREFIX, urg_error(urg));
+		fprintf(stderr, "%s%s :: %s on %s\n", "connection failed on starting", PREFIX, urg_error(urg), device);
 		exit(EXIT_FAILURE);
 	}
 	
@@ -52,6 +52,11 @@ resetHokuyoUrg(void* urg, double angleMin, double angleMax){
 		fprintf(stderr, "%s%s :: %s\n", "connection failed on restarting", PREFIX, urg_error((urg_t*)urg));
 		exit(EXIT_FAILURE);
 	}
+}
+
+void
+closeHokuyoUrg(void* urg){
+	urg_close((urg_t*)urg);
 }
 
 int

@@ -1,5 +1,5 @@
 DEBUG=yes
-SDL=yes
+SDL=no
 
 CC=gcc
 SRC_FILES=main.c fast_math.c hokuyoUrg.c lidar.c robot.c protocole_serial.c serial_switch.c serial_defines.c serial_decoder.c serial_types.c compat.c
@@ -10,7 +10,8 @@ LFLAGS=-Wall `urg_c-config --libs` -lm -pthread
 CFLAGS=-Wall `urg_c-config --cflags` -std=c99
 
 ifeq ($(DEBUG),yes)
-	CFLAGS += -D DEBUG -g
+	CFLAGS += -D DEBUG -g -pg
+	LFLAGS += -pg
 else
 	CFLAGS += -Werror
 	LFLAGS += -Werror

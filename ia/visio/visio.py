@@ -38,6 +38,7 @@ class Visio:
 		#Parameters
 		self.__updatePeriod = 0.001  # période d'attente entre deux demandes au client
 		self.__offset_coords = (0, 0)  # changement de repère
+		self.__retry_count = 0
 
 		self.__log = logging.getLogger(__name__)
 		self.path_exec = './' + path_exec
@@ -77,8 +78,18 @@ class Visio:
 
 		# On supprime le END
 		data = data[:-4]
-		# Maj des triangles
-		self.__updateTriFromStr(data)
+		if data == "ERROR\n":
+			if self.__retry_count < 3:
+				self.__retry_count += 1
+				self.__log.error("Erreur du CPP, retry : " + str(self.__retry_count))
+				self.update()
+			else:
+				self.__log.error("Erreur du CPP, cancel")
+				self._triangles = []
+		else:
+			# Maj des triangles
+			self.__updateTriFromStr(data)
+			self.__retry_count = 0
 		return self._triangles
 
 	def __updateTriFromStr(self, data):

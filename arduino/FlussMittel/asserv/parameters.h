@@ -58,11 +58,11 @@
 //CONSIGNE_REACHED est la pwm en dessous de laquelle un robot peut etre considéré comme arrêté à son goal
 #define CONSIGNE_REACHED 10
 
-#define ENC_RESOLUTION 500 //resolution du codeur
+#define ENC_RESOLUTION 1024 //resolution du codeur
 
-#define ENC_LEFT_RADIUS 34.0 //REGLE PAR TEST - rayon de la roue codeuse
-#define ENC_RIGHT_RADIUS 34.0 //REGLE PAR TEST - rayon de la roue codeuse
-#define ENTRAXE_ENC 259.8 //REGLE PAR TES - Distance entre chaque roue codeuse en mm
+#define ENC_LEFT_RADIUS 36.1 //REGLE PAR TEST - rayon de la roue codeuse
+#define ENC_RIGHT_RADIUS 36.1 //REGLE PAR TEST - rayon de la roue codeuse
+#define ENTRAXE_ENC 324.5 //REGLE PAR TES - Distance entre chaque roue codeuse en mm
 
 #define ERROR_ANGLE 0.05 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
 #define ERROR_POS 10 // erreur en position (mm)  maximale pour considérer l'objectif comme atteint
@@ -83,6 +83,16 @@
 #define DIS_I 0 //spd = I * I_dis(mm * s)
 #define DIS_D 0.5 //a regler par incrementation
 #define DIS_AWU 0
+
+//BLOCAGE
+//TIME_BLOCKED : période de vérification (ms)
+//MIN_DIST_BLOCKED : disatcne min a parcourir pour ne pas etre considere bloqué (mm)
+#define TIME_BLOCKED 100
+#define MIN_DIST_BLOCKED 1
+
+//PIN LED
+#define LED_MAINLOOP 22
+#define LED_BLOCKED 23
 
 //DEFINES ARDUINO
 #define PIN_ENC_RIGHT_A 21

@@ -17,7 +17,11 @@ Encoder::Encoder(int p_side){
 }
 
 long Encoder::getTicks(){
-	return ticks;
+	if (side == LEFT_SIDE) {
+		return -ticks;
+	}else {
+		return -ticks;
+	}
 }
 
 void Encoder::reset(){
@@ -41,113 +45,85 @@ int Encoder::getError(){
 #if ENCODER_EVAL == 4
 void Encoder::interruptA(){
 	bool new_value;
+	int pin_a;
 	if(side == LEFT_SIDE){
-		new_value = digitalRead(PIN_ENC_LEFT_A);
-		if(new_value == 1)
-			if(last_value_B == 1)
-				ticks--;
-			else
-				ticks++;
-	
-		else
-			if(last_value_B == 1)
-				ticks++;
-			else
-				ticks--;
+		pin_a = PIN_ENC_LEFT_A;
+	}else {
+		pin_a = PIN_ENC_RIGHT_A;
 	}
-	else{
-		new_value = digitalRead(PIN_ENC_RIGHT_A);
-		if(new_value == 1)
-			if(last_value_B == 1)
-				ticks++;
-			else
-				ticks--;
-
+	new_value = digitalRead(pin_a);
+	if(new_value == 1)
+		if(last_value_B == 1)
+			ticks--;
 		else
-			if(last_value_B == 1)
-				ticks--;
-			else
-				ticks++;
-	}
+			ticks++;
 
+	else
+		if(last_value_B == 1)
+			ticks++;
+		else
+			ticks--;
 	last_value_A = new_value;
 }
 
 void Encoder::interruptB(){
 	bool new_value;
+	int pin_b;
 	if(side == LEFT_SIDE){
-		new_value = digitalRead(PIN_ENC_LEFT_B);
-		if(new_value == 1)
-			if(last_value_A == 1)
-				ticks++;
-			else
-				ticks--;
-	
-		else
-			if(last_value_A == 1)
-				ticks--;
-			else
-				ticks++;
+		pin_b = PIN_ENC_LEFT_B;
+	}else {
+		pin_b = PIN_ENC_RIGHT_B;
 	}
-	else{
-		new_value = digitalRead(PIN_ENC_RIGHT_B);
-		if(new_value == 1)
-			if(last_value_A == 1)
-				ticks--;
-			else
-				ticks++;
-	
+	new_value = digitalRead(pin_b);
+	if(new_value == 1)
+		if(last_value_A == 1)
+			ticks++;
 		else
-			if(last_value_A == 1)
-				ticks++;
-			else
-				ticks--;
-	}
+			ticks--;
+
+	else
+		if(last_value_A == 1)
+			ticks--;
+		else
+			ticks++;
 
 	last_value_B = new_value;
 }
 #elif ENCODER_EVAL == 2
 void Encoder::interruptA(){
 	bool new_value;
+	int pin_a, pin_b;
 	if(side == LEFT_SIDE){
-		new_value = digitalRead(PIN_ENC_LEFT_A);
-		if(new_value == 1)
-			if(digitalRead(PIN_ENC_LEFT_B) == 1)
-				ticks--;
-			else
-				ticks++;
-		else
-			if(digitalRead(PIN_ENC_LEFT_B) == 1)
-				ticks++;
-			else
-				ticks--;
+		pin_a = PIN_ENC_LEFT_A;
+		pin_b = PIN_ENC_LEFT_B;
+	}else {
+		pin_a = PIN_ENC_RIGHT_A;
+		pin_b = PIN_ENC_RIGHT_B;
 	}
-	else{
-		new_value = digitalRead(PIN_ENC_RIGHT_A);
-		if(new_value == 1)
-			if(digitalRead(PIN_ENC_RIGHT_B) == 1)
-				ticks++;
-			else
-				ticks--;
-		else
-			if(digitalRead(PIN_ENC_RIGHT_B) == 1)
-				ticks--;
-			else
-				ticks++;
-	}
-}
-#elif ENCODER_EVAL == 1
-void Encoder::interruptA(){
-	if(side == LEFT_SIDE)
-		if(digitalRead(PIN_ENC_LEFT_B) == 1)
+	new_value = digitalRead(pin_a);
+	if(new_value == 1)
+		if(digitalRead(pin_b) == 1)
 			ticks--;
 		else
 			ticks++;
 	else
-		if(digitalRead(PIN_ENC_RIGHT_B) == 1)
+		if(digitalRead(pin_b) == 1)
 			ticks++;
 		else
 			ticks--;
+}
+#elif ENCODER_EVAL == 1
+void Encoder::interruptA(){
+	int pin_b;
+	if(side == LEFT_SIDE){
+		pin_b = PIN_ENC_LEFT_B;
+	}else {
+		pin_b = PIN_ENC_RIGHT_B;
+	}
+	if(digitalRead(pin_b) == 1)
+		ticks--;
+	else
+		ticks++;
 }
 #endif
 

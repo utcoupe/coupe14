@@ -22,6 +22,7 @@ class SubProcessCommunicate():
 		if self.__Data.Tibot is not None:
 			self.__subprocess_tibot = MyProcess(self.__Data, self.__Data.Tibot.getName())
 
+		time.sleep(0.1)
 		
 	def readOrders(self):
 		"""retourne les données des subprocess"""
@@ -64,32 +65,23 @@ class MyProcess():
 	def __init__(self, Data, robot_name):
 		self.__Data = Data
 		self.__logger = logging.getLogger(__name__.split('.')[0])
-		self.__input_buffer = deque()
 
 		self.__parent_conn, self.__child_conn = Pipe()
 		self.__process = Process(target=goals.startSubprocess, args=(self.__child_conn, robot_name) )
 		self.__process.start()
-
-		time.sleep(0.1)
-
-		self.__Pull_thread = threading.Thread(target=self.__readPipe)
-		self.__Pull_thread.start()
-		
-
-		
+	
 	def readPackets(self):
-		if self.__input_buffer:
-			new_data = self.__input_buffer
-			self.__input_buffer = deque()
-			return new_data
-		else:
-			return self.__input_buffer
+		new_data = deque()
+		try:
+			while self.__parent_conn.poll():
+				new_data.append(self.__parent_conn.recv())
+		except EOFError:
+			self.__logger.error("except EOFError sur recv()")
+
+		return new_data
 
 	def sendPacket(self, packet):
 		self.__parent_conn.send(packet)
 
-	def __readPipe(self):
-		while True:
-			a = self.__parent_conn.recv()
-			self.__input_buffer.append(a)
+		
 
