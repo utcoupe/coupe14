@@ -60,7 +60,7 @@ class GraphView(View):
 		print(event)
 		
 		start = time.time()
-		self.dynamic_obstacle.setPosition(event)
+		self.dynamic_obstacle["setPosition"] = event
 		self.graph.update(self.self_bot)
 		difference = (time.time() - start)
 		self.sum_update += difference

@@ -22,7 +22,7 @@ class OurBot():
 
 		self.largeur = largeur 
 		self.longueur = longueur
-		self.rayon = sqrt(self.largeur * self.largeur + self.longueur * self.longueur)
+		self.rayon = sqrt(self.largeur * self.largeur + self.longueur * self.longueur)/2
 
 
 		#Valeurs récupérées (read-only)
@@ -39,9 +39,15 @@ class OurBot():
 		self.__actions_en_cours = None
 		self.__last_id_objectif_executed = None
 
+		#Variable pour evenManager
+		self.__id_to_reach = "ANY"
+
 	#Getter
 	def getPosition(self):
 		return (self.__positionX, self.__positionY)
+		
+	def getPositionAndAngle(self):
+		return (self.__positionX, self.__positionY, self.__angle)
 
 	def getRayon(self):
 		return self.rayon
@@ -67,7 +73,6 @@ class OurBot():
 	def getTrajectoires(self):
 		data_trajectoires = ()
 		trajectoire = ((self.__positionX, self.__positionY),)
-
 
 		#Pour les actions en cours d'execution
 		id_action_en_cours = None
@@ -125,8 +130,14 @@ class OurBot():
 		
 		return self.__actions_en_cours
 
+	def getIdToReach(self):
+		return self.__id_to_reach
+
 	def __getNextIdToStack(self):
 		return self.__last_id_action_stacked.idIncrementation()
+
+	def setIdToReach(self, id):
+		self.__id_to_reach = id
 
 	def setLastIdObjectifExecuted(self, idd):
 		self.__last_id_objectif_executed = idd
@@ -135,18 +146,23 @@ class OurBot():
 		if address == 'ADDR_FLUSSMITTEL_OTHER' or address == 'ADDR_TIBOT_OTHER':
 			if idd != self.__last_id_executed_other:
 				self.__last_id_executed_other = idd
-				self.__logger.debug("changement d'id other " + str(idd))
+				self.__logger.debug(str(address)+" changement d'id other " + str(idd))
 		else:
 			if idd != self.__last_id_executed_asserv:
 				self.__last_id_executed_asserv = idd
-				self.__logger.debug("changement d'id asserv " + str(idd))
+				self.__logger.debug(str(address)+" changement d'id other " + str(idd))
 
 	#utilise les données en provenance de de l'asserv uniquement !
 	def setPositionAndId(self, address, arguments):
-		self.positionX = arguments[0]
-		self.positionY = arguments[1]
-		self.angle = arguments[2]
+		self.__positionX = arguments[0]
+		self.__positionY = arguments[1]
+		self.__angle = arguments[2]
 		self.setLastId(address, arguments[3])
+
+	def setPosition(self, x, y, angle):
+		self.__positionX = x
+		self.__positionY = y
+		self.__angle = angle
 
 	def addNewObjectif(self, id_objectif, action_data):
 		new_objectif = (id_objectif,)

@@ -26,12 +26,10 @@ class EventManager():
 		self.__last_hokuyo_data = None
 
 		self.__last_flussmittel_order_finished = ID_ACTION_MAX	#id_action
-		self.__id_to_reach_flussmittel = "ANY"
 		self.__sleep_time_flussmittel = 0
 		self.__resume_date_flussmittel = 0
 
 		self.__last_tibot_order_finished = ID_ACTION_MAX			#id_action
-		self.__id_to_reach_tibot = "ANY"
 		self.__sleep_time_tibot = 0
 		self.__resume_date_tibot = 0
 
@@ -83,19 +81,21 @@ class EventManager():
 				action_en_cours, objectif = robot.getQueuedObjectif()
 
 				if objectif:
-					last_objectif = objectif[-1]
+					last_id_objectif = objectif[-1][0]
 				elif action_en_cours:
-					last_objectif = action_en_cours
+					last_id_objectif = action_en_cours[0]
 				else:
-					last_objectif = robot.getLastIdObjectifExecuted()
+					last_id_objectif = robot.getLastIdObjectifExecuted()
 				
-				if last_objectif is not None:
-					if last_objectif[0] == id_prev_objectif:
+				if last_id_objectif is not None:
+					if last_id_objectif == id_prev_objectif:
 						robot.addNewObjectif(id_objectif, action_data)
 					else:
-						self.__logger.warning("On drop un nouvel ordre car il n'est pas à jour, id_prev_objectif: " + str(id_prev_objectif) + " last_objectif[0]: " + str(last_objectif[0]) + " action_data " + str(action_data))
+						self.__logger.warning(str(nom_robot)+" On drop un nouvel ordre car il n'est pas à jour, id_prev_objectif: " + str(id_prev_objectif) + " last_id_objectif: " + str(last_id_objectif) + " action_data " + str(action_data))
 				else:
 					robot.addNewObjectif(id_objectif, action_data)
+			else:
+				self.logger.error(str(nom_robot)+" on a reçu un ordre pour un robot qui n'existe pas")
 
 	def __checkEvent(self):
 		if self.__Tourelle is not None:
@@ -118,7 +118,7 @@ class EventManager():
 				self.__Flussmittel.removeActionBellow(new_id)
 
 			#si on est sur l'action bloquante
-			if self.__last_flussmittel_order_finished == self.__id_to_reach_flussmittel or self.__id_to_reach_flussmittel == "ANY":
+			if self.__last_flussmittel_order_finished == self.__Flussmittel.getIdToReach() or self.__Flussmittel.getIdToReach() == "ANY":
 				#Gestion des sleep
 				if self.__sleep_time_flussmittel > 0:
 					self.__resume_date_flussmittel = int(time.time()*1000) + self.__sleep_time_flussmittel
@@ -139,7 +139,7 @@ class EventManager():
 				self.__Tibot.removeActionBellow(new_id)
 
 			#si on est sur l'action bloquante
-			if self.__last_tibot_order_finished == self.__id_to_reach_tibot or self.__id_to_reach_tibot == "ANY":
+			if self.__last_tibot_order_finished == self.__Tibot.getIdToReach() or self.__Tibot.getIdToReach() == "ANY":
 				#Gestion des sleep
 				if self.__sleep_time_tibot > 0:
 					self.__resume_date_tibot = int(time.time()*1000) + self.__sleep_time_tibot
@@ -152,7 +152,7 @@ class EventManager():
 							self.__pushOrders(self.__Tibot, next_actions)
 
 	def __pushOrders(self, Objet, data): 
-		print(str(Objet.getName()) + " charge les actions: " + str(data))
+		print(str(Objet.getName()) + " charge les actions dans eventManager: " + str(data))
 		id_objectif = data[0]
 		data_action = data[1]#data_action est de type ((id_action, ordre, arguments),...)
 
@@ -160,9 +160,9 @@ class EventManager():
 		if data_action:
 			prev_last_order = data_action[-1]
 			if Objet is self.__Flussmittel:
-				self.__id_to_reach_flussmittel = prev_last_order[0]
+				self.__Flussmittel.setIdToReach(prev_last_order[0])
 			elif Objet is self.__Tibot:
-				self.__id_to_reach_tibot = prev_last_order[0]
+				self.__Tibot.setIdToReach(prev_last_order[0])
 			else:
 				self.__logger.error("Objet inconnu")
 
@@ -203,27 +203,29 @@ class EventManager():
 				else:
 					self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
 
-				self.__logger.debug("Envoi de l'ordre: " + str(action))
+				self.__logger.debug(str(address) + " envoi de l'ordre: " + str(action))
 
 
 	def __testCollision(self):
+
+		def checkSystem(system):
+			collision_data = self.__Collision.getCollision(system)
+			if collision_data is not None:
+				distance = collision_data[1]
+				if distance < self.__MetaData.getCollisionThreshold():
+					first_id_to_remove = collision_data[0]
+					id_canceled_list = system.removeObjectifAbove(first_id_to_remove)
+					self.__logger.info("On annule les ordres: " + str(id_canceled_list) + " pour causes de collision dans " + str(distance) + " mm")
+					empty_arg = []
+					self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
+					system.setIdToReach("ANY")
+					self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
+				else:
+					self.__logger.debug("On a detecté une collision dans "+str(distance)+" mm, mais on continue")
+		
 		if self.__Flussmittel is not None:
-			arg = []
-			collision_data = self.__Collision.getCollision(self.__Flussmittel)
-			if collision_data is not None:
-				first_id_to_remove = collision_data[0]
-				id_canceled_list = self.__Flussmittel.removeObjectifAbove(first_id_to_remove)
-				self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_CLEANG', *arg)
-				self.__id_to_reach_flussmittel = "ANY"
-				self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
-
+			checkSystem(self.__Flussmittel)
+		
 		if self.__Tibot is not None:
-			collision_data = self.__Collision.getCollision(self.__Tibot)
-			if collision_data is not None:
-				first_id_to_remove = collision_data[0]
-				id_canceled_list = self.__Tibot.removeObjectifAbove(first_id_to_remove)
-				self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_CLEANG', *arg)
-				self.__id_to_reach_tibot = "ANY"
-				self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
-
-
+			checkSystem(self.__Tibot)
+		

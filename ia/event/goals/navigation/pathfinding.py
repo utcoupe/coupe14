@@ -5,6 +5,9 @@ from geometry import Poly
 import logging
 import time
 
+import inspect, os
+base_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+
 class Path(list):
 	def __init__(self, list):
 		super().__init__(list)
@@ -15,7 +18,7 @@ class Path(list):
 		return dist
 
 class PathFinding:
-	def __init__(self, robot_list, xml_filename="event/goals/navigation/map.xml"):
+	def __init__(self, robot_list, xml_filename=base_dir+"/map.xml"):
 		self.__log = logging.getLogger(__name__)
 		self.__flussmittel, self.__tibot, self.__big_enemy_bot, self.__small_enemy_bot = robot_list
 		#on cree le navgraph
@@ -54,7 +57,7 @@ class PathFinding:
 
 	def update(self, robot):
 		start_time = time.time()
-		self.__ng.setOffset(robot.getRayon() + MARGE_PASSAGE_PATH)
+		self.__ng.setOffset(robot["getRayon"] + MARGE_PASSAGE_PATH)
 		self.__update_enemy_bot()
 		if self.__our_bot_count == 2:  #Si on a deux robots, il faut compte le deuxieme dans le pathfinding
 			self.__update_our_bot(robot)
@@ -77,33 +80,33 @@ class PathFinding:
 	def __update_our_bot(self, robot):  # fonciton appelée uniquement quand on a deux robots
 		"""Update le navgraph pour calculer une trajectoire pour le robot en paramètre"""
 		if robot is self.__our_bot:  # on met juste la position a jour
-			self.__other_bot_poly.move_to(self.__other_bot.getPosition())
+			self.__other_bot_poly.move_to(self.__other_bot["getPosition"])
 		else:  # il faut recreer un nouveau poly a la bonne taille
 			#swap des robots
 			self.__other_bot = self.__our_bot
 			self.__our_bot = robot
 			#nouveau poly
-			self.__other_bot_poly = Poly().initFromCircle(self.__other_bot.getPosition(), self.__other_bot.getRayon() + self.__our_bot.getRayon() + MARGE_PASSAGE_PATH, POINTS_PAR_CERCLE)
+			self.__other_bot_poly = Poly().initFromCircle(self.__other_bot["getPosition"], self.__other_bot["getRayon"] + self.__our_bot["getRayon"] + MARGE_PASSAGE_PATH, POINTS_PAR_CERCLE)
 			#maj navgraph
 			self.__ng.pop_dynamic_obstable()
 			self.__ng.add_dynamic_obstacle(self.__other_bot_poly)
 
 	def __update_enemy_bot(self):
 		if self.__big_enemy_bot is not None:
-			self.__big_enemy_poly.move_to(self.__big_enemy_bot.getPosition())
+			self.__big_enemy_poly.move_to(self.__big_enemy_bot["getPosition"])
 		if self.__small_enemy_bot is not None:
-			self.__small_enemy_poly.move_to(self.__small_enemy_bot.getPosition())
+			self.__small_enemy_poly.move_to(self.__small_enemy_bot["getPosition"])
 
 	def __init_enemy_bot(self):
 		if self.__big_enemy_bot is not None:
-			self.__big_enemy_poly = Poly().initFromCircle((-1000,-1000), self.__big_enemy_bot.getRayon() + self.__our_bot.getRayon() + MARGE_PASSAGE_PATH, POINTS_PAR_CERCLE)
+			self.__big_enemy_poly = Poly().initFromCircle((-1000,-1000), self.__big_enemy_bot["getRayon"] + self.__our_bot["getRayon"] + MARGE_PASSAGE_PATH, POINTS_PAR_CERCLE)
 			self.__ng.add_dynamic_obstacle(self.__big_enemy_poly)
 		if self.__small_enemy_bot is not None:
-			self.__small_enemy_poly = Poly().initFromCircle((-1000,-1000), self.__small_enemy_bot.getRayon() + self.__our_bot.getRayon() + MARGE_PASSAGE_PATH, POINTS_PAR_CERCLE)
+			self.__small_enemy_poly = Poly().initFromCircle((-1000,-1000), self.__small_enemy_bot["getRayon"] + self.__our_bot["getRayon"] + MARGE_PASSAGE_PATH, POINTS_PAR_CERCLE)
 			self.__ng.add_dynamic_obstacle(self.__small_enemy_poly)
 		self.__update_enemy_bot()
 
 	def __init_allied_bot(self):
 		if self.__our_bot_count == 2:
-			self.__other_bot_poly = Poly().initFromCircle(self.__other_bot.getPosition(), self.__other_bot.getRayon() + self.__our_bot.getRayon() + MARGE_PASSAGE_PATH, POINTS_PAR_CERCLE)
+			self.__other_bot_poly = Poly().initFromCircle(self.__other_bot["getPosition"], self.__other_bot["getRayon"] + self.__our_bot["getRayon"] + MARGE_PASSAGE_PATH, POINTS_PAR_CERCLE)
 			self.__ng.add_dynamic_obstacle(self.__other_bot_poly)

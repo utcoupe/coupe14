@@ -13,38 +13,16 @@
 #include "serial_switch.h"
 #include "serial_defines.h"
 #include "serial_types.h"
+#include "actions.h"
 
-extern Servo servoBras, servoRet;
+extern Servo servoRet;
 extern AF_DCMotor motor_ascenseur;
-
-void couper_asc () {
-	motor_ascenseur.setSpeed(0);
-}
-
 
 //La fonction renvoit le nombre d'octet dans ret, chaine de caractère de réponse. Si doublon, ne pas executer d'ordre mais renvoyer les données à renvoyer
 int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bool doublon){ 
 	static int last_id = 0;
 	int ret_size = 0;
 	switch(ordre){
-	case O_BRAS_OUVRIR:
-		if (!doublon) {
-			last_id = btoi(argv);
-			argv+=2;
-			//Execution des ordre
-			servoBras.write(10);			
-		}
-		//Formation et envoi d'une réponse
-		break;
-	case O_BRAS_FERMER:
-		if (!doublon) {
-			last_id = btoi(argv);
-			argv+=2;
-			//Execution des ordre
-			servoBras.write(170);			
-		}
-		//Formation et envoi d'une réponse
-		break;
 	case O_RET_OUVRIR:
 		if (!doublon) {
 			last_id = btoi(argv);
@@ -73,6 +51,15 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 			argv+=2;
 			motor_ascenseur.run(BACKWARD);
 			motor_ascenseur.setSpeed(255);
+		}
+		break;
+	case O_BRAS_DEPOT:
+		if (!doublon) {
+			last_id = btoi(argv);
+			double a = btoi(argv+2) / 100.0;
+			int l = btoi(argv+4);
+			int h = btoi(argv+6);
+			cmdBras(a, l, h, true);
 		}
 		break;
 	case GET_LAST_ID:
