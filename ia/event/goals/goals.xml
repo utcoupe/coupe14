@@ -16,12 +16,12 @@
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
-				<id_script>2000</id_script>
+				<id_script>0</id_script>
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
 				<x>1000</x>
-				<y>600</y>
+				<y>1400</y>
 				<angle>1.55</angle>
 				<points>1</points>
 				<priority>1</priority>

@@ -17,7 +17,9 @@ class SubProcessManager():
 		self.__robot_name = robot_name
 
 		self.__data = {}
-
+		while self.__data == {}:
+			self.readPipe(loop=False) #Normalement on ne peut pas recevoir over ni canaceled à ce stade
+		
 		self.__GoalsManager = GoalsManager(self, connection, robot_name)
 
 	def sendGoal(self, id_objectif_prev, id_objectif, elem_script):
@@ -26,8 +28,15 @@ class SubProcessManager():
 	def getData(self):
 		return self.__data
 
-	def readPipe(self):
-		while True:
+	def readPipe(self, loop):
+		if loop:
+			while True:
+				new_message = self.__connection.recv()
+				if new_message[0] == "data":
+					self.__updateData(new_message[1])
+				else:
+					self.__processStatus(new_message)
+		else:
 			new_message = self.__connection.recv()
 			if new_message[0] == "data":
 				self.__updateData(new_message[1])
@@ -50,4 +59,4 @@ class SubProcessManager():
 
 def startSubprocess(connection, robot_name):
 	a = SubProcessManager(connection, robot_name)
-	a.readPipe()
+	a.readPipe(loop=True)

@@ -9,7 +9,7 @@ import time
 
 from .constantes import *
 from .subProcessCommunicate import *
-from .navigation import *
+from .collision import *
 
 class EventManager():
 	def __init__(self, Communication, Data):
@@ -215,8 +215,6 @@ class EventManager():
 				id_canceled_list = self.__Flussmittel.removeObjectifAbove(first_id_to_remove)
 				self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_CLEANG', *arg)
 				self.__id_to_reach_flussmittel = "ANY"
-				print(collision_data)
-				print(id_canceled_list)
 				self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
 
 		if self.__Tibot is not None:

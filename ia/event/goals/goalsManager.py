@@ -9,11 +9,12 @@ import heapq
 import logging
 from xml.dom.minidom import parseString
 from collections import deque
+import os
 
 from .goal import *
 from .goalExecution import *
 from .ElemGoal import *
-import os
+from .navigation import *
 
 
 
@@ -27,7 +28,10 @@ class GoalsManager:
 		self.__finished_goals		= [] #List of finished goals
 		self.__elem_script			= {}
 		self.__SubProcessManager 	= SubProcessManager
-		self.__last_id_objectif_send = 0
+		self.__last_id_objectif_send= 0
+
+		data = self.__SubProcessManager.getData() #pas de self, data n'est pas stocké ici !
+		#self.__PathFinding = PathFinding((data["FLUSSMITTEL"], data["TIBOT"], data["BIGENEMYBOT"], data["SMALLENEMYBOT"]))
 
 		self.__loadElemScript("elemScripts.xml")
 		self.__loadGoals("goals.xml")
@@ -45,12 +49,37 @@ class GoalsManager:
 			if objectif.getId() == id_objectif:
 				self.__releaseGoal(objectif)
 
-	def __addGoal(self, goal, elem_goal_id):
+	def __addGoal(self, tuple_trajectoire_list, goal, elem_goal_id, prev_action=deque()):
+		"""Méthode pour l'ajout d'un ordre dans la file du robot, la trajectoire envoyé ne doit pas contenir le point d'entrée"""
 		if self.__tryBlockGoal(goal):
-			self.__SubProcessManager.sendGoal(self.__last_id_objectif_send, goal.getId(), self.__elem_script[ goal.getElemGoal(elem_goal_id).getIdScript() ])
+			#on met les prev_action, ce sont des hack pour faire passer le robot d'une action à l'autre avec un trajectoire prédeterminé
+			orders = prev_action
+			#on ajoute la trajectoire calculé
+			orders.extend(self.__tupleTrajectoireToDeque(tuple_trajectoire_list))
+			
+			#on ajoute le point d'entré de l'objectif
+			position = goal.getElemGoal(elem_goal_id).getPosition()
+			got_to_position_finale = deque()
+			got_to_position_finale.append(("A_GOTO", (position[0], position[1])))
+			got_to_position_finale.append(("A_ROT", (position[2],)))
+			orders.extend(got_to_position_finale)
+
+			#on ajoute le script d'action
+			orders.extend(self.__elem_script[ goal.getElemGoal(elem_goal_id).getIdScript() ])
+			#on envoi le tout
+			self.__SubProcessManager.sendGoal(self.__last_id_objectif_send, goal.getId(), orders)
+			
 			self.__last_id_objectif_send = goal.getId()
 		else:
-			self.__logger.error('Impossible to block ' + goal.getName())
+			self.__logger.error('Unable to block ' + goal.getName())
+
+	def __tupleTrajectoireToDeque(self, tuple_trajectoire_list):
+		order_list = deque()
+
+		for tuple in tuple_trajectoire_list:
+			order_list.append(('A_GOTO', [tuple[0], tuple[1]]))
+
+		return order_list
 
 	def __blockGoalFromId(self, id_objectif):
 		"""utilisé uniquement au chargement du script initial"""
@@ -150,11 +179,18 @@ class GoalsManager:
 			id_objectif	= int(xml_goal.getElementsByTagName('id_objectif')[0].firstChild.nodeValue)
 			elem_goal_id= int(xml_goal.getElementsByTagName('elem_goal_id')[0].firstChild.nodeValue)
 
+			prev_action = deque()
+			for raw_prev_action in xml_goal.getElementsByTagName('prev_action'):
+				raw_order = raw_prev_action.childNodes[0].nodeValue.split()
+				order = raw_order[0]
+				arguments = raw_order[1:]
+				prev_action.append((order, arguments))
+
 			find = False
 			for goal in self.__available_goals:
 				if goal.getId() == id_objectif:
 					find = True
-					self.__addGoal(goal, elem_goal_id)
+					self.__addGoal((), goal, elem_goal_id, prev_action=prev_action)
 					break
 
 			if not find:

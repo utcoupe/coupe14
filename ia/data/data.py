@@ -46,36 +46,40 @@ class Data():
 
 		if self.Flussmittel is not None:
 			system = self.Flussmittel
-			data["Flussmittel"] = {}
-			data["Flussmittel"]["getPositon"] = system.getPosition()
+			data["FLUSSMITTEL"] = {}
+			data["FLUSSMITTEL"]["getPositon"] = system.getPosition()
+			data["FLUSSMITTEL"]["getRayon"] = system.getRayon()
 		else:
-			data["Flussmittel"] = None
+			data["FLUSSMITTEL"] = None
 
 		if self.Tibot is not None:
 			system = self.Tibot
-			data["Tibot"] = {}
-			data["Tibot"]["getPositon"] = system.getPosition()
+			data["TIBOT"] = {}
+			data["TIBOT"]["getPositon"] = system.getPosition()
+			data["TIBOT"]["getRayon"] = system.getRayon()
 		else:
-			data["Tibot"] = None
+			data["TIBOT"] = None
 
 		if self.Tourelle is not None:
 			system = self.Tourelle
-			data["Tourelle"] = {}
+			data["TOURELLE"] = {}
 		else:
-			data["Tourelle"] = None
-
-		if self.SmallEnemyBot is not None:
-			system = self.SmallEnemyBot
-			data["SmallEnemyBot"] = {}
-			data["SmallEnemyBot"]["getPositon"] = system.getPosition()
-		else:
-			data["SmallEnemyBot"] = None
+			data["TOURELLE"] = None
 
 		if self.BigEnemyBot is not None:
 			system = self.BigEnemyBot
-			data["BigEnemyBot"] = {}
-			data["BigEnemyBot"]["getPositon"] = system.getPosition()
+			data["BIGENEMYBOT"] = {}
+			data["BIGENEMYBOT"]["getPositon"] = system.getPosition()
+			data["BIGENEMYBOT"]["getRayon"] = system.getRayon()
 		else:
-			data["BigEnemyBot"] = None
+			data["BIGENEMYBOT"] = None
+
+		if self.SmallEnemyBot is not None:
+			system = self.SmallEnemyBot
+			data["SMALLENEMYBOT"] = {}
+			data["SMALLENEMYBOT"]["getPositon"] = system.getPosition()
+			data["SMALLENEMYBOT"]["getRayon"] = system.getRayon()
+		else:
+			data["SMALLENEMYBOT"] = None
 
 		return data
