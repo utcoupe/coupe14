@@ -60,18 +60,18 @@ def startIa(pipe=None, ia_color="RED"):
 	if TEST_MODE == False and ENABLE_FLUSSMITTEL == True:
 		Gpio = gpio.Gpio()
 		data.parametrerHokuyo()
-		data.parametrerIa(Data.MetaData, Gpio.getColor)
+		data.parametrerIa(Data.MetaData, ia_color)
 	else:
 		data.parametrerHokuyo()
-		data.parametrerIa(Data.MetaData, ia_color)
+		data.parametrerIa(Data.MetaData, ia_color)#TODO, remove ia_color
 
 	TimeManager = event.TimeManager(Communication, Data)
 	EventManager = event.EventManager(Communication, Data)
 
 
-
+	TimeManager.startMatch()#TODO, remove
 	if TEST_MODE == False and ENABLE_FLUSSMITTEL == True:
-		while Gpio.getJack() != True: #TODO à verifier
+		while Gpio.getJack() != 1: #TODO à verifier
 			pass
 	TimeManager.startMatch()
 

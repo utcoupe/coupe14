@@ -4,15 +4,15 @@ Ce fichier regroupe toutes les constantes de l'IA
 """
 
 
-TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
 
 #====================Enable====================
-ENABLE_TOURELLE = 		True 
+ENABLE_TOURELLE = 		False 
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
-ENABLE_TIBOT = 			True
+ENABLE_TIBOT = 			False
 
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
@@ -72,7 +72,7 @@ SEUIL_JAUNE = 			100 #TODO
 POINTS_PAR_CERCLE = 	8
 MARGE_PASSAGE_PATH = 	0
 MARGE_COLLISION =		-20
-COLLISION_THRESHOLD =	200
+COLLISION_THRESHOLD =	300
 
 
 #=======================================Systemes physiques========================================
