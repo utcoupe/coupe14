@@ -48,9 +48,9 @@ class SubProcessCommunicate():
 
 	def sendObjectifGotoOver(self, id_objectif):
 		if self.__Data.Flussmittel is not None:
-			self.__subprocess_flussmittel.sendPacket(("END_GOTO", id_objectif))
+			self.__subprocess_flussmittel.sendPacket(("GOTO_OVER", id_objectif))
 		if self.__Data.Tibot is not None:
-			self.__subprocess_tibot.sendPacket(("END_GOTO", id_objectif))
+			self.__subprocess_tibot.sendPacket(("GOTO_OVER", id_objectif))
 
 	def sendObjectifsCanceled(self, id_canceled_list):
 		if self.__Data.Flussmittel is not None:

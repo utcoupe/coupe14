@@ -14,7 +14,7 @@ class GUI:
 		self.others_addr = '1'
 		self.asserv_addr = '2'
 
-		self.serverHost = '192.168.2.2'
+		self.serverHost = '10.42.0.52'
 		self.serverPort = 2001
 
 		#init comm
@@ -60,6 +60,14 @@ class GUI:
 		self.send_gotoa = Button(self.goto_frame, text="Gotoa", command=self.gotoa_handler).pack(side='right')
 
 
+		#pwm menu
+		self.pwm_text = Label(self.fen, text= "PWM")
+		self.pwm_g = Entry(self.fen)
+		self.pwm_d = Entry(self.fen)
+		self.pwm_duration = Entry(self.fen)
+		self.pwm_frame = Frame()
+		self.send_pwm = Button(self.pwm_frame, text="Send pwm", command=self.pwm_handler).pack(side='left')
+
 		#reglages
 		self.pida_text = Label(self.fen, text="PID angle")
 		self.pida_p = Entry(self.fen)
@@ -97,6 +105,12 @@ class GUI:
 		self.gotoy_e.pack()
 		self.gotoang.pack()
 		self.goto_frame.pack()
+
+		self.pwm_text.pack()
+		self.pwm_g.pack()
+		self.pwm_d.pack()
+		self.pwm_duration.pack()
+		self.pwm_frame.pack()
 
 		self.send_reg.pack(side='bottom')
 		self.pidd_d.pack(side='bottom')
@@ -192,6 +206,19 @@ class GUI:
 		arguments = [str(gotox), str(gotoy), str(gotoa)]
 		tosend = ':'.join([self.asserv_addr, 'A_GOTOA'] + arguments) + '!'
 		self.sock.send(bytes(tosend, 'utf-8'))               # send the data
+
+	def sendPwm(self, g, d, duration):
+		self.chaine.configure(text = "Gotoa : "+str(g)+" ; "+str(d)+" ; "+str(duration))
+		#ENVOYER DATA PROTOCOLE
+		if self.fifo_switch.get() == 0:#on clean la file a chaque nouvel ordre
+			self.sock.send(bytes(self.asserv_addr +':A_CLEANG!', 'utf-8'))
+
+		arguments = [str(g), str(d), str(duration)]
+		tosend = ':'.join([self.asserv_addr, 'A_PWM'] + arguments) + '!'
+		self.sock.send(bytes(tosend, 'utf-8'))               # send the data
+
+	def pwm_handler(self):
+		self.sendPwm(self.pwm_g, self.pwm_d, self.pwm_duration)
 
 	def goto_handler(self):
 		self.goto(self.gotox_e.get(), self.gotoy_e.get())

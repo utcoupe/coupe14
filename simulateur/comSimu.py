@@ -240,10 +240,9 @@ class Communication():
 		"""
 		Parse l'ordre envoyé à ADDR_HOKUYO
 		"""
-		if(order == GET_HOKUYO):
+		if(order == "GET_HOKUYO"):
 			data = tuple(self.__hokuyo.getHokuyo())
-			data_to_ret = (args[0],)
-			data_to_ret += data
+			data_to_ret = data
 			self.__addOrder("ADDR_HOKUYO", order, data_to_ret)
 
 	def __addOrder(self, addr, ordre, args):
