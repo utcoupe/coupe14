@@ -16,9 +16,9 @@ PARITY_OTHER = 			"NONE"
 MAX_UNCONFIRMED_PACKET =5 # maximum 32
 EMPTY_FIFO = 			True
 TIMEOUT = 				100
-HIGH_PRIO_SPEED = 		15 #période d'execution en ms
-LOW_PRIO_SPEED = 		1000 #période d'execution en ms
-KEEP_CONTACT_TIMEOUT = 	2000
+HIGH_PRIO_SPEED = 		2 #période d'execution en ms
+LOW_PRIO_SPEED = 		400 #période d'execution en ms
+KEEP_CONTACT_TIMEOUT = 	1500
 OFF_LIGNE_TIMEOUT = 	5000
 
 #Systèmes arretable:
@@ -37,7 +37,7 @@ renvoiImmediat = 		False # fonction non terminé, ne pas activer !
 NUMBER_OF_ENEMY = 		2
 
 #====================eventManager====================
-PERIODE_EVENT_MANAGER =	50
+PERIODE_EVENT_MANAGER =	20
 ID_ACTION_MAX =			29999
 
 #====================timeManager====================
@@ -45,19 +45,26 @@ PERIODE_TIME_MANAGER =	100
 END_OF_MATCH = 			89500
 BEGIN_FUNNY_ACTION =	90000
 END_OF_FUNNY_ACTION = 	94000
+BEGIN_CHECK_COLLISION =	3000 #TODO
+
+#====================Goal====================
+FINISHED_THRESHOLD = 50
+
 
 #====================tourelle====================
-ENABLE_TOURELLE = 		False #permet de deactiver la tourelle
+ENABLE_TOURELLE = 		False 		#permet de desactiver la tourelle
+OUR_ROBOTS_VISIBLE_TOURELLE = True 	#True si une balise visible par l'hokuyo est presente sur nos robots 
+TOURELLE_PULL_PERIODE = 100 		#ms
 
 #====================pullData====================
-PULL_PERIODE = 			50 #période des pull en ms
+PULL_PERIODE = 			10 #période des pull en ms
 
 #====================CAMERA====================
 SEUIL_ROUGE = 			100 #TODO
 SEUIL_JAUNE = 			100 #TODO
 
 #====================Flussmittel====================
-ENABLE_FLUSSMITTEL = 	False #permet de deactiver Flussmitel
+ENABLE_FLUSSMITTEL = 	False #permet de desactiver Flussmitel
 LARGEUR_FLUSSMITTEL = 	100
 LONGUEUR_FLUSSMITTEL = 	100
 
@@ -65,12 +72,8 @@ LONGUEUR_FLUSSMITTEL = 	100
 
 
 
-
-
-
-
 #====================TIBOT====================
-ENABLE_TIBOT = 			True #permet de deactiver un Tibot
+ENABLE_TIBOT = 			True #permet de desactiver un Tibot
 LARGEUR_TIBOT = 		100
 LONGUEUR_TIBOT = 		100
 
