@@ -2,6 +2,11 @@
 
 import sys
 sys.path.append('../../ia/')
+import logging
+import os
+
+logging.basicConfig(filename=os.path.join(os.path.dirname(os.path.abspath(__file__)), "log.log"), filemode='w', level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__.split('.')[0])
 
 import communication
 from socket import *
@@ -17,7 +22,6 @@ sock = socket(AF_INET, SOCK_STREAM)    # create a TCP socket
 sock.bind((myHost, myPort))            # bind it to the server port
 sock.listen(5)                         # allow 5 simultaneous
 
-
 def update():
 	if len(sys.argv) == 2:
 		addr = sys.argv[1]
@@ -28,7 +32,8 @@ def update():
 		com.sendOrderAPI(addr, 'A_GET_POS')
 		ret = -1
 		while ret == -1:
-			ret = com.readOrdersAPI(addr)
+			ret = com.readOrdersAPI()
+			time.sleep(0.01)
 		data = ":".join(str(el) for el in ret[2])
 		print(data)
 		connection.send(bytes(data, 'utf-8'))
