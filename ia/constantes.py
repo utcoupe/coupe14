@@ -17,8 +17,8 @@ PARITY_OTHER = 			"NONE"
 #constantes réglables:
 MAX_UNCONFIRMED_PACKET =5 # maximum 32
 EMPTY_FIFO = 			True
-TIMEOUT = 				100
-HIGH_PRIO_SPEED = 		30 #période d'execution en ms
+TIMEOUT = 				75
+HIGH_PRIO_SPEED = 		7 #période d'execution en ms
 LOW_PRIO_SPEED = 		1000 #période d'execution en ms
 KEEP_CONTACT_TIMEOUT = 	1000
 OFF_LIGNE_TIMEOUT = 	5000
@@ -46,7 +46,7 @@ NUMBER_OF_ENEMY = 		2
 ENABLE_TOURELLE = 		False #permet de deactiver la tourelle
 
 #====================pullData====================
-PULL_PERIODE = 			50 #période des pull en ms
+PULL_PERIODE = 			100 #période des pull en ms
 
 #====================CAMERA====================
 SEUIL_ROUGE = 			100 #TODO
@@ -67,7 +67,7 @@ RAYON_FLUSSMITTEL = 	math.sqrt(LARGEUR_FLUSSMITTEL * LARGEUR_FLUSSMITTEL + LONGU
 
 
 #====================TIBOT====================
-ENABLE_TIBOT = 			False #permet de deactiver un Tibot
+ENABLE_TIBOT = 			True #permet de deactiver un Tibot
 LARGEUR_TIBOT = 		100
 LONGUEUR_TIBOT = 		100
 RAYON_TIBOT = 			math.sqrt(LARGEUR_TIBOT * LARGEUR_TIBOT + LONGUEUR_TIBOT * LONGUEUR_TIBOT) 
