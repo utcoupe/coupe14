@@ -18,6 +18,10 @@ class EnemyBot():
 
 	def getPosition(self):
 		return (self.__positionX, self.__positionY)
+
 	def getRayon(self):
 		return self.__rayon
 
+	def setPosition(self, position):
+		self.__positionX = position.x
+		self.__positionY = position.y

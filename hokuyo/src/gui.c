@@ -25,10 +25,17 @@ SDL_Rect
 getPixelCoord(int x, int y){
 	SDL_Rect p;
 	p.x = (BORDER_PADDING+(float)x) * GUI_WINDOW_RESOLUTION_X / GUI_WINDOW_REAL_SIZE_X;
-	p.y = (BORDER_PADDING+(float)y) * GUI_WINDOW_RESOLUTION_Y / GUI_WINDOW_REAL_SIZE_Y;
+	p.y = GUI_WINDOW_RESOLUTION_Y - ((BORDER_PADDING+(float)y) * GUI_WINDOW_RESOLUTION_Y / GUI_WINDOW_REAL_SIZE_Y);
 	return p;
 }
 
+SDL_Rect
+getPixelCoordWithSize(int x, int y, int sx, int sy){
+	SDL_Rect p;
+	p.x = (BORDER_PADDING+(float)(x)) * GUI_WINDOW_RESOLUTION_X / GUI_WINDOW_REAL_SIZE_X;
+	p.y = GUI_WINDOW_RESOLUTION_Y - ((BORDER_PADDING+(float)(y+sy)) * GUI_WINDOW_RESOLUTION_Y / GUI_WINDOW_REAL_SIZE_Y);
+	return p;
+}
 
 
 struct color newColor(int r, int g, int b){
@@ -47,14 +54,14 @@ initSDL(struct coord positionLidar){
 
 	gui.terrain = SDL_CreateRGBSurface(SDL_HWSURFACE, GUI_TERRAIN_SIZE_X, GUI_TERRAIN_SIZE_Y, 32, 0, 0, 0, 0);
 	SDL_FillRect(gui.terrain, NULL, SDL_MapRGB(gui.ecran->format, 200, 255, 200));
-	gui.posTerrain = getPixelCoord(0, 0);
+	gui.posTerrain = getPixelCoordWithSize(0, 0, TAILLE_TABLE_X, TAILLE_TABLE_Y);
 
 	gui.robot = SDL_CreateRGBSurface(SDL_HWSURFACE, GUI_ROBOT_SIZE, GUI_ROBOT_SIZE, 32, 0, 0, 0, 0);
 	SDL_FillRect(gui.robot, NULL, SDL_MapRGB(gui.ecran->format, 0, 0, 0));
 
 	gui.marker = SDL_CreateRGBSurface(SDL_HWSURFACE, GUI_MARKER_SIZE_X, GUI_MARKER_SIZE_Y, 32, 0, 0, 0, 0);
 	SDL_FillRect(gui.marker, NULL, SDL_MapRGB(gui.ecran->format, 0, 255, 0));
-	gui.posMarker = getPixelCoord(MARKER_R_POS_X-MARKER_SIZE/2, MARKER_R_POS_Y-MARKER_SIZE/2);
+	gui.posMarker = getPixelCoordWithSize(MARKER_R_POS_X-MARKER_SIZE/2, MARKER_R_POS_Y-MARKER_SIZE/2, MARKER_SIZE, MARKER_SIZE);
 
 	gui.lidar = SDL_CreateRGBSurface(SDL_HWSURFACE, GUI_LIDAR_SIZE_X, GUI_LIDAR_SIZE_Y, 32, 0, 0, 0, 0);
 	gui.point = SDL_CreateRGBSurface(SDL_HWSURFACE, GUI_POINT_SIZE, GUI_POINT_SIZE, 32, 0, 0, 0, 0);
@@ -71,7 +78,7 @@ blitMap(struct coord positionLidar){
 
 void
 blitLidar(struct coord positionLidar, struct color c){
-	SDL_Rect p = getPixelCoord(positionLidar.x-LIDAR_SIZE/2, positionLidar.y-LIDAR_SIZE/2);
+	SDL_Rect p = getPixelCoord(positionLidar.x-LIDAR_SIZE/2, positionLidar.y+LIDAR_SIZE/2);
 	SDL_FillRect(gui.lidar, NULL, SDL_MapRGB(gui.ecran->format, c.r, c.g, c.b));
 	SDL_BlitSurface(gui.lidar, NULL, gui.ecran, &p);
 }
@@ -79,7 +86,7 @@ blitLidar(struct coord positionLidar, struct color c){
 void
 blitRobots(struct coord *robots, int nRobots){
 	for(int i=0; i<nRobots; i++){
-		SDL_Rect p = getPixelCoord(robots[i].x-GUI_ROBOT_SIZE/2, robots[i].y-GUI_ROBOT_SIZE/2);
+		SDL_Rect p = getPixelCoord(robots[i].x-GUI_ROBOT_SIZE/2, robots[i].y+GUI_ROBOT_SIZE/2);
 		SDL_BlitSurface(gui.robot, NULL, gui.ecran, &p );
 	}
 }

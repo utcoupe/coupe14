@@ -54,6 +54,7 @@ class Control{
 
 	//Get ID
 	int getLastFinishedId();
+	void resetLastFinishedId();
 
 	private:
 	RobotState robot;
@@ -63,7 +64,7 @@ class Control{
 	//interface avec les PIDs
 	void setConsigne(float consigne_left, float consigne_right); //controles puis modification (renvoie l'overflow)
 	void check_acc(float *consigne, float last);
-	void check_max(float *consigne);
+	void check_max(float *consigne, float max = CONSIGNE_RANGE_MAX);
 	void controlAngle(float goal_angle); //goal en radians
 	void controlPos(float e_angle, float e_dist); //goal en mm
 

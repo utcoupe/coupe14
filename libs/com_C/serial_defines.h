@@ -59,6 +59,7 @@ enum ordre {
 	A_ACCMAX,	//@float
 	A_RESET_POS,
 	A_GET_POS,	//#int #int #float
+	A_GET_POS_ID,	//#int #int #float #int
 
 	O_BRAS_OUVRIR, //@int
 	O_BRAS_FERMER, //@int
@@ -68,8 +69,10 @@ enum ordre {
 	O_BAISSER_ASC, //@int
 
 	GET_CAM,	//#int #int
-	GET_HOKUYO,	//#int #int #int #int #int #int #int #int #long
+	GET_HOKUYO,	//#long #int #int #int #int #int #int #int #int
 	GET_LAST_ID, //#int
+
+	RESET_ID,
 	ORDRE_NON_PARSE
 	//FINPARSE
 };

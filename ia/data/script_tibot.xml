@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+<objectifs>
+	<objectif objectif_name='Sortir de la zone de depart'>
+		<idd>0</idd>
+		<actions>
+			<action>
+				<ordre>SLEEP</ordre>
+				<arguments>5000</arguments>
+			</action>
+			<action>
+				<ordre>SLEEP</ordre>
+				<arguments>1000</arguments>
+			</action>
+			<action>
+				<ordre>END</ordre>
+				<arguments></arguments>
+			</action>
+		</actions>
+	</objectif>
+	<objectif objectif_name='Prendre position'>
+		<idd>1</idd>
+		<actions>
+			<action>
+				<ordre>SLEEP</ordre>
+				<arguments>5000</arguments>
+			</action>
+			<action>
+				<ordre>A_GOTO</ordre>
+				<arguments>0,0</arguments>
+			</action>
+			<action>
+				<ordre>A_GOTO</ordre>
+				<arguments>0,0</arguments>
+			</action>
+			<action>
+				<ordre>SLEEP</ordre>
+				<arguments>10000</arguments>
+			</action>
+			<action>
+				<ordre>A_GOTO</ordre>
+				<arguments>0,0</arguments>
+			</action>
+			<action>
+				<ordre>END</ordre>
+				<arguments></arguments>
+			</action>
+		</actions>
+	</objectif>
+</objectifs>

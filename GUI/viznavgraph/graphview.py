@@ -10,6 +10,7 @@ class GraphView(View):
 		View.__init__(self)
 
 		self.self_bot = self_bot
+		self.dynamic_obstacle = dynamic_obstacle
 		self.graph = graph
 
 		self.p_depart = (200,200)
@@ -18,9 +19,7 @@ class GraphView(View):
 		self.draw_polygons(graph.getPolygons())
 
 		self.id_raw_path = None
-		self.id_smooth_path = None
-
-		self.dynamic_obstacle = dynamic_obstacle
+		self.id_path = None
 		
 		## bindings
 		self.canvas.bind('<Button-1>',self.onLeft)
@@ -30,10 +29,19 @@ class GraphView(View):
 		self.canvas.bind('<Button-2>',self.onWheel)
 		self.canvas.bind('<B2-Motion>',self.onWheel)
 
+		self.bind_all('m', self.switchPathType)
+
 		self.sum_calc_times = 0
 		self.nb_calc_times = 0
 		self.sum_update = 0
 		self.nb_update = 0
+
+		self.path_type = True  # True = smooth
+
+	def switchPathType(self, args):
+		self.path_type = not self.path_type
+		print('Smooth_path status : ' + str(self.path_type))
+		self.calc_path()
 	
 	def onLeft(self, event):
 		event = self.event_to_x_y(event)
@@ -44,7 +52,7 @@ class GraphView(View):
 	def onRight(self, event):
 		event = self.event_to_x_y(event)
 		print(event)
-		self.p_depart =  event
+		self.p_depart = event
 		self.calc_path()
 
 	def onWheel(self, event):
@@ -68,18 +76,23 @@ class GraphView(View):
 
 	def calc_path(self):
 		start = time.time()
-		smooth_path = self.graph.getPath(self.p_depart,self.p_arrive)
+		path = self.graph.getPath(self.p_depart,self.p_arrive, self.path_type)
 		difference = (time.time() - start)
 		self.sum_calc_times += difference
 		self.nb_calc_times += 1
 		print("pathfinding computing time : %s (moy=%s)" % (difference,self.sum_calc_times/self.nb_calc_times))
-		print("path : "+str(smooth_path))
+		print("path : "+str(path))
 
-		self.show_result_calc_path(smooth_path)
+		self.show_result_calc_path(path)
+		print("Longueur : " + str(path.getDist()))
 		
-		return smooth_path
+		return path
 
-	def show_result_calc_path(self, smooth_path):
-		self.remove(self.id_smooth_path)
-		if smooth_path:
-			self.id_smooth_path = self.draw_line(smooth_path, 'blue')
+	def show_result_calc_path(self, path):
+		self.remove(self.id_path)
+		if self.path_type:  #smooth
+			color = 'red'
+		else:
+			color = 'blue'
+		if path:
+			self.id_path = self.draw_line(path, color)
