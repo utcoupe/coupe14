@@ -16,7 +16,8 @@ class subProcessManager():
 	def __init__(self, connection, robot_name):
 		self.__logger = logging.getLogger(__name__.split('.')[0])
 		self.__connection = connection
-		if robot_name == "Flussmittel":
+		self.__robot_name = robot_name
+		if self.__robot_name == 'FLUSSMITTEL':
 			self.__script_filename = "data/script_flussmittel.xml"
 		else:
 			self.__script_filename = "data/script_tibot.xml"
@@ -60,7 +61,7 @@ class subProcessManager():
 				ordre += arguments
 				data_objectif.append(ordre)
 
-			objectif.append(("TIBOT", 0, id_objectif, data_objectif))#TODO
+			objectif.append((self.__robot_name, 0, id_objectif, data_objectif))
 
 		
 		self.__logger.debug("Script chargé: " + str(objectif))
