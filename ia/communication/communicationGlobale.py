@@ -79,8 +79,8 @@ class communicationGlobale():
 				if self.renvoieOrdre == True:
 					for address in self.address:
 						if isinstance(address, (int)):
-							if self.lastConfirmationDate[address] != -1 and self.lastSendDate != -1 and (self.lastSendDate[address] - self.lastConfirmationDate[address] > 200) :#si il reste un ordre non confirmé en moins de 500 ms
-								self.lastConfirmationDate = actualDate
+							if self.lastConfirmationDate[address] != -1 and self.lastSendDate != -1 and (actualDate - self.lastConfirmationDate[address] > 200) :#si il reste un ordre non confirmé en moins de 500 ms
+								self.lastConfirmationDate[address] = actualDate
 								indiceARenvoyer = self.getAllUnknowledgeId(address)
 								for indice in indiceARenvoyer:
 									print "WARNING: Renvoie de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "au robot ", self.address[address]
