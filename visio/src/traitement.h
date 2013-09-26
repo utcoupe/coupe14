@@ -1,6 +1,5 @@
 // Visio UTCoupe 2014
 // Par Quentin CHATEAU
-// Derniere edition le 04/12/13
 
 #ifndef TRAITEMENT_H
 #define TRAITEMENT_H
