@@ -31,15 +31,18 @@ int main(int argc, char **argv){
 		v_yellow_tol = atoi(argv[3]);
 	}
 #else
-	//if(argc >= 2)
-	//	mask_name = argv[1];
+	if(argc >= 2)
+		mask_name = argv[1];
 #endif
 
 	// Capture vidéo
 	CvCapture *capture=NULL;
 	IplImage *image=NULL, *mask_red=NULL, *mask_yellow=NULL, *color_red_mask=NULL, *color_yellow_mask=NULL;
+	IplImage *zone_mask = cvLoadImage(mask_name, 0);
+
 	// Ouvrir le flux vidéo
 	capture = cvCreateCameraCapture(CV_CAP_ANY);
+	image = cvQueryFrame(capture);
 
 	// Vérifier si l'ouverture du flux est ok
 	if (!capture) {
@@ -47,7 +50,11 @@ int main(int argc, char **argv){
 		return 1;
 	}
 
-	image = cvQueryFrame(capture);
+	//Resize mask
+	IplImage *resized_mask = cvCreateImage(cvGetSize(image), image->depth, 1);
+	cvResize(zone_mask, resized_mask, 0);
+
+	//Ceation masques couleur
 	color_yellow_mask = cvCreateImage(cvGetSize(image), image->depth, 1);
 	mask_yellow = cvCreateImage(cvGetSize(image), image->depth, 1);
 	color_red_mask = cvCreateImage(cvGetSize(image), image->depth, 1);
@@ -59,9 +66,8 @@ int main(int argc, char **argv){
 	cvNamedWindow("Mask_yellow", CV_WINDOW_AUTOSIZE);
 	cvNamedWindow("Mask_red", CV_WINDOW_AUTOSIZE);
 #endif
-	int i = 0, times = atoi(argv[1]);
 	// Boucle tant que l'utilisateur n'appuie pas sur la touche q (ou Q)
-	while(i < times && key != 'q' && key != 'Q') {
+	while(key != 'q' && key != 'Q') {
 #ifdef VISUAL
 		if(key == 'p'){
 			h_yellow=(h_yellow+5)%180;
@@ -98,14 +104,17 @@ int main(int argc, char **argv){
 #endif
 		// On récupère une image
 		image = cvQueryFrame(capture);
+
+		//Processing
 		detect_color(image, color_yellow_mask, h_yellow, h_yellow_tol, s_yellow_tol, v_yellow_tol);
-		detect_zone(color_yellow_mask, mask_yellow, mask_name);
+		detect_zone(color_yellow_mask, mask_yellow, resized_mask);
 		weight_yellow = get_weight(mask_yellow);
 
 		detect_color(image, color_red_mask, h_red, h_red_tol, s_red_tol, v_red_tol);
-		detect_zone(color_red_mask, mask_red, mask_name);
+		detect_zone(color_red_mask, mask_red, resized_mask);
 		weight_red = get_weight(mask_red);
 
+		//Affichage resultat
 		printf("weight_yellow : %d \t weight_red : %d\n", weight_yellow, weight_red);
 #ifdef VISUAL
 		// On affiche l'image dans une fenêtre
@@ -116,7 +125,6 @@ int main(int argc, char **argv){
 		// On attend 50ms
 		key = cvWaitKey(50);
 #endif
-		i++;
 	}
 	cvReleaseCapture(&capture);
 	cvReleaseImage(&mask_yellow);
