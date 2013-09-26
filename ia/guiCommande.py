@@ -20,9 +20,34 @@ def gui(com):
 		address = 2
 		arguments = []
 		order = str(raw_input("Entre le nom ou le numéro d'un ordre:\n"))
+		if order[0] == 'A':
+			address = 2
+		elif order[0] == 'O':
+			address = 1
 
 		if order == 'k':# arret d'urgence
-			com.sendOrderAPI(address, 'A_KILLG', *arguments)
+			com.sendOrderAPI(2, 'A_CLEANG', *arguments)
+		if order == 'a':# arret d'urgence
+			arguments = [1000, 500]
+			com.sendOrderAPI(2, 'A_GOTO', *arguments)
+			arguments = [1000, -500]
+			com.sendOrderAPI(2, 'A_GOTO', *arguments)
+			arguments = [0, 0, 0]
+			com.sendOrderAPI(2, 'A_GOTOA', *arguments)
+		if order == 's':
+			com.sendOrderAPI(1, 'O_BRAS_FERMER', *arguments)
+			arguments = [1000, 0]
+			com.sendOrderAPI(2, 'A_GOTO', *arguments)
+			arguments = [1400, 600]
+			com.sendOrderAPI(2, 'A_GOTO', *arguments)
+			arguments = [1400, 2000]
+			com.sendOrderAPI(2, 'A_GOTO', *arguments)
+			arguments = [1000, 2300]
+			com.sendOrderAPI(2, 'A_GOTO', *arguments)
+			arguments = [300, 2300]
+			com.sendOrderAPI(2, 'A_GOTO', *arguments)
+			arguments = [0, 0, 0]
+			com.sendOrderAPI(2, 'A_GOTOA', *arguments)
 		elif order in com.orders:
 			if isinstance(order, (int)):
 				order = com.orders[order]
