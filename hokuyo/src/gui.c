@@ -3,8 +3,8 @@
 #include "stdio.h"
 
 struct GUI_data{
-	SDL_Surface *ecran, *terrain, *lidar, *robot, *point;
-	SDL_Rect posTerrain;
+	SDL_Surface *ecran, *terrain, *lidar, *robot, *point, *marker;
+	SDL_Rect posTerrain, posMarker;
 };
 static struct GUI_data gui;
 
@@ -14,6 +14,9 @@ static struct GUI_data gui;
 
 #define GUI_TERRAIN_SIZE_X GUI_WINDOW_RESOLUTION_X*TAILLE_TABLE_X / GUI_WINDOW_REAL_SIZE_X
 #define GUI_TERRAIN_SIZE_Y GUI_WINDOW_RESOLUTION_Y*TAILLE_TABLE_Y / GUI_WINDOW_REAL_SIZE_Y
+
+#define GUI_MARKER_SIZE_X GUI_WINDOW_RESOLUTION_X*MARKER_SIZE / GUI_WINDOW_REAL_SIZE_X
+#define GUI_MARKER_SIZE_Y GUI_WINDOW_RESOLUTION_Y*MARKER_SIZE / GUI_WINDOW_REAL_SIZE_Y
 
 #define GUI_LIDAR_SIZE_X GUI_WINDOW_RESOLUTION_X*LIDAR_SIZE / GUI_WINDOW_REAL_SIZE_X
 #define GUI_LIDAR_SIZE_Y GUI_WINDOW_RESOLUTION_Y*LIDAR_SIZE / GUI_WINDOW_REAL_SIZE_Y
@@ -49,6 +52,10 @@ initSDL(struct coord positionLidar){
 	gui.robot = SDL_CreateRGBSurface(SDL_HWSURFACE, GUI_ROBOT_SIZE, GUI_ROBOT_SIZE, 32, 0, 0, 0, 0);
 	SDL_FillRect(gui.robot, NULL, SDL_MapRGB(gui.ecran->format, 0, 0, 0));
 
+	gui.marker = SDL_CreateRGBSurface(SDL_HWSURFACE, GUI_MARKER_SIZE_X, GUI_MARKER_SIZE_Y, 32, 0, 0, 0, 0);
+	SDL_FillRect(gui.marker, NULL, SDL_MapRGB(gui.ecran->format, 0, 255, 0));
+	gui.posMarker = getPixelCoord(MARKER_R_POS_X-MARKER_SIZE/2, MARKER_R_POS_Y-MARKER_SIZE/2);
+
 	gui.lidar = SDL_CreateRGBSurface(SDL_HWSURFACE, GUI_LIDAR_SIZE_X, GUI_LIDAR_SIZE_Y, 32, 0, 0, 0, 0);
 	gui.point = SDL_CreateRGBSurface(SDL_HWSURFACE, GUI_POINT_SIZE, GUI_POINT_SIZE, 32, 0, 0, 0, 0);
 
@@ -59,6 +66,7 @@ void
 blitMap(struct coord positionLidar){
 	SDL_FillRect(gui.ecran, NULL, SDL_MapRGB(gui.ecran->format, 255, 255, 255));
 	SDL_BlitSurface(gui.terrain, NULL, gui.ecran, &(gui.posTerrain));
+	SDL_BlitSurface(gui.marker, NULL, gui.ecran, &(gui.posMarker));
 }
 
 void
@@ -71,7 +79,7 @@ blitLidar(struct coord positionLidar, struct color c){
 void
 blitRobots(struct coord *robots, int nRobots){
 	for(int i=0; i<nRobots; i++){
-		SDL_Rect p = getPixelCoord(robots[i].x, robots[i].y);
+		SDL_Rect p = getPixelCoord(robots[i].x-GUI_ROBOT_SIZE/2, robots[i].y-GUI_ROBOT_SIZE/2);
 		SDL_BlitSurface(gui.robot, NULL, gui.ecran, &p );
 	}
 }

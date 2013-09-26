@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <urg_sensor.h>
 #include <urg_serial_utils.h>
-
+#include "global.h"
 
 
 void*
@@ -17,25 +17,41 @@ initHokuyoUrg(char* device, double angleMin, double angleMax){
 
 	if(error < 0){
 		urg_close(urg);
-		fprintf(stderr, "%s :: %s\n", "connection failed", urg_error(urg));
+		fprintf(stderr, "%s :: %s\n", "connection failed on open", urg_error(urg));
 		exit(EXIT_FAILURE);
 	}
 	
 	printf("Connection établie à %s\n", device);
 
-    urg_set_scanning_parameter(urg, urg_rad2step(urg, angleMin), urg_rad2step(urg, angleMax), 0);//scan en continu, on ne garde que les point entre angleMin et angleMax
+	printf("Hokuyo init from %f to %f\n", -angleMax*180/PI, -angleMin*180/PI);
+    urg_set_scanning_parameter(urg, urg_rad2step(urg, -angleMax), urg_rad2step(urg, -angleMin), 0);//scan en continu, on ne garde que les point entre angleMin et angleMax
 	
-	printf("Parameters set\n");
+	printf("Parameters set #1\n");
 
 	error = urg_start_measurement(urg, URG_DISTANCE, URG_SCAN_INFINITY, 0);
 
 	if(error < 0){
 		urg_close(urg);
-		fprintf(stderr, "%s :: %s\n", "connection failed", urg_error(urg));
+		fprintf(stderr, "%s :: %s\n", "connection failed on starting", urg_error(urg));
 		exit(EXIT_FAILURE);
 	}
 	
 	return urg;
+}
+
+void
+resetHokuyoUrg(void* urg, double angleMin, double angleMax){
+	urg_stop_measurement((urg_t*)urg);
+	printf("Hokuyo reinit from %f to %f\n", -angleMax*180/PI, -angleMin*180/PI);
+	urg_set_scanning_parameter((urg_t*)urg, urg_rad2step(urg, -angleMax), urg_rad2step(urg, -angleMin), 0);
+	printf("Parameters set #2\n");
+
+	int error = urg_start_measurement((urg_t*)urg, URG_DISTANCE, URG_SCAN_INFINITY, 0);
+	if(error < 0){
+		urg_close(urg);
+		fprintf(stderr, "%s :: %s\n", "connection failed on restarting", urg_error((urg_t*)urg));
+		exit(EXIT_FAILURE);
+	}
 }
 
 int
@@ -45,7 +61,7 @@ getnPointsHokuyoUrg(void* urg){
 
 double
 getAngleFromIndexHokuyoUrg(void* urg, int index){
-	return urg_index2rad((urg_t*)urg, index);
+	return -urg_index2rad((urg_t*)urg, index);
 }
 
 void

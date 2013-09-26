@@ -70,14 +70,14 @@ int main(int argc, char **argv){
 
 	struct coord pos1;
   if( strcmp(argv[1], "red") == 0 ){
-  	pos1.x = -25;  	
+  	pos1.x = 25;  	
   }else{
     pos1.x = TAILLE_TABLE_Y+25;
   }
 
-  pos1.y = TAILLE_TABLE_Y+25;
+  pos1.y = TAILLE_TABLE_Y-25;
 
-	l1 = initLidar( hokuyo_urg, "/dev/ttyACM0", pos1, 0, -PI/2, 0);
+	l1 = initLidarAndCalibrate( hokuyo_urg, "/dev/ttyACM0", pos1, -PI/2, -PI/2, 0);
 
   #ifdef SDL
 	l1Color = newColor(255, 0, 0);
@@ -85,7 +85,7 @@ int main(int argc, char **argv){
   #endif
 
   if(pipeactivated){
-    if (signal(SIGPIPE, catch_SIGPIPE) == SIGPIPE) {
+    if (signal(SIGPIPE, catch_SIGPIPE) == SIG_ERR) {
         fputs("An error occurred while setting a SIGPIPE signal handler.\n", stderr);
         return EXIT_FAILURE;
     }
