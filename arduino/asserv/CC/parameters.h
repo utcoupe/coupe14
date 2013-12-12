@@ -40,8 +40,8 @@
  * control.getMotorSpd()
  * Cette vitesse est en mm/ms = m/s  */
 
-#define PWM_MAX 255
-#define ACCELERATION_MAX 50
+//#define SPD_MAX 1.0
+//#define ACCELERATION_MAX 0.5
 
 /* PWM MINIMALE 
  * "shift" de la pwm sur l'asservissement CC
@@ -68,7 +68,12 @@
 
 //Intégrales et dérivée sont calculée avec un intervalle de temps en SECONDES
 //Ne modifier que le nombre, laisser les DUREE_CYCLE
-
+/*
+//Le "I" est très important, sans lui, l'erreur statique sera très élevée
+#define SPEED_P 255 //pwm += P * E_spd(m/s)
+#define SPEED_I 10 //pwm += I * I_spd(m/s * s)
+#define SPEED_D 0 
+*/
 //Le "I" devrait etre faible (ou nul), le "D" est à régler progressivement pour éviter le dépassement
 #define ANGLE_P 0.75 //spd = P * E_ang(rad)
 #define ANGLE_I 0 //spd = I * I_ang(rad * s)
@@ -103,23 +108,19 @@
 #elif ENCODER_EVAL == 1
 	#define TICKS_PER_TURN ENC_RESOLUTION
 #endif
+/*
+#define ACC_MAX ACCELERATION_MAX * DUREE_CYCLE
 
-#define ACC_MAX ACCELERATION_MAX * (DUREE_CYCLE/1000.0)
-
+#define SPD_P SPEED_P 
+#define SPD_I SPEED_I * DUREE_CYCLE
+#define SPD_D SPEED_D / DUREE_CYCLE
+*/
 #define ANG_P ANGLE_P
-#define ANG_I ANGLE_I * (DUREE_CYCLE/1000.0)
-#define ANG_D ANGLE_D / (DUREE_CYCLE/1000.0)
+#define ANG_I ANGLE_I * DUREE_CYCLE
+#define ANG_D ANGLE_D / DUREE_CYCLE
 
 #define DIS_P DISTANCE_P
-#define DIS_I DISTANCE_I * (DUREE_CYCLE/1000.0)
-#define DIS_D DISTANCE_D / (DUREE_CYCLE/1000.0)
-
-#ifdef DEBUG
-#define PDEBUG(x) Serial.print(x)
-#define PDEBUGLN(x) Serial.println(x)
-#else
-#define PDEBUG(x)
-#define PDEBUGLN(x)
-#endif
+#define DIS_I DISTANCE_I * DUREE_CYCLE
+#define DIS_D DISTANCE_D / DUREE_CYCLE
 
 #endif

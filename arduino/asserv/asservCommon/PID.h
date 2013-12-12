@@ -8,11 +8,6 @@
 
 #include "parameters.h"
 
-enum anti_windup_mode {none, bound}; //Pour réguler l'effet de windup de l'intégrale
-/*
-none : pas d'anti-windup
-bound : limite la valeur de l'intégrale entre +max_I et -max_I
-*/
 
 class PID{
 	public:
@@ -20,7 +15,7 @@ class PID{
 	void setBias(double n_bias);
 	void reset();
 	double getOutput();
-	double compute(double error);
+	double compute(double error);	
 	PID(double n_p = 0, double n_I = 0, double n_D = 0, double n_bias = 0);
 	private:
 	double P, I, D;

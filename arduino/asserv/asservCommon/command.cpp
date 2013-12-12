@@ -11,10 +11,8 @@
 #define T_CODER 'c' //enCoder
 #define T_GOAL_KILL 'k' //Kill
 #define T_POS 'o' //pOs
+#define T_SPD 's' //Spd
 #define T_DEBUG 'd' //Debug
-#define T_P '+'
-#define T_M '-'
-#define T_RESET 'r'
 /**
  * Analyse le message et effectue les actions associees
  *
@@ -24,37 +22,22 @@
  * */
 void cmd(char cmd){
 	extern Control control;
-	static double P = ANG_P;
 	/* On analyse le message en fonction de son type */
 	switch(cmd){
-		case T_RESET:
-		{
-			control.reset();
-			break;
-		}
 		case T_DEBUG:
 		{
-			break;
-		}
-		case T_P:
-		{
-			P++;
-			control.setPID_angle(P,ANG_I,ANG_D);
-			//control.pushGoal(0,TYPE_PWM,P,P,1000);
-			Serial.println(P);
-			break;
-		}
-		case T_M:
-		{
-			P--;
-			control.setPID_angle(P,ANG_I,ANG_D);
-			//control.pushGoal(0,TYPE_PWM,P,P,1000);
-			Serial.println(P);
+			Serial.print("Encoder Spd : ");Serial.print(control.getEncoderSpd().L);Serial.print("/");Serial.println(control.getEncoderSpd().R);
+			Serial.print("Motor Spd : ");Serial.print(control.getMotorSpd().L);Serial.print("/");Serial.println(control.getMotorSpd().R);
 			break;
 		}
 		case T_GOAL_KILL:
 		{
 			control.nextGoal();
+			break;
+		}
+		case T_SPD:
+		{
+			control.pushGoal(0,TYPE_SPD,0.05,0.05,3000);
 			break;
 		}
 		case T_PWM_TEST:
@@ -65,6 +48,9 @@ void cmd(char cmd){
 			control.pushGoal(0,TYPE_PWM,50,50,2000);
 			control.pushGoal(0,TYPE_PWM,-150,-150,2000);
 			control.pushGoal(0,TYPE_PWM,-254,-254,2000);
+#ifdef DEBUG
+			Serial.write("Set test PWM - ");
+#endif
 			break;
 		}
 		case T_CODER:
@@ -81,7 +67,7 @@ void cmd(char cmd){
 		}
 		case T_POS:
 		{
-			m_pos current_pos = control.getPos();
+			pos current_pos = control.getPos();
 			Serial.write("position : ");
 			Serial.print(current_pos.x);
 			Serial.write(" : ");
@@ -93,7 +79,10 @@ void cmd(char cmd){
 		}
 		case T_GOTO:
 		{
-			m_pos current = control.getPos();
+#ifdef BEBUG
+			Serial.write("Set test goto - ");
+#endif
+			pos current = control.getPos();
 			double co = cos(current.angle);
 			double si = sin(current.angle);
 			double d;
@@ -101,10 +90,7 @@ void cmd(char cmd){
 			int goal_y = 0; //mm
 
 			d = 0;
-			control.pushGoal(0,TYPE_POS, 500,0,0);
-			//control.pushGoal(0,TYPE_ANG, (1.0/2)*M_PI, 0, 0);
-			//control.pushGoal(0,TYPE_ANG, 2*M_PI, 0, 0);
-			//control.pushGoal(0,TYPE_ANG, 0, 0, 0);
+			control.pushGoal(0,TYPE_ANG, -3.14/2, 0, 0);
 			break;
 		}
 			

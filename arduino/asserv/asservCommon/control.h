@@ -30,11 +30,12 @@ class Control{
 	//set des differents PIDs
 	void setPID_angle(double n_P, double n_I, double n_D); //PID de l'asservissement angulaire
 	void setPID_distance(double n_P, double n_I, double n_D); //PID de l'asservissement en position
+	void setPID_speed(double n_P, double n_I, double n_D); //PID de l'asserv vitesse
 	
 	//gestion de la pwm_mini. Attention, il faut modifier les PIDs !
 	void setPwmMin(int n_pwm_min); //Pwm minimale
 	void setMaxAngCurv(double n_max_ang);
-	void setMaxPwm(double n_max_spd);
+	void setMaxSpd(double n_max_spd);
 	void setMaxAcc(double n_max_acc);
 
 	//Push un goal
@@ -43,8 +44,10 @@ class Control{
 	void clearGoals();
 
 	//Toutes les positions sont renvoyée en mm, toutes les vitess en mm/ms = m/s
-	void pushPos(m_pos n_pos); 
-	m_pos getPos();
+	void pushPos(pos n_pos); 
+	pos getPos();
+	spd getMotorSpd();
+	spd getEncoderSpd();
 
 	//Renvoie les valeurs des codeur (utile pour debug)
 	Encoder* getLenc();
@@ -59,18 +62,21 @@ class Control{
 	Fifo fifo;
 	PID PID_Angle;
 	PID PID_Distance;
+	PID PID_SpdL;
+	PID PID_SpdR;
 	//interface avec les PIDs
-	int setPwms(int pwm_left, int pwm_right); //controles puis modification (renvoie l'overflow)
-	void check(double *consigne, double last);
+	int setPwms(int pwm_right, int pwm_left, bool enable_pwm_min = true); //controles puis modification (renvoie l'overflow)
+	void checkSpd(double *consigne, double last);
 	int controlAngle(double goal_angle); //goal en radians
 	int controlPos(double e_angle, double e_dist); //goal en mm
+	int controlSpd(double goal_spdL, double goal_spdR);
 
 	void applyPwm();
 
 	int pwm_min;
 	double max_angle;
 
-	double max_pwm;
+	double max_spd;
 	double max_acc;
 
 	//Les pwm à appliquer

@@ -11,13 +11,14 @@
 #define TYPE_POS 1
 #define TYPE_ANG 2
 #define TYPE_PWM 3
+#define TYPE_SPD 4
 #define NO_GOAL -1
 
 struct goal{
 	int type;
-	double data_1; //	x	angle	pwmL
-	double data_2; //	y	.	pwmR
-	double data_3; //	d_rest	.	duree
+	double data_1; //	x	angle	pwmL	spdL
+	double data_2; //	y	.	pwmR	spdR
+	double data_3; //	d_rest	.	duree	duree
 	int ID;
 	bool isReached;
 	struct goal *next; //Chaque goal contient un pointeur vers le goal suivant;
