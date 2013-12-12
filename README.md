@@ -7,13 +7,6 @@ Commandes de base pour se lancer dans le projet
 Pour clonner le depot:
 * git clone git@github.com:utcoupe/coupe14.git
 
-Mise en place de l'environnement de dev:
-* sudo apt-get install python-pip python-setuptools
-* sudo pip install --upgrade pip
-* sudo pip install virtualenv
-* ./virt_env/bin/pip install -r requirements.txt
-
-
 
 
 Commandes à utiliser au quotidien pour developper:
