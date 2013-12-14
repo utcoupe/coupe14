@@ -6,7 +6,8 @@
 Fichier de define commun aux 4 arduinos
 Les ordres sont commun à toutes les arduinos
 Tous les ordres sont codées sur 6 bits, le bit de poids fort est toujours réservé au protocole
-Le parseur python prend ce qu'il y a entre //DEBUTPARSE et //FINPARSE
+Le parseur python prend ce qu'il y a entre les balises de parse, ne pas les écrirent ailleurs
+Si vous voulez commentez une enumération, il faut le faire sur la même ligne et après la virgule
 */
 
 
@@ -15,7 +16,7 @@ enum address{
 	//l'adresse 0 est réservé au protocole donc on commence à 1
 
 	//DEBUTPARSE
-	ADDR_FLUSSMITTEL_OTHER=1,
+	ADDR_FLUSSMITTEL_OTHER= 1,
 	ADDR_FLUSSMITTEL_ASSERV,
 	ADDR_TIBOT_OTHER,
 	ADDR_TIBOT_ASSERV,
