@@ -1,0 +1,13 @@
+*__pycache__*
+CMake*
+
+*.dblite
+*build
+*.o
+*.elf
+*.hex
+*.depend
+*.layout
+*.a
+*.pyc
+*.exe
