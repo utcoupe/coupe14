@@ -19,11 +19,6 @@
 #define MOTOR1_RDY 42
 #define MOTOR2_RDY 36
 
-#define MOTOR1_DIG1 46
-#define MOTOR1_DIG2 44
-#define MOTOR2_DIG1 30
-#define MOTOR2_DIG2 32
-
 #define MOTOR_LEFT 1
 #define MOTOR_RIGHT 2
 

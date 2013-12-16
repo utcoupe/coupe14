@@ -26,11 +26,6 @@ Motor::Motor(int n_motor_side) {
 		 	pinMode(MOTOR1_EN, OUTPUT);
 			digitalWrite(MOTOR1_EN, HIGH); //Enable motor
 
-			pinMode(MOTOR1_DIG1, OUTPUT);
-			digitalWrite(MOTOR1_DIG1, LOW);
-			pinMode(MOTOR1_DIG2, OUTPUT);
-			digitalWrite(MOTOR1_DIG2, LOW); //config DIG1&2 to 0 
-
 			pinMode(MOTOR1_RDY, INPUT);
 			pinMode(MOTOR1_DIR, OUTPUT);
 			digitalWrite(MOTOR1_DIR, LOW);
@@ -41,11 +36,6 @@ Motor::Motor(int n_motor_side) {
 
 			pinMode(MOTOR2_EN, OUTPUT);
 			digitalWrite(MOTOR2_EN,HIGH); //enable motor
-        
-			pinMode(MOTOR1_DIG2, OUTPUT);
-			digitalWrite(MOTOR2_DIG1, LOW);
-			pinMode(MOTOR1_DIG2, OUTPUT);
-			digitalWrite(MOTOR2_DIG2, LOW); //config DIG1&2 to 0
 
 			pinMode(MOTOR2_RDY, INPUT);
 			pinMode(MOTOR2_DIR, OUTPUT);

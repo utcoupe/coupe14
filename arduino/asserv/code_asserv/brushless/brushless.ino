@@ -6,11 +6,9 @@
   
 #include "compaArduino.h"
 #include "parameters.h"
-#include <math.h>
-#include "protocole.h"
-#include "command.h"
-#include "message.h"
 #include "control.h"
+
+#include "protocol.h"
 
 unsigned long index = 0;
 unsigned long timeStart = 0;
@@ -18,17 +16,16 @@ unsigned long timeStart = 0;
 //Creation du controleur
 Control control;
 
-#define MAX_READ 4 
+#define MAX_READ 64 
 void setup(){
 	initPins();
-	initSerialLink();
-	Serial.write("INIT DONE\n");
+	Serial.begin(57600, SERIAL_8N1);
+	PDEBUGLN("INIT DONE");
 	// LED qui n'en est pas une
 	pinMode(16,OUTPUT);
 }
 
 void loop(){
-	int right_error, left_error;
 	/* on note le temps de debut */
 	timeStart = micros();
 
@@ -43,21 +40,11 @@ void loop(){
 	for(int i = 0; i < available; i++) {
 		// recuperer l'octet courant
 		char data = Serial.read();
-		cmd(data);
-		Serial.write(data);
+		executeCmd(data);
+		WRDEBUG(data);
 	}
 	//Action asserv
 	control.compute();
-
-	//---- DEBUG TICKS ----
-	right_error = control.getRenc()->getError();
-	left_error = control.getLenc()->getError();
-
-	if(left_error != 0)
-		Serial.println("-- left ticks error : " + left_error);
-	if(right_error != 0)
-		Serial.println("-- right ticks error : " + right_error);
-	//---- FIN DEBUG TICKS ----
 
 	/* fin zone de programmation libre */
 	
@@ -67,9 +54,7 @@ void loop(){
 	/* On attend le temps qu'il faut pour boucler */
 	long udelay = DUREE_CYCLE*1000-(micros()-timeStart);
 	if(udelay<0)
-		Serial.println("ouch : mainloop trop longue");
+		PDEBUGLN("ouch : mainloop trop longue");
 	else
-		 delayMicroseconds(udelay);
+		delayMicroseconds(udelay);
 }
-
-

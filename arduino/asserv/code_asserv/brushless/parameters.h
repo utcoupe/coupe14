@@ -1,12 +1,13 @@
 /****************************************
  * Author : Quentin C			*
  * Mail : quentin.chateau@gmail.com	*
- * Date : 11/10/13			*
+ * Date : 29/11/13			*
  ****************************************/
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
-#define DEBUG
+#define DEBUG //Commenter cette ligne pour enlever les pints de debug
+
 /* Simple ou Double ou Quadruple evaluation ? 
  * La quadruple evaluation utilise 4 interruption par tick
  * (une pour chaque changement de valeur des fils A et B)
@@ -28,24 +29,16 @@
 #define ENCODER_EVAL 2
 
 #define FIXED_POINT_PRECISION 100 //The robot's position is stocked with a precision of 1/FIXED_POINT_PRECISION ticks
-#define SOUS_ECHANTILLONAGE_VITESSE 10 //plus haut : vitesse plus précise mais plus de retard au calcul
 
 #define GESTION_3EME_FIL false
 
 #define MAX_GOALS 15 //nombre max de goals dans la file, évite surcharge mémoire
-#define DUREE_CYCLE 5 //période de calcul, en ms
+#define DUREE_CYCLE 7 //période de calcul, en ms
 
-/* Vitesse Maximale
- * Vitesse max à laquelle peuvent aller les moteurs
- * Utile pour asservir la vitesse
- * Il suffit de commander les moteurs à pwm maximale et de faire un
- * control.getMotorSpd()
- * Cette vitesse est en mm/ms = m/s  */
+#define ACCELERATION_MAX 200
 
-#define SPD_MAX 1 
-#define ACCELERATION_MAX 0.25 
-
-/* PWM MINIMALE 
+/* CONSIGNE OFFSET
+ * DEVRAIT ETRE A 0
  * "shift" de la pwm sur l'asservissement CC
  * cela sert à remédier au problème lié au fait 
  * qu'en dessous d'une certaine tension, les moteurs
@@ -55,7 +48,13 @@
  * envoyer des consignes en pwm au robot
  * partant de 0 et en augmentant progressivement
  * dès que le robot avance, la pwm min est trouvée */
-#define PWM_MIN 0
+#define CONSIGNE_OFFSET 0
+
+#define CONSIGNE_RANGE_MAX 255
+#define CONSIGNE_RANGE_MIN 0
+
+//CONSIGNE_REACHED est la pwm en dessous de laquelle un robot peut etre considéré comme arrêté à son goal
+#define CONSIGNE_REACHED 0
 
 #define ENC_RESOLUTION 1024 //resolution du codeur
 
@@ -63,7 +62,7 @@
 #define ENTRAXE_ENC 130.0 // Distance entre chaque roue codeuse en mm
 #define ENTRAXE_MOTOR 70.0 // Distance entre chaque roue motrice en mm
 
-#define ERROR_ANGLE 0.05 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
+#define ERROR_ANGLE 0.00 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
 #define ERROR_POS 10 // erreur en position (mm)  maximale pour considérer l'objectif comme atteint
 
 #define MAX_ANGLE 0.20  //~10° angle en dessous duquel on décrit une trajectoire curviligne (trop bas, le robot s'arretera constamment pour se recaler au lieu d'avancer, trop haut, les trajectoires seront très courbes voir meme fausses (overflow spd -> overflow pwm).
@@ -72,19 +71,13 @@
 //Ne modifier que le nombre, laisser les DUREE_CYCLE
 
 
-//Le "I" est très important, sans lui, l'erreur statique sera très élevée
-#define SPEED_P 500.0 //pwm += P * E_spd(m/s)
-#define SPEED_I 400.0 //pwm += I * I_spd(m/s * s)
-#define SPEED_D 0 
-
-
 //Le "I" devrait etre faible (ou nul), le "D" est à régler progressivement pour éviter le dépassement
-#define ANGLE_P .005 //spd = P * E_ang(rad)
+#define ANGLE_P 30.0 //spd = P * E_ang(rad)
 #define ANGLE_I 0 //spd = I * I_ang(rad * s)
 #define ANGLE_D 0 //a regler par incrementation
 
-#define DISTANCE_P 40.0 //spd = P * E_dis(mm)
-#define DISTANCE_I 0.01 //spd = I * I_dis(mm * s)
+#define DISTANCE_P 0.5 //spd = P * E_dis(mm)
+#define DISTANCE_I 0 //spd = I * I_dis(mm * s)
 #define DISTANCE_D 0 //a regler par incrementation
 
 /*****************************************
@@ -98,18 +91,24 @@
 	#define TICKS_PER_TURN ENC_RESOLUTION
 #endif
 
-#define ACC_MAX ACCELERATION_MAX / DUREE_CYCLE
-
-#define SPD_P SPEED_P 
-#define SPD_I SPEED_I / DUREE_CYCLE
-#define SPD_D SPEED_D * DUREE_CYCLE
+#define ACC_MAX ACCELERATION_MAX * (DUREE_CYCLE/1000.0)
 
 #define ANG_P ANGLE_P
-#define ANG_I ANGLE_I / DUREE_CYCLE
-#define ANG_D ANGLE_D * DUREE_CYCLE
+#define ANG_I ANGLE_I * (DUREE_CYCLE/1000.0)
+#define ANG_D ANGLE_D / (DUREE_CYCLE/1000.0)
 
 #define DIS_P DISTANCE_P
-#define DIS_I DISTANCE_I / DUREE_CYCLE
-#define DIS_D DISTANCE_D * DUREE_CYCLE
+#define DIS_I DISTANCE_I * (DUREE_CYCLE/1000.0)
+#define DIS_D DISTANCE_D / (DUREE_CYCLE/1000.0)
+
+#ifdef DEBUG
+#define PDEBUG(x) Serial.print(x)
+#define PDEBUGLN(x) Serial.println(x)
+#define WRDEBUG(x) Serial.write(x)
+#else
+#define PDEBUG(x)
+#define PDEBUGLN(x)
+#define WRDEBUG(x)
+#endif
 
 #endif

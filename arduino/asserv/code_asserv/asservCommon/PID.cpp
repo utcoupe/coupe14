@@ -7,9 +7,10 @@
 #include "include_arduino.h"
 
 PID::PID(double n_P, double n_I, double n_D, double n_bias){
-	PID::setPID(n_P,n_I,n_D);
-	PID::setBias(n_bias);
-	PID::reset();
+	setPID(n_P,n_I,n_D);
+	setBias(n_bias);
+	reset();
+	
 }
 
 void PID::setPID(double n_P, double n_I, double n_D){
@@ -43,6 +44,7 @@ double PID::compute(double error){
 		error_D = (error - last_error); //derivée = deltaErreur/dt - dt est la période de compute
 		error_I = error_I + error; //integrale = somme(erreur*dt) - dt est la période de compute
 	}
+	
 	output = bias + (P*error) + (I*error_I) + (D*error_D); //calcul de la sortie avec le PID
 
 	last_error = error;

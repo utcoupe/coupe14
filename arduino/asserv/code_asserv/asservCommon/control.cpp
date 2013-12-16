@@ -1,7 +1,7 @@
 /****************************************
  * Author : Quentin C			*
  * Mail : quentin.chateau@gmail.com	*
- * Date : 13/10/13			*
+ * Date : 29/11/13			*
  ****************************************/
 #include "control.h"
 #include "compaArduino.h"
@@ -19,43 +19,35 @@
 Control::Control(){
 	setPID_angle(ANG_P, ANG_I, ANG_D);
 	setPID_distance(DIS_P, DIS_I, DIS_D);
-	setPID_speed(SPD_P , SPD_I, SPD_D);
-	setPwmMin(PWM_MIN);
+	setConsigneOffset(CONSIGNE_OFFSET);
 	max_angle = MAX_ANGLE;
-	setMaxSpd(SPD_MAX);
 	setMaxAcc(ACC_MAX);
 
-	value_pwm_right = 0;
-	value_pwm_left = 0;
+	value_consigne_right = 0;
+	value_consigne_left = 0;
 }
 
-int Control::compute(){
+void Control::compute(){
 	static bool reset = true, order_started = false;
 	static long start_time;
-	int overflow = NO_OVERFLOW;
 	struct goal current_goal = fifo.getCurrentGoal();
-	pos current_pos = robot.getMmPos();
+	m_pos current_pos = robot.getMmPos();
 	long now = timeMicros();
 	robot.update();
 
 	if(fifo.isPaused() || current_goal.type == NO_GOAL){
-		value_pwm_right = 0;
-		value_pwm_left = 0;
+		value_consigne_right = 0;
+		value_consigne_left = 0;
 	}
 	else{
-		if(current_goal.isReached){//Si le but est atteint et que ce n'est pas le dernier, on passe au suivant
-#ifdef DEBUG
-			Serial.write("Next GOAL - ");
-#endif
+		if(current_goal.isReached && fifo.getRemainingGoals() > 1){//Si le but est atteint et que ce n'est pas le dernier, on passe au suivant
+			PDEBUGLN("Next Goal");
 			current_goal = fifo.gotoNext();
 			reset = true;
 		}
-
 		if(reset){//permet de reset des variables entre les goals
 			PID_Angle.reset();
 			PID_Distance.reset();
-			PID_SpdR.reset();
-			PID_SpdL.reset();
 			reset = false;
 			order_started = false;
 		}
@@ -65,18 +57,19 @@ int Control::compute(){
 			case TYPE_ANG :
 			{
 				double da = current_goal.data_1 - current_pos.angle;
-				overflow = controlAngle(da);
+				if(abs(da) < ERROR_ANGLE && value_consigne_left <= CONSIGNE_REACHED && value_consigne_right <= CONSIGNE_REACHED)
+					fifo.pushIsReached();
+				else
+					controlAngle(da);
 #ifdef DEBUG
 				static int counter = 0;
 				counter++;
 				if(counter > 100){
 					counter = 0;
 					Serial.println(da);
+					Serial.print(value_consigne_left);Serial.println(value_consigne_right);
 				}
 #endif
-				if(abs(current_goal.data_1 - current_pos.angle) < ERROR_ANGLE)
-					Serial.println("Reached");
-				//	fifo.pushIsReached();
 				break;
 			}
 
@@ -89,10 +82,10 @@ int Control::compute(){
 				double dd = sqrt(pow(dx, 2.0)+pow(dy, 2.0));//erreur en distance
 
 				if(da > max_angle)//On tourne sur place avant de se déplacer
-					overflow = controlAngle(da);
+					controlAngle(da);
 				else
-					overflow = controlPos(da, dd + current_goal.data_3);//erreur en dist = dist au point + dist additionelle
-				if(dd < ERROR_POS)
+					controlPos(da, dd + current_goal.data_3);//erreur en dist = dist au point + dist additionelle
+				if(dd < ERROR_POS && value_consigne_right <= CONSIGNE_REACHED && value_consigne_left <= CONSIGNE_REACHED)
 					fifo.pushIsReached();
 				break;
 			}
@@ -104,44 +97,23 @@ int Control::compute(){
 					order_started = true;
 				}
 				if((now - start_time)/1000.0 <= current_goal.data_3){
-					overflow = setPwms(current_goal.data_2,current_goal.data_1,false);
+					setConsigne(current_goal.data_1,current_goal.data_2);
 				}
 				else{
-					overflow = setPwms(0,0,false);
+					setConsigne(0,0);
 					fifo.pushIsReached();
 				}
 				break;
 			}
-
-			case TYPE_SPD :
-			{
-				if(!order_started){
-					start_time = now;
-					order_started = true;
-				}
-				if((now - start_time)/1000.0 <= current_goal.data_3){
-					overflow = controlSpd(current_goal.data_1, current_goal.data_2);
-				}
-				else{
-					value_pwm_right = 0;
-					value_pwm_left = 0;
-					fifo.pushIsReached();
-				}
-				break;
-			}
-
 			default:
 			{
-#ifdef DEBUG
-				Serial.write("No Goal ? - ");
-#endif
+				PDEBUGLN("No Goal");
 				break;
 			}	
 		}
 	}
 
 	applyPwm();
-	return overflow;
 }
 
 void Control::update_robot_state(){
@@ -149,8 +121,8 @@ void Control::update_robot_state(){
 }
 
 void Control::reset(){
-	value_pwm_left = 0;
-	value_pwm_right = 0;
+	value_consigne_left = 0;
+	value_consigne_right = 0;
 	fifo.clearGoals();
 	robot.reset();
 	applyPwm();
@@ -165,29 +137,19 @@ void Control::setPID_distance(double n_P, double n_I, double n_D){
 	PID_Distance.setPID(n_P, n_I, n_D);
 }
 
-void Control::setPID_speed(double n_P, double n_I, double n_D){
-	PID_SpdR.setPID(n_P, n_I, n_D);
-	PID_SpdL.setPID(n_P, n_I, n_D);
-}
-
-void Control::setPwmMin(int n_pwm_min){
-	pwm_min = n_pwm_min;
+void Control::setConsigneOffset(int n_offset){
+	consigne_offset = n_offset;
 }
 
 void Control::setMaxAngCurv(double n_max_ang){
 	max_angle = n_max_ang;
 }
 
-void Control::setMaxSpd(double n_max_spd){
-	max_spd = n_max_spd;
-}
-
 void Control::setMaxAcc(double n_max_acc){
 	max_acc = n_max_acc;
 }
 
-
-void Control::pushPos(pos n_pos){
+void Control::pushPos(m_pos n_pos){
 	robot.pushMmPos(n_pos);
 }
 
@@ -203,16 +165,8 @@ void Control::clearGoals(){
 	fifo.clearGoals();
 }
 
-pos Control::getPos(){
+m_pos Control::getPos(){
 	return robot.getMmPos();
-}
-
-spd Control::getMotorSpd(){
-	return robot.getMmSpdMotor();
-}
-
-spd Control::getEncoderSpd(){
-	return robot.getMmSpdEncoder();
 }
 
 Encoder* Control::getRenc(){
@@ -233,52 +187,35 @@ void Control::resume(){
 
 /********** PRIVATE **********/
 
-int Control::setPwms(int pwm_right, int pwm_left, bool enable_pwm_min){
-	bool overflowPwm = false;
+void Control::setConsigne(int consigne_left, int consigne_right){
 	//Ajout des pwm minimale : "shift" des pwm
-	if(pwm_min != 0 && enable_pwm_min){
-		if(pwm_right > 0)
-			pwm_right += pwm_min;
-		else if(pwm_right < 0)
-			pwm_right -= pwm_min;
-		if(pwm_left > 0)
-			pwm_left += pwm_min;
-		else if(pwm_left < 0)
-			pwm_left -= pwm_min;
+	if(consigne_offset != 0){
+		if(consigne_right > 0)
+			consigne_right += consigne_offset;
+		else if(consigne_right < 0)
+			consigne_right -= consigne_offset;
+		if(consigne_left > 0)
+			consigne_left += consigne_offset;
+		else if(consigne_left < 0)
+			consigne_left -= consigne_offset;
 	}
 
 	//Tests d'overflow
-	if(pwm_right > 254){
-		overflowPwm = PWM_OVERFLOW;
-		pwm_right = 254;
-	}
-	else if(pwm_right < -254){
-		overflowPwm = PWM_OVERFLOW;
-		pwm_right = -254;
-	}
-	if(pwm_left > 254){
-		overflowPwm = PWM_OVERFLOW;
-		pwm_left = 254;
-	}
-	else if(pwm_left < -254){
-		overflowPwm = PWM_OVERFLOW;
-		pwm_left = -254;
-	}
-	value_pwm_right = pwm_right;
-	value_pwm_left = pwm_left;
-
-	return overflowPwm;
+	if(consigne_left > CONSIGNE_RANGE_MAX)
+		consigne_left = CONSIGNE_RANGE_MAX;
+	else if(consigne_left < CONSIGNE_RANGE_MIN)
+		consigne_left = CONSIGNE_RANGE_MIN;
+	if(consigne_right > CONSIGNE_RANGE_MAX)
+		consigne_right = CONSIGNE_RANGE_MAX;
+	else if(consigne_right < CONSIGNE_RANGE_MIN)
+		consigne_right = CONSIGNE_RANGE_MIN;
+	
+	value_consigne_right = consigne_right;
+	value_consigne_left = consigne_left;
 }
 
-void Control::checkSpd(double *consigne, double last)
+void Control::check(double *consigne, double last)
 {
-	//Check MAX_SPD
-	if(*consigne > max_spd){//test d'overflow
-		*consigne = max_spd;
-	}
-	else if(*consigne < -max_spd){//test d'overflow
-		*consigne = -max_spd;
-	}
 	//Check MAX_ACC
 	if(*consigne > last + max_acc){
 		*consigne = last + max_acc;
@@ -288,91 +225,48 @@ void Control::checkSpd(double *consigne, double last)
 	}
 }
 
-int Control::controlAngle(double da)
+void Control::controlAngle(double da)
 {
-	spd current_spd = robot.getMmSpdMotor();
-	double consigneSpd;
+	double consigne;
+	static double last_consigne = 0;
 	int consignePwmL, consignePwmR;
-	static double last_consigneSpd = 0;
-	bool overflowPwm = false;
 
 	//Asservissement en position, renvoie une consigne de vitesse
-	consigneSpd = PID_Angle.compute(da);
+	consigne = PID_Angle.compute(da);
 
-	checkSpd(&consigneSpd, last_consigneSpd);
+	check(&consigne, last_consigne);
 		
-	//Asservissement en vitesse
-	consignePwmR = PID_SpdR.compute(consigneSpd - current_spd.R); 
-	consignePwmL = PID_SpdL.compute((-consigneSpd) - current_spd.L); 
+	consignePwmR = consigne;
+	consignePwmL = -consigne;
 
-	overflowPwm = setPwms(consignePwmR, consignePwmL, false);
-
-	last_consigneSpd = consigneSpd;
-
-	if(overflowPwm)
-		return PWM_OVERFLOW;
-	else
-		return NO_OVERFLOW;
+	setConsigne(consignePwmL, consignePwmR);
+	last_consigne = consigne;
 }
 
-int Control::controlPos(double da, double dd)
+void Control::controlPos(double da, double dd)
 {
-	//spd current_spd = robot.getMmSpdMotor();
-	double consigneSpdR, consigneSpdL, consigneSpdAngle, consigneSpdDistance, consignePwmR, consignePwmL;
-	//static double last_consigneSpdR = 0;
-	//static double last_consigneSpdL = 0;
-	bool overflowPwm = false;
+	double consigneAngle, consigneDistance, consigneR, consigneL;
+	static double last_consigneL = 0, last_consigneR = 0;
 
 	//Asservissement en position, renvoie une consigne de vitesse
 	//Calcul des spd angulaire
-	consigneSpdAngle = PID_Angle.compute(da); //erreur = angle à corriger pour etre en direction du goal
+	consigneAngle = PID_Angle.compute(da); //erreur = angle à corriger pour etre en direction du goal
 	//Calcul des spd de distance
-	consigneSpdDistance = PID_Distance.compute(dd); //erreur = distance au goal
+	consigneDistance = PID_Distance.compute(dd); //erreur = distance au goal
 
-	consigneSpdR = consigneSpdDistance + consigneSpdAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
-	consigneSpdL = consigneSpdDistance - consigneSpdAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
+	consigneR = consigneDistance + consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
+	consigneL = consigneDistance - consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
 
-/*
-	checkSpd(consigneSpdR, last_consigneSpdR);
-	checkSpd(consigneSpdL, last_consigneSpdL);
+	check(&consigneR, last_consigneR);
+	check(&consigneL, last_consigneL);
 
-	//Asservissement en vitesse
-	consignePwmR = PID_SpdR.compute(consigneSpdR - current_spd.R); 
-	consignePwmL = PID_SpdL.compute(consigneSpdL - current_spd.L); 
-*/
-	consignePwmR = consigneSpdR;
-	consignePwmL = consigneSpdL;
-	
-	overflowPwm = setPwms(consignePwmR, consignePwmL);
-/*
-	last_consigneSpdR = consigneSpdR;
-	last_consigneSpdL = consigneSpdL;
-*/
-	if(overflowPwm)
-		return PWM_OVERFLOW;
-	else
-		return NO_OVERFLOW;
-}
+	setConsigne(consigneL, consigneR);
 
-int Control::controlSpd(double goal_spdL, double goal_spdR)
-{
-	spd current_spd = robot.getMmSpdMotor();
-	double consignePwmR, consignePwmL;
-	bool overflowPwm = false;
-
-	//Asservissement en vitesse
-	consignePwmR = PID_SpdR.compute(goal_spdR - current_spd.R); 
-	consignePwmL = PID_SpdL.compute(goal_spdL - current_spd.L); 
-
-	overflowPwm = setPwms(consignePwmR, consignePwmL);
-
-	if(overflowPwm)
-		return PWM_OVERFLOW;
-	else
-		return NO_OVERFLOW;
+	last_consigneR = consigneR;
+	last_consigneL = consigneL;
 }
 
 void Control::applyPwm(){
-	set_pwm_left(value_pwm_left);
-	set_pwm_right(value_pwm_right);
+	set_pwm_left(value_consigne_left);
+	set_pwm_right(value_consigne_right);
 }
