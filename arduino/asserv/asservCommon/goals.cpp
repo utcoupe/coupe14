@@ -18,7 +18,7 @@ Fifo::Fifo(){
 	maxGoals = MAX_GOALS;
 }
 
-int Fifo::pushGoal(int ID, int p_type, double p_data_1, double p_data_2, double p_data_3){
+int Fifo::pushGoal(int ID, int p_type, float p_data_1, float p_data_2, float p_data_3){
 	if(nbrGoals >= maxGoals)
 		return -1; //si on est deja au max de goals, return -1
 

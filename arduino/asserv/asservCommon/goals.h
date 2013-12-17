@@ -15,9 +15,9 @@
 
 struct goal{
 	int type;
-	double data_1; //	x	angle	pwmL
-	double data_2; //	y	.	pwmR
-	double data_3; //	d_rest	.	duree
+	float data_1; //	x	angle	pwmL
+	float data_2; //	y	.	pwmR
+	float data_3; //	d_rest	.	duree
 	int ID;
 	bool isReached;
 	struct goal *next; //Chaque goal contient un pointeur vers le goal suivant;
@@ -25,7 +25,7 @@ struct goal{
 	
 class Fifo{
 	public:
-	int pushGoal(int ID, int p_type, double p_data_1 = 0, double p_data_2 = 0, double p_data_3 = 0);
+	int pushGoal(int ID, int p_type, float p_data_1 = 0, float p_data_2 = 0, float p_data_3 = 0);
 	void killGoal(int ID);
 	void clearGoals();
 	struct goal gotoNext(); //Va au goal suivant et le renvoit

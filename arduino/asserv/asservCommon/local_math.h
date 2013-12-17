@@ -7,6 +7,6 @@
 #ifndef LOCAL_MATH_H
 #define LOCAL_MATH_H
 
-double moduloTwoPI(double angle);
+float moduloTwoPI(float angle);
 
 #endif

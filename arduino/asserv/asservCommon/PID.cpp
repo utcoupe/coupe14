@@ -6,14 +6,14 @@
 #include "PID.h"
 #include "include_arduino.h"
 
-PID::PID(double n_P, double n_I, double n_D, double n_bias){
+PID::PID(float n_P, float n_I, float n_D, float n_bias){
 	setPID(n_P,n_I,n_D);
 	setBias(n_bias);
 	reset();
 	
 }
 
-void PID::setPID(double n_P, double n_I, double n_D){
+void PID::setPID(float n_P, float n_I, float n_D){
 	if(n_P == 0 || n_I < 0 || n_D < 0)
 		return; //Controle de PID correct
 	P = n_P;
@@ -21,7 +21,7 @@ void PID::setPID(double n_P, double n_I, double n_D){
 	D = n_D;
 }
 
-void PID::setBias(double n_bias){
+void PID::setBias(float n_bias){
 	bias = n_bias;
 }
 
@@ -32,8 +32,8 @@ void PID::reset(){
 	initDone = false;
 }
 
-double PID::compute(double error){
-	double error_D;
+float PID::compute(float error){
+	float error_D;
 
 	if(!initDone){ //Lors du premier compute, on ne tient pas compte de I et D
 		error_I = 0;
@@ -52,6 +52,6 @@ double PID::compute(double error){
 	return output;
 }
 
-double PID::getOutput(){
+float PID::getOutput(){
 	return output;
 }

@@ -25,16 +25,16 @@ class Control{
 	void reset();
 
 	//set des differents PIDs
-	void setPID_angle(double n_P, double n_I, double n_D); //PID de l'asservissement angulaire
-	void setPID_distance(double n_P, double n_I, double n_D); //PID de l'asservissement en position
+	void setPID_angle(float n_P, float n_I, float n_D); //PID de l'asservissement angulaire
+	void setPID_distance(float n_P, float n_I, float n_D); //PID de l'asservissement en position
 	
 	//gestion de l'offset. Attention, il faut modifier les PIDs !
 	void setConsigneOffset(int n_offset);
-	void setMaxAngCurv(double n_max_ang);
-	void setMaxAcc(double n_max_acc);
+	void setMaxAngCurv(float n_max_ang);
+	void setMaxAcc(float n_max_acc);
 
 	//Push un goal
-	int pushGoal(int ID, int p_type, double p_data_1 = 0, double p_data_2 = 0, double p_data_3 = 0);
+	int pushGoal(int ID, int p_type, float p_data_1 = 0, float p_data_2 = 0, float p_data_3 = 0);
 	void nextGoal(); //va au goal suivant
 	void clearGoals();
 
@@ -57,16 +57,16 @@ class Control{
 	PID PID_Distance;
 	//interface avec les PIDs
 	void setConsigne(int consigne_left, int consigne_right); //controles puis modification (renvoie l'overflow)
-	void check(double *consigne, double last);
-	void controlAngle(double goal_angle); //goal en radians
-	void controlPos(double e_angle, double e_dist); //goal en mm
+	void check(float *consigne, float last);
+	void controlAngle(float goal_angle); //goal en radians
+	void controlPos(float e_angle, float e_dist); //goal en mm
 
 	void applyPwm();
 
 	int consigne_offset;
-	double max_angle;
+	float max_angle;
 
-	double max_acc;
+	float max_acc;
 
 	//Les pwm à appliquer
 	int value_consigne_right, value_consigne_left;

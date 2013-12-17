@@ -56,7 +56,7 @@ void RobotState::update(){
 	int dl = (ticksL - last_ticksL)*FIXED_POINT_PRECISION;
 	int dr = (ticksR - last_ticksR)*FIXED_POINT_PRECISION;
 
-	double d_angle = tan((dr - dl)/(ENTRAXE_ENC * ENC_MM_TO_TICKS * FIXED_POINT_PRECISION)); //sans approximation tan
+	float d_angle = tan((dr - dl)/(ENTRAXE_ENC * ENC_MM_TO_TICKS * FIXED_POINT_PRECISION)); //sans approximation tan
 	current_pos.angle = current_pos.angle + d_angle;
 	current_pos.rangle = moduloTwoPI(current_pos.rangle + d_angle);
 

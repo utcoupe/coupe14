@@ -56,7 +56,7 @@ void Control::compute(){
 		switch(current_goal.type){
 			case TYPE_ANG :
 			{
-				double da = current_goal.data_1 - current_pos.angle;
+				float da = current_goal.data_1 - current_pos.angle;
 				if(abs(da) < ERROR_ANGLE && value_consigne_left <= CONSIGNE_REACHED && value_consigne_right <= CONSIGNE_REACHED)
 					fifo.pushIsReached();
 				else
@@ -75,11 +75,11 @@ void Control::compute(){
 
 			case TYPE_POS :
 			{
-				double dx = current_goal.data_1 - current_pos.x;
-				double dy = current_goal.data_2 - current_pos.y;
-				double goal_a = atan2(dy, dx);
-				double da = moduloTwoPI(goal_a - current_pos.angle);
-				double dd = sqrt(pow(dx, 2.0)+pow(dy, 2.0));//erreur en distance
+				float dx = current_goal.data_1 - current_pos.x;
+				float dy = current_goal.data_2 - current_pos.y;
+				float goal_a = atan2(dy, dx);
+				float da = moduloTwoPI(goal_a - current_pos.angle);
+				float dd = sqrt(pow(dx, 2.0)+pow(dy, 2.0));//erreur en distance
 
 				if(da > max_angle)//On tourne sur place avant de se déplacer
 					controlAngle(da);
@@ -129,11 +129,11 @@ void Control::reset(){
 }
 
 
-void Control::setPID_angle(double n_P, double n_I, double n_D){
+void Control::setPID_angle(float n_P, float n_I, float n_D){
 	PID_Angle.setPID(n_P, n_I, n_D);
 }
 
-void Control::setPID_distance(double n_P, double n_I, double n_D){
+void Control::setPID_distance(float n_P, float n_I, float n_D){
 	PID_Distance.setPID(n_P, n_I, n_D);
 }
 
@@ -141,11 +141,11 @@ void Control::setConsigneOffset(int n_offset){
 	consigne_offset = n_offset;
 }
 
-void Control::setMaxAngCurv(double n_max_ang){
+void Control::setMaxAngCurv(float n_max_ang){
 	max_angle = n_max_ang;
 }
 
-void Control::setMaxAcc(double n_max_acc){
+void Control::setMaxAcc(float n_max_acc){
 	max_acc = n_max_acc;
 }
 
@@ -153,7 +153,7 @@ void Control::pushPos(m_pos n_pos){
 	robot.pushMmPos(n_pos);
 }
 
-int Control::pushGoal(int ID, int p_type, double p_data_1, double p_data_2, double p_data_3){
+int Control::pushGoal(int ID, int p_type, float p_data_1, float p_data_2, float p_data_3){
 	return fifo.pushGoal(ID, p_type, p_data_1, p_data_2, p_data_3);
 }
 
@@ -214,7 +214,7 @@ void Control::setConsigne(int consigne_left, int consigne_right){
 	value_consigne_left = consigne_left;
 }
 
-void Control::check(double *consigne, double last)
+void Control::check(float *consigne, float last)
 {
 	//Check MAX_ACC
 	if(*consigne > last + max_acc){
@@ -225,10 +225,10 @@ void Control::check(double *consigne, double last)
 	}
 }
 
-void Control::controlAngle(double da)
+void Control::controlAngle(float da)
 {
-	double consigne;
-	static double last_consigne = 0;
+	float consigne;
+	static float last_consigne = 0;
 	int consignePwmL, consignePwmR;
 
 	//Asservissement en position, renvoie une consigne de vitesse
@@ -243,10 +243,10 @@ void Control::controlAngle(double da)
 	last_consigne = consigne;
 }
 
-void Control::controlPos(double da, double dd)
+void Control::controlPos(float da, float dd)
 {
-	double consigneAngle, consigneDistance, consigneR, consigneL;
-	static double last_consigneL = 0, last_consigneR = 0;
+	float consigneAngle, consigneDistance, consigneR, consigneL;
+	static float last_consigneL = 0, last_consigneR = 0;
 
 	//Asservissement en position, renvoie une consigne de vitesse
 	//Calcul des spd angulaire
