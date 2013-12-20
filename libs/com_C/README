@@ -1,0 +1,18 @@
+Fichiers de protocoles serial et instructions d'utilisation
+
+Cette version n'effectue aucune vérifications sur les pertes ou corruptions de paquets
+Voici les instructions d'utilisation :
+switch_decoder.* : contient le décodeur des données serial.
+	il suffit de forwarder les octets du serial vers cette fonction
+	il convient de faire des liens symboliques vers ces fichiers, ils sont génériques
+
+serial_defines.h : tout les defines protocole
+	fichier generique, il convient d'utiliser un lien symbolique
+
+serial_switch.* : contient le switch sur les ordres et le getSize
+	fichier squelette : il faut le copier et l'adapter au client
+	Il convient de remplir le switch avec les ordres à executer
+		et getSize avec la taille des arguments des ordres
+
+serial_local.h : defines locaux
+	Pour l'instant il ne sert qu'à définir l'adresse locale
