@@ -38,6 +38,8 @@ clean:
 mrproper: clean
 	rm -f $(EXEC)
 
+main.o: global.h
+
 build/:
 	mkdir build
 

@@ -13,6 +13,7 @@
 int main(int argc, char **argv){
 	// Touche clavier
 	char key;
+	char mask_name[20];
 	int h_yellow = H_YEL, h_yellow_tol = H_YEL_TOL, s_yellow_tol = S_YEL_TOL, v_yellow_tol = V_YEL_TOL;
 	int h_red = H_RED, h_red_tol = H_RED_TOL, s_red_tol = S_RED_TOL, v_red_tol = V_RED_TOL;
 	int weight_yellow, weight_red;
@@ -25,6 +26,9 @@ int main(int argc, char **argv){
 		s_yellow_tol = atoi(argv[3]);
 		v_yellow_tol = atoi(argv[3]);
 	}
+#else
+	if(argc >= 2)
+		mask_name = argv[1];
 #endif
 
 	// Capture vidéo
@@ -92,11 +96,11 @@ int main(int argc, char **argv){
 		image = cvQueryFrame(capture);
 
 		detect_color(image, color_yellow_mask, h_yellow, h_yellow_tol, s_yellow_tol, v_yellow_tol);
-		detect_zone(color_yellow_mask, mask_yellow, "./mask.jpg");
+		detect_zone(color_yellow_mask, mask_yellow, mask_name);
 		weight_yellow = get_weight(mask_yellow);
 
 		detect_color(image, color_red_mask, h_red, h_red_tol, s_red_tol, v_red_tol);
-		detect_zone(color_red_mask, mask_red, "./mask.jpg");
+		detect_zone(color_red_mask, mask_red, mask_name);
 		weight_red = get_weight(mask_red);
 
 		printf("weight_yellow : %d \t weight_red : %d\n", weight_yellow, weight_red);
