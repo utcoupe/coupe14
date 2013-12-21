@@ -133,8 +133,9 @@ ordersList2 = deque()
 
 import time
 while 1:
-	address = int(raw_input("Entre une adresse (int)"))
-	idd = int(raw_input("Entre un id (int)"))
+	#address = int(raw_input("Entre une adresse (int)"))
+	#idd = int(raw_input("Entre un id (int)"))
+	address = 2
 
 	dataString = str(raw_input("Entre le nom d'un ordre (string)"))
 	if dataString == 'A_GOTO':
@@ -187,5 +188,8 @@ while 1:
 		orderSize = instance.getConst()[2][ instance.getConst()[1][ orderNumber ] ]
 		for i in range(index, orderSize*8+index, 8):
 			print("data: ")
-			print(int(order[2][i:i+8], 2)) """
+			temp2 = ""
+			for b in range(8, 0, -1):
+				temp2 += order[2][i - b + 1]
+			print(int(temp2, 2)) """
 
