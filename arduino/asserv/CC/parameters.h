@@ -6,7 +6,7 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
-#define DEBUG //Commenter cette ligne pour enlever les pints de debug
+//#define DEBUG //Commenter cette ligne pour enlever les pints de debug
 
 /* Simple ou Double ou Quadruple evaluation ? 
  * La quadruple evaluation utilise 4 interruption par tick

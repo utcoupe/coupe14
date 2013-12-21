@@ -66,8 +66,8 @@ void Control::compute(){
 				counter++;
 				if(counter > 100){
 					counter = 0;
-					Serial.println(da);
-					Serial.print(value_consigne_left);Serial.println(value_consigne_right);
+					PDEBUGLN(da);
+					PDEBUG(value_consigne_left); PDEBUGLN(value_consigne_right);
 				}
 #endif
 				break;
