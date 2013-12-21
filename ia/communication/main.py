@@ -133,6 +133,25 @@ while 1:
 	elif dataString == 'A_ROT':
 		data = orderToBinary(instance.getConst()[1][dataString])
 		data += floatToBinary(float(raw_input("Entre l'argument 1 (float)")))
+
+	elif dataString == 'A_PWM_TEST':
+		data = orderToBinary(int(instance.getConst()[1][dataString]))
+		data += intToBinary(int(raw_input("Entre l'argument 1 (int)")))
+		data += intToBinary(int(raw_input("Entre l'argument 2 (int)")))
+		data += intToBinary(int(raw_input("Entre l'argument 3 (int)")))
+
+	elif dataString == 'A_PIDA':
+		data = orderToBinary(int(instance.getConst()[1][dataString]))
+		data += intToBinary(int(raw_input("Entre l'argument 1 (int)")))
+		data += intToBinary(int(raw_input("Entre l'argument 2 (int)")))
+		data += intToBinary(int(raw_input("Entre l'argument 3 (int)")))
+
+	elif dataString == 'A_PIDD':
+		data = orderToBinary(int(instance.getConst()[1][dataString]))
+		data += intToBinary(int(raw_input("Entre l'argument 1 (int)")))
+		data += intToBinary(int(raw_input("Entre l'argument 2 (int)")))
+		data += intToBinary(int(raw_input("Entre l'argument 3 (int)")))
+
 	else:
 		print ("L'ordre n'est pas implementé")
 
@@ -142,6 +161,7 @@ while 1:
 
 	time.sleep(1)
 	ordersList2 = instance2.getXbeeOrders()
+	print(instance.getConst())
 
 
 	for order in ordersList2:

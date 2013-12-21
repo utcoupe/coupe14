@@ -16,6 +16,7 @@ Les ordres sont commun à toutes les arduinos
 Tous les ordres sont codées sur 6 bits, le bit de poids fort est toujours réservé au protocole
 Le parseur python prend ce qu'il y a entre les balises de parse, ne pas les écrirent ailleurs
 Si vous voulez commentez une enumération, il faut le faire sur la même ligne et après la virgule
+Il faut toujours mettre un espace entre une enumération et le commentaire qui suit
 */
 
 
@@ -28,7 +29,8 @@ enum address{
 	ADDR_FLUSSMITTEL_ASSERV,
 	ADDR_TIBOT_OTHER,
 	ADDR_TIBOT_ASSERV,
-	ADDR_HOKUYO
+	ADDR_HOKUYO,
+	ORDRE_NON_PARSE
 	//FINPARSE
 };
 
@@ -48,7 +50,8 @@ enum ordre {
 	A_CLEANG,
 	A_PIDA, //@int @int @int
 	A_PIDD, //@int @int @int
-	A_PWM_TEST //@int @int @int
+	A_PWM_TEST, //@int @int @int
+	ORDRE_NON_PARSE
 	//FINPARSE
 };
 

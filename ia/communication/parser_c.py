@@ -43,14 +43,14 @@ def parseFile(path, myRe, nbGroupParse=1):
 
 
 def parseConstante():
-	relativePath = "../../arduino/commun/communication/"
+	relativePath = "../../libs/com_C/"
 
 	reEnum = re.compile("\s?(?P<constante>\w*)(\s?=\s?(?P<value>.*))?,")
 	reArrayC = re.compile("\s?ordreSize\[(?P<constante>\w*)\](\s?=\s?(?P<value>.*))?;")
 
 
-	address = parseFile(relativePath + "defines.h", reEnum, 1)
-	orders = parseFile(relativePath + "defines.h", reEnum, 2)
-	ordersSize = parseFile(relativePath + "defines_size.c", reArrayC, 1)
+	address = parseFile(relativePath + "serial_defines.h", reEnum, 1)
+	orders = parseFile(relativePath + "serial_defines.h", reEnum, 2)
+	ordersSize = parseFile(relativePath + "serial_defines.c", reArrayC, 1)
 
 	return (address, orders, ordersSize)
