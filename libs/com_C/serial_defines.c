@@ -24,5 +24,6 @@ void initSize()
 	ordreSize[A_PIDA]=6;
 	ordreSize[A_PIDD]=6;
 	ordreSize[A_PWM_TEST]=6;
+	ordreSize[A_GET_CODER]=0;
 	//FINPARSE
 }

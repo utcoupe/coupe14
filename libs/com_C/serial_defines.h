@@ -51,6 +51,7 @@ enum ordre {
 	A_PIDA, //@int @int @int
 	A_PIDD, //@int @int @int
 	A_PWM_TEST, //@int @int @int
+	A_GET_CODER,
 	ORDRE_NON_PARSE
 	//FINPARSE
 };

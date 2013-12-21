@@ -36,7 +36,8 @@ void executeCmd(char serial_data){
 		break;
 	case data_step:
 		if ((serial_data & PROTOCOL_BIT) == 0){
-			data[data_counter++] = serial_data;
+			data[data_counter] = serial_data;
+			data_counter++;
 			break;
 		}
 		else if (serial_data == END) {
@@ -76,7 +77,14 @@ void executeCmd(char serial_data){
 
 int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){ //7bits -> 8bits (on garde le même tableau)
 	int i = 0, j = 0, offset = 0;
-	for(i=0;i<data_counter;i++){
+	// CECI EST IMMONDE
+	data_out[0] = data_in[0] >> 1;
+	j++;
+	if(data_counter > 1){
+		data_out[1] = (data_in[0] << 7) | data_in[1] ;
+		j++;
+	}
+	for(i=2;i<data_counter;i++){
 		if(offset == 7){
 			i++;
 			offset = 0;
@@ -98,6 +106,7 @@ int encode(unsigned char *data_in, unsigned char *data_out, int data_counter){ /
 			data_out[j] = copy & 0x7f;
 			offset = 0;
 			copy = 0;
+			i--;
 		}
 		else{
 			unsigned char temp = data_in[i];
@@ -156,6 +165,7 @@ void sendResponse(unsigned char *data, int data_counter, unsigned char id){
 	int i, size;
 	size = encode(data, data_7bits, data_counter);
 	sendByte(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
+	sendByte(id);
 	for(i = 0 ; i < size ; i++){
 		sendByte(data_7bits[i]); //contenu
 	}
@@ -167,3 +177,5 @@ void sendInvalid() {//renvoit le code de message invalide (dépend de la platefo
 	sendByte(INVALID_MESSAGE);
 	sendByte(END);
 }
+
+void rightShidt2Bits(unsigned char *data_in, unsigned char *data_out);
