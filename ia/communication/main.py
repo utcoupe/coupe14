@@ -114,7 +114,7 @@ def orderToBinary(num):
 	return temp
 
 instance = Communication("/dev/ttyUSB0")
-instance2 = Communication("/dev/ttyUSB1")
+#instance2 = Communication("/dev/ttyUSB1")
 
 ordersList = deque()
 ordersList2 = deque()
@@ -159,7 +159,7 @@ while 1:
 	instance.sendXbeeOrders(ordersList)
 	ordersList.pop()
 
-	time.sleep(1)
+	"""time.sleep(1)
 	ordersList2 = instance2.getXbeeOrders()
 	print(instance.getConst())
 
@@ -175,5 +175,5 @@ while 1:
 		orderSize = instance.getConst()[2][ orderNumber ]
 		for i in range(index, orderSize*8+index, 8):
 			print("data: ")
-			print(int(order[2][i:i+8], 2))
+			print(int(order[2][i:i+8], 2))"""
 
