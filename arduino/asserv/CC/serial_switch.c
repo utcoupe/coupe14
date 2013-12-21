@@ -6,7 +6,7 @@
 #include "serial_switch.h"
 #include "serial_defines.h"
 #include "serial_types.h"
-#include "compaArduino.h"
+#include "control.h"
 
 extern Control control;
 
@@ -15,14 +15,9 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 	int ret_size = 0;
 	switch(ordre){
 	case PINGPING:
-		control.pushGoal(0,TYPE_PWM,100,100,500);
-		/*
                 if (!doublon) {
-			Serial2.print("coucou");
+		//	Serial2.print("coucou");
 		}
-		else {
-			Serial2.print("Doublon");
-		}*/
 		break;
 	case A_GOTO:
 		if (!doublon) {
