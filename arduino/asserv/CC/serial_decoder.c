@@ -77,7 +77,14 @@ void executeCmd(char serial_data){
 
 int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){ //7bits -> 8bits (on garde le même tableau)
 	int i = 0, j = 0, offset = 0;
-	for(i=0;i<data_counter;i++){
+	// CECI EST IMMONDE
+	data_out[0] = data_in[0] >> 1;
+	j++;
+	if(data_counter > 1){
+		data_out[1] = (data_in[0] << 7) | data_in[1] ;
+		j++;
+	}
+	for(i=2;i<data_counter;i++){
 		if(offset == 7){
 			i++;
 			offset = 0;
@@ -170,3 +177,5 @@ void sendInvalid() {//renvoit le code de message invalide (dépend de la platefo
 	sendByte(INVALID_MESSAGE);
 	sendByte(END);
 }
+
+void rightShidt2Bits(unsigned char *data_in, unsigned char *data_out);
