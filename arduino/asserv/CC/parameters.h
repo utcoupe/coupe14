@@ -83,12 +83,12 @@
 #define PIN_ENC_RIGHT_A 21
 #define PIN_ENC_RIGHT_B 20
 #define PIN_ENC_RIGHT_0 4 //non utilisé
-#define PIN_ENC_LEFT_A 18
-#define PIN_ENC_LEFT_B 19
+#define PIN_ENC_LEFT_A 19
+#define PIN_ENC_LEFT_B 18
 #define PIN_ENC_LEFT_0 2 //non utilisé
 
-#define INTERRUPT_ENC_LEFT_A 5
-#define INTERRUPT_ENC_LEFT_B 4
+#define INTERRUPT_ENC_LEFT_A 4
+#define INTERRUPT_ENC_LEFT_B 5
 #define INTERRUPT_ENC_LEFT_0 0 //non utilisé
 #define INTERRUPT_ENC_RIGHT_A 2
 #define INTERRUPT_ENC_RIGHT_B 3
