@@ -5,8 +5,8 @@
  ****************************************/
 #include "serial_decoder.h"
 #include "serial_defines.h"
-#include "serial_local.skeleton.h"
-#include "serial_switch.skeleton.h"
+#include "serial_local.h"
+#include "serial_switch.h"
 
 extern unsigned char ordreSize[MAX_ORDRES];
 
@@ -15,7 +15,7 @@ void executeCmd(char serial_data){
 	static char ID_attendu = 0;
 	static unsigned char data[MAX_DATA];
 	static int data_counter = 0;
-	bool doublon = false;
+	static bool doublon = false;
 
 	static enum etape etape = wait_step;
 
@@ -30,36 +30,37 @@ void executeCmd(char serial_data){
 			sendInvalid();
 		}
 		else {//Doublon
-			etape = end_step;
+			etape = data_step;
 			doublon = true;
 		}
 		break;
 	case data_step:
-		if(serial_data == END){
-			etape = end_step;
-		}
-		else if((serial_data & PROTOCOL_BIT) != 0){
-			sendInvalid();
-			etape = wait_step;
-		}
-		else{
+		if ((serial_data & PROTOCOL_BIT) == 0){
 			data[data_counter++] = serial_data;
+			break;
 		}
-		break;
-	case end_step:
-		unsigned char data_8bits[MAX_DATA];
-		data_counter = decode(data, data_8bits, data_counter); //Décale le tableau data pour avoir des données 8 bits, renvoit le nombre d'octets apres décalage
-		if(check(data_8bits, data_counter) != 0){//Si les data sont invalide
+		else if (serial_data == END) {
+			unsigned char data_8bits[MAX_DATA];
+			data_counter = decode(data, data_8bits, data_counter); //Décale le tableau data pour avoir des données 8 bits, renvoit le nombre d'octets apres décalage
+			if(check(data_8bits, data_counter) != 0){//Si les data sont invalide
+				sendInvalid();
+				etape = wait_step;
+			}
+			else{
+				executeOrdre(data_8bits, data_counter, ID_recu, doublon); //Execute les ordres, envoit les réponses
+				if (!doublon){
+					ID_attendu=(ID_attendu + 1) % 64;//ID sur 6 bits effectifs, incrémentée si non doublon
+				}
+				etape = wait_step;
+			}
+			data_counter = 0;
+			doublon = false;
+		}
+		else {
 			sendInvalid();
 			etape = wait_step;
+			break;
 		}
-		else{
-			executeOrdre(data_8bits, data_counter, ID_recu, doublon); //Execute les ordres, envoit les réponses
-			if (!doublon)
-				ID_attendu=(ID_attendu + 1) % 128;//ID sur 7 bits, incrémentée si non doublon
-		}
-		data_counter = 0;
-		doublon = false;
 		break;
 	case wait_step:
 		break;
@@ -75,12 +76,12 @@ void executeCmd(char serial_data){
 
 int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){ //7bits -> 8bits (on garde le même tableau)
 	int i = 0, j = 0, offset = 0;
-	for(i=0;i<data_counter-1;i++){
+	for(i=0;i<data_counter;i++){
 		if(offset == 7){
 			i++;
 			offset = 0;
 		}
-		data_out[j] = data_in[i] << 1+offset;
+		data_out[j] = data_in[i] << (1+offset);
 		data_out[j] |= data_in[i+1] >> (6-offset);
 		offset++;
 		j++;
@@ -92,7 +93,7 @@ int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){ /
 int encode(unsigned char *data_in, unsigned char *data_out, int data_counter){ //8bits -> 7bits (deux tableaux)
 	int offset = 0, i = 0, j = 0;
 	unsigned char copy = 0;
-	for(i=0;i<data_counter;i++){
+	for (i=0;i<data_counter;i++){
 		if(offset == 7){
 			data_out[j] = copy & 0x7f;
 			offset = 0;
@@ -108,7 +109,7 @@ int encode(unsigned char *data_in, unsigned char *data_out, int data_counter){ /
 		}
 		j++;
 	}
-	if(offset == 0){
+	if (offset == 0){
 		j--;
 	}
 	else{
@@ -136,7 +137,7 @@ int check(unsigned char *data, int data_counter){ //Vérifie la validité des do
 	return 0;
 }
 
-int executeOrdre(unsigned char *data, int data_counter, unsigned char id, bool doublon){
+void executeOrdre(unsigned char *data, int data_counter, unsigned char id, bool doublon){
 	int i = 0, ret_size = 0;
 	unsigned char ordre;
 	unsigned char *params;

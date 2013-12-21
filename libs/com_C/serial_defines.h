@@ -36,18 +36,19 @@ enum address{
 //Codes des ordres (sur 6 bits)
 enum ordre {
 	//DEBUTPARSE
-	PINGPING,
-	PONG,
-	A_GOTOA,
-	A_GOTO,
-	A_GOTOAR,
-	A_GOTOR,
-	A_ROT,
-	A_ROTR,
-	A_KILLG,
+	PINGPING, 
+	PONG, 
+	A_GOTOA, //@int @int @float
+	A_GOTO, //@int @int
+	A_GOTOAR, //@int @int @float
+	A_GOTOR, //@int @int
+	A_ROT, //@float
+	A_ROTR, //@float
+	A_KILLG, 
 	A_CLEANG,
-	A_PIDA,
-	A_PIDD
+	A_PIDA, //@int @int @int
+	A_PIDD, //@int @int @int
+	A_PWM_TEST //@int @int @int
 	//FINPARSE
 };
 
