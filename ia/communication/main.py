@@ -17,16 +17,28 @@ class Communication():
 		self.orders = {}
 		self.ordersSize = {}
 		self.ordersListBuffer = deque()
-		self.sendId = 0
-		self.receiveId = 0
-
-
+		
 		(self.address, self.orders, self.ordersSize) = parser_c.parseConstante()
-		#on initialise le port serial du xbee explorer
+		self.lastIdConfirm = {x:63 for x in self.address}
+		self.lastIdSend = self.lastIdConfirm
+
 		self.liaisonXbee = serial_comm.ComSerial(port, 57600)
 
 	def getConst(self):
 		return (self.address, self.orders, self.ordersSize)
+
+	def getId(self, address):
+		"""retourne l'id qu'il faut utiliser pour envoyer un packet à l'adresse passé en argument"""
+		if self.lastIdSend[address] >= 63:# -1 car l'adresse 0 n'existe pas
+			return 0
+		else:
+			self.lastIdSend[address] += 1
+			return self.lastIdSend[address]
+
+
+
+
+
 
 
 
@@ -62,8 +74,25 @@ class Communication():
 
 
 	def readOrders(self):
-		ordersList = deque()
-		#print(self.getXbeeOrders())
+		ordersList = self.getXbeeOrders()
+
+		for order in ordersList:
+			address =order[0]
+			idd = order[1]
+
+			index = 0
+			orderNumber = int(order[2][index:6], 2)
+			index += 6
+			orderSize = instance.getConst()[2][ instance.getConst()[1][ orderNumber ] ]
+			for i in range(index, orderSize*8+index, 8):
+				print("data: ")
+				temp2 = ""
+				for b in range(8, 0, -1):
+					temp2 += order[2][i - b + 1]
+				print(int(temp2, 2)) 
+
+
+
 
 
 	#Envoi
@@ -71,8 +100,7 @@ class Communication():
 		""" on concatène les trois parametres et on retourne chaineRetour en appliquant le protocole """
 		chaineRetour = ""
 		chaineRetour += chr(address + 128)
-		chaineRetour += chr(self.sendId)
-		self.sendId += 1
+		chaineRetour += chr(packetId)
 
 		rawBinary = data
 		
@@ -95,11 +123,19 @@ class Communication():
 			chaineTemp = self.applyProtocole(order[0], order[1], order[2])
 			self.liaisonXbee.send(chaineTemp)
 
+	def sendOrder(self, order):
+		"""c'est la fonction que l'utilisateur doit manipuler, ordre est de type (address, data)"""
+		#TODO:
+		#on get les packet à renvoyer
+		#on y ajoute notre packet
+		#on envoye tout à sendXbeeOrders
 
-	def addOrders(self, order):
-		""" order est de la forme (adresse, id, data) où data ne contient d'un ordre, on ajoute l'ordre dans ordersListBuffer """
-		# on lis les ordres et on les regroupes par detination
-		self.ordersListBuffer.append(order)
+		#bypass temporaire:
+		ordersList = deque()
+		ordersList.append((order[0], self.getId(order[0]), order[1]))
+		self.sendXbeeOrders(ordersList)
+		ordersList.pop()
+
 
 
 def floatToBinary(num):
@@ -125,18 +161,12 @@ def orderToBinary(num):
 		temp = '0' + temp
 	return temp
 
+
+
+
 instance = Communication("/dev/ttyUSB0")
-#instance2 = Communication("/dev/ttyUSB1")
-
-ordersList = deque()
-ordersList2 = deque()
-
 import time
 while 1:
-	#address = int(raw_input("Entre une adresse (int)"))
-	#idd = int(raw_input("Entre un id (int)"))
-	address = 2
-
 	dataString = str(raw_input("Entre le nom d'un ordre (string)"))
 	if dataString == 'A_GOTO':
 		data = orderToBinary(int(instance.getConst()[1][dataString]))
@@ -165,31 +195,16 @@ while 1:
 		data += intToBinary(int(raw_input("Entre l'argument 2 (int)")))
 		data += intToBinary(int(raw_input("Entre l'argument 3 (int)")))
 
+	elif dataString == 'PINGPING':
+		data = orderToBinary(int(instance.getConst()[1][dataString]))
+
+	elif dataString == 'A_GET_CODER':
+		data = orderToBinary(int(instance.getConst()[1][dataString]))
+
 	else:
 		print ("L'ordre n'est pas implementé")
 
-	ordersList.append((address,idd,data))
-	instance.sendXbeeOrders(ordersList)
-	ordersList.pop()
-	"""
-
-	time.sleep(1)
-	ordersList2 = instance.getXbeeOrders()
-
-
-	for order in ordersList2:
-		print("BEGIN")
-		print(order[0])
-		print(order[1])
-
-		index = 0
-		orderNumber = int(order[2][index:6], 2)
-		index += 6
-		orderSize = instance.getConst()[2][ instance.getConst()[1][ orderNumber ] ]
-		for i in range(index, orderSize*8+index, 8):
-			print("data: ")
-			temp2 = ""
-			for b in range(8, 0, -1):
-				temp2 += order[2][i - b + 1]
-			print(int(temp2, 2)) """
+	address = 2
+	instance.sendOrder((address,data))
+	
 
