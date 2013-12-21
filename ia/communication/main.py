@@ -133,7 +133,7 @@ ordersList2 = deque()
 
 import time
 while 1:
-	"""address = int(raw_input("Entre une adresse (int)"))
+	address = int(raw_input("Entre une adresse (int)"))
 	idd = int(raw_input("Entre un id (int)"))
 
 	dataString = str(raw_input("Entre le nom d'un ordre (string)"))
@@ -169,7 +169,8 @@ while 1:
 
 	ordersList.append((address,idd,data))
 	instance.sendXbeeOrders(ordersList)
-	ordersList.pop()"""
+	ordersList.pop()
+	"""
 
 	time.sleep(1)
 	ordersList2 = instance.getXbeeOrders()
@@ -186,5 +187,5 @@ while 1:
 		orderSize = instance.getConst()[2][ instance.getConst()[1][ orderNumber ] ]
 		for i in range(index, orderSize*8+index, 8):
 			print("data: ")
-			print(int(order[2][i:i+8], 2))
+			print(int(order[2][i:i+8], 2)) """
 
