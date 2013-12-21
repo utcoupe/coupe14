@@ -6,7 +6,7 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
-//#define DEBUG //Commenter cette ligne pour enlever les pints de debug
+#define DEBUG //Commenter cette ligne pour enlever les pints de debug
 
 /* Simple ou Double ou Quadruple evaluation ? 
  * La quadruple evaluation utilise 4 interruption par tick
@@ -51,16 +51,16 @@
 #define CONSIGNE_OFFSET 0
 
 #define CONSIGNE_RANGE_MAX 255
-#define CONSIGNE_RANGE_MIN 0
+#define CONSIGNE_RANGE_MIN -255
 
 //CONSIGNE_REACHED est la pwm en dessous de laquelle un robot peut etre considéré comme arrêté à son goal
 #define CONSIGNE_REACHED 0
 
-#define ENC_RESOLUTION 1024 //resolution du codeur
+#define ENC_RESOLUTION 500 //resolution du codeur
 
-#define ENC_RADIUS 34 //rayon de la roue codeuse
-#define ENTRAXE_ENC 262.0 // Distance entre chaque roue codeuse en mm
-#define ENTRAXE_MOTOR 262.0 // Distance entre chaque roue motrice en mm
+#define ENC_RADIUS 32 //rayon de la roue codeuse
+#define ENTRAXE_ENC 260.0 // Distance entre chaque roue codeuse en mm
+#define ENTRAXE_MOTOR 203.0 // Distance entre chaque roue motrice en mm
 
 #define ERROR_ANGLE 0.05 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
 #define ERROR_POS 10 // erreur en position (mm)  maximale pour considérer l'objectif comme atteint
