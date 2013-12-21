@@ -22,6 +22,15 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		//	Serial2.print("coucou");
 		}
 		break;
+	case A_GET_CODER:
+		Serial2.println("");
+		Serial2.print("X : ");
+		Serial2.println(control.getPos().x);
+		Serial2.print("Y : ");
+		Serial2.println(control.getPos().y);
+		Serial2.print("A : ");
+		Serial2.println(control.getPos().angle);
+		break;
 	case A_GOTO:
 		if (!doublon) {
 			control.pushGoal(0, TYPE_POS, btoi(argv), btoi(argv+2), 0);
