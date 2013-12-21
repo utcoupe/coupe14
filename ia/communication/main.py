@@ -17,6 +17,8 @@ class Communication():
 		self.orders = {}
 		self.ordersSize = {}
 		self.ordersListBuffer = deque()
+		self.sendId = 0
+		self.receiveId = 0
 
 
 		(self.address, self.orders, self.ordersSize) = parser_c.parseConstante()
@@ -43,6 +45,8 @@ class Communication():
 				temp = '0' + temp
 			packetData += temp
 
+		print("raw")
+		print(packetData)
 		return (packetAddress, packetId, packetData)
 
 	def getXbeeOrders(self):
@@ -59,7 +63,7 @@ class Communication():
 
 	def readOrders(self):
 		ordersList = deque()
-		print(self.getXbeeOrders())
+		#print(self.getXbeeOrders())
 
 
 	#Envoi
@@ -67,7 +71,8 @@ class Communication():
 		""" on concatène les trois parametres et on retourne chaineRetour en appliquant le protocole """
 		chaineRetour = ""
 		chaineRetour += chr(address + 128)
-		chaineRetour += chr(packetId)
+		chaineRetour += chr(self.sendId)
+		self.sendId += 1
 
 		rawBinary = data
 		
@@ -79,6 +84,8 @@ class Communication():
 		#on ajoute l'octet de fin
 		chaineRetour += chr(128)
 
+		print("send raw")
+		print(rawBinary)
 		return(chaineRetour)
 
 
@@ -101,10 +108,15 @@ def floatToBinary(num):
 
 def intToBinary(num):
 	"""retourne une chaine de 16 bits"""
+	temp2 = ""
 	temp = bin(num)[2:]
 	while len(temp) < 16:
 		temp = '0' + temp
-	return temp
+	for i in range(8, 0, -1):
+		temp2 += temp[i-1]
+	for i in range(16, 8, -1):
+		temp2 += temp[i-1]
+	return temp2
 
 def orderToBinary(num):
 	"""retourne une chaine de 6 bits"""
@@ -121,7 +133,7 @@ ordersList2 = deque()
 
 import time
 while 1:
-	address = int(raw_input("Entre une adresse (int)"))
+	"""address = int(raw_input("Entre une adresse (int)"))
 	idd = int(raw_input("Entre un id (int)"))
 
 	dataString = str(raw_input("Entre le nom d'un ordre (string)"))
@@ -157,23 +169,22 @@ while 1:
 
 	ordersList.append((address,idd,data))
 	instance.sendXbeeOrders(ordersList)
-	ordersList.pop()
+	ordersList.pop()"""
 
-	"""time.sleep(1)
-	ordersList2 = instance2.getXbeeOrders()
-	print(instance.getConst())
+	time.sleep(1)
+	ordersList2 = instance.getXbeeOrders()
 
 
 	for order in ordersList2:
+		print("BEGIN")
 		print(order[0])
 		print(order[1])
 
 		index = 0
-		orderNumber = instance.getConst()[1][ int(order[2][index:6], 2) ]
-		print(orderNumber)
+		orderNumber = int(order[2][index:6], 2)
 		index += 6
-		orderSize = instance.getConst()[2][ orderNumber ]
+		orderSize = instance.getConst()[2][ instance.getConst()[1][ orderNumber ] ]
 		for i in range(index, orderSize*8+index, 8):
 			print("data: ")
-			print(int(order[2][i:i+8], 2))"""
+			print(int(order[2][i:i+8], 2))
 
