@@ -4,6 +4,7 @@ Ce fichier gère la communication
 """
 
 from collections import deque
+import struct
 
 import parser_c
 import serial_comm
@@ -22,8 +23,10 @@ class Communication():
 		#on initialise le port serial du xbee explorer
 		self.liaisonXbee = serial_comm.ComSerial(port, 57600)
 
-	def getConst():
+	def getConst(self):
 		return (self.address, self.orders, self.ordersSize)
+
+
 
 	def extractData(self, rawInput):
 		""" prend rawInput une chaine de caractère qui correspond  qui correspond à un ordre, retourne les autres packerData est prêt à être interpréter"""
@@ -51,13 +54,6 @@ class Communication():
 		for rawInput in rawInputList:
 			ordersList.append(self.extractData(rawInput))
 
-		for order in ordersList:
-			print(order[0])
-			print(order[1])
-			for i in range(0, len(order[2]), 8):
-				if int(order[2][i:i+8], 2):
-					print("data: " + chr(int(order[2][i:i+8], 2)))
-
 		return ordersList
 
 
@@ -73,10 +69,8 @@ class Communication():
 		chaineRetour += chr(address + 128)
 		chaineRetour += chr(packetId)
 
-		#on ajoute les data
-		rawBinary = ""
-		for octet in data:
-			rawBinary += bin(ord(octet))[2:].zfill(8)
+		rawBinary = data
+		
 		while len(rawBinary)%7!=0: # hack pour former correctement le dernier octet
 			rawBinary += '0'
 		for i in range(0, len(rawBinary), 7):
@@ -101,22 +95,65 @@ class Communication():
 		self.ordersListBuffer.append(order)
 
 
+def floatToBinary(num):
+	"""retourne une chaine de 32 bits"""
+	return ''.join(bin(ord(c)).replace('0b', '').rjust(8, '0') for c in struct.pack('!f', num))
+
+def intToBinary(num):
+	"""retourne une chaine de 16 bits"""
+	temp = bin(num)[2:]
+	while len(temp) < 16:
+		temp = '0' + temp
+	return temp
+
+def orderToBinary(num):
+	"""retourne une chaine de 6 bits"""
+	temp = bin(num)[2:]
+	while len(temp) < 6:
+		temp = '0' + temp
+	return temp
+
 instance = Communication("/dev/ttyUSB0")
 instance2 = Communication("/dev/ttyUSB1")
 
 ordersList = deque()
+ordersList2 = deque()
 
 import time
 while 1:
 	address = int(raw_input("Entre une adresse (int)"))
 	idd = int(raw_input("Entre un id (int)"))
-	data = str(raw_input("Entre le nom d'un ordre (string)"))
-	print(instance.getConst()[2])
+
+	dataString = str(raw_input("Entre le nom d'un ordre (string)"))
+	if dataString == 'A_GOTO':
+		data = orderToBinary(int(instance.getConst()[1][dataString]))
+		data += intToBinary(int(raw_input("Entre l'argument 1 (int)")))
+		data += intToBinary(int(raw_input("Entre l'argument 2 (int)")))
+
+	elif dataString == 'A_ROT':
+		data = orderToBinary(instance.getConst()[1][dataString])
+		data += floatToBinary(float(raw_input("Entre l'argument 1 (float)")))
+	else:
+		print ("L'ordre n'est pas implementé")
 
 	ordersList.append((address,idd,data))
 	instance.sendXbeeOrders(ordersList)
 	ordersList.pop()
 
 	time.sleep(1)
-	instance2.getXbeeOrders()
+	ordersList2 = instance2.getXbeeOrders()
+
+
+	for order in ordersList2:
+		print(order[0])
+		print(order[1])
+
+		index = 0
+		orderNumber = instance.getConst()[1][ int(order[2][index:6], 2) ]
+		print(orderNumber)
+		index += 6
+		orderSize = instance.getConst()[2][ orderNumber ]
+		for i in range(index, orderSize*8+index, 8):
+			print("data: ")
+			print(int(order[2][i:i+8], 2))
 

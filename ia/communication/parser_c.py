@@ -30,6 +30,7 @@ def parseFile(path, myRe, nbGroupParse=1):
 				if value:
 					compteur = int(value)
 				dico[constante] = compteur
+				dico[compteur] = constante
 				compteur += 1
 
 		if reBegin.match(line):
