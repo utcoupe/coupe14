@@ -97,7 +97,6 @@ int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){ /
 	return j;
 }
 
-
 int encode(unsigned char *data_in, unsigned char *data_out, int data_counter){ //8bits -> 7bits (deux tableaux)
 	int offset = 0, i = 0, j = 0;
 	unsigned char copy = 0;
@@ -177,5 +176,3 @@ void sendInvalid() {//renvoit le code de message invalide (dépend de la platefo
 	sendByte(INVALID_MESSAGE);
 	sendByte(END);
 }
-
-void rightShidt2Bits(unsigned char *data_in, unsigned char *data_out);
