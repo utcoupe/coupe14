@@ -7,6 +7,7 @@
 #include "serial_defines.h"
 #include "serial_types.h"
 #include "control.h"
+#include "compaArduino.h"
 
 extern Control control;
 
@@ -16,6 +17,8 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 	switch(ordre){
 	case PINGPING:
                 if (!doublon) {
+			Serial2.print(control.getLenc()->getTicks());
+			Serial2.print(control.getRenc()->getTicks());
 		//	Serial2.print("coucou");
 		}
 		break;
