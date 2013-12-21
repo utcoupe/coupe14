@@ -7,8 +7,7 @@
 #include "compaArduino.h"
 #include "parameters.h"
 #include "control.h"
-
-#include "protocol.h"
+#include "serial_decoder.h"
 
 unsigned long index = 0;
 unsigned long timeStart = 0;
@@ -19,7 +18,7 @@ Control control;
 #define MAX_READ 64 
 void setup(){
 	initPins();
-	Serial.begin(57600, SERIAL_8N1);
+	Serial.begin(57600, SERIAL_8O1);
 	PDEBUGLN("INIT DONE");
 	// LED qui n'en est pas une
 	pinMode(16,OUTPUT);
