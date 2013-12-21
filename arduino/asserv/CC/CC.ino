@@ -18,7 +18,7 @@ Control control;
 #define MAX_READ 64 
 void setup(){
 	initPins();
-	Serial.begin(57600, SERIAL_8O1);
+	Serial2.begin(57600, SERIAL_8O1);
 	PDEBUGLN("INIT DONE");
 	// LED qui n'en est pas une
 	pinMode(16,OUTPUT);
@@ -35,13 +35,13 @@ void loop(){
 	control.compute();
 
 	/* zone programmation libre */
-	int available = Serial.available();
+	int available = Serial2.available();
 	if (available > MAX_READ) {
 		available = MAX_READ;
 	}
 	for(int i = 0; i < available; i++) {
 		// recuperer l'octet courant
-		char data = Serial.read();
+		char data = Serial2.read();
 		executeCmd(data);
 		WRDEBUG(data);
 	}

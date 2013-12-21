@@ -12,7 +12,7 @@
 #define LOCAL_ADDR ADDR_FLUSSMITTEL_ASSERV //Ici l'adresse locale du client
 
 void sendByte(char data) { //Envoi d'un octet en serial, dépend de la plateforme
-	Serial.write(data);
+	Serial2.write(data);
 }
 
 #endif

@@ -15,12 +15,14 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 	int ret_size = 0;
 	switch(ordre){
 	case PINGPING:
+		control.pushGoal(0,TYPE_PWM,100,100,500);
+		/*
                 if (!doublon) {
-			Serial.print("coucou");
+			Serial2.print("coucou");
 		}
 		else {
-			Serial.print("Doublon");
-		}
+			Serial2.print("Doublon");
+		}*/
 		break;
 	case A_GOTO:
 		if (!doublon) {
