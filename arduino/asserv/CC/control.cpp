@@ -41,7 +41,7 @@ void Control::compute(){
 	}
 	else{
 		if(current_goal.isReached && fifo.getRemainingGoals() > 1){//Si le but est atteint et que ce n'est pas le dernier, on passe au suivant
-			PDEBUGLN("Next Goal");
+			//PDEBUGLN("Next Goal");
 			current_goal = fifo.gotoNext();
 			reset = true;
 		}
@@ -66,8 +66,8 @@ void Control::compute(){
 				counter++;
 				if(counter > 100){
 					counter = 0;
-					PDEBUGLN(da);
-					PDEBUG(value_consigne_left); PDEBUGLN(value_consigne_right);
+					//PDEBUGLN(da);
+					//PDEBUG(value_consigne_left); PDEBUGLN(value_consigne_right);
 				}
 #endif
 				break;
@@ -107,7 +107,7 @@ void Control::compute(){
 			}
 			default:
 			{
-				PDEBUGLN("No Goal");
+				//PDEBUGLN("No Goal");
 				break;
 			}	
 		}
