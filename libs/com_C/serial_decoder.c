@@ -75,15 +75,23 @@ void executeCmd(char serial_data){
 	}
 }
 
-int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){ //7bits -> 8bits (on garde le même tableau)
+// decode permet de transformée un tableau de char de données recues sur 7 bits en données faisant sens sur 8 bits.
+// Un simple décalage ne suffit pas car l'ordre est codé sur 6bits, il faut donc l'extraire avant de traiter la suite.
+//
+// N'ayant pas trouvé de solution jugée suffisamment efficace (il ne faut pas que la communication prenne des ressources), la fonction ne peut décoder qu'un peu rre par tramme.
+int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){ 
 	int i = 0, j = 0, offset = 0;
-	// CECI EST IMMONDE
+	//Recupération de l'ordre sur 6bits
 	data_out[0] = data_in[0] >> 1;
 	j++;
+
+	//Test necessaire pour ne pas seg-fault (ou corruption de data) sur les ordres sans paramètres
 	if(data_counter > 1){
 		data_out[1] = (data_in[0] << 7) | data_in[1] ;
 		j++;
 	}
+	
+	//Transformation 7->8bits classique
 	for(i=2;i<data_counter;i++){
 		if(offset == 7){
 			i++;
