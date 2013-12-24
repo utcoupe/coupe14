@@ -7,6 +7,7 @@
 #define INVALID_MESSAGE 0xC0
 #define PROTOCOL_BIT 0x80
 #define END 0x80
+#define PONG 0xFFFF //Pong est une répons à PINGPING, donc un nombre et non un ordre
 
 void initSize();
 
@@ -38,20 +39,19 @@ enum address{
 //Codes des ordres (sur 6 bits)
 enum ordre {
 	//DEBUTPARSE
-	PINGPING, 
-	PONG, 
-	A_GOTOA, //@int @int @float
-	A_GOTO, //@int @int
-	A_GOTOAR, //@int @int @float
-	A_GOTOR, //@int @int
-	A_ROT, //@float
-	A_ROTR, //@float
+	PINGPING, 	//#int - PONG n'est pas un ordre, c'est une valeur d'int
+	A_GOTOA, 	//@int @int @float
+	A_GOTO, 	//@int @int
+	A_GOTOAR, 	//@int @int @float
+	A_GOTOR, 	//@int @int
+	A_ROT, 		//@float
+	A_ROTR, 	//@float
 	A_KILLG, 
 	A_CLEANG,
-	A_PIDA, //@int @int @int
-	A_PIDD, //@int @int @int
-	A_PWM_TEST, //@int @int @int
-	A_GET_CODER,
+	A_PIDA, 	//@int @int @int
+	A_PIDD, 	//@int @int @int
+	A_GET_CODER, 	//#long #long
+	A_PWM_TEST, 	//@int @int @int
 	ORDRE_NON_PARSE
 	//FINPARSE
 };
