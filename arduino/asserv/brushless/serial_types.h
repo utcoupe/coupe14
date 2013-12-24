@@ -10,15 +10,15 @@
 // SUR ARDUINO //
 // sizeof(int) = 2B
 // sizeof(long) = 4B
-// sizeof(float) = sizeof(float) = 4B
+// sizeof(float) = sizeof(double) = 4B
 //
-// Pas de float sur arduino donc pas de float dans le protocole
+// Pas de double sur arduino donc pas de double dans le protocole
 
-int16_t btoi(char *bytes);
-int32_t btol(char *bytes);
-float btof(char *bytes);
-char* itob(int16_t i, char *bytes);
-char* ltob(int32_t i, char *bytes);
-char* ftob(float f, char *bytes);
+int16_t btoi(unsigned char *bytes);
+int32_t btol(unsigned char *bytes);
+float btof(unsigned char *bytes);
+unsigned char* itob(int16_t i, unsigned char *bytes);
+unsigned char* ltob(int32_t i, unsigned char *bytes);
+unsigned char* ftob(float f, unsigned char *bytes);
 
 #endif

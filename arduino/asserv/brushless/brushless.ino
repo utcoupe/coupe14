@@ -7,8 +7,7 @@
 #include "compaArduino.h"
 #include "parameters.h"
 #include "control.h"
-
-#include "protocol.h"
+#include "serial_decoder.h"
 
 unsigned long index = 0;
 unsigned long timeStart = 0;

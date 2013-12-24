@@ -1,45 +1,87 @@
-#include "compaArduino.h"
+/****************************************
+ * Author : Quentin C			*
+ * Mail : quentin.chateau@gmail.com	*
+ * Date : 18/12/13			*
+ ****************************************/
 #include "serial_switch.h"
 #include "serial_defines.h"
 #include "serial_types.h"
-#include "parameters.h"
+#include "control.h"
+#include "compaArduino.h"
 
 extern Control control;
 
-int switchOrder(char ordre, int argc, char *argv){
-	ordre &= 0b00011111; //ordre sans adresse
+//La fonction renvoit le nombre d'octet dans ret, chaine de caractère de réponse. Si doublon, ne pas executer d'ordre mais renvoyer les données à renvoyer
+int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bool doublon){ 
+	int ret_size = 0;
 	switch(ordre){
-	case O_PING:
-		Serial.write(IA_ADDR + O_PONG);
+	case PINGPING:
+                if (!doublon) {
+			PDEBUG(control.getLenc()->getTicks());
+			PDEBUG(control.getRenc()->getTicks());
+		//	PDEBUG("coucou");
+		}
+		break;
+	case A_GET_CODER:
+		PDEBUGLN("");
+		PDEBUG("X : ");
+		PDEBUGLN(control.getPos().x);
+		PDEBUG("Y : ");
+		PDEBUGLN(control.getPos().y);
+		PDEBUG("A : ");
+		PDEBUGLN(control.getPos().angle);
 		break;
 	case A_GOTO:
-		//DEBUG
-		PDEBUGLN("GOTO :");
-		PDEBUG("arg 1 : ");PDEBUG(btoi(argv));
-		PDEBUG(" arg 2 : ");PDEBUG(btoi(argv+2));
-		PDEBUG(" arg 3 : ");PDEBUGLN(btof(argv+4));
-		break;
-	case A_GOTOA:
-		break;
-	case A_GOTOR:
-		break;
-	case A_GOTOAR:
+		if (!doublon) {
+			control.pushGoal(0, TYPE_POS, btoi(argv), btoi(argv+2), 0);
+		}
 		break;
 	case A_ROT:
-		control.pushGoal(0,TYPE_ANG, btof(argv), 0, 0);
+		if (!doublon) {
+			control.pushGoal(0, TYPE_ANG, btof(argv), 0, 0);
+		}
 		break;
-	case A_ROTR:
+	case A_PWM_TEST:
+		if (!doublon) {
+			control.pushGoal(0, TYPE_PWM, btoi(argv), btoi(argv+2), btoi(argv+4));
+		}
 		break;
 	case A_PIDA:
-		control.setPID_angle(btoi(argv),btoi(argv+2),btoi(argv+4));
-		PDEBUG("PID : "); PDEBUG(btoi(argv)); PDEBUG(btoi(argv+2)); PDEBUGLN(btoi(argv+4)); 
+		if (!doublon) {
+			control.setPID_angle(btoi(argv), btoi(argv+2), btoi(argv+3));
+		}
 		break;
 	case A_PIDD:
-		control.setPID_distance(btoi(argv),btoi(argv+2),btoi(argv+4));
-		PDEBUG("PID : "); PDEBUG(btoi(argv)); PDEBUG(btoi(argv+2)); PDEBUGLN(btoi(argv+4)); 
+		if (!doublon) {
+			control.setPID_distance(btoi(argv), btoi(argv+2), btoi(argv+3));
+		}
 		break;
+	case A_KILLG:
+		if (!doublon) {
+			control.nextGoal();
+		}
+		break;
+	case A_CLEANG:
+		if (!doublon) {
+			control.clearGoals();
+		}
+		break;
+
+/*	case ORDRE_001:
+		if (!doublon) {
+			//Execution des ordre
+			//Les fonction btoi(), btol() et btof() aident à récupérer les arguments
+
+			// Coder ici les actions à executer
+		}
+		//Formation et envoi d'une réponse
+		//Les fonctions itob(), ltob() et itof() aident à formet les arguments
+
+		//Coder ici la formation des données de retour
+
+		break;*/
 	default:
-		return -1;
+		return -1;//commande inconnue
 	}
-	return 0;
+	return ret_size;
 }
