@@ -17,19 +17,19 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 	switch(ordre){
 	case PINGPING:
                 if (!doublon) {
-			Serial2.print(control.getLenc()->getTicks());
-			Serial2.print(control.getRenc()->getTicks());
-		//	Serial2.print("coucou");
+			PDEBUG(control.getLenc()->getTicks());
+			PDEBUG(control.getRenc()->getTicks());
+		//	PDEBUG("coucou");
 		}
 		break;
 	case A_GET_CODER:
-		Serial2.println("");
-		Serial2.print("X : ");
-		Serial2.println(control.getPos().x);
-		Serial2.print("Y : ");
-		Serial2.println(control.getPos().y);
-		Serial2.print("A : ");
-		Serial2.println(control.getPos().angle);
+		PDEBUGLN("");
+		PDEBUG("X : ");
+		PDEBUGLN(control.getPos().x);
+		PDEBUG("Y : ");
+		PDEBUGLN(control.getPos().y);
+		PDEBUG("A : ");
+		PDEBUGLN(control.getPos().angle);
 		break;
 	case A_GOTO:
 		if (!doublon) {
