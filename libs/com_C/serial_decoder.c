@@ -42,8 +42,13 @@ void executeCmd(char serial_data){
 		}
 		else if (serial_data == END) {
 			unsigned char data_8bits[MAX_DATA];
+
+                        /* ANCIEN DECODEUR
 			data_counter = decode(data, data_8bits, data_counter); //Décale le tableau data pour avoir des données 8 bits, renvoit le nombre d'octets apres décalage
 			if(check(data_8bits, data_counter) != 0){//Si les data sont invalide
+                        */
+                        data_counter = full_decode(data, data_8bits, data_counter);
+                        if(data_counter == -1){ //Si données invalides
 				sendInvalid();
 				etape = wait_step;
 			}
@@ -74,7 +79,7 @@ void executeCmd(char serial_data){
 			etape = wait_step;
 	}
 }
-
+/*
 // decode permet de transformée un tableau de char de données recues sur 7 bits en données faisant sens sur 8 bits.
 // Un simple décalage ne suffit pas car l'ordre est codé sur 6bits, il faut donc l'extraire avant de traiter la suite.
 //
@@ -103,6 +108,74 @@ int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){
 		j++;
 	}
 	return j;
+}*/
+
+//full_decode permet de décoder les données recues par la protocole, de manièe complète (plusieurs ordres par tramme. En revanche, le décodage est BEAUCOUP plus long.
+//En plus, full_decode effectue la vérification des dnnées
+//Renvoit le compte de données en cas de succès, -1 en cas de corruption de données
+int full_decode(unsigned char *data_in, unsigned char *data_out, int data_counter){ 
+	int i = 0, j = 0, offset = 0;
+	//Transformation 7->8bits classique
+	for(i=0;i<data_counter;i++){
+		if(offset == 7){
+			i++;
+			offset = 0;
+		}
+		data_out[j] = data_in[i] << (1+offset);
+		data_out[j] |= data_in[i+1] >> (6-offset);
+		offset++;
+		j++;
+	}
+
+        data_counter = j; //nouveau compte de datas
+
+        //recalage des ordres 6bits
+        i = 0;
+	while(i<data_counter){
+                unsigned char overflow = right_shift_array(data_out, data_out, data_counter - i, 1); //Shift tout le tableau à droite de 1 à partir de i (le premier ordre est calé)
+                if(overflow != 0){
+                        data_out[data_counter] = overflow; //Si overflow, on le met (attention aux segfault)
+                }
+                //Ici le premier ordre est calé à la première boucle, le deuxieme à la deuxieme,etc ...
+                
+                unsigned char ordre = data_out[i];
+		if(ordre > MAX_ORDRES){//L'odre n'existe pas => corruption
+			return -1;
+		}
+		unsigned char size = ordreSize[ordre];
+		if(size == SIZE_ERROR){//L'ordre n'existe pas => corruption de données
+			return -1;
+		}
+		else{
+			i += size + 1; //On se décale de la taille de l'ordre + 1 (+1 car on se décale aussi de l'ordre)
+		}
+	}
+	return data_counter;
+}
+
+//Shift un tableau de char à gauche, le même tableau peut etre donnée en entrée et en sortie
+//Inutile ?
+unsigned char left_shift_array(unsigned char *data_in, unsigned char *data_out, int data_counter, int shift){
+        int i;
+        unsigned char ret = data_in[0] >> (8-shift);
+        for(i=0;i<data_counter-1;i++){
+                unsigned char temp = data_in[i+1] >> (8-shift);
+                data_out[i] = (data_in[i] << shift) | temp;
+        }
+        data_out[i] = data_in[i] << shift;
+        return ret;
+}
+
+//Shift un tableau de char à droite, le même tablaue peut etre donnée en entrée et en sortie, l'overflow est renvoyé
+unsigned char right_shift_array(unsigned char *data_in, unsigned char *data_out, int data_counter, int shift){
+        int i;
+        unsigned char temp = 0, last = 0;
+        for(i=0;i<data_counter;i++){
+                temp = data_in[i] << (8-shift);
+                data_out[i] = (data_in[i] >> shift) | last;
+                last = temp;
+        }
+        return last;
 }
 
 int encode(unsigned char *data_in, unsigned char *data_out, int data_counter){ //8bits -> 7bits (deux tableaux)
@@ -135,6 +208,7 @@ int encode(unsigned char *data_in, unsigned char *data_out, int data_counter){ /
 	return j+1;
 }
 
+/* ANCIEN DECODEUR
 int check(unsigned char *data, int data_counter){ //Vérifie la validité des données 8 bits
 	int i = 0;
 	while(i<data_counter){
@@ -151,7 +225,7 @@ int check(unsigned char *data, int data_counter){ //Vérifie la validité des do
 		}
 	}
 	return 0;
-}
+}*/
 
 void executeOrdre(unsigned char *data, int data_counter, unsigned char id, bool doublon){
 	int i = 0, ret_size = 0;
