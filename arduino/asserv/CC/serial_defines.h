@@ -3,10 +3,12 @@
 
 #define SIZE_ERROR 255
 #define MAX_ORDRES 64
+#define ID_MAX 63
 
 #define INVALID_MESSAGE 0xC0
 #define PROTOCOL_BIT 0x80
 #define END 0x80
+#define PONG 1000 //Pong est une répons à PINGPING, donc un nombre et non un ordre. Il serait bon de répondre à un ping par un PONG en int et un en float (mesure de test)
 
 void initSize();
 
@@ -38,20 +40,19 @@ enum address{
 //Codes des ordres (sur 6 bits)
 enum ordre {
 	//DEBUTPARSE
-	PINGPING, 
-	PONG, 
-	A_GOTOA, //@int @int @float
-	A_GOTO, //@int @int
-	A_GOTOAR, //@int @int @float
-	A_GOTOR, //@int @int
-	A_ROT, //@float
-	A_ROTR, //@float
+	PINGPING, 	//#int #float - PONG n'est pas un ordre, c'est une valeur
+	A_GOTOA, 	//@int @int @float
+	A_GOTO, 	//@int @int
+	A_GOTOAR, 	//@int @int @float
+	A_GOTOR, 	//@int @int
+	A_ROT, 		//@float
+	A_ROTR, 	//@float
 	A_KILLG, 
 	A_CLEANG,
-	A_PIDA, //@int @int @int
-	A_PIDD, //@int @int @int
-	A_PWM_TEST, //@int @int @int
-	A_GET_CODER,
+	A_PIDA, 	//@int @int @int
+	A_PIDD, 	//@int @int @int
+	A_GET_CODER, 	//#long #long
+	A_PWM_TEST, 	//@int @int @int
 	ORDRE_NON_PARSE
 	//FINPARSE
 };

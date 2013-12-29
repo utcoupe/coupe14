@@ -25,7 +25,7 @@ void executeCmd(char serial_data){
 		if(ID_recu == ID_attendu){//ID correct
 			etape = data_step;
 		}
-		else if(ID_recu > ID_attendu){//On a raté un paquet
+		else if(ID_recu > ID_attendu || (ID_attendu == ID_MAX && ID_recu < (ID_attendu - ID_MAX/2))){//On a raté un paquet - ID_MAX/2 représente la marge de paquets perdus
 			etape = wait_step;
 			sendInvalid();
 		}
@@ -55,7 +55,7 @@ void executeCmd(char serial_data){
 			else{
 				executeOrdre(data_8bits, data_counter, ID_recu, doublon); //Execute les ordres, envoit les réponses
 				if (!doublon){
-					ID_attendu=(ID_attendu + 1) % 64;//ID sur 6 bits effectifs, incrémentée si non doublon
+					ID_attendu=(ID_attendu + 1) % (ID_MAX+1);//ID sur 6 bits effectifs, incrémentée si non doublon
 				}
 				etape = wait_step;
 			}
