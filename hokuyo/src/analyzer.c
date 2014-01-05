@@ -15,7 +15,7 @@
 #include "global.h"
 #include "exceptions.h"
 
-int init(urg_t *urg){
+int init(urg_t *urg, int n_hokuyo){
 	char *device = "/dev/ttyACM0";
 	int error;
 	int i;
@@ -44,7 +44,10 @@ int init(urg_t *urg){
 	}
 	else{
 		printf("Connection établie à %s\n", device);
-		urg_set_scanning_parameter(urg, urg_rad2step(urg, ANGLE_MIN), urg_rad2step(urg, ANGLE_MAX), 0);//scan en continu, on ne garde que les point entre -PI/2 et PI/2
+                if(n_hokuyo == 0)
+        		urg_set_scanning_parameter(urg, urg_rad2step(urg, ANGLE_MIN0), urg_rad2step(urg, ANGLE_MAX0), 0);//scan en continu, on ne garde que les point entre -PI/2 et PI/2
+                else
+        		urg_set_scanning_parameter(urg, urg_rad2step(urg, ANGLE_MIN1), urg_rad2step(urg, ANGLE_MAX1), 0);//scan en continu, on ne garde que les point entre -PI/2 et PI/2
 		printf("Parameters set\n");
 		error = urg_start_measurement(urg, URG_DISTANCE, URG_SCAN_INFINITY, 0);
 		if(error < 0){

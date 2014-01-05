@@ -25,10 +25,17 @@
 // postion de l'hokuyo par rapport au coin inférieur droit
 // le coin est dépendant du side, c'est à dire que la valeur
 // n'est pas dépendante du side
-#define HOKUYO_X 0 
-#define HOKUYO_Y 0
-#define ANGLE_MIN -PI/2
-#define ANGLE_MAX PI/2
+#define NUMBER_HOKUYO 1
+
+#define HOKUYO0_X 0 
+#define HOKUYO0_Y 0
+#define ANGLE_MIN0 -PI/2
+#define ANGLE_MAX0 PI/2
+
+#define HOKUYO1_X 0 
+#define HOKUYO1_Y 0
+#define ANGLE_MIN1 -PI/2
+#define ANGLE_MAX1 PI/2
 
 
 //**********

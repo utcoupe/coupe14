@@ -10,7 +10,7 @@
 
 #include "analyzer.h"
 
-void affichage_sdl(struct urg_params hokuyo);
+void affichage_sdl(struct urg_params *hokuyo);
 
 #endif
 #endif
