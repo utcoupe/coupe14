@@ -20,8 +20,12 @@ int main(int argc, char **argv){
 	//INITIALISATION
 	urg_t urg;
 	struct urg_params hokuyo;
-	int error;
-	error = init(&urg);
+
+	hokuyo.ptr = &urg;
+	hokuyo.x = HOKUYO_X;
+	hokuyo.y = HOKUYO_Y;
+
+	int error = init(hokuyo.ptr);
 
 	if(error < 0){
 		fprintf(stderr, "Erreur de connection\n");
@@ -29,9 +33,6 @@ int main(int argc, char **argv){
 	}
 
 	//On initialise la structure hokuyo avec ses paramètres de side et de position
-	hokuyo.ptr = &urg;
-	hokuyo.x = HOKUYO_X;
-	hokuyo.y = HOKUYO_Y;
 	if(argc >= 2){
 		if(strcmp(argv[1], "blue") == 0)
 			hokuyo.side = BLUE_SIDE;
