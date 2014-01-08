@@ -50,17 +50,36 @@ Hok_t initHokuyo(const char *path, double ori, double cone, Pt_t pt) {
 }
 
 int calibrate(Hok_t *hok) {
-	hok->imin = urg_rad2index(hok->urg, -CONE_CALIB);
-	hok->imax = urg_rad2index(hok->urg, CONE_CALIB);
+	double a_calib = angle(hok->pt,  CALIB_PT) - hok->orientation;
+	hok->imin = urg_rad2index(hok->urg, a_calib - CONE_CALIB);
+	hok->imax = urg_rad2index(hok->urg, a_calib + CONE_CALIB);
 
 	Pt_t points[MAX_DATA], detected;
 	Cluster_t clusters[MAX_CLUSTERS];
-	int i, count = 0;
+	int i, count = 0, j = 0, k = 0;
 	long sumx = 0, sumy = 0;
 
+	printf("%sCalibrating %s between %d and %d degrees\n", PREFIX, hok->path, urg_index2deg(hok->urg, hok->imin), urg_index2deg(hok->urg, hok->imax));
 	for (i=0; i<CALIB_MEASURES; i++) {
 		int n = getPoints(*hok, points);
 		int nb_cluster = getClustersFromPts(points, n, clusters);
+	
+		j = 0;
+		while (j < nb_cluster) {
+			int changed = 0;
+			int x = clusters[j].center.x;
+			int y = clusters[j].center.y;
+			if (x > CALIB_X + DIST_CALIB || x < CALIB_X - DIST_CALIB || y > CALIB_Y + DIST_CALIB || y < CALIB_Y - DIST_CALIB) {
+				for (k = j+1; k < nb_cluster; k++) {
+					clusters[k-1] = clusters[k];
+					nb_cluster--;
+					changed = 1;
+				}
+			}
+			if (!changed) {
+				j++;
+			}
+		}	
 
 		if (nb_cluster == 1) {
 			sumx += clusters[0].center.x;
