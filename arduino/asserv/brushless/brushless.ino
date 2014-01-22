@@ -8,6 +8,7 @@
 #include "parameters.h"
 #include "control.h"
 #include "serial_decoder.h"
+#include "serial_defines.h"
 
 unsigned long index = 0;
 unsigned long timeStart = 0;
@@ -18,7 +19,9 @@ Control control;
 #define MAX_READ 64 
 void setup(){
 	initPins();
-	Serial.begin(57600, SERIAL_8N1);
+        initSize();
+	Serial2.begin(57600, SERIAL_8O1);
+	Serial.begin(115200, SERIAL_8N1);
 	PDEBUGLN("INIT DONE");
 	// LED qui n'en est pas une
 	pinMode(16,OUTPUT);
@@ -40,7 +43,6 @@ void loop(){
 		// recuperer l'octet courant
 		char data = Serial.read();
 		executeCmd(data);
-		WRDEBUG(data);
 	}
 	//Action asserv
 	control.compute();

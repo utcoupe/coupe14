@@ -12,7 +12,6 @@ void initSize()
 
 	//DEBUTPARSE
 	ordreSize[PINGPING]=0;
-	ordreSize[PONG]=0;
 	ordreSize[A_GOTOA]=8;
 	ordreSize[A_GOTO]=4;
 	ordreSize[A_GOTOAR]=8;
