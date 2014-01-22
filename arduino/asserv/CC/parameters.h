@@ -116,13 +116,15 @@
 #define DIS_D DISTANCE_D / (DUREE_CYCLE/1000.0)
 
 #ifdef DEBUG
-#define PDEBUG(x) Serial2.print(x)
-#define PDEBUGLN(x) Serial2.println(x)
-#define WRDEBUG(x) Serial2.write(x)
+#define PDEBUG(x) Serial.print(x)
+#define PDEBUGLN(x) Serial.println(x)
+#define WRDEBUG(x) Serial.write(x)
+#define BINPR(x) Serial.print(x, BIN)
 #else
 #define PDEBUG(x)
 #define PDEBUGLN(x)
 #define WRDEBUG(x)
+#define BINPR(x)
 #endif
 
 #endif

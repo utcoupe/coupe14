@@ -11,7 +11,7 @@
 enum etape {ID_step,data_step,wait_step};
 void executeCmd(char serial_data);
 //int decode(unsigned char *data_in, unsigned char *data_out, int data_counter); //7bits -> 8bits (on garde le même tableau)
-int full_decode(unsigned char *data_in, unsigned char *data_out, int data_counter); //Decodage des données et vérification de corruption
+int decode(unsigned char *data_in, unsigned char *data_out, int data_counter); //Decodage des données et vérification de corruption
 unsigned char left_shift_array(unsigned char *data_in, unsigned char *data_out, int data_counter, int shift); //Decalage de tableau à gauche
 unsigned char right_shift_array(unsigned char *data_in, unsigned char *data_out, int data_counter, int shift); //Decalage de tableau à droite
 int encode(unsigned char *data_in, unsigned char *data_out, int data_counter); //8bits -> 7bits (deux tableaux)

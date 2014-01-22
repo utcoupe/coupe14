@@ -7,6 +7,7 @@
 #include "serial_defines.h"
 #include "serial_local.h"
 #include "serial_switch.h"
+#include "serial_types.h"
 
 extern unsigned char ordreSize[MAX_ORDRES];
 
@@ -47,12 +48,19 @@ void executeCmd(char serial_data){
 			data_counter = decode(data, data_8bits, data_counter); //Décale le tableau data pour avoir des données 8 bits, renvoit le nombre d'octets apres décalage
 			if(check(data_8bits, data_counter) != 0){//Si les data sont invalide
                         */
-                        data_counter = full_decode(data, data_8bits, data_counter);
+                        data_counter = decode(data, data_8bits, data_counter);
                         if(data_counter == -1){ //Si données invalides
 				sendInvalid();
 				etape = wait_step;
 			}
 			else{
+#ifdef DEBUG
+                                int i;
+                                for(i = 0; i < data_counter; i++){
+                                        PDEBUG("Data "); PDEBUG(i); PDEBUG(" : ");
+                                        BINPR((int)data_8bits[i]); PDEBUGLN("");
+                                }
+#endif
 				executeOrdre(data_8bits, data_counter, ID_recu, doublon); //Execute les ordres, envoit les réponses
 				if (!doublon){
 					ID_attendu=(ID_attendu + 1) % (ID_MAX+1);//ID sur 6 bits effectifs, incrémentée si non doublon
@@ -110,10 +118,10 @@ int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){
 	return j;
 }*/
 
-//full_decode permet de décoder les données recues par la protocole, de manièe complète (plusieurs ordres par tramme. En revanche, le décodage est BEAUCOUP plus long.
+//decode permet de décoder les données recues par la protocole, de manièe complète (plusieurs ordres par tramme. En revanche, le décodage est BEAUCOUP plus long.
 //En plus, full_decode effectue la vérification des dnnées
 //Renvoit le compte de données en cas de succès, -1 en cas de corruption de données
-int full_decode(unsigned char *data_in, unsigned char *data_out, int data_counter){ 
+int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){ 
 	int i = 0, j = 0, offset = 0;
 	//Transformation 7->8bits classique
 	for(i=0;i<data_counter;i++){
@@ -132,7 +140,7 @@ int full_decode(unsigned char *data_in, unsigned char *data_out, int data_counte
         //recalage des ordres 6bits
         i = 0;
 	while(i<data_counter){
-                unsigned char overflow = right_shift_array(data_out, data_out, data_counter - i, 1); //Shift tout le tableau à droite de 1 à partir de i (le premier ordre est calé)
+                unsigned char overflow = right_shift_array(data_out + i, data_out + i, data_counter - i, 2); //Shift tout le tableau à droite de 1 à partir de i (le premier ordre est calé)
                 if(overflow != 0){
                         data_out[data_counter] = overflow; //Si overflow, on le met (attention aux segfault)
                 }
@@ -142,7 +150,7 @@ int full_decode(unsigned char *data_in, unsigned char *data_out, int data_counte
 		if(ordre > MAX_ORDRES){//L'odre n'existe pas => corruption
 			return -1;
 		}
-		unsigned char size = ordreSize[ordre];
+		unsigned char size = ordreSize[(int)ordre];
 		if(size == SIZE_ERROR){//L'ordre n'existe pas => corruption de données
 			return -1;
 		}
@@ -232,12 +240,12 @@ void executeOrdre(unsigned char *data, int data_counter, unsigned char id, bool 
 	unsigned char ordre;
 	unsigned char *params;
 	unsigned char ret[MAX_DATA];
-	while (i < data_counter) {
+	//while (i < data_counter) { PROBLEME : les bits poubelles crée un ordre en trop - Solution : On commente la boucle : un seule ordre par tramme
 		ordre = data[i];
 		params = data + i + 1;
 		ret_size += switchOrdre(ordre, params, (ret + ret_size), doublon);//execution ordres, enregistrement du retour
 		i += ordreSize[ordre] + 1;
-	}
+	//}
 	sendResponse(ret, ret_size, id);
 }
 
@@ -254,6 +262,7 @@ void sendResponse(unsigned char *data, int data_counter, unsigned char id){
 }
 
 void sendInvalid() {//renvoit le code de message invalide (dépend de la plateforme)
+        PDEBUGLN("Data error");
 	sendByte(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
 	sendByte(INVALID_MESSAGE);
 	sendByte(END);
