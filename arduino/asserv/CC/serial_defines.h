@@ -8,6 +8,8 @@
 #define INVALID_MESSAGE 0x40
 #define PROTOCOL_BIT 0x80
 #define END 0x80
+#define RESET 0xC0
+
 #define PONG 1000 //Pong est une répons à PINGPING, donc un nombre et non un ordre. Il serait bon de répondre à un ping par un PONG en int et un en float (mesure de test)
 
 void initSize();

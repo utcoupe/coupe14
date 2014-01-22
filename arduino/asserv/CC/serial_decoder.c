@@ -77,10 +77,15 @@ void executeCmd(char serial_data){
 	}
 
 	if((serial_data & PROTOCOL_BIT) != 0){ //Si 0b1xxxxxxx
-		if((serial_data & 0x7f) == LOCAL_ADDR) //Si début de paquet adressé au client
-			etape = ID_step;
-		else //Si fin de paquet ou packet non adressé au client
+		if((serial_data & 0x0F) == LOCAL_ADDR){ //Si début de paquet adressé au client
+			if ((serial_data & 0xF0) == RESET) //Si demande de reset
+				protocol_reset(&ID_attendu);
+			else
+				etape = ID_step; //Sinon le message nous est adressé
+		}
+		else{ //Si fin de paquet ou packet non adressé au client
 			etape = wait_step;
+		}
 	}
 }
 
@@ -200,4 +205,9 @@ void sendInvalid() {//renvoit le code de message invalide (dépend de la platefo
 	sendByte(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
 	sendByte(INVALID_MESSAGE);
 	sendByte(END);
+}
+
+void protocol_reset(char *ID){
+	*ID = 0;
+	sendByte(RESET | LOCAL_ADDR);
 }

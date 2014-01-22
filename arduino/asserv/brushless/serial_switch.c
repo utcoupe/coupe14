@@ -16,13 +16,14 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 	int ret_size = 0;
 	switch(ordre){
 	case PINGPING:
+                PDEBUGLN("coucou");
+		break;
+	case A_GET_CODER:
                 if (!doublon) {
 			PDEBUG(control.getLenc()->getTicks());
 			PDEBUG(control.getRenc()->getTicks());
-		//	PDEBUG("coucou");
-		}
-		break;
-	case A_GET_CODER:
+                }
+                /*
 		PDEBUGLN("");
 		PDEBUG("X : ");
 		PDEBUGLN(control.getPos().x);
@@ -30,16 +31,24 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		PDEBUGLN(control.getPos().y);
 		PDEBUG("A : ");
 		PDEBUGLN(control.getPos().angle);
+                */
 		break;
 	case A_GOTO:
+                Serial.print("Arg 1 : ");
+                Serial.println(btoi(argv));
+                Serial.print("Arg 2 : ");
+                Serial.println(btoi(argv+2));
+                /*
 		if (!doublon) {
 			control.pushGoal(0, TYPE_POS, btoi(argv), btoi(argv+2), 0);
-		}
+		}*/
 		break;
 	case A_ROT:
+                PDEBUG("Arg : "); PDEBUGLN(btof(argv));
+                /*
 		if (!doublon) {
 			control.pushGoal(0, TYPE_ANG, btof(argv), 0, 0);
-		}
+		}*/
 		break;
 	case A_PWM_TEST:
 		if (!doublon) {
