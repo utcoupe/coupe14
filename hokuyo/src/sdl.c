@@ -106,7 +106,6 @@ void affichage_sdl(struct urg_params *hokuyo){
 			SDL_BlitSurface(sdl_hokuyo[1], NULL, ecran, &sdl_hokuyo_pos);
 		}
 		SDL_Flip(ecran);
-		printf("ok\n");
 	}
 	SDL_FreeSurface(sdl_points[0]);
 	SDL_FreeSurface(sdl_points[1]);
