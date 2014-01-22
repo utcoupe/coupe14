@@ -5,7 +5,7 @@ encoder.*	: management des coderus, garde le compte des ticks et est appelé par
 robotstate.*	: calcule et garde l'etat du robot (position, etc...)
 control.*	: partie controle, met en relation toutes les parties
 PID.*		: classe de PID générique
-compaArduino.*	: "hacks" pour interfacer les interruptuions arduino avec le code
+compat.*	: "hacks" pour interfacer les interruptuions arduino avec le code
 command.* 	: commandes appelées par serial port
 message.*	: serial port compatibility
 

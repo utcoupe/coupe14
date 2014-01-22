@@ -3,7 +3,7 @@
  * Mail : quentin.chateau@gmail.com	*
  * Date : 13/10/13			*
  ****************************************/
-#include "compaArduino.h"
+#include "compat.h"
 
 extern Control control;
 
@@ -74,3 +74,6 @@ void interruptRight0{
 }
 #endif
 
+char serial_read(){
+	return Serial2.read();
+}

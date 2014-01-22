@@ -4,7 +4,8 @@
  * Date : 13/10/13			*
  ****************************************/
   
-#include "compaArduino.h"
+#include "include_arduino.h"
+#include "compat.h"
 #include "parameters.h"
 #include "control.h"
 #include "serial_decoder.h"
@@ -25,6 +26,7 @@ void setup(){
 	PDEBUGLN("INIT DONE");
 	// LED qui n'en est pas une
 	pinMode(16,OUTPUT);
+	protocol_reset();
 }
 
 void loop(){
@@ -44,8 +46,7 @@ void loop(){
 	}
 	for(int i = 0; i < available; i++) {
 		// recuperer l'octet courant
-		char data = Serial2.read();
-		executeCmd(data);
+		executeCmd(serial_read());
 	}
 
 	/* fin zone de programmation libre */

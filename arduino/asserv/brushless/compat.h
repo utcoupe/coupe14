@@ -26,5 +26,6 @@ void interruptRight0();
 void initPins();
 unsigned long timeMillis();
 unsigned long timeMicros();
+char serial_read();
 
 #endif

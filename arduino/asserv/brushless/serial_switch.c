@@ -7,7 +7,7 @@
 #include "serial_defines.h"
 #include "serial_types.h"
 #include "control.h"
-#include "compaArduino.h"
+#include "compat.h"
 
 extern Control control;
 
@@ -16,7 +16,12 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 	int ret_size = 0;
 	switch(ordre){
 	case PINGPING:
-                PDEBUGLN("coucou");
+                if (!doublon) {
+			PDEBUGLN("PONG (nouveau)");
+		}
+		else{
+			PDEBUGLN("PONG (ancien)");
+		}
 		break;
 	case A_GET_CODER:
                 if (!doublon) {

@@ -4,7 +4,7 @@
  * Date : 13/10/13			*
  ****************************************/
   
-#include "compaArduino.h"
+#include "compat.h"
 #include "parameters.h"
 #include "control.h"
 #include "serial_decoder.h"
