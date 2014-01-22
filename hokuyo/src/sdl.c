@@ -35,14 +35,15 @@ void affichage_sdl(struct urg_params *hokuyo){
 	sdl_robots = SDL_CreateRGBSurface(SDL_HWSURFACE, 30, 30, 32, 0, 0, 0, 0);
 	SDL_FillRect(sdl_robots, NULL, SDL_MapRGB(ecran->format, 0, 255, 0));
 
+
 	sdl_points[0] = SDL_CreateRGBSurface(SDL_HWSURFACE, 2, 2, 32, 0, 0, 0, 0);
 	SDL_FillRect(sdl_points[0], NULL, SDL_MapRGB(ecran->format, 255, 0, 0));
 	sdl_hokuyo[0] = SDL_CreateRGBSurface(SDL_HWSURFACE, 20, 20, 32, 0, 0, 0, 0);
-	SDL_FillRect(sdl_hokuyo[1], NULL, SDL_MapRGB(ecran->format, 255, 50, 50));
+	SDL_FillRect(sdl_hokuyo[0], NULL, SDL_MapRGB(ecran->format, 255, 50, 50));
         
         if (NUMBER_HOKUYO == 2){
 		sdl_points[1] = SDL_CreateRGBSurface(SDL_HWSURFACE, 2, 2, 32, 0, 0, 0, 0);
-		SDL_FillRect(sdl_points[0], NULL, SDL_MapRGB(ecran->format, 0, 0, 255));
+		SDL_FillRect(sdl_points[1], NULL, SDL_MapRGB(ecran->format, 0, 0, 255));
 		sdl_hokuyo[1] = SDL_CreateRGBSurface(SDL_HWSURFACE, 20, 20, 32, 0, 0, 0, 0);
 		SDL_FillRect(sdl_hokuyo[1], NULL, SDL_MapRGB(ecran->format, 50, 50, 255));
         }
