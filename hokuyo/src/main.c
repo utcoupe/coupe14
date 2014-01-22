@@ -34,7 +34,7 @@ int main(int argc, char **argv){
 		error[1] = init(hokuyo[1].ptr, 1);
         }
 
-	if(error < 0){
+	if(error[0] < 0 || (error[1] < 0 && NUMBER_HOKUYO == 2)){
 		fprintf(stderr, "Erreur de connection\n");
 		exit(EXIT_FAILURE);
 	}
