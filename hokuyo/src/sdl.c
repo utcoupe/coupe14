@@ -98,12 +98,15 @@ void affichage_sdl(struct urg_params *hokuyo){
 		sdl_hokuyo_pos.y -= 20/2;
 		SDL_BlitSurface(sdl_hokuyo[0], NULL, ecran, &sdl_hokuyo_pos);
                 //hokuyo 1
-		sdl_hokuyo_pos.x = HOKUYO1_X;
-		sdl_hokuyo_pos.x -= 20/2;
-		sdl_hokuyo_pos.y = Y_WINDOW_RESOLUTION - HOKUYO1_Y;
-		sdl_hokuyo_pos.y -= 20/2;
-		SDL_BlitSurface(sdl_hokuyo[1], NULL, ecran, &sdl_hokuyo_pos);
+		if(NUMBER_HOKUYO == 2){
+			sdl_hokuyo_pos.x = HOKUYO1_X;
+			sdl_hokuyo_pos.x -= 20/2;
+			sdl_hokuyo_pos.y = Y_WINDOW_RESOLUTION - HOKUYO1_Y;
+			sdl_hokuyo_pos.y -= 20/2;
+			SDL_BlitSurface(sdl_hokuyo[1], NULL, ecran, &sdl_hokuyo_pos);
+		}
 		SDL_Flip(ecran);
+		printf("ok\n");
 	}
 	SDL_FreeSurface(sdl_points[0]);
 	SDL_FreeSurface(sdl_points[1]);
