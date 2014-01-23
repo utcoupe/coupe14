@@ -21,28 +21,8 @@ void executeCmd(char serial_data){
 
 	static enum etape etape = wait_step;
 
-	switch(etape){
-	case ID_step: //On attend l'ID du paquet (1er octet)
-		ID_recu = serial_data;
-		if(ID_recu == ID_attendu){//ID correct
-			etape = data_step;
-		}
-		else if(ID_recu > ID_attendu || (ID_attendu == ID_MAX && ID_recu < (ID_attendu - ID_MAX/2))){//On a raté un paquet - ID_MAX/2 représente la marge de paquets perdus
-			etape = wait_step;
-			sendInvalid();
-		}
-		else {//Doublon
-			etape = data_step;
-			doublon = true;
-		}
-		break;
-	case data_step:
-		if ((serial_data & PROTOCOL_BIT) == 0){
-			data[data_counter] = serial_data;
-			data_counter++;
-			break;
-		}
-		else if (serial_data == END) {
+	if((serial_data & PROTOCOL_BIT) == PROTOCOL_BIT){ //Si 0b1xxxxxxx
+		if (serial_data == END) { //Fin de trame, execution de l'ordre
 			unsigned char data_8bits[MAX_DATA];
 
                         data_counter = decode(data, data_8bits, data_counter);
@@ -60,18 +40,7 @@ void executeCmd(char serial_data){
 			data_counter = 0;
 			doublon = false;
 		}
-		else {
-			sendInvalid();
-			etape = wait_step;
-			break;
-		}
-		break;
-	case wait_step:
-		break;
-	}
-
-	if((serial_data & PROTOCOL_BIT) != 0){ //Si 0b1xxxxxxx
-		if((serial_data & 0x0F) == LOCAL_ADDR){ //Si début de paquet adressé au client
+		else if((serial_data & 0x0F) == LOCAL_ADDR){ //Si début de paquet adressé au client
 			if ((serial_data & 0xF0) == RESET){ //Si demande de reset
 				ID_attendu = 0;
 				sendByte(RESET_CONF | LOCAL_ADDR);
@@ -85,6 +54,31 @@ void executeCmd(char serial_data){
 			etape = wait_step;
 		}
 	}
+	else{
+		switch(etape){
+		case ID_step: //On attend l'ID du paquet (1er octet)
+			ID_recu = serial_data;
+			if(ID_recu == ID_attendu){//ID correct
+				etape = data_step;
+			}
+			else if(ID_recu > ID_attendu || (ID_attendu == ID_MAX && ID_recu < (ID_attendu - ID_MAX/2))){//On a raté un paquet - ID_MAX/2 représente la marge de paquets perdus
+				etape = wait_step;
+				sendInvalid();
+			}
+			else {//Doublon
+				etape = data_step;
+				doublon = true;
+			}
+			break;
+		case data_step:
+			data[data_counter] = serial_data;
+			data_counter++;
+			break;
+		case wait_step:
+			break;
+		}
+	}
+
 }
 
 //decode permet de décoder les données recues par la protocole, de manièe complète (plusieurs ordres par tramme. En revanche, le décodage est BEAUCOUP plus long.

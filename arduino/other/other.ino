@@ -4,41 +4,32 @@
  * Date : 13/10/13			*
  ****************************************/
   
-#include "include_arduino.h"
-#include "compat.h"
-#include "parameters.h"
-#include "control.h"
+#include "Arduino.h"
 #include "serial_decoder.h"
 #include "serial_defines.h"
+#include "servo.h"
 
-unsigned long index = 0;
-unsigned long timeStart = 0;
 
-//Creation du controleur
-Control control;
+Servo servoBras;
 
 #define MAX_READ 64 
 void setup(){
 	initPins();
 	Serial2.begin(57600, SERIAL_8O1);
-#ifdef DEBUG
 	Serial.begin(115200, SERIAL_8N1);
-#endif
 	init_protocol();
 	PDEBUGLN("INIT DONE");
 	// LED qui n'en est pas une
 	pinMode(16,OUTPUT);
+
+	servoBras.attach(PIN_SERVO_BRAS);
 }
 
 void loop(){
-	/* on note le temps de debut */
-	timeStart = micros();
 
 	/* La del est allumee pendant le traitement */
 	digitalWrite(16, HIGH);
 
-	//Action asserv
-	control.compute();
 
 	/* zone programmation libre */
 	int available = Serial2.available();
@@ -55,10 +46,4 @@ void loop(){
 	/* On eteint la del */
 	digitalWrite(16, LOW);
 	
-	/* On attend le temps qu'il faut pour boucler */
-	long udelay = DUREE_CYCLE*1000-(micros()-timeStart);
-	if(udelay<0)
-		PDEBUGLN("ouch : mainloop trop longue");
-	else
-		delayMicroseconds(udelay);
 }
