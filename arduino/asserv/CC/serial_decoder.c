@@ -20,20 +20,9 @@ void executeCmd(char serial_data){
 	static bool doublon = false;
 
 	static enum etape etape = wait_step;
-	enum etape next_etape = etape;
 
 	if((serial_data & PROTOCOL_BIT) == PROTOCOL_BIT){ //Si 0b1xxxxxxx
-		if((serial_data & 0x0F) == LOCAL_ADDR){ //Si début de paquet adressé au client
-			if ((serial_data & 0xF0) == RESET){ //Si demande de reset
-				ID_attendu = 0;
-				sendByte(RESET_CONF | LOCAL_ADDR);
-				PDEBUGLN("RESET CONFIRME");
-			}
-			else{
-				next_etape = ID_step; //Sinon le message nous est adressé
-			}
-		}
-		else if (serial_data == END) { //Fin de trame, execution de l'ordre
+		if (serial_data == END) { //Fin de trame, execution de l'ordre
 			unsigned char data_8bits[MAX_DATA];
 
                         data_counter = decode(data, data_8bits, data_counter);
@@ -51,8 +40,18 @@ void executeCmd(char serial_data){
 			data_counter = 0;
 			doublon = false;
 		}
+		else if((serial_data & 0x0F) == LOCAL_ADDR){ //Si début de paquet adressé au client
+			if ((serial_data & 0xF0) == RESET){ //Si demande de reset
+				ID_attendu = 0;
+				sendByte(RESET_CONF | LOCAL_ADDR);
+				PDEBUGLN("RESET CONFIRME");
+			}
+			else{
+				etape = ID_step; //Sinon le message nous est adressé
+			}
+		}
 		else{ //Si fin de paquet ou packet non adressé au client
-			next_etape = wait_step;
+			etape = wait_step;
 		}
 	}
 	else{
