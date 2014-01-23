@@ -160,15 +160,17 @@ class CommunicationGobale():
 			idd = int(order[1])
 
 			if address in self.address:
-				if idd >= 64:
-					print("\nERREUR: l'arduino", self.address[address], " a mal recu un message.")
+				if isinstance(address, (int)):
+					if idd >= 64:
+						print("\nERREUR: l'arduino", self.address[address], " a mal recu un message.")
 
-				else:
-					print("\nSuccess: l'arduino", self.address[address]," a bien recu l'ordre le message d'id: ", idd)
-					if idd == self.lastIdConfirm[self.address[address]]+1:
-						self.lastIdConfirm[self.address[address]] += 1
 					else:
-						print("\ERREUR: l'arduino a accepte le paquet ", idd, "alors que le dernier confirme etait ", self.lastIdConfirm[self.address[address]])
+						print("\nSuccess: l'arduino", self.address[address]," a bien recu l'ordre le message d'id: ", idd)
+						#TODO
+						"""if idd == self.lastIdConfirm[address]+1:
+							self.lastIdConfirm[address] += 1
+						else:
+							print("\ERREUR: l'arduino a accepte le paquet ", idd, "alors que le dernier confirme etait ", self.lastIdConfirm[address])"""
 
 			else:
 				print("ERREUR: address: ", address, " inconnue")
@@ -214,11 +216,13 @@ class CommunicationGobale():
 		return(chaineRetour)
 
 
-	def sendXbeeOrders(self, order, commande):
+	def sendXbeeOrders(self, order, ordersList):
 		""" ordersList est une liste de chaine de caractère sous la forme (adresse, id, data) où data est une chaine de char avec un ou plusieurs ordres"""
-		chaineTemp = self.applyProtocole(commande[0], commande[1], commande[2])
-		self.ordreLog[commande[0]][commande[1]] = (order[0],chaineTemp)
-		self.liaisonXbee.send(chaineTemp)
+		for commande in ordersList:
+			chaineTemp = self.applyProtocole(commande[0], commande[1], commande[2])
+			#TODO
+			#self.ordreLog[commande[0]][commande[1]] = (order[0],chaineTemp)
+			self.liaisonXbee.send(chaineTemp)
 
 	def sendOrder(self, order, data):
 		"""c'est la fonction que l'utilisateur doit manipuler, ordre est de type (address, data)"""
@@ -227,7 +231,11 @@ class CommunicationGobale():
 		#on y ajoute notre packet
 		#on envoye tout à sendXbeeOrders
 
-		self.sendXbeeOrders(order, (data[0], self.getId(data[0]), data[1]))
+		#bypass temporaire:
+		ordersList = deque()
+		ordersList.append((data[0], self.getId(data[0]), data[1]))
+		self.sendXbeeOrders(order, ordersList)
+		ordersList.pop()
 
 
 
