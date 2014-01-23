@@ -4,7 +4,7 @@
  * Date : 13/10/13			*
  ****************************************/
 #include "robotstate.h"
-#include "compaArduino.h"
+#include "compat.h"
 #include "local_math.h"
 
 /********************************************************

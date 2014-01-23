@@ -7,7 +7,7 @@
 #define SERIAL_LOCAL_H
 
 #include "serial_defines.h"
-#include "compaArduino.h"
+#include "compat.h"
 
 #define LOCAL_ADDR ADDR_FLUSSMITTEL_ASSERV //Ici l'adresse locale du client
 

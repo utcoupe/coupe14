@@ -3,6 +3,7 @@
  * Mail : quentin.chateau@gmail.com	*
  * Date : 22/01/13			*
  ****************************************/
+#include "compat.h"
 #include "serial_decoder.h"
 #include "serial_defines.h"
 #include "serial_local.h"
@@ -50,13 +51,6 @@ void executeCmd(char serial_data){
 				etape = wait_step;
 			}
 			else{
-#ifdef DEBUG
-                                int i;
-                                for(i = 0; i < data_counter; i++){
-                                        PDEBUG("Data "); PDEBUG(i); PDEBUG(" : ");
-                                        BINPR((int)data_8bits[i]); PDEBUGLN("");
-                                }
-#endif
 				executeOrdre(data_8bits, data_counter, ID_recu, doublon); //Execute les ordres, envoit les réponses
 				if (!doublon){
 					ID_attendu=(ID_attendu + 1) % (ID_MAX+1);//ID sur 6 bits effectifs, incrémentée si non doublon
@@ -78,10 +72,14 @@ void executeCmd(char serial_data){
 
 	if((serial_data & PROTOCOL_BIT) != 0){ //Si 0b1xxxxxxx
 		if((serial_data & 0x0F) == LOCAL_ADDR){ //Si début de paquet adressé au client
-			if ((serial_data & 0xF0) == RESET) //Si demande de reset
-				protocol_reset(&ID_attendu);
-			else
+			if ((serial_data & 0xF0) == RESET){ //Si demande de reset
+				ID_attendu = 0;
+				sendByte(RESET_CONF | LOCAL_ADDR);
+				PDEBUGLN("RESET CONFIRME");
+			}
+			else{
 				etape = ID_step; //Sinon le message nous est adressé
+			}
 		}
 		else{ //Si fin de paquet ou packet non adressé au client
 			etape = wait_step;
@@ -207,7 +205,17 @@ void sendInvalid() {//renvoit le code de message invalide (dépend de la platefo
 	sendByte(END);
 }
 
-void protocol_reset(char *ID){
-	*ID = 0;
-	sendByte(RESET | LOCAL_ADDR);
+void protocol_reset(){
+	while(serial_read() != (RESET_CONF | LOCAL_ADDR)){
+		sendByte(RESET | LOCAL_ADDR);
+		long t = timeMillis();
+		while (timeMillis() - t < 500);
+	}
+	PDEBUGLN("RESET");
 }
+
+void init_protocol(){
+	initSize();
+	protocol_reset();
+}
+

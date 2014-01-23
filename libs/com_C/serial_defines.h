@@ -9,6 +9,7 @@
 #define PROTOCOL_BIT 0x80
 #define END 0x80
 #define RESET 0xC0
+#define RESET_CONF 0xE0
 
 void initSize();
 

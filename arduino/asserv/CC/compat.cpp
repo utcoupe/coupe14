@@ -3,18 +3,18 @@
  * Mail : quentin.chateau@gmail.com	*
  * Date : 13/10/13			*
  ****************************************/
-#include "compaArduino.h"
+#include "compat.h"
 
 extern Control control;
 
 void initPins(){
 	//set mode des pins pour arduino
-	pinMode(PIN_ENC_LEFT_A,INPUT);
-	pinMode(PIN_ENC_LEFT_B,INPUT);
-	pinMode(PIN_ENC_LEFT_0,INPUT);
-	pinMode(PIN_ENC_RIGHT_0,INPUT);
-	pinMode(PIN_ENC_RIGHT_A,INPUT);
-	pinMode(PIN_ENC_RIGHT_B,INPUT);
+	pinMode(PIN_ENC_LEFT_A,INPUT_PULLUP);
+	pinMode(PIN_ENC_LEFT_B,INPUT_PULLUP);
+	pinMode(PIN_ENC_LEFT_0,INPUT_PULLUP);
+	pinMode(PIN_ENC_RIGHT_0,INPUT_PULLUP);
+	pinMode(PIN_ENC_RIGHT_A,INPUT_PULLUP);
+	pinMode(PIN_ENC_RIGHT_B,INPUT_PULLUP);
 
 	//Definition des interruptions arduino en fonction du type d'évaluation
 #if ENCODER_EVAL == 4
@@ -74,3 +74,6 @@ void interruptRight0{
 }
 #endif
 
+char serial_read(){
+	return Serial2.read();
+}

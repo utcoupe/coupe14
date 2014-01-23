@@ -4,7 +4,7 @@
  * Date : 29/11/13			*
  ****************************************/
 #include "control.h"
-#include "compaArduino.h"
+#include "compat.h"
 #include "motor.h"
 #include "local_math.h"
 

@@ -16,6 +16,7 @@ int encode(unsigned char *data_in, unsigned char *data_out, int data_counter); /
 void executeOrdre(unsigned char *data, int data_counter, unsigned char id, bool doublon);
 void sendResponse(unsigned char *data, int data_counter, unsigned char id); //Envoit un tableau de char 8 bits en réponse standard
 void sendInvalid(); //renvoit le code de message invalide (dépend de la plateforme)
-void protocol_reset(char *ID); //reset du protocole
+void protocol_reset(); //reset du protocole
+void init_protocol();
 
 #endif
