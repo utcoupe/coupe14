@@ -214,11 +214,12 @@ class CommunicationGobale():
 		return(chaineRetour)
 
 
-	def sendXbeeOrders(self, order, commande):
+	def sendXbeeOrders(self, order, ordersList):
 		""" ordersList est une liste de chaine de caractère sous la forme (adresse, id, data) où data est une chaine de char avec un ou plusieurs ordres"""
-		chaineTemp = self.applyProtocole(commande[0], commande[1], commande[2])
-		self.ordreLog[commande[0]][commande[1]] = (order[0],chaineTemp)
-		self.liaisonXbee.send(chaineTemp)
+		for commande in ordersList:
+			chaineTemp = self.applyProtocole(commande[0], commande[1], commande[2])
+			self.ordreLog[commande[0]][commande[1]] = (order[0],chaineTemp)
+			self.liaisonXbee.send(chaineTemp)
 
 	def sendOrder(self, order, data):
 		"""c'est la fonction que l'utilisateur doit manipuler, ordre est de type (address, data)"""
@@ -227,7 +228,11 @@ class CommunicationGobale():
 		#on y ajoute notre packet
 		#on envoye tout à sendXbeeOrders
 
-		self.sendXbeeOrders(order, (data[0], self.getId(data[0]), data[1]))
+		#bypass temporaire:
+		ordersList = deque()
+		ordersList.append((order[0], self.getId(order[0]), order[1]))
+		self.sendXbeeOrders(order, ordersList)
+		ordersList.pop()
 
 
 
