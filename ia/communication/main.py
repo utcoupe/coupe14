@@ -320,7 +320,7 @@ def gui():
 					data += intToBinary(long(raw_input("Entre  un long ")))
 				else:
 					print("\nERREUR: Parseur: le parseur un trouvé un type non supporté")
-			communication.sendOrder(order, (address,data))	
+			communication.sendOrder(ordre, (address,data))	
 		else:
 			print ("\nL'ordre n'a pas été trouvé dans les fichiers arduino")
 
