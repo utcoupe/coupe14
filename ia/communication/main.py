@@ -16,8 +16,10 @@ class CommunicationGobale():
 		#on récupère les constantes
 		self.address = {}
 		self.orders = {}
+		self.ordersArguments = {}
+		self.ordersRetour = {}
 		self.ordersSize = {}
-		(self.address, self.orders, self.ordersSize) = parser_c.parseConstante()
+		(self.address, self.orders, self.ordersSize, self.ordersArguments, self.ordersRetour) = parser_c.parseConstante()
 		
 		self.arduinoIdReady = [False]*(len(self.address)+1)
 		self.lastIdConfirm = {x:63 for x in self.address}
@@ -31,7 +33,7 @@ class CommunicationGobale():
 
 
 	def getConst(self):
-		return (self.address, self.orders, self.ordersSize)
+		return (self.address, self.orders, self.ordersSize, self.ordersArguments, self.ordersRetour)
 
 
 
@@ -218,6 +220,30 @@ def floatToBinary(num):
 	return temp2
 
 
+def longToBinary(num):
+	"""retourne une chaine de 32 bits"""
+	temp2 = ""
+	
+	if num<0: #si l'int est négatif
+		num = 4294967295 + num
+
+	temp = bin(num)[2:]
+
+	while len(temp) < 32:
+		temp = '0' + temp
+
+	#On inverse les 16 bits par blocks de 8, exemple AAAAAAAABBBBBBBB devient BBBBBBBBAAAAAAAA
+	for i in range(24, 32, 1):
+		temp2 += temp[i]
+	for i in range(16, 24, 1):
+		temp2 += temp[i]
+	for i in range(8, 16, 1):
+		temp2 += temp[i]
+	for i in range(0, 8, 1):
+		temp2 += temp[i]
+	return temp2
+
+
 def intToBinary(num):
 	"""retourne une chaine de 16 bits"""
 	temp2 = ""
@@ -237,6 +263,7 @@ def intToBinary(num):
 		temp2 += temp[i]
 	return temp2
 
+
 def orderToBinary(num):
 	"""retourne une chaine de 6 bits"""
 	temp = bin(num)[2:]
@@ -244,50 +271,26 @@ def orderToBinary(num):
 		temp = '0' + temp
 	return temp
 
+
 def gui():
 	while 1:
-		dataString = str(raw_input("Entre le nom d'un ordre (string)"))
-		if dataString == 'A_GOTO':
-			data = orderToBinary(int(communication.getConst()[1][dataString]))
-			data += intToBinary(int(raw_input("Entre l'argument 1 (int)")))
-			data += intToBinary(int(raw_input("Entre l'argument 2 (int)")))
-
-		elif dataString == 'A_ROT':
-			data = orderToBinary(communication.getConst()[1][dataString])
-			data += floatToBinary(float(raw_input("Entre l'argument 1 (float)")))
-
-		elif dataString == 'A_PWM_TEST':
-			data = orderToBinary(int(communication.getConst()[1][dataString]))
-			data += intToBinary(int(raw_input("Entre l'argument 1 (int)")))
-			data += intToBinary(int(raw_input("Entre l'argument 2 (int)")))
-			data += intToBinary(int(raw_input("Entre l'argument 3 (int)")))
-
-		elif dataString == 'A_PIDA':
-			data = orderToBinary(int(communication.getConst()[1][dataString]))
-			data += intToBinary(int(raw_input("Entre l'argument 1 (int)")))
-			data += intToBinary(int(raw_input("Entre l'argument 2 (int)")))
-			data += intToBinary(int(raw_input("Entre l'argument 3 (int)")))
-
-		elif dataString == 'A_PIDD':
-			data = orderToBinary(int(communication.getConst()[1][dataString]))
-			data += intToBinary(int(raw_input("Entre l'argument 1 (int)")))
-			data += intToBinary(int(raw_input("Entre l'argument 2 (int)")))
-			data += intToBinary(int(raw_input("Entre l'argument 3 (int)")))
-
-		elif dataString == 'PINGPING':
+		dataString = str(raw_input("Entre le nom d'un ordre:"))
+		if dataString in communication.getConst()[1]:
+			address = 2
 			data = orderToBinary(int(communication.getConst()[1][dataString]))
 
-		elif dataString == 'A_GET_CODER':
-			data = orderToBinary(int(communication.getConst()[1][dataString]))
-
+			for typeToGet in communication.getConst()[3][dataString]:
+				if typeToGet == 'int':
+					data += intToBinary(int(raw_input("Entre  un int")))
+				elif typeToGet == 'float':
+					data += floatToBinary(float(raw_input("Entre un float")))
+				elif typeToGet == 'long':
+					data += intToBinary(long(raw_input("Entre  un long")))
+				else:
+					print("ERREUR: Parseur: le parseur un trouvé un type non supporté")
+			communication.sendOrder((address,data))	
 		else:
-			print ("L'ordre n'est pas implementé")
-
-		address = 2
-		communication.sendOrder((address,data))	
-
-
-
+			print ("L'ordre n'a pas été trouvé dans les fichiers arduino")
 
 
 communication = CommunicationGobale("/dev/ttyUSB0")
@@ -299,8 +302,8 @@ probResetIdThread = threading.Thread(target=communication.probResetId)
 
 
 try:
-	lectureInputThread.start()
-	probResetIdThread.start()
+	#lectureInputThread.start()
+	#probResetIdThread.start()
 	gui()
 except KeyboardInterrupt:
 	communication.stopReadingInput()

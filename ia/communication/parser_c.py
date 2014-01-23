@@ -9,7 +9,7 @@ import os
 import re
 
 
-def parseFile(path, myRe, nbGroupParse=1):
+def parseFile(path, myRe, nbGroupParse=1, seekArguments=False):
 	reBegin = re.compile("\s?//DEBUTPARSE\s?")
 	reFin = re.compile("\s?//FINPARSE\s?")
 	definesFile = open(path)
@@ -29,8 +29,20 @@ def parseFile(path, myRe, nbGroupParse=1):
 				value = result.group('value')
 				if value:
 					compteur = int(value)
-				dico[constante] = compteur
-				dico[compteur] = constante
+
+				if seekArguments:
+					argList = result.group('arg')
+					if argList == None:
+						argList = ""
+					argTuple = ()
+					for arg in argList.split():
+						argTuple = argTuple + (arg[1:],)
+					dico[constante] = argTuple
+					dico[compteur] = argTuple
+				else:
+					dico[constante] = compteur
+					dico[compteur] = constante
+
 				compteur += 1
 
 		if reBegin.match(line):
@@ -45,12 +57,16 @@ def parseFile(path, myRe, nbGroupParse=1):
 def parseConstante():
 	relativePath = "../../libs/com_C/"
 
-	reEnum = re.compile("\s?(?P<constante>\w*)(\s?=\s?(?P<value>.*))?,")
-	reArrayC = re.compile("\s?ordreSize\[(?P<constante>\w*)\](\s?=\s?(?P<value>.*))?;")
+	reEnum = re.compile("\s*(?P<constante>\w*)(\s*=\s*(?P<value>.*))?,")
+	reArguments = re.compile("\s*(?P<constante>\w*)(\s*=\s*(?P<value>.*))?,(\s*//(?P<arg>(@\w*\s*)*))?.*\n")
+	reReturn = re.compile("\s*(?P<constante>\w*)(\s*=\s*(?P<value>.*))?,(\s*//(?P<arg>(#\w*\s*)*))?.*\n")
+	reArrayC = re.compile("\s*ordreSize\[(?P<constante>\w*)\](\s*=\s*(?P<value>.*))?;")
 
 
 	address = parseFile(relativePath + "serial_defines.h", reEnum, 1)
 	orders = parseFile(relativePath + "serial_defines.h", reEnum, 2)
+	ordersArguments = parseFile(relativePath + "serial_defines.h", reArguments, 2, seekArguments=True)
+	ordersRetour = parseFile(relativePath + "serial_defines.h", reReturn, 2, seekArguments=True)
 	ordersSize = parseFile(relativePath + "serial_defines.c", reArrayC, 1)
 
-	return (address, orders, ordersSize)
+	return (address, orders, ordersSize, ordersArguments, ordersRetour)
