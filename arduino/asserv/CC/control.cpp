@@ -129,11 +129,11 @@ void Control::reset(){
 
 
 void Control::setPID_angle(float n_P, float n_I, float n_D){
-	PID_Angle.setPID(n_P, n_I * (DUREE_CYCLE/1000.0), n_D / (DUREE_CYCLE/1000.0));
+	PID_Angle.setPID(n_P, n_I / FREQ, n_D * FREQ);
 }
 
 void Control::setPID_distance(float n_P, float n_I, float n_D){
-	PID_Distance.setPID(n_P, n_I * (DUREE_CYCLE/1000.0), n_D / (DUREE_CYCLE/1000.0));
+	PID_Distance.setPID(n_P, n_I / FREQ, n_D * FREQ);
 }
 
 void Control::setConsigneOffset(int n_offset){
@@ -145,8 +145,7 @@ void Control::setMaxAngCurv(float n_max_ang){
 }
 
 void Control::setMaxAcc(float n_max_acc){
-	max_acc = n_max_acc * (DUREE_CYCLE/1000.0)
-;
+	max_acc = n_max_acc / FREQ; 
 }
 
 void Control::pushPos(m_pos n_pos){
