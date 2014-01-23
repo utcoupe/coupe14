@@ -160,15 +160,17 @@ class CommunicationGobale():
 			idd = int(order[1])
 
 			if address in self.address:
-				if idd >= 64:
-					print("\nERREUR: l'arduino", self.address[address], " a mal recu un message.")
+				if isinstance(address, (int)):
+					if idd >= 64:
+						print("\nERREUR: l'arduino", self.address[address], " a mal recu un message.")
 
-				else:
-					print("\nSuccess: l'arduino", self.address[address]," a bien recu l'ordre le message d'id: ", idd)
-					if idd == self.lastIdConfirm[self.address[address]]+1:
-						self.lastIdConfirm[self.address[address]] += 1
 					else:
-						print("\ERREUR: l'arduino a accepte le paquet ", idd, "alors que le dernier confirme etait ", self.lastIdConfirm[self.address[address]])
+						print("\nSuccess: l'arduino", self.address[address]," a bien recu l'ordre le message d'id: ", idd)
+						#TODO
+						"""if idd == self.lastIdConfirm[address]+1:
+							self.lastIdConfirm[address] += 1
+						else:
+							print("\ERREUR: l'arduino a accepte le paquet ", idd, "alors que le dernier confirme etait ", self.lastIdConfirm[address])"""
 
 			else:
 				print("ERREUR: address: ", address, " inconnue")
@@ -218,7 +220,8 @@ class CommunicationGobale():
 		""" ordersList est une liste de chaine de caractère sous la forme (adresse, id, data) où data est une chaine de char avec un ou plusieurs ordres"""
 		for commande in ordersList:
 			chaineTemp = self.applyProtocole(commande[0], commande[1], commande[2])
-			self.ordreLog[commande[0]][commande[1]] = (order[0],chaineTemp)
+			#TODO
+			#self.ordreLog[commande[0]][commande[1]] = (order[0],chaineTemp)
 			self.liaisonXbee.send(chaineTemp)
 
 	def sendOrder(self, order, data):
@@ -230,7 +233,7 @@ class CommunicationGobale():
 
 		#bypass temporaire:
 		ordersList = deque()
-		ordersList.append((order[0], self.getId(order[0]), order[1]))
+		ordersList.append((data[0], self.getId(data[0]), data[1]))
 		self.sendXbeeOrders(order, ordersList)
 		ordersList.pop()
 
