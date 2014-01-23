@@ -82,7 +82,7 @@ class CommunicationGobale():
 
 	def probResetId(self):
 		while self.probingIdReset == True:
-			for address in range(1, len(self.address), 1):
+			for address in range(1, len(self.address)/2+1, 1):
 				if self.arduinoIdReady[address] == False:
 					self.askResetId(address)
 			time.sleep(2)
