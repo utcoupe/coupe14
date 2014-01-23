@@ -25,7 +25,7 @@ class CommunicationGobale():
 		
 		self.arduinoIdReady = [False]*(len(self.address)/2+1)
 		self.lastIdConfirm = [63]*(len(self.address)/2+1)
-		self.lastIdSend = self.lastIdConfirm
+		self.lastIdSend = [63]*(len(self.address)/2+1)
 
 		self.liaisonXbee = serial_comm.ComSerial(port, 57600)
 
@@ -64,12 +64,27 @@ class CommunicationGobale():
 
 	def getId(self, address):
 		"""retourne l'id qu'il faut utiliser pour envoyer un packet à l'adresse passé en argument"""
-		if self.lastIdSend[address] >= 63:# -1 car l'adresse 0 n'existe pas
+		if self.lastIdSend[address] == 63:
 			self.lastIdSend[address] = 0
 		else:
 			self.lastIdSend[address] += 1
 
 		return self.lastIdSend[address]
+
+	def getNextConfirmeId(self, address):
+		"""retourne le prochain id attendu"""
+		if self.lastIdConfirm[address] == 63:
+			return 0
+		else:
+			return self.lastIdConfirm[address]+1
+
+	def incrementeLastConfirmedId(self, address):
+		if self.lastIdConfirm[address] == 63:
+			self.lastIdConfirm[address] = 0
+		else:
+			self.lastIdConfirm[address] += 1
+
+
 
 
 	def askResetId(self, address): #demande a une arduino de reset
@@ -160,18 +175,14 @@ class CommunicationGobale():
 			idd = int(order[1])
 
 			if address in self.address:
-				if isinstance(address, (int)):
-					if idd >= 64:
-						print("\nERREUR: l'arduino", self.address[address], " a mal recu un message.")
-
+				if idd >= 64:
+					print("\nERREUR: l'arduino", self.address[address], " a mal recu un message.")
+				else:
+					if idd == self.getNextConfirmeId(address):
+						print("\nSuccess: l'arduino", self.address[address]," a bien recu l'ordre d'id: ", idd)
+						self.incrementeLastConfirmedId(address)
 					else:
-						print("\nSuccess: l'arduino", self.address[address]," a bien recu l'ordre le message d'id: ", idd)
-						#TODO
-						"""if idd == self.lastIdConfirm[address]+1:
-							self.lastIdConfirm[address] += 1
-						else:
-							print("\ERREUR: l'arduino a accepte le paquet ", idd, "alors que le dernier confirme etait ", self.lastIdConfirm[address])"""
-
+						print("\ERREUR: l'arduino a accepte le paquet ", idd, "alors que le paquet a confirmer est ", self.getNextConfirmeId(address))
 			else:
 				print("ERREUR: address: ", address, " inconnue")
 				
