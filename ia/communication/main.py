@@ -231,8 +231,7 @@ class CommunicationGobale():
 		""" ordersList est une liste de chaine de caractère sous la forme (adresse, id, data) où data est une chaine de char avec un ou plusieurs ordres"""
 		for commande in ordersList:
 			chaineTemp = self.applyProtocole(commande[0], commande[1], commande[2])
-			#TODO
-			#self.ordreLog[commande[0]][commande[1]] = (order[0],chaineTemp)
+			self.ordreLog[commande[0]][commande[1]] = (order,chaineTemp)
 			self.liaisonXbee.send(chaineTemp)
 
 	def sendOrder(self, order, data):
@@ -324,7 +323,7 @@ def gui():
 		address = 2
 
 		if dataString == 'k':# arret d'urgence
-			communication.sendOrder(order, (address, orderToBinary(int(communication.getConst()[1]['A_KILLG']))))	
+			communication.sendOrder(ordre, (address, orderToBinary(int(communication.getConst()[1]['A_KILLG']))))	
 		elif dataString in communication.getConst()[1]:
 			ordre = int(communication.getConst()[1][dataString])
 			data = orderToBinary(ordre)
