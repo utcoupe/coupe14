@@ -60,7 +60,6 @@ class CommunicationGobale():
 			for address in range(1, len(self.address), 1):
 				if self.arduinoIdReady[address] == False:
 					self.askResetId(address)
-					print("Demande de reset", address)
 			time.sleep(5)
 
 	def stopProbResetId(self):
@@ -69,7 +68,7 @@ class CommunicationGobale():
 
 	#cas où on reçoi
 	def acceptConfirmeResetId(self, address):#accepte la confirmation de reset d'un arduino
-		print("confirmation OKOKOKOKOKOKOKOKOKOK")
+		print("confirmation de reset de ", address)
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
 		self.arduinoIdReady[address] = True
@@ -302,8 +301,8 @@ probResetIdThread = threading.Thread(target=communication.probResetId)
 
 
 try:
-	#lectureInputThread.start()
-	#probResetIdThread.start()
+	lectureInputThread.start()
+	probResetIdThread.start()
 	gui()
 except KeyboardInterrupt:
 	communication.stopReadingInput()
