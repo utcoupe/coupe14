@@ -76,6 +76,11 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 			control.clearGoals();
 		}
 		break;
+	case A_ACCMAX:
+		if(!doublon) {
+			control.setMaxAcc(btof(argv));
+		}
+		break;
 
 /*	case ORDRE_001:
 		if (!doublon) {
