@@ -35,7 +35,7 @@
 #define MAX_GOALS 15 //nombre max de goals dans la file, évite surcharge mémoire
 #define DUREE_CYCLE 5 //période de calcul, en ms
 
-#define ACCELERATION_MAX 50
+#define ACC_MAX 1000 //consigne*s-2
 
 /* CONSIGNE OFFSET
  * DEVRAIT ETRE A 0
@@ -58,8 +58,8 @@
 
 #define ENC_RESOLUTION 500 //resolution du codeur
 
-#define ENC_RADIUS 32 //rayon de la roue codeuse
-#define ENTRAXE_ENC 260.0 // Distance entre chaque roue codeuse en mm
+#define ENC_RADIUS 33.5 //rayon de la roue codeuse
+#define ENTRAXE_ENC 261.0 // Distance entre chaque roue codeuse en mm
 #define ENTRAXE_MOTOR 203.0 // Distance entre chaque roue motrice en mm
 
 #define ERROR_ANGLE 0.05 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
@@ -71,13 +71,13 @@
 //Ne modifier que le nombre, laisser les DUREE_CYCLE
 
 //Le "I" devrait etre faible (ou nul), le "D" est à régler progressivement pour éviter le dépassement
-#define ANGLE_P 0.75 //spd = P * E_ang(rad)
-#define ANGLE_I 0 //spd = I * I_ang(rad * s)
-#define ANGLE_D 0 //a regler par incrementation
+#define ANG_P 450 //spd = P * E_ang(rad)
+#define ANG_I 0 //spd = I * I_ang(rad * s)
+#define ANG_D 50 //a regler par incrementation
 
-#define DISTANCE_P 0.002 //spd = P * E_dis(mm)
-#define DISTANCE_I 0 //spd = I * I_dis(mm * s)
-#define DISTANCE_D 0 //a regler par incrementation
+#define DIS_P 0.002 //spd = P * E_dis(mm)
+#define DIS_I 0 //spd = I * I_dis(mm * s)
+#define DIS_D 0 //a regler par incrementation
 
 //DEFINES ARDUINO
 #define PIN_ENC_RIGHT_A 21
@@ -104,16 +104,6 @@
 #elif ENCODER_EVAL == 1
 	#define TICKS_PER_TURN ENC_RESOLUTION
 #endif
-
-#define ACC_MAX ACCELERATION_MAX * (DUREE_CYCLE/1000.0)
-
-#define ANG_P ANGLE_P
-#define ANG_I ANGLE_I * (DUREE_CYCLE/1000.0)
-#define ANG_D ANGLE_D / (DUREE_CYCLE/1000.0)
-
-#define DIS_P DISTANCE_P
-#define DIS_I DISTANCE_I * (DUREE_CYCLE/1000.0)
-#define DIS_D DISTANCE_D / (DUREE_CYCLE/1000.0)
 
 #ifdef DEBUG
 #define PDEBUG(x) Serial.print(x)
