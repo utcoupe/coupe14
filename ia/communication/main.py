@@ -20,6 +20,7 @@ class CommunicationGobale():
 		self.ordersRetour = {}
 		self.ordersSize = {}
 		(self.address, self.orders, self.ordersSize, self.ordersArguments, self.ordersRetour) = parser_c.parseConstante()
+		#self.checkTypeSize()
 		
 		self.arduinoIdReady = [False]*(len(self.address)+1)
 		self.lastIdConfirm = {x:63 for x in self.address}
@@ -34,6 +35,14 @@ class CommunicationGobale():
 
 	def getConst(self):
 		return (self.address, self.orders, self.ordersSize, self.ordersArguments, self.ordersRetour)
+
+	"""def checkTypeSize(self):
+		for order in self.orders:
+			if not isinstance(order, (int)):
+				sizeExpected = self.ordersSize[4]
+			print sizeExpected"""
+			
+			
 
 
 
@@ -68,12 +77,13 @@ class CommunicationGobale():
 
 	#cas où on reçoi
 	def acceptConfirmeResetId(self, address):#accepte la confirmation de reset d'un arduino
-		print("confirmation de reset de ", address)
+		print("accepte la confirmation de reset du système ", address)
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
 		self.arduinoIdReady[address] = True
 
 	def confirmeResetId(self, address):#renvoie une confirmation de reset
+		print("renvoie une confirmation de reset du système ", address)
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
 		chaineTemp = chr(address+224)
@@ -273,7 +283,8 @@ def orderToBinary(num):
 
 def gui():
 	while 1:
-		dataString = str(raw_input("Entre le nom d'un ordre:"))
+		dataString = str(raw_input("Entre le nom ou le numéro d'un ordre:"))
+
 		if dataString in communication.getConst()[1]:
 			address = 2
 			data = orderToBinary(int(communication.getConst()[1][dataString]))
