@@ -39,21 +39,17 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
                 */
 		break;
 	case A_GOTO:
-                Serial.print("Arg 1 : ");
-                Serial.println(btoi(argv));
-                Serial.print("Arg 2 : ");
-                Serial.println(btoi(argv+2));
-                /*
+                PDEBUG("Arg 1 : "); PDEBUGLN(btoi(argv));
+                PDEBUG("Arg 2 : "); PDEBUGLN(btoi(argv+2));
 		if (!doublon) {
 			control.pushGoal(0, TYPE_POS, btoi(argv), btoi(argv+2), 0);
-		}*/
+		}
 		break;
 	case A_ROT:
                 PDEBUG("Arg : "); PDEBUGLN(btof(argv));
-                /*
 		if (!doublon) {
 			control.pushGoal(0, TYPE_ANG, btof(argv), 0, 0);
-		}*/
+		}
 		break;
 	case A_PWM_TEST:
 		if (!doublon) {
