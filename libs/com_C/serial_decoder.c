@@ -213,3 +213,9 @@ void protocol_reset(){
 	}
 	PDEBUGLN("RESET");
 }
+
+void init_protocol(){
+	initSize();
+	protocol_reset();
+}
+

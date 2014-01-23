@@ -20,13 +20,12 @@ Control control;
 #define MAX_READ 64 
 void setup(){
 	initPins();
-	initSize();
 	Serial2.begin(57600, SERIAL_8O1);
 	Serial.begin(115200, SERIAL_8N1);
+	init_protocol();
 	PDEBUGLN("INIT DONE");
 	// LED qui n'en est pas une
 	pinMode(16,OUTPUT);
-	protocol_reset();
 }
 
 void loop(){
