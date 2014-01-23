@@ -20,10 +20,11 @@ class CommunicationGobale():
 		self.ordersRetour = {}
 		self.ordersSize = {}
 		(self.address, self.orders, self.ordersSize, self.ordersArguments, self.ordersRetour) = parser_c.parseConstante()
+		self.ordreLog = [[(-1,"")]*64 for x in xrange(len(self.address)/2+1)] #stock un historique des ordres envoyés, double tableau de tuple (ordre,data)
 		self.checkTypeSize()
 		
-		self.arduinoIdReady = [False]*(len(self.address)+1)
-		self.lastIdConfirm = {x:63 for x in self.address}
+		self.arduinoIdReady = [False]*(len(self.address)/2+1)
+		self.lastIdConfirm = [63]*(len(self.address)/2+1)
 		self.lastIdSend = self.lastIdConfirm
 
 		self.liaisonXbee = serial_comm.ComSerial(port, 57600)
@@ -72,6 +73,10 @@ class CommunicationGobale():
 
 
 	def askResetId(self, address): #demande a une arduino de reset
+		self.arduinoIdReady[address] = False
+		self.lastIdConfirm[address] = 63
+		self.lastIdSend[address] = 63
+
 		chaineTemp = chr(address+192)
 		self.liaisonXbee.send(chaineTemp)
 
@@ -80,7 +85,7 @@ class CommunicationGobale():
 			for address in range(1, len(self.address), 1):
 				if self.arduinoIdReady[address] == False:
 					self.askResetId(address)
-			time.sleep(5)
+			time.sleep(2)
 
 	def stopProbResetId(self):
 		self.probingIdReset = False
@@ -88,13 +93,14 @@ class CommunicationGobale():
 
 	#cas où on reçoi
 	def acceptConfirmeResetId(self, address):#accepte la confirmation de reset d'un arduino
-		print("accepte la confirmation de reset du systeme ", address)
+		print("\naccepte la confirmation de reset du systeme ", address)
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
 		self.arduinoIdReady[address] = True
 
 	def confirmeResetId(self, address):#renvoie une confirmation de reset
-		print("renvoie une confirmation de reset du systeme ", address)
+		print("\nrenvoie une confirmation de reset du systeme ", address)
+		self.arduinoIdReady[address] = True
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
 		chaineTemp = chr(address+224)
@@ -153,12 +159,17 @@ class CommunicationGobale():
 			address = int(order[0])
 			idd = int(order[1])
 
-			if address in self.getConst()[0]:
+			if address in self.address:
 				if idd >= 64:
-					print("ERREUR: l'arduino", self.getConst()[0][address], " a mal recu un message id: ")
+					print("\nERREUR: l'arduino", self.address[address], " a mal recu un message.")
 
 				else:
-					print("success: l'arduino", self.getConst()[0][address]," a bien recu le message d'id: ", idd)
+					print("\nSuccess: l'arduino", self.address[address]," a bien recu l'ordre le message d'id: ", idd)
+					if idd == self.lastIdConfirm[self.address[address]]+1:
+						self.lastIdConfirm[self.address[address]] += 1
+					else:
+						print("\ERREUR: l'arduino a accepte le paquet ", idd, "alors que le dernier confirme etait ", self.lastIdConfirm[self.address[address]])
+
 			else:
 				print("ERREUR: address: ", address, " inconnue")
 				
@@ -203,24 +214,21 @@ class CommunicationGobale():
 		return(chaineRetour)
 
 
-	def sendXbeeOrders(self, ordersList):
+	def sendXbeeOrders(self, order, ordersList):
 		""" ordersList est une liste de chaine de caractère sous la forme (adresse, id, data) où data est une chaine de char avec un ou plusieurs ordres"""
-		for order in ordersList:
-			chaineTemp = self.applyProtocole(order[0], order[1], order[2])
+		for commande in ordersList:
+			chaineTemp = self.applyProtocole(commande[0], commande[1], commande[2])
+			self.ordreLog[commande[0]][commande[1]] = (order[0],chaineTemp)
 			self.liaisonXbee.send(chaineTemp)
 
-	def sendOrder(self, order):
+	def sendOrder(self, order, data):
 		"""c'est la fonction que l'utilisateur doit manipuler, ordre est de type (address, data)"""
 		#TODO:
 		#on get les packet à renvoyer
 		#on y ajoute notre packet
 		#on envoye tout à sendXbeeOrders
 
-		#bypass temporaire:
-		ordersList = deque()
-		ordersList.append((order[0], self.getId(order[0]), order[1]))
-		self.sendXbeeOrders(ordersList)
-		ordersList.pop()
+		self.sendXbeeOrders(order, (data[0], self.getId(data[0]), data[1]))
 
 
 
@@ -294,27 +302,27 @@ def orderToBinary(num):
 
 def gui():
 	while 1:
-		dataString = str(raw_input("Entre le nom ou le numéro d'un ordre:"))
+		dataString = str(raw_input("Entre le nom ou le numéro d'un ordre: "))
 		address = 2
 
 		if dataString == 'k':# arret d'urgence
-			communication.sendOrder((address,orderToBinary(int(communication.getConst()[1]['A_KILLG']))))	
+			communication.sendOrder(order, (address, orderToBinary(int(communication.getConst()[1]['A_KILLG']))))	
 		elif dataString in communication.getConst()[1]:
-			
-			data = orderToBinary(int(communication.getConst()[1][dataString]))
+			ordre = int(communication.getConst()[1][dataString])
+			data = orderToBinary(ordre)
 
 			for typeToGet in communication.getConst()[3][dataString]:
 				if typeToGet == 'int':
-					data += intToBinary(int(raw_input("Entre  un int")))
+					data += intToBinary(int(raw_input("Entre  un int ")))
 				elif typeToGet == 'float':
-					data += floatToBinary(float(raw_input("Entre un float")))
+					data += floatToBinary(float(raw_input("Entre un float ")))
 				elif typeToGet == 'long':
-					data += intToBinary(long(raw_input("Entre  un long")))
+					data += intToBinary(long(raw_input("Entre  un long ")))
 				else:
-					print("ERREUR: Parseur: le parseur un trouvé un type non supporté")
-			communication.sendOrder((address,data))	
+					print("\nERREUR: Parseur: le parseur un trouvé un type non supporté")
+			communication.sendOrder(order, (address,data))	
 		else:
-			print ("L'ordre n'a pas été trouvé dans les fichiers arduino")
+			print ("\nL'ordre n'a pas été trouvé dans les fichiers arduino")
 
 
 communication = CommunicationGobale("/dev/ttyUSB0")
