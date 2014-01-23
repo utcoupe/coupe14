@@ -38,9 +38,9 @@ class CommunicationGobale():
 
 	"""def checkTypeSize(self):
 		for order in self.orders:
-			if not isinstance(order, (int)):
-				sizeExpected = self.ordersSize[4]
-			print sizeExpected"""
+			if not isinstance(order, (int)):# on teste uniquement les ordres numériques, ils sont i
+				sizeExpected = self.ordersSize[order]
+				print sizeExpected"""
 			
 			
 
@@ -77,13 +77,13 @@ class CommunicationGobale():
 
 	#cas où on reçoi
 	def acceptConfirmeResetId(self, address):#accepte la confirmation de reset d'un arduino
-		print("accepte la confirmation de reset du système ", address)
+		print("accepte la confirmation de reset du systeme ", address)
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
 		self.arduinoIdReady[address] = True
 
 	def confirmeResetId(self, address):#renvoie une confirmation de reset
-		print("renvoie une confirmation de reset du système ", address)
+		print("renvoie une confirmation de reset du systeme ", address)
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
 		chaineTemp = chr(address+224)
@@ -284,9 +284,12 @@ def orderToBinary(num):
 def gui():
 	while 1:
 		dataString = str(raw_input("Entre le nom ou le numéro d'un ordre:"))
+		address = 2
 
-		if dataString in communication.getConst()[1]:
-			address = 2
+		if dataString == 'k':# arret d'urgence
+			communication.sendOrder((address,orderToBinary(int(communication.getConst()[1]['A_KILLG']))))	
+		elif dataString in communication.getConst()[1]:
+			
 			data = orderToBinary(int(communication.getConst()[1][dataString]))
 
 			for typeToGet in communication.getConst()[3][dataString]:
