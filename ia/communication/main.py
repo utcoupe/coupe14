@@ -20,7 +20,7 @@ class CommunicationGobale():
 		self.ordersRetour = {}
 		self.ordersSize = {}
 		(self.address, self.orders, self.ordersSize, self.ordersArguments, self.ordersRetour) = parser_c.parseConstante()
-		#self.checkTypeSize()
+		self.checkTypeSize()
 		
 		self.arduinoIdReady = [False]*(len(self.address)+1)
 		self.lastIdConfirm = {x:63 for x in self.address}
@@ -36,11 +36,22 @@ class CommunicationGobale():
 	def getConst(self):
 		return (self.address, self.orders, self.ordersSize, self.ordersArguments, self.ordersRetour)
 
-	"""def checkTypeSize(self):
+	def checkTypeSize(self):
 		for order in self.orders:
-			if not isinstance(order, (int)):# on teste uniquement les ordres numériques, ils sont i
+			if not isinstance(order, (int)):# on teste uniquement les ordres numériques, ils sont identiquent aux strings
 				sizeExpected = self.ordersSize[order]
-				print sizeExpected"""
+				somme = 0
+				for argumentType in self.ordersArguments[order]:
+					if argumentType == 'int':
+						somme += 2
+					elif argumentType == 'long':
+						somme += 4
+					elif argumentType == 'float':
+						somme += 4
+					else:
+						print("ERREUR: type parse inconnu")
+				if somme != sizeExpected:
+					print("ERREUR: la constante de taille de l'ordre ", order, " ne correspond pas aux types indiqués attendu ", sizeExpected, " calculee ", somme)
 			
 			
 
