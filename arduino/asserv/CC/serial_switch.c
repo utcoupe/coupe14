@@ -25,8 +25,9 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		break;
 	case A_GET_CODER:
                 if (!doublon) {
-			PDEBUG(control.getLenc()->getTicks());
-			PDEBUG(control.getRenc()->getTicks());
+			PDEBUG("Codeur L : ");PDEBUGLN(control.getLenc()->getTicks());
+			PDEBUG("Codeur R : ");PDEBUGLN(control.getRenc()->getTicks());
+			PDEBUG("Angle pos : ");PDEBUGLN(control.getPos().angle);
                 }
                 /*
 		PDEBUGLN("");
@@ -58,12 +59,12 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		break;
 	case A_PIDA:
 		if (!doublon) {
-			control.setPID_angle(btoi(argv), btoi(argv+2), btoi(argv+3));
+			control.setPID_angle(btof(argv), btof(argv+4), btof(argv+8));
 		}
 		break;
 	case A_PIDD:
 		if (!doublon) {
-			control.setPID_distance(btoi(argv), btoi(argv+2), btoi(argv+3));
+			control.setPID_distance(btof(argv), btof(argv+4), btof(argv+8));
 		}
 		break;
 	case A_KILLG:
