@@ -21,7 +21,9 @@ Control control;
 void setup(){
 	initPins();
 	Serial2.begin(57600, SERIAL_8O1);
+#ifdef DEBUG
 	Serial.begin(115200, SERIAL_8N1);
+#endif
 	init_protocol();
 	PDEBUGLN("INIT DONE");
 	// LED qui n'en est pas une
