@@ -57,6 +57,7 @@ enum ordre {
 	A_GET_CODER, 	//#long #long
 	A_PWM_TEST, 	//@int @int @int
 	A_ACCMAX,	//@float
+	A_RESET_POS,
 	ORDRE_NON_PARSE
 	//FINPARSE
 };

@@ -71,6 +71,15 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 			control.clearGoals();
 		}
 		break;
+	case A_RESET_POS:
+		if (!doublon) {
+			m_pos pos;
+			pos.x = 0;
+			pos.y = 0;
+			pos.angle = 0;
+			control.pushPos(pos);
+		}
+		break;
 	case A_ACCMAX:
 		if(!doublon) {
 			control.setMaxAcc(btof(argv));
