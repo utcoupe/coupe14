@@ -94,7 +94,7 @@ class communicationGlobale():
 							if ((date - self.lastSendDate[address]) > 5000) and self.lastSendDate[address] != -1:#le système est considèrer comme hors ligne
 								self.arduinoIdReady[address] = False
 							elif (date - self.lastSendDate[address]) > 1000:
-								self.sendOrder(orders['PINGPING'], (address, conversion.orderToBinary(int(orders['PINGPING']))))	
+								self.sendOrder(self.orders['PINGPING'], (address, conversion.orderToBinary(int(self.orders['PINGPING']))))	
 			time.sleep(0.1)
 
 	def stopGestion(self):
