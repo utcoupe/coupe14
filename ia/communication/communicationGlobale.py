@@ -80,7 +80,7 @@ class communicationGlobale():
 				for address in self.address:
 					if isinstance(address, (int)):
 						if (self.lastConfirmationDate[address] != -1 and self.lastSendDate != -1) and (self.lastSendDate[address] - self.lastConfirmationDate[address] > 500):#si il reste un ordre non confirmé en moins de 500 ms
-							for indice in len(self.ordreLog[address]):
+							for indice in range(len(self.ordreLog[address])):
 								print "WARNING: Renvoie de l'ordre: ", self.ordreLog[address][indice][0], "au robot ", self.adresse[address]
 								self.liaisonXbee.send(self.ordreLog[address][indice][1])
 								self.lastConfirmationDate[address] = date 
