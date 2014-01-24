@@ -24,12 +24,14 @@ class CommunicationGobale():
 		self.checkTypeSize()
 		
 		self.arduinoIdReady = [False]*(len(self.address)/2+1)
+		self.lastConfirmationDate = [-1]*(len(self.address)/2+1)#date du dernier envoie sans confirmation(en milliseconde)
 		self.lastIdConfirm = [63]*(len(self.address)/2+1)
 		self.lastIdSend = [63]*(len(self.address)/2+1)
 
 		self.liaisonXbee = serial_comm.ComSerial(port, 57600)
 
 		#defines de threads
+		self.threadActif = True
 		self.readInput = True
 		self.probingIdReset = True
 
@@ -55,6 +57,33 @@ class CommunicationGobale():
 					print("ERREUR: la constante de taille de l'ordre ", order, " ne correspond pas aux types indiqués attendu ", sizeExpected, " calculee ", somme)
 			
 			
+
+						#Thread
+
+	def gestion(self):
+		while self.threadActif:
+			if self.readInput == True:
+				self.readOrders()
+
+			if self.probingIdReset == True:
+				for address in range(1, len(self.address)/2+1, 1):
+					if self.arduinoIdReady[address] == False:
+						self.askResetId(address)
+
+			date = int(time.time()*1000)
+			for address in self.address:
+				if isinstance(address, (int)):
+					if (self.lastConfirmationDate[address] != -1) and (date - self.lastConfirmationDate[address] > 500):
+						print date - self.lastConfirmationDate[address]
+						#renvoyer tous les ordres
+			time.sleep(0.2)
+
+	def stopGestion(self):
+		self.threadActif = False
+
+
+
+
 
 
 
@@ -94,16 +123,6 @@ class CommunicationGobale():
 
 		chaineTemp = chr(address+192)
 		self.liaisonXbee.send(chaineTemp)
-
-	def probResetId(self):
-		while self.probingIdReset == True:
-			for address in range(1, len(self.address)/2+1, 1):
-				if self.arduinoIdReady[address] == False:
-					self.askResetId(address)
-			time.sleep(2)
-
-	def stopProbResetId(self):
-		self.probingIdReset = False
 
 
 	#cas où on reçoi
@@ -182,6 +201,11 @@ class CommunicationGobale():
 						print("\nSuccess: l'arduino", self.address[address]," a bien recu l'ordre d'id: ", idd)
 						self.incrementeLastConfirmedId(address)
 
+						if idd == self.lastIdSend[address]:
+							self.lastConfirmationDate[address] = -1
+						else:
+							self.lastConfirmationDate[address] = int(time.time()*1000)
+
 						index = 0
 						for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
 							if returnType == 'int':
@@ -200,18 +224,11 @@ class CommunicationGobale():
 								print("\nERREUR: Parseur: le parseur a trouvé un type non supporté")
 
 					else:
-						print("\ERREUR: l'arduino a accepte le paquet ", idd, "alors que le paquet a confirmer est ", self.getNextConfirmeId(address))
+						print("WARNING: l'arduino a accepte le paquet ", idd, "alors que le paquet a confirmer est ", self.getNextConfirmeId(address))
 			else:
 				print("ERREUR: address: ", address, " inconnue")
 				
 
-	def stopReadingInput(self):
-		self.readInput = False
-
-	def lectureInput(self):
-		while self.readInput == True:
-			self.readOrders()
-			time.sleep(0.1)
 
 
 	#Envoi
@@ -239,6 +256,8 @@ class CommunicationGobale():
 		for commande in ordersList:
 			chaineTemp = self.applyProtocole(commande[0], commande[1], commande[2])
 			self.ordreLog[commande[0]][commande[1]] = (order,chaineTemp)
+			if self.lastConfirmationDate[commande[0]] == -1:
+				self.lastConfirmationDate[commande[0]] = int(time.time()*1000)
 			self.liaisonXbee.send(chaineTemp)
 
 	def sendOrder(self, order, data):
@@ -397,16 +416,13 @@ communication = CommunicationGobale("/dev/ttyUSB1")
 
 
 import threading
-lectureInputThread = threading.Thread(target=communication.lectureInput)
-probResetIdThread = threading.Thread(target=communication.probResetId)
+gestionThread = threading.Thread(target=communication.gestion)
 
 
 try:
-	lectureInputThread.start()
-	probResetIdThread.start()
+	gestionThread.start()
 	gui()
 except KeyboardInterrupt:
-	communication.stopReadingInput()
-	communication.stopProbResetId()
+	communication.stopGestion()
 
 
