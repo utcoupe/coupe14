@@ -91,7 +91,7 @@ class communicationGlobale():
 				for address in self.address:
 					if isinstance(address, (int)):
 						if self.arduinoIdReady[address]:
-							if ((date - self.lastSendDate[address]) > 5000) self.lastSendDate[address] != -1:#le système est considèrer comme hors ligne
+							if ((date - self.lastSendDate[address]) > 5000) and self.lastSendDate[address] != -1:#le système est considèrer comme hors ligne
 								self.arduinoIdReady[address] = False
 							elif (date - self.lastSendDate[address]) > 1000:
 								com.sendOrder(orders['PINGPING'], (address, conversion.orderToBinary(int(orders['PINGPING']))))	
