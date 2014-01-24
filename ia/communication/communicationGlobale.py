@@ -75,10 +75,12 @@ class communicationGlobale():
 				date = int(time.time()*1000)
 				for address in self.address:
 					if isinstance(address, (int)):
-						if (self.lastConfirmationDate[address] != -1) and (date - self.lastConfirmationDate[address] > 500):
-							print date - self.lastConfirmationDate[address]
-							#renvoyer tous les ordres
-			time.sleep(0.2)
+						if (self.lastConfirmationDate[address] != -1) and (date - self.lastConfirmationDate[address] > 500):#si il reste un ordre non confirmé en moins de 500 ms
+							for indice in self.ordreLog[address]:
+								print "WARNING: Renvoie de l'ordre: ", self.ordreLog[address][indice][0], "au robot ", self.adresse[address]
+								self.liaisonXbee.send(self.ordreLog[address][indice][1])
+								self.lastConfirmationDate[address] = date 
+			time.sleep(0.1)
 
 	def stopGestion(self):
 		self.threadActif = False
@@ -108,6 +110,17 @@ class communicationGlobale():
 			return 0
 		else:
 			return self.lastIdConfirm[address]+1
+
+	def getAllUnknowledgeId(self, address):
+		unconfirmedId = self.getNextConfirmeId(address)
+		unconfirmedIds = (unconfirmed,)
+		while unconfirmedId != self.lastIdSend[address]:
+			if unconfirmedId == 63:
+				unconfirmedId = 0
+			else:
+				unconfirmedId +=1
+			unconfirmedIds += (unconfirmedId,)
+		return unconfirmedIds
 
 	def incrementeLastConfirmedId(self, address):
 		if self.lastIdConfirm[address] == 63:

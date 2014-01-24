@@ -24,4 +24,3 @@ except KeyboardInterrupt:
 	com.stopGestion()
 finally:
 	com.stopGestion()
-	#print "Unexpected error:", sys.exc_info()[0]
