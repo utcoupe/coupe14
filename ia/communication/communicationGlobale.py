@@ -24,7 +24,8 @@ class communicationGlobale():
 		self.checkTypeSize()
 		
 		self.arduinoIdReady = [False]*(len(self.address)/2+1)
-		self.lastConfirmationDate = [-1]*(len(self.address)/2+1)#date du dernier envoie sans confirmation(en milliseconde)
+		self.lastConfirmationDate = [-1]*(len(self.address)/2+1)#date de la dernière confirmation(en milliseconde)
+		self.lastSendDate = [-1]*(len(self.address)/2+1)#date du dernier envoie(en milliseconde)
 		self.lastIdConfirm = [63]*(len(self.address)/2+1)
 		self.lastIdSend = [63]*(len(self.address)/2+1)
 
@@ -42,20 +43,23 @@ class communicationGlobale():
 
 	def checkTypeSize(self):
 		for order in self.orders:
-			if not isinstance(order, (int)):# on teste uniquement les ordres numériques, ils sont identiquent aux strings
-				sizeExpected = self.ordersSize[order]
-				somme = 0
-				for argumentType in self.ordersArguments[order]:
-					if argumentType == 'int':
-						somme += 2
-					elif argumentType == 'long':
-						somme += 4
-					elif argumentType == 'float':
-						somme += 4
-					else:
-						print("ERREUR: type parse inconnu")
-				if somme != sizeExpected:
-					print("ERREUR: la constante de taille de l'ordre ", order, " ne correspond pas aux types indiqués attendu ", sizeExpected, " calculee ", somme)
+			if isinstance(order, (str)):# on teste uniquement les ordres numériques, ils sont identiquent aux strings
+				if order in self.ordersSize:#verification
+					sizeExpected = self.ordersSize[order]
+					somme = 0
+					for argumentType in self.ordersArguments[order]:
+						if argumentType == 'int':
+							somme += 2
+						elif argumentType == 'long':
+							somme += 4
+						elif argumentType == 'float':
+							somme += 4
+						else:
+							print("ERREUR: type parse inconnu")
+					if somme != sizeExpected:
+						print("ERREUR: la constante de taille de l'ordre ", order, " ne correspond pas aux types indiqués attendu ", sizeExpected, " calculee ", somme)
+				else:
+					print "ERREUR l'ordre ", order, "n'a pas été trouvé dans serial_defines.c"
 			
 			
 
@@ -75,7 +79,7 @@ class communicationGlobale():
 				date = int(time.time()*1000)
 				for address in self.address:
 					if isinstance(address, (int)):
-						if (self.lastConfirmationDate[address] != -1) and (date - self.lastConfirmationDate[address] > 500):#si il reste un ordre non confirmé en moins de 500 ms
+						if (self.lastConfirmationDate[address] != -1 and self.lastSendDate != -1) and (self.lastSendDate[address] - self.lastConfirmationDate[address] > 500):#si il reste un ordre non confirmé en moins de 500 ms
 							for indice in len(self.ordreLog[address]):
 								print "WARNING: Renvoie de l'ordre: ", self.ordreLog[address][indice][0], "au robot ", self.adresse[address]
 								self.liaisonXbee.send(self.ordreLog[address][indice][1])
@@ -132,6 +136,8 @@ class communicationGlobale():
 
 
 	def askResetId(self, address): #demande a une arduino de reset
+		self.lastConfirmationDate[address] = -1
+		self.lastSendDate[address] = -1
 		self.arduinoIdReady[address] = False
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
@@ -143,12 +149,16 @@ class communicationGlobale():
 	#cas où on reçoi
 	def acceptConfirmeResetId(self, address):#accepte la confirmation de reset d'un arduino
 		print("\naccepte la confirmation de reset du systeme ", address)
+		self.lastConfirmationDate[address] = -1
+		self.lastSendDate[address] = -1
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
 		self.arduinoIdReady[address] = True
 
 	def confirmeResetId(self, address):#renvoie une confirmation de reset
 		print("\nrenvoie une confirmation de reset du systeme ", address)
+		self.lastConfirmationDate[address] = -1
+		self.lastSendDate[address] = -1
 		self.arduinoIdReady[address] = True
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
@@ -173,7 +183,7 @@ class communicationGlobale():
 			self.confirmeResetId(packetAddress-64)
 			return 0
 
-		else:#cas normal
+		elif len(rawInput)>=3:#cas normal
 			packetId = ord(rawInput[1])
 			rawInput = rawInput[2:-1] # on supprime les deux carctères du dessus et le paquet de fin
 			
@@ -185,7 +195,14 @@ class communicationGlobale():
 					temp = '0' + temp
 				packetData += temp
 
-			return (packetAddress, packetId, packetData)
+			if len(packetData)/8 == self.ordersSize[self.ordreLog[address][idd][0]]:# si la longeur des données reçu est bonne
+				return (packetAddress, packetId, packetData)
+			else:
+				print("WARNING: Le paquet ne fait pas la bonne taille, des données ont probablement été perdue, paquet droppé")
+				return 0
+		else:
+			print("WARNING: Le paquet ne fait même pas 3 octet, des données ont probablement été perdue, paquet droppé")
+			return 0
 
 	def getXbeeOrders(self):
 		""" retourne ordersList, une liste d'élements sous la forme(adresse, id, data) où data est prêt à être interpréter"""
@@ -195,7 +212,7 @@ class communicationGlobale():
 
 		for rawInput in rawInputList:
 			ret = self.extractData(rawInput)
-			if ret !=0:# 0 = cas du reset d'id
+			if ret !=0:# cas où les données sont de la bonne taille et que ça n'a rien à voir avec le système de reset
 				ordersList.append(ret)
 
 		return ordersList
@@ -216,10 +233,7 @@ class communicationGlobale():
 						print("\nSuccess: l'arduino", self.address[address]," a bien recu l'ordre d'id: ", idd)
 						self.incrementeLastConfirmedId(address)
 
-						if idd == self.lastIdSend[address]:
-							self.lastConfirmationDate[address] = -1
-						else:
-							self.lastConfirmationDate[address] = int(time.time()*1000)
+						self.lastConfirmationDate[address] = int(time.time()*1000)
 
 
 						index = 0
@@ -272,8 +286,7 @@ class communicationGlobale():
 		for commande in ordersList:
 			chaineTemp = self.applyProtocole(commande[0], commande[1], commande[2])
 			self.ordreLog[commande[0]][commande[1]] = (order,chaineTemp)
-			if self.lastConfirmationDate[commande[0]] == -1:
-				self.lastConfirmationDate[commande[0]] = int(time.time()*1000)
+			self.lastSendDate[commande[0]] = int(time.time()*1000)
 			self.liaisonXbee.send(chaineTemp)
 
 	def sendOrder(self, order, data):
