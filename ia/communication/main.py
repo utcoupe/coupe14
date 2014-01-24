@@ -186,11 +186,11 @@ class CommunicationGobale():
 						for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
 							if returnType == 'int':
 								print ("Retour int: ")
-								print(int(order[2][index*8:(index+2)*8], 2))
+								print(binaryToInt(order[2][index*8:(index+2)*8]))
 								index += 2
 							elif returnType == 'float':
 								print ("Retour float: ")
-								print(float(order[2][index*8:(index+4)*8], 2))
+								print(binaryToFloat(order[2][index*8:(index+4)*8]))
 								index += 4
 							elif returnType == 'long':
 								print ("Retour long: ")
@@ -254,6 +254,35 @@ class CommunicationGobale():
 		self.sendXbeeOrders(order, ordersList)
 		ordersList.pop()
 
+def binaryToFloat(string):
+	temp = ""
+	for i in range(24, 32, 1):
+		temp += string[i]
+	for i in range(16, 24, 1):
+		temp += string[i]
+	for i in range(8, 16, 1):
+		temp += string[i]
+	for i in range(0, 8, 1):
+		temp += string[i]
+
+	resultat = float(temp, 2)
+
+	#TODO gérer les float négatif et tester car taille(floatArduino) != taille(floatPC)
+	return resultat
+
+
+def binaryToInt(string):
+	temp = ""
+	for i in range(8, 16, 1):
+		temp += string[i]
+	for i in range(0, 8, 1):
+		temp += string[i]
+
+	resultat = int(temp, 2)
+	if resultat>32767:
+		resultat -= 65536
+	return resultat
+
 def binaryToLong(string):
 	temp = ""
 	for i in range(24, 32, 1):
@@ -265,9 +294,9 @@ def binaryToLong(string):
 	for i in range(0, 8, 1):
 		temp += string[i]
 
-	resultat = int(temp, 2)
+	resultat = long(temp, 2)
 	if resultat>2147483647: #si le nombre est négatif
-		resultat = resultat-4294967295
+		resultat -= 4294967295
 	return resultat
 
 
