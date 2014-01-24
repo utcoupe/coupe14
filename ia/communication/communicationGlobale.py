@@ -94,7 +94,7 @@ class communicationGlobale():
 							if ((date - self.lastSendDate[address]) > 5000) and self.lastSendDate[address] != -1:#le système est considèrer comme hors ligne
 								self.arduinoIdReady[address] = False
 							elif (date - self.lastSendDate[address]) > 1000:
-								self.sendOrder(self.orders['PINGPING'], (address, conversion.orderToBinary(int(self.orders['PINGPING']))))	
+								self.sendOrder(self.orders['PINGPING_AUTO'], (address, conversion.orderToBinary(int(self.orders['PINGPING_AUTO']))))	
 			time.sleep(0.1)
 
 	def stopGestion(self):
@@ -241,9 +241,9 @@ class communicationGlobale():
 					print("\nERREUR: l'arduino", self.address[address], " a mal recu un message.")
 				else:
 					if idd == self.getNextConfirmeId(address):
-						print("\nSuccess: l'arduino", self.address[address]," a bien recu l'ordre d'id: ", idd)
+						if self.ordreLog[address][idd][0] != PINGPING_AUTO:# on affiche pas les PING automatique
+							print("\nSuccess: l'arduino", self.address[address]," a bien recu l'ordre d'id: ", idd)
 						self.incrementeLastConfirmedId(address)
-
 						self.lastConfirmationDate[address] = long(time.time()*1000)
 
 

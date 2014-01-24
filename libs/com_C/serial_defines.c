@@ -11,6 +11,7 @@ void initSize()
 		ordreSize[i]=SIZE_ERROR;
 
 	//DEBUTPARSE
+	ordreSize[PINGPING_AUTO]=0;
 	ordreSize[PINGPING]=0;
 	ordreSize[A_GOTOA]=8;
 	ordreSize[A_GOTO]=4;
