@@ -34,6 +34,7 @@ class communicationGlobale():
 		self.threadActif = True
 		self.readInput = True
 		self.probingIdReset = True
+		self.renvoieOrdre = True
 
 
 	def getConst(self):
@@ -70,12 +71,13 @@ class communicationGlobale():
 					if self.arduinoIdReady[address] == False:
 						self.askResetId(address)
 
-			date = int(time.time()*1000)
-			for address in self.address:
-				if isinstance(address, (int)):
-					if (self.lastConfirmationDate[address] != -1) and (date - self.lastConfirmationDate[address] > 500):
-						print date - self.lastConfirmationDate[address]
-						#renvoyer tous les ordres
+			if self.renvoieOrdre == True:
+				date = int(time.time()*1000)
+				for address in self.address:
+					if isinstance(address, (int)):
+						if (self.lastConfirmationDate[address] != -1) and (date - self.lastConfirmationDate[address] > 500):
+							print date - self.lastConfirmationDate[address]
+							#renvoyer tous les ordres
 			time.sleep(0.2)
 
 	def stopGestion(self):

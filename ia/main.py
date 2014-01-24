@@ -7,6 +7,8 @@ Fichier principale, demarre l'ia
 import threading
 import sys
 
+
+
 #Nos fichiers
 from communication import communicationGlobale
 import guiCommande

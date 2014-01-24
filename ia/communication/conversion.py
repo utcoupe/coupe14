@@ -6,6 +6,25 @@ Ce fichier gère les conversion pour la communication
 import struct
 
 def binaryToFloat(string):
+	#convertion d'un chaine de binaire en float
+	def as_float32(s):
+	    """
+	    See: http://en.wikipedia.org/wiki/IEEE_754-2008
+	    """
+	    from struct import pack,unpack
+	    return unpack("f",pack("I", bits2int(s)))
+
+	# Where the bits2int function converts bits to an integer.  
+	def bits2int(bits):
+	    # You may want to change ::-1 if depending on which bit is assumed
+	    # to be most significant. 
+	    bits = [int(x) for x in bits[::-1]]
+
+	    x = 0
+	    for i in range(len(bits)):
+	        x += bits[i]*2**i
+	    return x
+
 	temp = ""
 	for i in range(24, 32, 1):
 		temp += string[i]
@@ -16,7 +35,7 @@ def binaryToFloat(string):
 	for i in range(0, 8, 1):
 		temp += string[i]
 
-	resultat = float(temp, 2)
+	resultat = as_float32(temp)[0]
 
 	#TODO gérer les float négatif et tester car taille(floatArduino) != taille(floatPC)
 	return resultat
