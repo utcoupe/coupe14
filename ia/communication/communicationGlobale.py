@@ -29,7 +29,7 @@ class communicationGlobale():
 		self.lastIdConfirm = [63]*(len(self.address)/2+1)
 		self.lastIdSend = [63]*(len(self.address)/2+1)
 
-		self.liaisonXbee = serial_comm.ComSerial(port, 57600)
+		#self.liaisonXbee = serial_comm.ComSerial(port, 57600)
 
 		#defines de threads
 		self.threadActif = True
@@ -195,11 +195,11 @@ class communicationGlobale():
 					temp = '0' + temp
 				packetData += temp
 
-			#if len(packetData)/8 == self.ordersSize[self.address[ self.ordreLog[packetAddress][packetId][0] ]]:# si la longeur des données reçu est bonne
-			return (packetAddress, packetId, packetData)
-			"""else:
+			if len(packetData)/8 == self.ordersSize[self.orders[ self.ordreLog[packetAddress][packetId][0] ]]:# si la longeur des données reçu est bonne
+				return (packetAddress, packetId, packetData)
+			else:
 				print("WARNING: Le paquet ne fait pas la bonne taille, des données ont probablement été perdue, paquet droppé")
-				return 0"""
+				return 0
 		else:
 			print("WARNING: Le paquet ne fait même pas 3 octet, des données ont probablement été perdue, paquet droppé")
 			return 0
