@@ -241,7 +241,7 @@ class communicationGlobale():
 					print("\nERREUR: l'arduino", self.address[address], " a mal recu un message.")
 				else:
 					if idd == self.getNextConfirmeId(address):
-						if self.ordreLog[address][idd][0] != self.orders[PINGPING_AUTO]:# on affiche pas les PING automatique
+						if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:# on affiche pas les PING automatique
 							print("\nSuccess: l'arduino", self.address[address]," a bien recu l'ordre d'id: ", idd)
 						self.incrementeLastConfirmedId(address)
 						self.lastConfirmationDate[address] = long(time.time()*1000)
