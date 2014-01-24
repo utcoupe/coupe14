@@ -181,22 +181,29 @@ class CommunicationGobale():
 					if idd == self.getNextConfirmeId(address):
 						print("\nSuccess: l'arduino", self.address[address]," a bien recu l'ordre d'id: ", idd)
 						self.incrementeLastConfirmedId(address)
+
+						index = 0
+						for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
+							if returnType == 'int':
+								print ("Retour int: ")
+								print(int(order[2][index*8:(index+2)*8], 2))
+								index += 2
+							elif returnType == 'float':
+								print ("Retour float: ")
+								print(float(order[2][index*8:(index+4)*8], 2))
+								index += 4
+							elif returnType == 'long':
+								print ("Retour long: ")
+								print(binaryToLong(order[2][index*8:(index+4)*8]))
+								index += 4
+							else:
+								print("\nERREUR: Parseur: le parseur a trouvé un type non supporté")
+
 					else:
 						print("\ERREUR: l'arduino a accepte le paquet ", idd, "alors que le paquet a confirmer est ", self.getNextConfirmeId(address))
 			else:
 				print("ERREUR: address: ", address, " inconnue")
 				
-
-			"""index = 0
-			orderNumber = int(order[2][index:6], 2)
-			index += 6
-			orderSize = self.getConst()[2][ self.getConst()[1][ orderNumber ] ]
-			for i in range(index, orderSize*8+index, 8):
-				print("data: ")
-				temp2 = ""
-				for b in range(8, 0, -1):
-					temp2 += order[2][i - b + 1]
-				print(int(temp2, 2)) """
 
 	def stopReadingInput(self):
 		self.readInput = False
@@ -247,6 +254,21 @@ class CommunicationGobale():
 		self.sendXbeeOrders(order, ordersList)
 		ordersList.pop()
 
+def binaryToLong(string):
+	temp = ""
+	for i in range(24, 32, 1):
+		temp += string[i]
+	for i in range(16, 24, 1):
+		temp += string[i]
+	for i in range(8, 16, 1):
+		temp += string[i]
+	for i in range(0, 8, 1):
+		temp += string[i]
+
+	resultat = int(temp, 2)
+	if resultat>2147483647: #si le nombre est négatif
+		resultat = resultat-4294967295
+	return resultat
 
 
 def floatToBinary(num):
@@ -336,13 +358,13 @@ def gui():
 				elif typeToGet == 'long':
 					data += intToBinary(long(raw_input("Entre  un long ")))
 				else:
-					print("\nERREUR: Parseur: le parseur un trouvé un type non supporté")
+					print("\nERREUR: Parseur: le parseur a trouvé un type non supporté")
 			communication.sendOrder(ordre, (address,data))	
 		else:
 			print ("\nL'ordre n'a pas été trouvé dans les fichiers arduino")
 
 
-communication = CommunicationGobale("/dev/ttyUSB0")
+communication = CommunicationGobale("/dev/ttyUSB1")
 
 
 import threading
