@@ -56,7 +56,7 @@ def parseFile(path, myRe, nbGroupParse=1, seekArguments=False, bothSideAssigment
 
 
 def parseConstante():
-	relativePath = "../../libs/com_C/"
+	relativePath = "../libs/com_C/"
 
 	reEnum = re.compile("\s*(?P<constante>\w*)(\s*=\s*(?P<value>.*))?,")
 	reArguments = re.compile("\s*(?P<constante>\w*)(\s*=\s*(?P<value>.*))?,(\s*//(?P<arg>(@\w*\s*)*))?.*\n")

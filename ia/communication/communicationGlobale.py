@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Ce fichier gère la communication
+Ce fichier est objet qui gère toute la communication
 """
 
 from collections import deque
@@ -9,9 +9,10 @@ import time
 
 import parser_c
 import serial_comm
+import conversion
 
 
-class CommunicationGobale():
+class communicationGlobale():
 	def __init__(self, port):
 		#on récupère les constantes
 		self.address = {}
@@ -24,12 +25,14 @@ class CommunicationGobale():
 		self.checkTypeSize()
 		
 		self.arduinoIdReady = [False]*(len(self.address)/2+1)
+		self.lastConfirmationDate = [-1]*(len(self.address)/2+1)#date du dernier envoie sans confirmation(en milliseconde)
 		self.lastIdConfirm = [63]*(len(self.address)/2+1)
 		self.lastIdSend = [63]*(len(self.address)/2+1)
 
 		self.liaisonXbee = serial_comm.ComSerial(port, 57600)
 
 		#defines de threads
+		self.threadActif = True
 		self.readInput = True
 		self.probingIdReset = True
 
@@ -55,6 +58,33 @@ class CommunicationGobale():
 					print("ERREUR: la constante de taille de l'ordre ", order, " ne correspond pas aux types indiqués attendu ", sizeExpected, " calculee ", somme)
 			
 			
+
+						#Thread
+
+	def gestion(self):
+		while self.threadActif:
+			if self.readInput == True:
+				self.readOrders()
+
+			if self.probingIdReset == True:
+				for address in range(1, len(self.address)/2+1, 1):
+					if self.arduinoIdReady[address] == False:
+						self.askResetId(address)
+
+			date = int(time.time()*1000)
+			for address in self.address:
+				if isinstance(address, (int)):
+					if (self.lastConfirmationDate[address] != -1) and (date - self.lastConfirmationDate[address] > 500):
+						print date - self.lastConfirmationDate[address]
+						#renvoyer tous les ordres
+			time.sleep(0.2)
+
+	def stopGestion(self):
+		self.threadActif = False
+
+
+
+
 
 
 
@@ -95,16 +125,6 @@ class CommunicationGobale():
 		chaineTemp = chr(address+192)
 		self.liaisonXbee.send(chaineTemp)
 
-	def probResetId(self):
-		while self.probingIdReset == True:
-			for address in range(1, len(self.address)/2+1, 1):
-				if self.arduinoIdReady[address] == False:
-					self.askResetId(address)
-			time.sleep(2)
-
-	def stopProbResetId(self):
-		self.probingIdReset = False
-
 
 	#cas où on reçoi
 	def acceptConfirmeResetId(self, address):#accepte la confirmation de reset d'un arduino
@@ -141,7 +161,7 @@ class CommunicationGobale():
 
 		else:#cas normal
 			packetId = ord(rawInput[1])
-			rawInput = rawInput[2:-1] # on supprime les deux carctère du dessus et le paquet de fin
+			rawInput = rawInput[2:-1] # on supprime les deux carctères du dessus et le paquet de fin
 			
 			#python enleve les zero lors de la conversion en binaire donc on les rajoute, sauf le premier du protocole
 			packetData = ""
@@ -179,32 +199,39 @@ class CommunicationGobale():
 					print("\nERREUR: l'arduino", self.address[address], " a mal recu un message.")
 				else:
 					if idd == self.getNextConfirmeId(address):
+						print self.lastConfirmationDate[address]
 						print("\nSuccess: l'arduino", self.address[address]," a bien recu l'ordre d'id: ", idd)
 						self.incrementeLastConfirmedId(address)
+
+						if idd == self.lastIdSend[address]:
+							self.lastConfirmationDate[address] = -1
+						else:
+							self.lastConfirmationDate[address] = int(time.time()*1000)
+
+
+						index = 0
+						for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
+							if returnType == 'int':
+								print ("Retour int: ")
+								print(conversion.binaryToInt(order[2][index*8:(index+2)*8]))
+								index += 2
+							elif returnType == 'float':
+								print ("Retour float: ")
+								print(conversion.binaryToFloat(order[2][index*8:(index+4)*8]))
+								index += 4
+							elif returnType == 'long':
+								print ("Retour long: ")
+								print(conversion.binaryToLong(order[2][index*8:(index+4)*8]))
+								index += 4
+							else:
+								print("\nERREUR: Parseur: le parseur a trouvé un type non supporté")
+
 					else:
-						print("\ERREUR: l'arduino a accepte le paquet ", idd, "alors que le paquet a confirmer est ", self.getNextConfirmeId(address))
+						print("WARNING: l'arduino a accepte le paquet ", idd, "alors que le paquet a confirmer est ", self.getNextConfirmeId(address))
 			else:
 				print("ERREUR: address: ", address, " inconnue")
 				
 
-			"""index = 0
-			orderNumber = int(order[2][index:6], 2)
-			index += 6
-			orderSize = self.getConst()[2][ self.getConst()[1][ orderNumber ] ]
-			for i in range(index, orderSize*8+index, 8):
-				print("data: ")
-				temp2 = ""
-				for b in range(8, 0, -1):
-					temp2 += order[2][i - b + 1]
-				print(int(temp2, 2)) """
-
-	def stopReadingInput(self):
-		self.readInput = False
-
-	def lectureInput(self):
-		while self.readInput == True:
-			self.readOrders()
-			time.sleep(0.1)
 
 
 	#Envoi
@@ -232,6 +259,8 @@ class CommunicationGobale():
 		for commande in ordersList:
 			chaineTemp = self.applyProtocole(commande[0], commande[1], commande[2])
 			self.ordreLog[commande[0]][commande[1]] = (order,chaineTemp)
+			if self.lastConfirmationDate[commande[0]] == -1:
+				self.lastConfirmationDate[commande[0]] = int(time.time()*1000)
 			self.liaisonXbee.send(chaineTemp)
 
 	def sendOrder(self, order, data):
@@ -246,116 +275,5 @@ class CommunicationGobale():
 		ordersList.append((data[0], self.getId(data[0]), data[1]))
 		self.sendXbeeOrders(order, ordersList)
 		ordersList.pop()
-
-
-
-def floatToBinary(num):
-	"""retourne une chaine de 32 bits"""
-	temp = ''.join(bin(ord(c)).replace('0b', '').rjust(8, '0') for c in struct.pack('!f', num))
-	temp2 = ""
-	for i in range(24, 32, 1):
-		temp2 += temp[i]
-	for i in range(16, 24, 1):
-		temp2 += temp[i]
-	for i in range(8, 16, 1):
-		temp2 += temp[i]
-	for i in range(0, 8, 1):
-		temp2 += temp[i]
-
-	return temp2
-
-
-def longToBinary(num):
-	"""retourne une chaine de 32 bits"""
-	temp2 = ""
-	
-	if num<0: #si l'int est négatif
-		num = 4294967295 + num
-
-	temp = bin(num)[2:]
-
-	while len(temp) < 32:
-		temp = '0' + temp
-
-	#On inverse les 16 bits par blocks de 8, exemple AAAAAAAABBBBBBBB devient BBBBBBBBAAAAAAAA
-	for i in range(24, 32, 1):
-		temp2 += temp[i]
-	for i in range(16, 24, 1):
-		temp2 += temp[i]
-	for i in range(8, 16, 1):
-		temp2 += temp[i]
-	for i in range(0, 8, 1):
-		temp2 += temp[i]
-	return temp2
-
-
-def intToBinary(num):
-	"""retourne une chaine de 16 bits"""
-	temp2 = ""
-	
-	if num<0: #si l'int est négatif
-		num = 65536 + num
-
-	temp = bin(num)[2:]
-
-	while len(temp) < 16:
-		temp = '0' + temp
-
-	#On inverse les 16 bits par blocks de 8, exemple AAAAAAAABBBBBBBB devient BBBBBBBBAAAAAAAA
-	for i in range(8, 16, 1):
-		temp2 += temp[i]
-	for i in range(0, 8, 1):
-		temp2 += temp[i]
-	return temp2
-
-
-def orderToBinary(num):
-	"""retourne une chaine de 6 bits"""
-	temp = bin(num)[2:]
-	while len(temp) < 6:
-		temp = '0' + temp
-	return temp
-
-
-def gui():
-	while 1:
-		dataString = str(raw_input("Entre le nom ou le numéro d'un ordre: "))
-		address = 2
-
-		if dataString == 'k':# arret d'urgence
-			communication.sendOrder(ordre, (address, orderToBinary(int(communication.getConst()[1]['A_KILLG']))))	
-		elif dataString in communication.getConst()[1]:
-			ordre = int(communication.getConst()[1][dataString])
-			data = orderToBinary(ordre)
-
-			for typeToGet in communication.getConst()[3][dataString]:
-				if typeToGet == 'int':
-					data += intToBinary(int(raw_input("Entre  un int ")))
-				elif typeToGet == 'float':
-					data += floatToBinary(float(raw_input("Entre un float ")))
-				elif typeToGet == 'long':
-					data += intToBinary(long(raw_input("Entre  un long ")))
-				else:
-					print("\nERREUR: Parseur: le parseur un trouvé un type non supporté")
-			communication.sendOrder(ordre, (address,data))	
-		else:
-			print ("\nL'ordre n'a pas été trouvé dans les fichiers arduino")
-
-
-communication = CommunicationGobale("/dev/ttyUSB0")
-
-
-import threading
-lectureInputThread = threading.Thread(target=communication.lectureInput)
-probResetIdThread = threading.Thread(target=communication.probResetId)
-
-
-try:
-	lectureInputThread.start()
-	probResetIdThread.start()
-	gui()
-except KeyboardInterrupt:
-	communication.stopReadingInput()
-	communication.stopProbResetId()
 
 
