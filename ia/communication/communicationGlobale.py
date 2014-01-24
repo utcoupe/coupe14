@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Ce fichier gère la communication
+Ce fichier est objet qui gère toute la communication
 """
 
 from collections import deque
@@ -9,9 +9,10 @@ import time
 
 import parser_c
 import serial_comm
+import conversion
 
 
-class CommunicationGobale():
+class communicationGlobale():
 	def __init__(self, port):
 		#on récupère les constantes
 		self.address = {}
@@ -210,15 +211,15 @@ class CommunicationGobale():
 						for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
 							if returnType == 'int':
 								print ("Retour int: ")
-								print(binaryToInt(order[2][index*8:(index+2)*8]))
+								print(conversion.binaryToInt(order[2][index*8:(index+2)*8]))
 								index += 2
 							elif returnType == 'float':
 								print ("Retour float: ")
-								print(binaryToFloat(order[2][index*8:(index+4)*8]))
+								print(conversion.binaryToFloat(order[2][index*8:(index+4)*8]))
 								index += 4
 							elif returnType == 'long':
 								print ("Retour long: ")
-								print(binaryToLong(order[2][index*8:(index+4)*8]))
+								print(conversion.binaryToLong(order[2][index*8:(index+4)*8]))
 								index += 4
 							else:
 								print("\nERREUR: Parseur: le parseur a trouvé un type non supporté")
@@ -272,157 +273,5 @@ class CommunicationGobale():
 		ordersList.append((data[0], self.getId(data[0]), data[1]))
 		self.sendXbeeOrders(order, ordersList)
 		ordersList.pop()
-
-def binaryToFloat(string):
-	temp = ""
-	for i in range(24, 32, 1):
-		temp += string[i]
-	for i in range(16, 24, 1):
-		temp += string[i]
-	for i in range(8, 16, 1):
-		temp += string[i]
-	for i in range(0, 8, 1):
-		temp += string[i]
-
-	resultat = float(temp, 2)
-
-	#TODO gérer les float négatif et tester car taille(floatArduino) != taille(floatPC)
-	return resultat
-
-
-def binaryToInt(string):
-	temp = ""
-	for i in range(8, 16, 1):
-		temp += string[i]
-	for i in range(0, 8, 1):
-		temp += string[i]
-
-	resultat = int(temp, 2)
-	if resultat>32767:
-		resultat -= 65536
-	return resultat
-
-def binaryToLong(string):
-	temp = ""
-	for i in range(24, 32, 1):
-		temp += string[i]
-	for i in range(16, 24, 1):
-		temp += string[i]
-	for i in range(8, 16, 1):
-		temp += string[i]
-	for i in range(0, 8, 1):
-		temp += string[i]
-
-	resultat = long(temp, 2)
-	if resultat>2147483647: #si le nombre est négatif
-		resultat -= 4294967295
-	return resultat
-
-
-def floatToBinary(num):
-	"""retourne une chaine de 32 bits"""
-	temp = ''.join(bin(ord(c)).replace('0b', '').rjust(8, '0') for c in struct.pack('!f', num))
-	temp2 = ""
-	for i in range(24, 32, 1):
-		temp2 += temp[i]
-	for i in range(16, 24, 1):
-		temp2 += temp[i]
-	for i in range(8, 16, 1):
-		temp2 += temp[i]
-	for i in range(0, 8, 1):
-		temp2 += temp[i]
-
-	return temp2
-
-
-def longToBinary(num):
-	"""retourne une chaine de 32 bits"""
-	temp2 = ""
-	
-	if num<0: #si l'int est négatif
-		num = 4294967295 + num
-
-	temp = bin(num)[2:]
-
-	while len(temp) < 32:
-		temp = '0' + temp
-
-	#On inverse les 16 bits par blocks de 8, exemple AAAAAAAABBBBBBBB devient BBBBBBBBAAAAAAAA
-	for i in range(24, 32, 1):
-		temp2 += temp[i]
-	for i in range(16, 24, 1):
-		temp2 += temp[i]
-	for i in range(8, 16, 1):
-		temp2 += temp[i]
-	for i in range(0, 8, 1):
-		temp2 += temp[i]
-	return temp2
-
-
-def intToBinary(num):
-	"""retourne une chaine de 16 bits"""
-	temp2 = ""
-	
-	if num<0: #si l'int est négatif
-		num = 65536 + num
-
-	temp = bin(num)[2:]
-
-	while len(temp) < 16:
-		temp = '0' + temp
-
-	#On inverse les 16 bits par blocks de 8, exemple AAAAAAAABBBBBBBB devient BBBBBBBBAAAAAAAA
-	for i in range(8, 16, 1):
-		temp2 += temp[i]
-	for i in range(0, 8, 1):
-		temp2 += temp[i]
-	return temp2
-
-
-def orderToBinary(num):
-	"""retourne une chaine de 6 bits"""
-	temp = bin(num)[2:]
-	while len(temp) < 6:
-		temp = '0' + temp
-	return temp
-
-
-def gui():
-	while 1:
-		dataString = str(raw_input("Entre le nom ou le numéro d'un ordre: "))
-		address = 2
-
-		if dataString == 'k':# arret d'urgence
-			communication.sendOrder(ordre, (address, orderToBinary(int(communication.getConst()[1]['A_KILLG']))))	
-		elif dataString in communication.getConst()[1]:
-			ordre = int(communication.getConst()[1][dataString])
-			data = orderToBinary(ordre)
-
-			for typeToGet in communication.getConst()[3][dataString]:
-				if typeToGet == 'int':
-					data += intToBinary(int(raw_input("Entre  un int ")))
-				elif typeToGet == 'float':
-					data += floatToBinary(float(raw_input("Entre un float ")))
-				elif typeToGet == 'long':
-					data += intToBinary(long(raw_input("Entre  un long ")))
-				else:
-					print("\nERREUR: Parseur: le parseur a trouvé un type non supporté")
-			communication.sendOrder(ordre, (address,data))	
-		else:
-			print ("\nL'ordre n'a pas été trouvé dans les fichiers arduino")
-
-
-communication = CommunicationGobale("/dev/ttyUSB1")
-
-
-import threading
-gestionThread = threading.Thread(target=communication.gestion)
-
-
-try:
-	gestionThread.start()
-	gui()
-except KeyboardInterrupt:
-	communication.stopGestion()
 
 
