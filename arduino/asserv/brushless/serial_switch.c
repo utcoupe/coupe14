@@ -25,35 +25,26 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		break;
 	case A_GET_CODER:
                 if (!doublon) {
-			PDEBUG(control.getLenc()->getTicks());
-			PDEBUG(control.getRenc()->getTicks());
+			PDEBUG("Codeur L : ");PDEBUGLN(control.getLenc()->getTicks());
+			PDEBUG("Codeur R : ");PDEBUGLN(control.getRenc()->getTicks());
+			PDEBUG("Angle pos : ");PDEBUGLN(control.getPos().angle);
                 }
-                /*
-		PDEBUGLN("");
-		PDEBUG("X : ");
-		PDEBUGLN(control.getPos().x);
-		PDEBUG("Y : ");
-		PDEBUGLN(control.getPos().y);
-		PDEBUG("A : ");
-		PDEBUGLN(control.getPos().angle);
-                */
+		ltob(control.getLenc()->getTicks(), ret);
+		ltob(control.getRenc()->getTicks(), ret + 4);
+		ret_size = 8;
 		break;
 	case A_GOTO:
-                Serial.print("Arg 1 : ");
-                Serial.println(btoi(argv));
-                Serial.print("Arg 2 : ");
-                Serial.println(btoi(argv+2));
-                /*
+                PDEBUG("Arg 1 : "); PDEBUGLN(btoi(argv));
+                PDEBUG("Arg 2 : "); PDEBUGLN(btoi(argv+2));
 		if (!doublon) {
 			control.pushGoal(0, TYPE_POS, btoi(argv), btoi(argv+2), 0);
-		}*/
+		}
 		break;
 	case A_ROT:
                 PDEBUG("Arg : "); PDEBUGLN(btof(argv));
-                /*
 		if (!doublon) {
 			control.pushGoal(0, TYPE_ANG, btof(argv), 0, 0);
-		}*/
+		}
 		break;
 	case A_PWM_TEST:
 		if (!doublon) {
@@ -62,12 +53,12 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		break;
 	case A_PIDA:
 		if (!doublon) {
-			control.setPID_angle(btoi(argv), btoi(argv+2), btoi(argv+3));
+			control.setPID_angle(btof(argv), btof(argv+4), btof(argv+8));
 		}
 		break;
 	case A_PIDD:
 		if (!doublon) {
-			control.setPID_distance(btoi(argv), btoi(argv+2), btoi(argv+3));
+			control.setPID_distance(btof(argv), btof(argv+4), btof(argv+8));
 		}
 		break;
 	case A_KILLG:
@@ -78,6 +69,11 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 	case A_CLEANG:
 		if (!doublon) {
 			control.clearGoals();
+		}
+		break;
+	case A_ACCMAX:
+		if(!doublon) {
+			control.setMaxAcc(btof(argv));
 		}
 		break;
 

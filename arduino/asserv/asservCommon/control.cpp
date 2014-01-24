@@ -41,7 +41,7 @@ void Control::compute(){
 	}
 	else{
 		if(current_goal.isReached && fifo.getRemainingGoals() > 1){//Si le but est atteint et que ce n'est pas le dernier, on passe au suivant
-			PDEBUGLN("Next Goal");
+			//PDEBUGLN("Next Goal");
 			current_goal = fifo.gotoNext();
 			reset = true;
 		}
@@ -66,8 +66,7 @@ void Control::compute(){
 				counter++;
 				if(counter > 100){
 					counter = 0;
-					Serial.println(da);
-					Serial.print(value_consigne_left);Serial.println(value_consigne_right);
+					PDEBUG("da : "); PDEBUGLN(da);
 				}
 #endif
 				break;
@@ -75,17 +74,31 @@ void Control::compute(){
 
 			case TYPE_POS :
 			{
+				static char aligne_rot = 0;
 				float dx = current_goal.data_1 - current_pos.x;
 				float dy = current_goal.data_2 - current_pos.y;
 				float goal_a = atan2(dy, dx);
 				float da = moduloTwoPI(goal_a - current_pos.angle);
 				float dd = sqrt(pow(dx, 2.0)+pow(dy, 2.0));//erreur en distance
 
-				if(da > max_angle)//On tourne sur place avant de se déplacer
+				if (dd < DISTANCE_MIN_ASSERV_ANGLE) { //On est "à coté de l'objectif"
+					da = 0;
+				}
+
+				if (abs(da) > ERREUR_MARCHE_ARRIERE){ //Faire marche arriere
+					dd = - dd;
+				}
+				da = moduloPI(da);
+
+				if(!aligne_rot && abs(da) < max_angle && value_consigne_right <= CONSIGNE_REACHED && value_consigne_left <= CONSIGNE_REACHED) //On est aligné
+					aligne_rot = 1;
+
+				if(!aligne_rot)//On tourne sur place avant de se déplacer
 					controlAngle(da);
 				else
 					controlPos(da, dd + current_goal.data_3);//erreur en dist = dist au point + dist additionelle
-				if(dd < ERROR_POS && value_consigne_right <= CONSIGNE_REACHED && value_consigne_left <= CONSIGNE_REACHED)
+
+				if(abs(dd) < ERROR_POS && value_consigne_right <= CONSIGNE_REACHED && value_consigne_left <= CONSIGNE_REACHED)
 					fifo.pushIsReached();
 				break;
 			}
@@ -107,7 +120,7 @@ void Control::compute(){
 			}
 			default:
 			{
-				PDEBUGLN("No Goal");
+				//PDEBUGLN("No Goal");
 				break;
 			}	
 		}
@@ -130,11 +143,11 @@ void Control::reset(){
 
 
 void Control::setPID_angle(float n_P, float n_I, float n_D){
-	PID_Angle.setPID(n_P, n_I, n_D);
+	PID_Angle.setPID(n_P, n_I / FREQ, n_D * FREQ);
 }
 
 void Control::setPID_distance(float n_P, float n_I, float n_D){
-	PID_Distance.setPID(n_P, n_I, n_D);
+	PID_Distance.setPID(n_P, n_I / FREQ, n_D * FREQ);
 }
 
 void Control::setConsigneOffset(int n_offset){
@@ -146,7 +159,7 @@ void Control::setMaxAngCurv(float n_max_ang){
 }
 
 void Control::setMaxAcc(float n_max_acc){
-	max_acc = n_max_acc;
+	max_acc = n_max_acc / FREQ; 
 }
 
 void Control::pushPos(m_pos n_pos){

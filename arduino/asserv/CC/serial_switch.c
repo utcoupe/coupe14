@@ -29,15 +29,9 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 			PDEBUG("Codeur R : ");PDEBUGLN(control.getRenc()->getTicks());
 			PDEBUG("Angle pos : ");PDEBUGLN(control.getPos().angle);
                 }
-                /*
-		PDEBUGLN("");
-		PDEBUG("X : ");
-		PDEBUGLN(control.getPos().x);
-		PDEBUG("Y : ");
-		PDEBUGLN(control.getPos().y);
-		PDEBUG("A : ");
-		PDEBUGLN(control.getPos().angle);
-                */
+		ltob(control.getLenc()->getTicks(), ret);
+		ltob(control.getRenc()->getTicks(), ret + 4);
+		ret_size = 8;
 		break;
 	case A_GOTO:
                 PDEBUG("Arg 1 : "); PDEBUGLN(btoi(argv));

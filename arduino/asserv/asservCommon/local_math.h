@@ -8,5 +8,6 @@
 #define LOCAL_MATH_H
 
 float moduloTwoPI(float angle);
+float moduloPI(float angle);
 
 #endif

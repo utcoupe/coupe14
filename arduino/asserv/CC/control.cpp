@@ -74,17 +74,31 @@ void Control::compute(){
 
 			case TYPE_POS :
 			{
+				static char aligne_rot = 0;
 				float dx = current_goal.data_1 - current_pos.x;
 				float dy = current_goal.data_2 - current_pos.y;
 				float goal_a = atan2(dy, dx);
 				float da = moduloTwoPI(goal_a - current_pos.angle);
 				float dd = sqrt(pow(dx, 2.0)+pow(dy, 2.0));//erreur en distance
 
-				if(da > max_angle)//On tourne sur place avant de se déplacer
+				if (dd < DISTANCE_MIN_ASSERV_ANGLE) { //On est "à coté de l'objectif"
+					da = 0;
+				}
+
+				if (abs(da) > ERREUR_MARCHE_ARRIERE){ //Faire marche arriere
+					dd = - dd;
+				}
+				da = moduloPI(da);
+
+				if(!aligne_rot && abs(da) < max_angle && value_consigne_right <= CONSIGNE_REACHED && value_consigne_left <= CONSIGNE_REACHED) //On est aligné
+					aligne_rot = 1;
+
+				if(!aligne_rot)//On tourne sur place avant de se déplacer
 					controlAngle(da);
 				else
 					controlPos(da, dd + current_goal.data_3);//erreur en dist = dist au point + dist additionelle
-				if(dd < ERROR_POS && value_consigne_right <= CONSIGNE_REACHED && value_consigne_left <= CONSIGNE_REACHED)
+
+				if(abs(dd) < ERROR_POS && value_consigne_right <= CONSIGNE_REACHED && value_consigne_left <= CONSIGNE_REACHED)
 					fifo.pushIsReached();
 				break;
 			}
