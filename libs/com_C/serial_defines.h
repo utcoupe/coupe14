@@ -43,7 +43,7 @@ enum address{
 //Codes des ordres (sur 6 bits)
 enum ordre {
 	//DEBUTPARSE
-	PINGPING, 	//#int #float - PONG n'est pas un ordre, c'est une valeur
+	PINGPING, 	
 	A_GOTOA, 	//@int @int @float
 	A_GOTO, 	//@int @int
 	A_GOTOAR, 	//@int @int @float
@@ -58,6 +58,7 @@ enum ordre {
 	A_PWM_TEST, 	//@int @int @int
 	A_ACCMAX,	//@float
 	A_RESET_POS,
+	A_GET_POS,	//#int #int #int
 	ORDRE_NON_PARSE
 	//FINPARSE
 };
