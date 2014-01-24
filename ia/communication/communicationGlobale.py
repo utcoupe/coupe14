@@ -195,7 +195,7 @@ class communicationGlobale():
 					temp = '0' + temp
 				packetData += temp
 
-			if len(packetData)/8 == self.ordersSize[self.address[ self.ordreLog[packetAddress][packetId][0] ]:# si la longeur des données reçu est bonne
+			if len(packetData)/8 == self.ordersSize[self.address[ self.ordreLog[packetAddress][packetId][0] ]]:# si la longeur des données reçu est bonne
 				return (packetAddress, packetId, packetData)
 			else:
 				print("WARNING: Le paquet ne fait pas la bonne taille, des données ont probablement été perdue, paquet droppé")
