@@ -161,7 +161,7 @@ class communicationGlobale():
 
 		else:#cas normal
 			packetId = ord(rawInput[1])
-			rawInput = rawInput[2:-1] # on supprime les deux carctère du dessus et le paquet de fin
+			rawInput = rawInput[2:-1] # on supprime les deux carctères du dessus et le paquet de fin
 			
 			#python enleve les zero lors de la conversion en binaire donc on les rajoute, sauf le premier du protocole
 			packetData = ""
@@ -199,6 +199,7 @@ class communicationGlobale():
 					print("\nERREUR: l'arduino", self.address[address], " a mal recu un message.")
 				else:
 					if idd == self.getNextConfirmeId(address):
+						print self.lastConfirmationDate[address]
 						print("\nSuccess: l'arduino", self.address[address]," a bien recu l'ordre d'id: ", idd)
 						self.incrementeLastConfirmedId(address)
 
@@ -206,6 +207,7 @@ class communicationGlobale():
 							self.lastConfirmationDate[address] = -1
 						else:
 							self.lastConfirmationDate[address] = int(time.time()*1000)
+
 
 						index = 0
 						for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:

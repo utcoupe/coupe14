@@ -5,6 +5,7 @@ Fichier principale, demarre l'ia
 
 #Libs
 import threading
+import sys
 
 #Nos fichiers
 from communication import communicationGlobale
@@ -19,3 +20,6 @@ try:
 	guiCommande.gui(com)
 except KeyboardInterrupt:
 	com.stopGestion()
+finally:
+	com.stopGestion()
+	#print "Unexpected error:", sys.exc_info()[0]

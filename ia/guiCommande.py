@@ -14,7 +14,7 @@ def gui(com):
 		address = 2
 
 		if dataString == 'k':# arret d'urgence
-			com.sendOrder(ordre, (address, orderToBinary(int(orders['A_KILLG']))))	
+			com.sendOrder(orders['A_KILLG'], (address, conversion.orderToBinary(int(orders['A_KILLG']))))	
 		elif dataString in orders:
 			ordre = int(orders[dataString])
 			data = conversion.orderToBinary(ordre)
