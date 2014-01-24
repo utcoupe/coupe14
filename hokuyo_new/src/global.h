@@ -1,0 +1,15 @@
+#ifndef GLOBAL_H
+#define GLOBAL_H
+
+
+#define TAILLE_TABLE_X 3000
+#define TAILLE_TABLE_Y 2000
+#define PI 3.14159265358979323846264338327950288
+
+
+
+
+
+
+
+#endif
