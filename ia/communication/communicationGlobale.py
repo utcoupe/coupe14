@@ -206,7 +206,18 @@ class communicationGlobale():
 					temp = '0' + temp
 				packetData += temp
 
-			if len(packetData)/8 == self.ordersSize[self.orders[ self.ordreLog[packetAddress][packetId][0] ]]:# si la longeur des données reçu est bonne
+			taille = 0
+			for returnType in self.ordersRetour[self.orders[ self.ordreLog[packetAddress][packetId][0] ]]:
+				if returnType == 'int':
+					taille += 2
+				elif returnType == 'float':
+					taille += 4
+				elif returnType == 'long':
+					taille += 4
+				else:
+					print("\nERREUR: Parseur: le parseur a trouvé un type non supporté")
+
+			if len(packetData)/8 == taille:# si la longeur des données reçu est bonne
 				return (packetAddress, packetId, packetData)
 			else:
 				print("WARNING: Le paquet ne fait pas la bonne taille, des données ont probablement été perdue, paquet droppé")
