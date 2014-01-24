@@ -3,6 +3,8 @@
 Ce fichier gère les conversion pour la communication
 """
 
+import struct
+
 def binaryToFloat(string):
 	temp = ""
 	for i in range(24, 32, 1):
