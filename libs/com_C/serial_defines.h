@@ -11,6 +11,8 @@
 #define RESET 0xC0
 #define RESET_CONF 0xE0
 
+#define PONG 1000 //Pong est une répons à PINGPING, donc un nombre et non un ordre. Il serait bon de répondre à un ping par un PONG en int et un en float (mesure de test)
+
 void initSize();
 
 /* 
@@ -38,12 +40,11 @@ enum address{
 };
 
 
-// Codes des ordres (sur 6 bits)
-// @ pour les arguments, # pour les retour
-// Separer les argument par un espace
+//Codes des ordres (sur 6 bits)
 enum ordre {
 	//DEBUTPARSE
-	PINGPING,
+	PINGPING_AUTO,
+	PINGPING, 	
 	A_GOTOA, 	//@int @int @float
 	A_GOTO, 	//@int @int
 	A_GOTOAR, 	//@int @int @float
@@ -52,10 +53,13 @@ enum ordre {
 	A_ROTR, 	//@float
 	A_KILLG, 
 	A_CLEANG,
-	A_PIDA, 	//@int @int @int
-	A_PIDD, 	//@int @int @int
+	A_PIDA, 	//@float @float @float
+	A_PIDD, 	//@float @float @float
 	A_GET_CODER, 	//#long #long
 	A_PWM_TEST, 	//@int @int @int
+	A_ACCMAX,	//@float
+	A_RESET_POS,
+	A_GET_POS,	//#int #int #int
 	ORDRE_NON_PARSE
 	//FINPARSE
 };

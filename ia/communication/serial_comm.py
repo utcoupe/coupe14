@@ -62,7 +62,6 @@ class ComSerial():
 				temp = bin(ord(char))[2:]
 				while len(temp) < 8:
 					temp = '0' + temp
-				print(temp)
 
 			self.liaison.write(rawOutputString)
 

@@ -11,6 +11,7 @@ void initSize()
 		ordreSize[i]=SIZE_ERROR;
 
 	//DEBUTPARSE
+	ordreSize[PINGPING_AUTO]=0;
 	ordreSize[PINGPING]=0;
 	ordreSize[A_GOTOA]=8;
 	ordreSize[A_GOTO]=4;
@@ -20,9 +21,12 @@ void initSize()
 	ordreSize[A_ROTR]=4;
 	ordreSize[A_KILLG]=0;
 	ordreSize[A_CLEANG]=0;
-	ordreSize[A_PIDA]=6;
-	ordreSize[A_PIDD]=6;
+	ordreSize[A_PIDA]=12;
+	ordreSize[A_PIDD]=12;
 	ordreSize[A_PWM_TEST]=6;
 	ordreSize[A_GET_CODER]=0;
+	ordreSize[A_ACCMAX]=4;
+	ordreSize[A_RESET_POS]=0;
+	ordreSize[A_GET_POS]=0;
 	//FINPARSE
 }

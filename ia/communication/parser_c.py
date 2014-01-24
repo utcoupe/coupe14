@@ -9,7 +9,7 @@ import os
 import re
 
 
-def parseFile(path, myRe, nbGroupParse=1, seekArguments=False):
+def parseFile(path, myRe, nbGroupParse=1, seekArguments=False, bothSideAssigment=False):
 	reBegin = re.compile("\s?//DEBUTPARSE\s?")
 	reFin = re.compile("\s?//FINPARSE\s?")
 	definesFile = open(path)
@@ -41,7 +41,8 @@ def parseFile(path, myRe, nbGroupParse=1, seekArguments=False):
 					dico[compteur] = argTuple
 				else:
 					dico[constante] = compteur
-					dico[compteur] = constante
+					if bothSideAssigment:
+						dico[compteur] = constante
 
 				compteur += 1
 
@@ -55,7 +56,7 @@ def parseFile(path, myRe, nbGroupParse=1, seekArguments=False):
 
 
 def parseConstante():
-	relativePath = "../../libs/com_C/"
+	relativePath = "../libs/com_C/"
 
 	reEnum = re.compile("\s*(?P<constante>\w*)(\s*=\s*(?P<value>.*))?,")
 	reArguments = re.compile("\s*(?P<constante>\w*)(\s*=\s*(?P<value>.*))?,(\s*//(?P<arg>(@\w*\s*)*))?.*\n")
@@ -63,10 +64,10 @@ def parseConstante():
 	reArrayC = re.compile("\s*ordreSize\[(?P<constante>\w*)\](\s*=\s*(?P<value>.*))?;")
 
 
-	address = parseFile(relativePath + "serial_defines.h", reEnum, 1)
-	orders = parseFile(relativePath + "serial_defines.h", reEnum, 2)
-	ordersArguments = parseFile(relativePath + "serial_defines.h", reArguments, 2, seekArguments=True)
-	ordersRetour = parseFile(relativePath + "serial_defines.h", reReturn, 2, seekArguments=True)
-	ordersSize = parseFile(relativePath + "serial_defines.c", reArrayC, 1)
+	address = parseFile(relativePath + "serial_defines.h", reEnum, 1, bothSideAssigment=True)
+	orders = parseFile(relativePath + "serial_defines.h", reEnum, 2, bothSideAssigment=True)
+	ordersArguments = parseFile(relativePath + "serial_defines.h", reArguments, 2, seekArguments=True, bothSideAssigment=False)
+	ordersRetour = parseFile(relativePath + "serial_defines.h", reReturn, 2, seekArguments=True, bothSideAssigment=False)
+	ordersSize = parseFile(relativePath + "serial_defines.c", reArrayC, 1, bothSideAssigment=False)
 
 	return (address, orders, ordersSize, ordersArguments, ordersRetour)
