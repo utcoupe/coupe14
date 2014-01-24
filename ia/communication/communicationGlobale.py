@@ -4,7 +4,6 @@ Ce fichier est objet qui gère toute la communication
 """
 
 from collections import deque
-import struct
 import time
 
 import parser_c
@@ -199,7 +198,6 @@ class communicationGlobale():
 					print("\nERREUR: l'arduino", self.address[address], " a mal recu un message.")
 				else:
 					if idd == self.getNextConfirmeId(address):
-						print self.lastConfirmationDate[address]
 						print("\nSuccess: l'arduino", self.address[address]," a bien recu l'ordre d'id: ", idd)
 						self.incrementeLastConfirmedId(address)
 
