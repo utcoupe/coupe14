@@ -29,13 +29,14 @@ class communicationGlobale():
 		self.lastIdConfirm = [63]*(len(self.address)/2+1)
 		self.lastIdSend = [63]*(len(self.address)/2+1)
 
-		#self.liaisonXbee = serial_comm.ComSerial(port, 57600)
+		self.liaisonXbee = serial_comm.ComSerial(port, 57600)
 
 		#defines de threads
 		self.threadActif = True
 		self.readInput = True
 		self.probingIdReset = True
 		self.renvoieOrdre = True
+		self.keepContact = True
 
 
 	def getConst(self):
@@ -67,6 +68,8 @@ class communicationGlobale():
 
 	def gestion(self):
 		while self.threadActif:
+			date = long(time.time()*1000)
+
 			if self.readInput == True:
 				self.readOrders()
 
@@ -76,14 +79,22 @@ class communicationGlobale():
 						self.askResetId(address)
 
 			if self.renvoieOrdre == True:
-				date = int(time.time()*1000)
 				for address in self.address:
 					if isinstance(address, (int)):
-						if (self.lastConfirmationDate[address] != -1 and self.lastSendDate != -1) and (self.lastSendDate[address] - self.lastConfirmationDate[address] > 500):#si il reste un ordre non confirmé en moins de 500 ms
+						if self.lastConfirmationDate[address] != -1 and self.lastSendDate != -1 and (self.lastSendDate[address] - self.lastConfirmationDate[address] > 500):#si il reste un ordre non confirmé en moins de 500 ms
 							for indice in range(len(self.ordreLog[address])):
-								print "WARNING: Renvoie de l'ordre: ", self.ordreLog[address][indice][0], "au robot ", self.adresse[address]
+								print "WARNING: Renvoie de l'ordre: ", self.ordreLog[address][indice][0], "au robot ", self.address[address]
 								self.liaisonXbee.send(self.ordreLog[address][indice][1])
 								self.lastConfirmationDate[address] = date 
+
+			if self.keepContact == True:# On envoie un PING pour verifier si le device est toujours présent
+				for address in self.address:
+					if isinstance(address, (int)):
+						if self.arduinoIdReady[address]:
+							if ((date - self.lastSendDate[address]) > 5000) self.lastSendDate[address] != -1:#le système est considèrer comme hors ligne
+								self.arduinoIdReady[address] = False
+							elif (date - self.lastSendDate[address]) > 1000:
+								com.sendOrder(orders['PINGPING'], (address, conversion.orderToBinary(int(orders['PINGPING']))))	
 			time.sleep(0.1)
 
 	def stopGestion(self):
@@ -233,7 +244,7 @@ class communicationGlobale():
 						print("\nSuccess: l'arduino", self.address[address]," a bien recu l'ordre d'id: ", idd)
 						self.incrementeLastConfirmedId(address)
 
-						self.lastConfirmationDate[address] = int(time.time()*1000)
+						self.lastConfirmationDate[address] = long(time.time()*1000)
 
 
 						index = 0
@@ -286,7 +297,7 @@ class communicationGlobale():
 		for commande in ordersList:
 			chaineTemp = self.applyProtocole(commande[0], commande[1], commande[2])
 			self.ordreLog[commande[0]][commande[1]] = (order,chaineTemp)
-			self.lastSendDate[commande[0]] = int(time.time()*1000)
+			self.lastSendDate[commande[0]] = long(time.time()*1000)
 			self.liaisonXbee.send(chaineTemp)
 
 	def sendOrder(self, order, data):
