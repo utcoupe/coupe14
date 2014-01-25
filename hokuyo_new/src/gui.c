@@ -80,9 +80,9 @@ void
 blitPoints(struct coord *points, int nPoints, struct color c){
 	SDL_FillRect(gui.point, NULL, SDL_MapRGB(gui.ecran->format, c.r, c.g, c.b));
 	for(int i=0; i<nPoints; i++){
-		#ifndef DEBUG_DO_NOT_REMOVE_POINTS
+		/*#ifndef DEBUG_DO_NOT_REMOVE_POINTS
 		if( points[i].x == 0 && points[i].y == 0) continue;
-		#endif
+		#endif*/
 		SDL_Rect p = getPixelCoord(points[i].x, points[i].y);
 		SDL_BlitSurface(gui.point, NULL, gui.ecran, &p );
 	}
@@ -105,6 +105,8 @@ waitScreen(){
 			}
 		}
 	}while(SDL_Flip(gui.ecran)!=0);
+
+	//SDL_Delay(1000);
 
 }
 

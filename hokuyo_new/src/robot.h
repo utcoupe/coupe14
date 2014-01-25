@@ -11,6 +11,8 @@
 #define MAX_MIN_DIST 100	/*mm, distance max entre 2 points les plus proches dans un groupe*/
 
 
+
+
 int getRobots(struct coord *points, int n, struct coord *robots);
 
 

@@ -66,7 +66,7 @@ void frame(){
 	printf("robots\n");
   blitMap();
 	blitLidar(l1.pos, l1Color);
-  //blitRobots(robots, nRobots);
+  blitRobots(robots, nRobots);
 	blitPoints(l1.points, l1.fm.n, l1Color);
 	waitScreen();
 }
