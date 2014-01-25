@@ -200,10 +200,11 @@ void sendInvalid() {//renvoit le code de message invalide (dépend de la platefo
 }
 
 void protocol_reset(){
+	sendByte(RESET | LOCAL_ADDR);
 	while(serial_read() != (RESET_CONF | LOCAL_ADDR)){
-		sendByte(RESET | LOCAL_ADDR);
 		long t = timeMillis();
-		while (timeMillis() - t < 500);
+		if (timeMillis() - t > 1000)
+			sendByte(RESET | LOCAL_ADDR);
 	}
 	PDEBUGLN("RESET");
 }
