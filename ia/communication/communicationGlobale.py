@@ -35,9 +35,14 @@ class communicationGlobale():
 				self.askResetId(address)
 
 		#defines de threads
+		self.lastHighPrioTaskDate = 0
+		self.highPrioSpeed = 20 #fréquence d'execution en ms
+		self.lastLowPrioTaskDate = 0
+		self.lowPrioSpeed = 1000
+
 		self.threadActif = True
 		self.readInput = True
-		self.probingIdReset = False
+		self.probingDevices = True
 		self.renvoieOrdre = True
 		self.keepContact = True
 
@@ -71,35 +76,51 @@ class communicationGlobale():
 
 	def gestion(self):
 		while self.threadActif:
-			date = long(time.time()*1000)
+			actualDate = long(time.time()*1000)
 
-			if self.readInput == True:
-				self.readOrders()
+			#tâches de hautes priotités
+			if (actualDate - self.lastHighPrioTaskDate) > self.highPrioSpeed:
+				self.lastHighPrioTaskDate = actualDate
+				#Lecture des entrées
+				if self.readInput == True:
+					self.readOrders()
 
-			if self.probingIdReset == True:
-				for address in range(1, len(self.address)/2+1, 1):
-					if self.arduinoIdReady[address] == False:
-						self.askResetId(address)
+				#Renvoie des ordres non confirmés
+				if self.renvoieOrdre == True:
+					for address in self.address:
+						if isinstance(address, (int)):
+							if self.lastConfirmationDate[address] != -1 and self.lastSendDate != -1 and (self.lastSendDate[address] - self.lastConfirmationDate[address] > 300):#si il reste un ordre non confirmé en moins de 500 ms
+								indiceARenvoyer = self.getAllUnknowledgeId(address)
+								for indice in indiceARenvoyer:
+									print "WARNING: Renvoie de l'ordre: ", self.ordreLog[address][indice][0], "au robot ", self.address[address]
+									self.liaisonXbee.send(self.ordreLog[address][indice][1])
+									self.lastSendDate[address] = actualDate 
 
-			if self.renvoieOrdre == True:
-				for address in self.address:
-					if isinstance(address, (int)):
-						if self.lastConfirmationDate[address] != -1 and self.lastSendDate != -1 and (self.lastSendDate[address] - self.lastConfirmationDate[address] > 500):#si il reste un ordre non confirmé en moins de 500 ms
-							indiceARenvoyer = self.getAllUnknowledgeId(address)
-							for indice in indiceARenvoyer:
-								print "WARNING: Renvoie de l'ordre: ", self.ordreLog[address][indice][0], "au robot ", self.address[address]
-								self.liaisonXbee.send(self.ordreLog[address][indice][1])
-								self.lastSendDate[address] = date 
+			#tâche de faibles priorités
+			if (actualDate - self.lastLowPrioTaskDate) > self.lowPrioSpeed:
+				self.lastLowPrioTaskDate = actualDate
+				#recherche d'arduino
+				if self.probingDevices == True:
+					for address in range(1, len(self.address)/2+1, 1):
+						if self.arduinoIdReady[address] == False:
+							self.askResetId(address)
 
-			if self.keepContact == True:# On envoie un PING pour verifier si le device est toujours présent
-				for address in self.address:
-					if isinstance(address, (int)):
-						if self.arduinoIdReady[address]:
-							if ((date - self.lastSendDate[address]) > 5000) and self.lastSendDate[address] != -1:#le système est considèrer comme hors ligne
-								self.arduinoIdReady[address] = False
-							elif (date - self.lastSendDate[address]) > 1000:
-								self.sendOrder(self.orders['PINGPING_AUTO'], (address, conversion.orderToBinary(int(self.orders['PINGPING_AUTO']))))	
-			time.sleep(0.1)
+				#Verification de la liaison avec les arduinos
+				if self.keepContact == True:# On envoie un PING pour verifier si le device est toujours présent
+					for address in self.address:
+						if isinstance(address, (int)):
+							if self.arduinoIdReady[address]:
+								if ((actualDate - self.lastSendDate[address]) > 5000) and self.lastSendDate[address] != -1:#le système est considere comme hors ligne
+									self.arduinoIdReady[address] = False
+								elif (actualDate - self.lastSendDate[address]) > 1500:
+									self.sendOrder(self.orders['PINGPING_AUTO'], (address, conversion.orderToBinary(int(self.orders['PINGPING_AUTO']))))
+
+			waitBeforeNextExec = (self.highPrioSpeed -(long(time.time()*1000) - actualDate))
+			if waitBeforeNextExec <1:
+				print "Warning: La boucle de pool de communication n'est pas assez rapide ", waitBeforeNextExec
+			else:
+				time.sleep(waitBeforeNextExec/1000.0)
+
 
 	def stopGestion(self):
 		self.threadActif = False
@@ -139,7 +160,6 @@ class communicationGlobale():
 			else:
 				unconfirmedId +=1
 			unconfirmedIds += (unconfirmedId,)
-		print "INFO: unconfirmedIds qui vont être renvoyé", unconfirmedIds
 		return unconfirmedIds
 
 	def incrementeLastConfirmedId(self, address):
@@ -157,7 +177,6 @@ class communicationGlobale():
 		self.arduinoIdReady[address] = False
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
-		print "Demande de reset à l'arduino "+str(address)
 
 		chaineTemp = chr(address+192)
 		self.liaisonXbee.send(chaineTemp)
@@ -273,8 +292,8 @@ class communicationGlobale():
 					print "ERREUR: IMPOSSIBLE l'arduino", self.address[address], " a mal recu un message."
 				else:
 					if idd == self.getNextConfirmeId(address):
-						#if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:# on affiche pas les PING automatique TODO
-						print "Success: l'arduino", self.address[address]," a bien recu l'ordre d'id: ", idd
+						if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:# on affiche pas les PING automatique TODO
+							print "Success: l'arduino", self.address[address]," a bien recu l'ordre d'id: ", idd
 						self.incrementeLastConfirmedId(address)
 						self.lastConfirmationDate[address] = long(time.time()*1000)
 
