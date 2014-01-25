@@ -19,9 +19,6 @@ struct lidar {
 	struct fastmathTrigo fm;
 
 	struct coord *points;
-	int *realPoints[PRESMOOTHING];
-
-	int preSmoothingIndex;
 };
 
 
