@@ -60,6 +60,9 @@ enum ordre {
 	A_ACCMAX,	//@float
 	A_RESET_POS,
 	A_GET_POS,	//#int #int #int
+
+	O_BRAS_OUVRIR,
+	O_BRAS_FERMER,
 	ORDRE_NON_PARSE
 	//FINPARSE
 };
