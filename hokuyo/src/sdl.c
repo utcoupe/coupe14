@@ -15,11 +15,12 @@
 void affichage_sdl(struct urg_params *hokuyo){
 	struct coord data[DATA_MAX], robots_pos[DETECTABLE_ROBOTS];
 	int i, n_data[NUMBER_HOKUYO], n_robots, continuer = 1;
+	char *group = NULL;
 
 	//INITIALISATION DES ELEMENTS SDL
 
 	//Initialisation de la fenetre
-	SDL_Surface *ecran = NULL, *sdl_points[NUMBER_HOKUYO], *sdl_robots, *sdl_hokuyo[NUMBER_HOKUYO];
+	SDL_Surface *ecran = NULL, *(sdl_points[NUMBER_HOKUYO][NB_COLOR_GROUP]), *sdl_robots, *sdl_hokuyo[NUMBER_HOKUYO];
 	SDL_Rect sdl_points_position[DATA_MAX], sdl_robots_position[DETECTABLE_ROBOTS], sdl_hokuyo_pos;
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_Event event;
@@ -35,18 +36,28 @@ void affichage_sdl(struct urg_params *hokuyo){
 	sdl_robots = SDL_CreateRGBSurface(SDL_HWSURFACE, 30, 30, 32, 0, 0, 0, 0);
 	SDL_FillRect(sdl_robots, NULL, SDL_MapRGB(ecran->format, 0, 255, 0));
 
+	//test
+	SDL_Surface *sdl_points_test = SDL_CreateRGBSurface(SDL_HWSURFACE, 3, 3, 32, 0, 0, 0, 0);
+	SDL_FillRect(sdl_points_test, NULL, SDL_MapRGB(ecran->format, 255, 0, 0));		
 
-	sdl_points[0] = SDL_CreateRGBSurface(SDL_HWSURFACE, 2, 2, 32, 0, 0, 0, 0);
-	SDL_FillRect(sdl_points[0], NULL, SDL_MapRGB(ecran->format, 255, 0, 0));
+
+	{
+		int i;
+		for(i=0; i<=NB_COLOR_GROUP; i++){
+			sdl_points[0][i] = SDL_CreateRGBSurface(SDL_HWSURFACE, 2, 2, 32, 0, 0, 0, 0);
+			SDL_FillRect(sdl_points[0][i], NULL, SDL_MapRGB(ecran->format, 32+i*(255-32), 0, 0));
+		}
+
+	}
 	sdl_hokuyo[0] = SDL_CreateRGBSurface(SDL_HWSURFACE, 20, 20, 32, 0, 0, 0, 0);
-	SDL_FillRect(sdl_hokuyo[0], NULL, SDL_MapRGB(ecran->format, 255, 50, 50));
+	SDL_FillRect(sdl_hokuyo[0], NULL, SDL_MapRGB(ecran->format, 255,  50,  50));
         
-        if (NUMBER_HOKUYO == 2){
-		sdl_points[1] = SDL_CreateRGBSurface(SDL_HWSURFACE, 2, 2, 32, 0, 0, 0, 0);
-		SDL_FillRect(sdl_points[1], NULL, SDL_MapRGB(ecran->format, 0, 0, 255));
-		sdl_hokuyo[1] = SDL_CreateRGBSurface(SDL_HWSURFACE, 20, 20, 32, 0, 0, 0, 0);
-		SDL_FillRect(sdl_hokuyo[1], NULL, SDL_MapRGB(ecran->format, 50, 50, 255));
-        }
+    /*#if NUMBER_HOKUYO == 2
+	sdl_points[1] = SDL_CreateRGBSurface(SDL_HWSURFACE,  2,  2, 32, 0, 0, 0, 0);
+	SDL_FillRect(sdl_points[1], NULL, SDL_MapRGB(ecran->format,   0,   0, 255));
+	sdl_hokuyo[1] = SDL_CreateRGBSurface(SDL_HWSURFACE, 20, 20, 32, 0, 0, 0, 0);
+	SDL_FillRect(sdl_hokuyo[1], NULL, SDL_MapRGB(ecran->format,  50,  50, 255));
+    #endif*/
 
 	printf("SDL Initialized\n");
 	
@@ -61,14 +72,14 @@ void affichage_sdl(struct urg_params *hokuyo){
 		}
 		//Recuperation des poins
 		n_data[0] = get_points_2d(hokuyo[0], data);
-                if (NUMBER_HOKUYO == 2)
-        		n_data[1] = n_data[0] + get_points_2d(hokuyo[1], data+n_data[0]);
-                else
-                        n_data[1] = 0;
+        /*if (NUMBER_HOKUYO == 2)
+        	n_data[1] = n_data[0] + get_points_2d(hokuyo[1], data+n_data[0]);
+        else*/
+        n_data[1] = 0;
 		//Recuperation des robots
-		n_robots = get_robots_2d(robots_pos, data, n_data[0]+n_data[1]);
+		n_robots = get_robots_2d(data, n_data[0]+n_data[1], robots_pos, group, NULL);
 
-                //Affichage
+        //Affichage
 		SDL_FillRect(ecran, NULL, SDL_MapRGB(ecran->format, 255, 255, 255));//on clean l'ecran
 		for(i=0;i<n_robots;i++){
 			//affichage des robots
@@ -78,37 +89,43 @@ void affichage_sdl(struct urg_params *hokuyo){
 			sdl_robots_position[i].y -= 30/2; //pour que le robot soit CENTRE sur son point
 			SDL_BlitSurface(sdl_robots, NULL, ecran, &sdl_robots_position[i]);
 		}
+
 		for(i=0;i<n_data[0];i++){
+			//printf("nb points:%i\n", n_data[0]);
 			//affichage des points de l'hokuyo 0
 			sdl_points_position[i].x = data[i].x*X_WINDOW_RESOLUTION/LX;
 			sdl_points_position[i].y = Y_WINDOW_RESOLUTION - (data[i].y*Y_WINDOW_RESOLUTION/LY);//attention, l'origine en SDL est en haut à gauche
-			SDL_BlitSurface(sdl_points[0], NULL, ecran, &sdl_points_position[i]);
+
+			SDL_BlitSurface(sdl_points[0][ group[i]%NB_COLOR_GROUP ], NULL, ecran, &sdl_points_position[i]);
+			//SDL_BlitSurface(sdl_points[0], NULL, ecran, &sdl_points_position[i]);
 		}
-		for(i=n_data[0];i<n_data[1];i++){
+		
+
+		/*for(i=n_data[0];i<n_data[1];i++){
 			//affichage des points de l'hokuyo 1
 			sdl_points_position[i].x = data[i].x*X_WINDOW_RESOLUTION/LX;
 			sdl_points_position[i].y = Y_WINDOW_RESOLUTION - (data[i].y*Y_WINDOW_RESOLUTION/LY);//attention, l'origine en SDL est en haut à gauche
 			SDL_BlitSurface(sdl_points[1], NULL, ecran, &sdl_points_position[i]);
-		}
-                //affichage es hokuyos
-                //hokuyo 0
+		}*/
+        //affichage des hokuyos
+        //hokuyo 0
 		sdl_hokuyo_pos.x = HOKUYO0_X;
 		sdl_hokuyo_pos.x -= 20/2;
 		sdl_hokuyo_pos.y = Y_WINDOW_RESOLUTION - HOKUYO0_Y;
 		sdl_hokuyo_pos.y -= 20/2;
 		SDL_BlitSurface(sdl_hokuyo[0], NULL, ecran, &sdl_hokuyo_pos);
-                //hokuyo 1
-		if(NUMBER_HOKUYO == 2){
+        //hokuyo 1
+		/*if(NUMBER_HOKUYO == 2){
 			sdl_hokuyo_pos.x = HOKUYO1_X;
 			sdl_hokuyo_pos.x -= 20/2;
 			sdl_hokuyo_pos.y = Y_WINDOW_RESOLUTION - HOKUYO1_Y;
 			sdl_hokuyo_pos.y -= 20/2;
 			SDL_BlitSurface(sdl_hokuyo[1], NULL, ecran, &sdl_hokuyo_pos);
-		}
+		}*/
 		SDL_Flip(ecran);
 	}
-	SDL_FreeSurface(sdl_points[0]);
-	SDL_FreeSurface(sdl_points[1]);
+	/*SDL_FreeSurface(sdl_points[0]);
+	SDL_FreeSurface(sdl_points[1]);*/
 	SDL_FreeSurface(sdl_robots);
 	SDL_FreeSurface(sdl_hokuyo[0]);
 	SDL_FreeSurface(sdl_hokuyo[1]);

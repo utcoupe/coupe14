@@ -43,6 +43,7 @@ enum address{
 //Codes des ordres (sur 6 bits)
 enum ordre {
 	//DEBUTPARSE
+	PINGPING_AUTO,
 	PINGPING, 	
 	A_GOTOA, 	//@int @int @float
 	A_GOTO, 	//@int @int
