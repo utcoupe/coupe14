@@ -2,22 +2,22 @@ DEBUG=yes
 SDL=yes
 
 CC=gcc
-SRC_FILES=main.c fast_math.c analyzer.c exceptions.c
+SRC_FILES=main.c fast_math.c hokuyoUrg.c lidar.c robot.c
 SRC_DIR=src/
 EXEC=hokuyo
 
 LFLAGS=-Wall `urg_c-config --libs` -lm
-CFLAGS=-Wall `urg_c-config --cflags`
+CFLAGS=-Wall `urg_c-config --cflags` -std=c99
 
 ifeq ($(DEBUG),yes)
-	CFLAGS += -D DEBUG 
+	CFLAGS += -D DEBUG -g
 else
 	CFLAGS += -Werror
 	LFLAGS += -Werror
 endif
 
 ifeq ($(SDL),yes)
-	SRC_FILES+= sdl.c
+	SRC_FILES+= gui.c
 	LFLAGS+= `sdl-config --libs` 
 	CFLAGS+= -D SDL `sdl-config --cflags` 
 	EXEC=hokuyo_sdl
@@ -37,10 +37,13 @@ build/%.o: src/%.c build
 build:
 	mkdir build
 
-sdl.o: sdl.h global.h
-main.o: fast_math.h global.h analyzer.h
-analyser.o: fast_math.h global.h analyzer.h
-fast_math.o: fast_math.h global.h
+fast_math.o: fast_math.h
+hokuyoUrg.o: hokuyoUrg.h
+lidar.o: lidar.h hokuyoUrg.h fast_math.h
+main.o: lidar.h gui.h
+gui.o: gui.h
+robot.o: robot.h 
+
 clean:
 	rm -rf build
 mrproper: clean
