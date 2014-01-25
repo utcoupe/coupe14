@@ -56,9 +56,9 @@ class communicationGlobale():
 						elif argumentType == 'float':
 							somme += 4
 						else:
-							print("ERREUR: type parse inconnu")
+							print "ERREUR: type parse inconnu"
 					if somme != sizeExpected:
-						print("ERREUR: la constante de taille de l'ordre ", order, " ne correspond pas aux types indiqués attendu ", sizeExpected, " calculee ", somme)
+						print "ERREUR: la constante de taille de l'ordre ", order, " ne correspond pas aux types indiqués attendu ", sizeExpected, " calculee ", somme
 				else:
 					print "ERREUR l'ordre ", order, "n'a pas été trouvé dans serial_defines.c"
 			
@@ -222,7 +222,7 @@ class communicationGlobale():
 						elif returnType == 'long':
 							taille += 4
 						else:
-							print("\nERREUR: Parseur: le parseur a trouvé un type non supporté")
+							print "ERREUR: Parseur: le parseur a trouvé un type non supporté"
 
 					if len(packetData)/8 == taille:# si la longeur des données reçu est bonne
 						return (packetAddress, packetId, packetData)
@@ -236,10 +236,10 @@ class communicationGlobale():
 					print "WARNING: Le paquet est mal formé, l'address ou l'id est invalide"
 					return 0
 			else:
-				print("WARNING: Le paquet ne fait même pas 3 octet, des données ont probablement été perdue, paquet droppé")
+				print "WARNING: Le paquet ne fait même pas 3 octet, des données ont probablement été perdue, paquet droppé"
 				return 0
 		else:
-			print("WARNING: Le paquet ne fait même pas 1 octet, des données ont probablement été perdue, paquet droppé")
+			print "WARNING: Le paquet ne fait même pas 1 octet, des données ont probablement été perdue, paquet droppé"
 			return 0
 		print "Erreur: erreur de code, cas non gérer"
 		return 0# ne doit pas arriver
@@ -267,11 +267,11 @@ class communicationGlobale():
 
 			if address in self.address:
 				if idd >= 64:# cas impossible car verification lors de l'extraction des données
-					print("\nERREUR: IMPOSSIBLE l'arduino", self.address[address], " a mal recu un message.")
+					print "ERREUR: IMPOSSIBLE l'arduino", self.address[address], " a mal recu un message."
 				else:
 					if idd == self.getNextConfirmeId(address):
 						#if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:# on affiche pas les PING automatique TODO
-						print("\nSuccess: l'arduino", self.address[address]," a bien recu l'ordre d'id: ", idd)
+						print "Success: l'arduino", self.address[address]," a bien recu l'ordre d'id: ", idd
 						self.incrementeLastConfirmedId(address)
 						self.lastConfirmationDate[address] = long(time.time()*1000)
 
@@ -279,24 +279,24 @@ class communicationGlobale():
 						index = 0
 						for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
 							if returnType == 'int':
-								print ("Retour int: ")
+								print "Retour int: "
 								print(conversion.binaryToInt(order[2][index*8:(index+2)*8]))
 								index += 2
 							elif returnType == 'float':
-								print ("Retour float: ")
+								print "Retour float: "
 								print(conversion.binaryToFloat(order[2][index*8:(index+4)*8]))
 								index += 4
 							elif returnType == 'long':
-								print ("Retour long: ")
+								print "Retour long: "
 								print(conversion.binaryToLong(order[2][index*8:(index+4)*8]))
 								index += 4
 							else:
-								print("\nERREUR: Parseur: le parseur a trouvé un type non supporté")
+								print "ERREUR: Parseur: le parseur a trouvé un type non supporté"
 
 					else:
-						print("WARNING: l'arduino a accepte le paquet ", idd, "alors que le paquet a confirmer est ", self.getNextConfirmeId(address))
+						print "WARNING: l'arduino a accepte le paquet ", idd, "alors que le paquet a confirmer est ", self.getNextConfirmeId(address)
 			else:
-				print("ERREUR: address: ", address, " inconnue")
+				print "ERREUR: address: ", address, " inconnue"
 				
 
 
