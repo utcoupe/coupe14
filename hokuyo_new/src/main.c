@@ -38,15 +38,17 @@ void frame();
 
 
 static struct lidar l1;
+static struct color l1Color;
 
 int main(int argc, char **argv){
 	struct coord pos1;
 	pos1.x = 25;
 	pos1.y = TAILLE_TABLE_Y-25;
 
-	l1 = initLidar( hokuyo_urg, "/dev/ttyACM0", pos1, -PI/2, 0, PI/2);
+	l1 = initLidar( hokuyo_urg, "/dev/ttyACM0", pos1, 0, -PI/2, 0);
+	l1Color = newColor(255, 0, 0);
 
-	initSDL(pos1);
+	initSDL();
 
 	while(1){
 		frame();
@@ -56,5 +58,8 @@ int main(int argc, char **argv){
 
 void frame(){
 	getPoints(&l1);
-	blit(l1.points, l1.fm.n);
+	blitMap();
+	blitLidar(l1.pos, l1Color);
+	blitPoints(l1.points, l1.fm.n, l1Color);
+	waitScreen();
 }

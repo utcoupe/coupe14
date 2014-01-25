@@ -10,7 +10,7 @@ LFLAGS=-Wall `urg_c-config --libs` -lm
 CFLAGS=-Wall `urg_c-config --cflags`
 
 ifeq ($(DEBUG),yes)
-	CFLAGS += -D DEBUG
+	CFLAGS += -D DEBUG 
 else
 	CFLAGS += -Werror
 	LFLAGS += -Werror

@@ -58,6 +58,7 @@ int init(urg_t *urg, int n_hokuyo){
 	return error;
 }
 
+
 int get_points_2d(struct urg_params urg, struct coord *points){
 	int data_max, n, i;
 	long *data;
@@ -95,107 +96,57 @@ int get_points_2d(struct urg_params urg, struct coord *points){
 	return n;
 }
 
-int get_robots_2d(struct coord *robot_pos, struct coord *points, int n){
-	//***************
-	// DECLARATIONS *
-	//***************
-	int groups_counter = 0, group_index;//groups_counter initialisé à 0 si il n'y a pas de groupes
-	int valid_groups_counter = 0;//pas de groupes valides initialement
-	int i, j;
-	struct points_group points_group[MAX_GROUPS];
-	struct coord *groups_pos = NULL;
-	group_index = groups_counter-1;
+int get_robots_2d(struct coord *points, int n, struct coord *robot_pos, char *group, char *nbGroup){
 
-	//********************************
-	// CREATION DE GROUPES DE POINTS *
-	//********************************
+	#define K 15	//nombre max de points abberrants consecutifs (angulairement) au milieu d'un groupe
+	#define D 200	//mm, distance max entre 2 points les plus proches dans un groupe
+	#define R 7		//nombre de points mini pour un robot
 
-	for(i=0; i<n; i++){//analyse des points
-		if(!ignore(points[i])){//si le point n'est pas à ignorer
-			while(group_index>=0 && dist(points[i], points_group[group_index].last) > DIST_DIFF_GROUP) group_index--; //On parcourt les groupes
-			if(group_index >= 0){ //Si le point apartient à un groupe
-				points_group[group_index].last = points[i];//on remplace le deuxième point par le dernier point détecté
-				points_group[group_index].size++; //il y un point de plus dans le groupe
-				group_index = groups_counter-1;
-			}
-			else{ //Sinon on cree un nouveau groupe
-				groups_counter++; //un groupe de plus
-				group_index = groups_counter-1;
-				points_group[group_index].first = points_group[group_index].last = points[i]; //on stocke le point dans un nouveau groupe de points
-				points_group[group_index].size = 1;//1 point dans ce groupe
-				points_group[group_index].valid = 0; //invalide par défaut
-			}
-		}
-	}
-
-	//*************************
-	// CALCUL DES COORDONNEES *
-	//*************************
-
-	for(i=0; i<groups_counter; i++){
-		points_group[i].coord.x = (points_group[i].first.x + points_group[i].last.x)/2;//X du robot
-		points_group[i].coord.y = (points_group[i].first.y + points_group[i].last.y)/2;//Y du robot
-	}
-		
-	//*************************
-	// TRAITEMENT DES GROUPES *
-	//*************************
-	for(i=0; i<groups_counter;i++){
-		if(!group_exception(points_group[i])){
-			points_group[i].valid = 1;//si le point passe toutes les exceptions, il est valide
-			valid_groups_counter++;//un groupe valide de plus
-		}
-	}
-
-	//*************************
-	// COPIE DES GROUPES TEMP *
-	//*************************
-
-	groups_pos = (struct coord*)malloc(sizeof(struct coord) * valid_groups_counter); //il y aura une coordonnée par groupe valide
-	if(groups_pos == NULL){
-		fprintf(stderr, "groups_pos : malloc error");
-		exit(1);
-	}
-
-	j = 0;
-	for(i=0; i<groups_counter; i++){
-		if(points_group[i].valid == 1){//si le groupe est valide, on calcule ses coordonées
-			groups_pos[j] = points_group[i].coord;
-			j++;
-		}
-	}
-		
-	//***************************************
-	// SUPPRESSION DES GROUPES EN TROP 	*
-	// On supprime les groupes les plus 	*
-	// près du bord 			*
-	// Ne devrait jamais arriver 		*
-	//***************************************
+	char groupNbPoints[DETECTABLE_ROBOTS], _nbGroup = 0;
 	
-	while(valid_groups_counter > DETECTABLE_ROBOTS) //si on a plus de groupe de point que de robots
-	{
-		int dist_min = LX, index_to_delete = 0;
-		for(i=0; i<valid_groups_counter; i++){//on repère quel group est le plus proche du bord
-			int dist = dist_to_edge(groups_pos[i]);
-			if(dist_min > dist){
-				dist_min = dist;
-				index_to_delete = i;
+	if(group == NULL){
+		group = (char*) malloc(sizeof(char) * n);
+		if(group == NULL){
+			fprintf(stderr, "data malloc error (%i)\n", n);
+			exit(1);
+		}		
+	}
+	if(points == NULL){
+			fprintf(stderr, "get_points_2d : points non alloués\n");
+			exit(1);
+		}
+
+	//Groupes 
+	int i;
+	printf("%d points\n", n);
+	for(i=K; i<n; i++) {
+		printf("%d ", n);
+		int dmin = 35000, j, jmin = 0;
+		unsigned long d[K];
+		for(j=1; j<=K; j++){			
+			d[j-1] = pow(points[i].x-points[i-j].x, 2) + pow(points[i].y-points[i-j].y, 2);
+			if(d[j-1] < dmin){
+				dmin = d[j-1];
+				jmin = j;
 			}
 		}
-		for(i=index_to_delete; i<valid_groups_counter ; i++){//on le supprime
-			groups_pos[i] = groups_pos[i+1];
+
+		if(dmin < D*D){
+			if(group[i-jmin] == 0){
+				_nbGroup++;
+				groupNbPoints[i-jmin] = 0;
+				group[i-jmin] = _nbGroup;
+			}				
+			group[i] = group[i-jmin];
+			groupNbPoints[i-jmin]++;
 		}
-		valid_groups_counter--;//on enlève un groupe
 	}
+	printf("fin boucle\n");
+	//if(nbGroup != NULL) *nbGroup = _nbGroup;
+	//robots
 
-	//*****************************
-	// Copie des groupes finaux   *
-	//*****************************
-	for(i=0; i<valid_groups_counter; i++){
-		robot_pos[i] = groups_pos[i];
-	}
+	return 0;
 
-	return valid_groups_counter;
 }
 
 void error_func(urg_t *urg, const char *message){

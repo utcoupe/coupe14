@@ -10,6 +10,8 @@
 
 #include "analyzer.h"
 
+#define NB_COLOR_GROUP 10
+
 void affichage_sdl(struct urg_params *hokuyo);
 
 #endif

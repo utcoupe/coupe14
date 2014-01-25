@@ -4,7 +4,7 @@
 
 struct GUI_data{
 	SDL_Surface *ecran, *terrain, *lidar, *point;
-	SDL_Rect posTerrain, posLidar;
+	SDL_Rect posTerrain;
 };
 static struct GUI_data gui;
 
@@ -26,6 +26,16 @@ getPixelCoord(int x, int y){
 	return p;
 }
 
+
+
+struct color newColor(int r, int g, int b){
+	struct color c;
+	c.r = r;
+	c.g = g;
+	c.b = b;
+	return c;
+}
+
 void
 initSDL(struct coord positionLidar){
 
@@ -37,42 +47,49 @@ initSDL(struct coord positionLidar){
 	gui.posTerrain = getPixelCoord(0, 0);
 
 	gui.lidar = SDL_CreateRGBSurface(SDL_HWSURFACE, GUI_LIDAR_SIZE_X, GUI_LIDAR_SIZE_Y, 32, 0, 0, 0, 0);
-	SDL_FillRect(gui.lidar, NULL, SDL_MapRGB(gui.ecran->format, 255, 0, 0));
-	gui.posLidar = getPixelCoord(positionLidar.x-LIDAR_SIZE/2, positionLidar.y-LIDAR_SIZE/2);
-	printf("Lidar\tx:%i\ty:%i\tsx:%i\tsy:%i\n", gui.posLidar.x, gui.posLidar.y, GUI_LIDAR_SIZE_X, GUI_LIDAR_SIZE_Y);
-
 	gui.point = SDL_CreateRGBSurface(SDL_HWSURFACE, GUI_POINT_SIZE, GUI_POINT_SIZE, 32, 0, 0, 0, 0);
-	SDL_FillRect(gui.point, NULL, SDL_MapRGB(gui.ecran->format, 255, 0, 0));
 
 }
 
 void
-blit(struct coord *points, int nPoints){
-	SDL_Event event;
-	while( SDL_PollEvent(&event) ){ // On doit utiliser PollEvent car il ne faut pas attendre d'évènement de l'utilisateur pour mettre à jour la fenêtre
-		switch(event.type) {
-			case SDL_QUIT:
-				exit(EXIT_SUCCESS);
-				break;
-			case SDL_KEYDOWN:
-		        if(event.key.keysym.sym == SDLK_ESCAPE) exit(EXIT_SUCCESS);
-		        break;
-		}
-
-	}
+blitMap(struct coord positionLidar){
 	SDL_FillRect(gui.ecran, NULL, SDL_MapRGB(gui.ecran->format, 255, 255, 255));
-
 	SDL_BlitSurface(gui.terrain, NULL, gui.ecran, &(gui.posTerrain));
-	SDL_BlitSurface(gui.lidar, NULL, gui.ecran, &(gui.posLidar));
+}
 
+void
+blitLidar(struct coord positionLidar, struct color c){
+	SDL_Rect p = getPixelCoord(positionLidar.x-LIDAR_SIZE/2, positionLidar.y-LIDAR_SIZE/2);
+	SDL_FillRect(gui.lidar, NULL, SDL_MapRGB(gui.ecran->format, c.r, c.g, c.b));
+	SDL_BlitSurface(gui.lidar, NULL, gui.ecran, &p);
+}
+
+void
+blitPoints(struct coord *points, int nPoints, struct color c){
+	SDL_FillRect(gui.point, NULL, SDL_MapRGB(gui.ecran->format, c.r, c.g, c.b));
 	for(int i=0; i<nPoints; i++){
 		SDL_Rect p = getPixelCoord(points[i].x, points[i].y);
 		SDL_BlitSurface(gui.point, NULL, gui.ecran, &p );
 	}
 
-	while(SDL_Flip(gui.ecran)!=0){
-        SDL_Delay(1);
-    }
 }
 
+
+void
+waitScreen(){
+	do{
+		SDL_Event event;
+		while( SDL_PollEvent(&event) ){ // On doit utiliser PollEvent car il ne faut pas attendre d'évènement de l'utilisateur pour mettre à jour la fenêtre
+			switch(event.type) {
+				case SDL_QUIT:
+					exit(EXIT_SUCCESS);
+					break;
+				case SDL_KEYDOWN:
+			        if(event.key.keysym.sym == SDLK_ESCAPE) exit(EXIT_SUCCESS);
+			        break;
+			}
+		}
+	}while(SDL_Flip(gui.ecran)!=0);
+
+}
 

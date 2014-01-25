@@ -8,6 +8,11 @@
 
 
 
+#define PRESMOOTHING 1
+#define PRESMOOTHINGSTEPS {100} /* total MUST be exactly 100*/
+
+
+
 
 
 

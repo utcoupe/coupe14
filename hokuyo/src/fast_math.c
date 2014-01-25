@@ -37,6 +37,8 @@ int dist_to_edge(struct coord p){
 }
 
 int dist(struct coord p1, struct coord p2){
-	int res = abs(p1.x - p2.x) + abs(p1.y - p2.y); //distance = abs( ( x1 - x2 ) + ( y1 - y2) )
+	int res;
+	//res = abs(p1.x - p2.x) + abs(p1.y - p2.y); //distance = abs( ( x1 - x2 ) + ( y1 - y2) )
+	res = p1.x*p1.x + p1.y*p2.y;
 	return res;
 }

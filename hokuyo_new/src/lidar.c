@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <urg_utils.h>
 #include "hokuyoUrg.h"
 #include "global.h"
@@ -31,7 +32,7 @@ initLidar(enum lidarModel model, char* device, struct coord position, double ori
 	}
 	
 	l.points = malloc(sizeof(struct coord)*l.fm.n);
-	if(l.points == NULL) exit(EXIT_FAILURE);
+	if(l.points == NULL) exit(EXIT_FAILURE);	
 
 	return l;
 }
@@ -41,8 +42,9 @@ getPoints(struct lidar* l){
 	long* buffer = malloc(sizeof(long)*l->fm.n);
 	getDistancesHokuyoUrg(l->lidarObject, buffer);
 	for(int i=0; i<l->fm.n; i++){
-		l->points[/*l->fm.n-*/i].x = fastCos(l->fm, i)*(buffer[l->fm.n-i]) + l->pos.x;
-		l->points[/*l->fm.n-*/i].y = fastSin(l->fm, i)*(buffer[l->fm.n-i]) + l->pos.y;
+		//hokuyo scans in indirect direction, buffer is reversed
+		l->points[i].x = fastCos(l->fm, i)*buffer[l->fm.n-i] + l->pos.x;
+		l->points[i].y = fastSin(l->fm, i)*buffer[l->fm.n-i] + l->pos.y;		
 	}
 	/*
 	for(int i=0; i<l->fm.n; i++){

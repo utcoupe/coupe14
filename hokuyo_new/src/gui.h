@@ -4,9 +4,17 @@
 #include "global.h"
 #include "fast_math.h"
 
+struct color {
+	int r, g, b;
+};
 
-void initSDL(struct coord positionLidar);
-void blit(struct coord *points, int nPoints);
+struct color newColor(int r, int g, int b);
+
+void initSDL();
+void blitMap();
+void blitLidar(struct coord positionLidar, struct color c);
+void blitPoints(struct coord *points, int nPoints, struct color c);
+void waitScreen();
 
 
 
