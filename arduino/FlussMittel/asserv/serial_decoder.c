@@ -23,7 +23,6 @@ void executeCmd(char serial_data){
 
 	if((serial_data & PROTOCOL_BIT) == PROTOCOL_BIT){ //Si 0b1xxxxxxx
 		if (serial_data == END && client_concerne) { //Fin de trame, execution de l'ordre
-			PDEBUGLN("END CONCERNE");
 			unsigned char data_8bits[MAX_DATA];
 
                         data_counter = decode(data, data_8bits, data_counter);
