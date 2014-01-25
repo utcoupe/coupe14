@@ -30,11 +30,14 @@ class communicationGlobale():
 		self.lastIdSend = [63]*(len(self.address)/2+1)
 
 		self.liaisonXbee = serial_comm.ComSerial(port, 57600)
+		for address in range(1, len(self.address)/2+1, 1):
+			if self.arduinoIdReady[address] == False:
+				self.askResetId(address)
 
 		#defines de threads
 		self.threadActif = True
 		self.readInput = True
-		self.probingIdReset = True
+		self.probingIdReset = False
 		self.renvoieOrdre = True
 		self.keepContact = True
 
@@ -56,9 +59,9 @@ class communicationGlobale():
 						elif argumentType == 'float':
 							somme += 4
 						else:
-							print("ERREUR: type parse inconnu")
+							print "ERREUR: type parse inconnu"
 					if somme != sizeExpected:
-						print("ERREUR: la constante de taille de l'ordre ", order, " ne correspond pas aux types indiqués attendu ", sizeExpected, " calculee ", somme)
+						print "ERREUR: la constante de taille de l'ordre ", order, " ne correspond pas aux types indiqués attendu ", sizeExpected, " calculee ", somme
 				else:
 					print "ERREUR l'ordre ", order, "n'a pas été trouvé dans serial_defines.c"
 			
@@ -82,10 +85,11 @@ class communicationGlobale():
 				for address in self.address:
 					if isinstance(address, (int)):
 						if self.lastConfirmationDate[address] != -1 and self.lastSendDate != -1 and (self.lastSendDate[address] - self.lastConfirmationDate[address] > 500):#si il reste un ordre non confirmé en moins de 500 ms
-							for indice in range(len(self.ordreLog[address])):
+							indiceARenvoyer = self.getAllUnknowledgeId(address)
+							for indice in indiceARenvoyer:
 								print "WARNING: Renvoie de l'ordre: ", self.ordreLog[address][indice][0], "au robot ", self.address[address]
 								self.liaisonXbee.send(self.ordreLog[address][indice][1])
-								self.lastConfirmationDate[address] = date 
+								self.lastSendDate[address] = date 
 
 			if self.keepContact == True:# On envoie un PING pour verifier si le device est toujours présent
 				for address in self.address:
@@ -128,13 +132,14 @@ class communicationGlobale():
 
 	def getAllUnknowledgeId(self, address):
 		unconfirmedId = self.getNextConfirmeId(address)
-		unconfirmedIds = (unconfirmed,)
+		unconfirmedIds = (unconfirmedId,)
 		while unconfirmedId != self.lastIdSend[address]:
 			if unconfirmedId == 63:
 				unconfirmedId = 0
 			else:
 				unconfirmedId +=1
 			unconfirmedIds += (unconfirmedId,)
+		print "INFO: unconfirmedIds qui vont être renvoyé", unconfirmedIds
 		return unconfirmedIds
 
 	def incrementeLastConfirmedId(self, address):
@@ -152,6 +157,7 @@ class communicationGlobale():
 		self.arduinoIdReady[address] = False
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
+		print "Demande de reset à l'arduino "+str(address)
 
 		chaineTemp = chr(address+192)
 		self.liaisonXbee.send(chaineTemp)
@@ -159,7 +165,7 @@ class communicationGlobale():
 
 	#cas où on reçoi
 	def acceptConfirmeResetId(self, address):#accepte la confirmation de reset d'un arduino
-		print("\naccepte la confirmation de reset du systeme ", address)
+		print "L'arduino "+ str(address)+" a accepte le reset"
 		self.lastConfirmationDate[address] = -1
 		self.lastSendDate[address] = -1
 		self.lastIdConfirm[address] = 63
@@ -167,7 +173,7 @@ class communicationGlobale():
 		self.arduinoIdReady[address] = True
 
 	def confirmeResetId(self, address):#renvoie une confirmation de reset
-		print("\nrenvoie une confirmation de reset du systeme ", address)
+		print "Reponse au reset de l'arduino "+ str(address)
 		self.lastConfirmationDate[address] = -1
 		self.lastSendDate[address] = -1
 		self.arduinoIdReady[address] = True
@@ -184,47 +190,62 @@ class communicationGlobale():
 
 	def extractData(self, rawInput):
 		""" prend rawInput une chaine de caractère qui correspond  qui correspond à un ordre, retourne les autres packerData est prêt à être interpréter"""
-		packetAddress = ord(rawInput[0]) - 128
+		
+		if len(rawInput) >0:#cas improbable, mais il semble que ça arrive
 
-		if packetAddress > 96:# l'arduino confirme le reset
-			self.acceptConfirmeResetId(packetAddress-96)
-			return 0
+			packetAddress = ord(rawInput[0]) - 128
 
-		elif packetAddress > 64:# l'arduino demande un reset
-			self.confirmeResetId(packetAddress-64)
-			return 0
+			if packetAddress > 96:# l'arduino confirme le reset
+				self.acceptConfirmeResetId(packetAddress-96)
+				return 0
 
-		elif len(rawInput)>=3:#cas normal
-			packetId = ord(rawInput[1])
-			rawInput = rawInput[2:-1] # on supprime les deux carctères du dessus et le paquet de fin
-			
-			#python enleve les zero lors de la conversion en binaire donc on les rajoute, sauf le premier du protocole
-			packetData = ""
-			for octet in rawInput:
-				temp = bin(ord(octet))[2:]
-				while len(temp) < 7:
-					temp = '0' + temp
-				packetData += temp
+			elif packetAddress > 64:# l'arduino demande un reset
+				self.confirmeResetId(packetAddress-64)
+				return 0
 
-			taille = 0
-			for returnType in self.ordersRetour[self.orders[ self.ordreLog[packetAddress][packetId][0] ]]:
-				if returnType == 'int':
-					taille += 2
-				elif returnType == 'float':
-					taille += 4
-				elif returnType == 'long':
-					taille += 4
+			elif len(rawInput)>=3:#cas normal
+				packetId = ord(rawInput[1])
+				rawInput = rawInput[2:-1] # on supprime les deux carctères du dessus et le paquet de fin
+				
+				#python enleve les zero lors de la conversion en binaire donc on les rajoute, sauf le premier du protocole
+				packetData = ""
+				for octet in rawInput:
+					temp = bin(ord(octet))[2:]
+					while len(temp) < 7:
+						temp = '0' + temp
+					packetData += temp
+
+				if (packetAddress in self.address) and packetId >= 0 and packetId < 64:
+					taille = 0
+					for returnType in self.ordersRetour[self.orders[ self.ordreLog[packetAddress][packetId][0] ]]:
+						if returnType == 'int':
+							taille += 2
+						elif returnType == 'float':
+							taille += 4
+						elif returnType == 'long':
+							taille += 4
+						else:
+							print "ERREUR: Parseur: le parseur a trouvé un type non supporté"
+
+					if len(packetData)/8 == taille:# si la longeur des données reçu est bonne
+						return (packetAddress, packetId, packetData)
+					else:
+						print "WARNING: Le paquet ne fait pas la bonne taille, des données ont probablement été perdue, paquet droppé, taille attendu ", taille
+						return 0
+				elif packetId > 63:
+					print "L'arduino nous indique avoir mal reçu un message, code id avec erreur ", packetId
+					return 0
 				else:
-					print("\nERREUR: Parseur: le parseur a trouvé un type non supporté")
-
-			if len(packetData)/8 == taille:# si la longeur des données reçu est bonne
-				return (packetAddress, packetId, packetData)
+					print "WARNING: Le paquet est mal formé, l'address ou l'id est invalide"
+					return 0
 			else:
-				print("WARNING: Le paquet ne fait pas la bonne taille, des données ont probablement été perdue, paquet droppé")
+				print "WARNING: Le paquet ne fait même pas 3 octet, des données ont probablement été perdue, paquet droppé"
 				return 0
 		else:
-			print("WARNING: Le paquet ne fait même pas 3 octet, des données ont probablement été perdue, paquet droppé")
+			print "WARNING: Le paquet ne fait même pas 1 octet, des données ont probablement été perdue, paquet droppé"
 			return 0
+		print "Erreur: erreur de code, cas non gérer"
+		return 0# ne doit pas arriver
 
 	def getXbeeOrders(self):
 		""" retourne ordersList, une liste d'élements sous la forme(adresse, id, data) où data est prêt à être interpréter"""
@@ -234,7 +255,7 @@ class communicationGlobale():
 
 		for rawInput in rawInputList:
 			ret = self.extractData(rawInput)
-			if ret !=0:# cas où les données sont de la bonne taille et que ça n'a rien à voir avec le système de reset
+			if ret != 0 and ret != None:# cas où les données sont de la bonne taille et que ça n'a rien à voir avec le système de reset
 				ordersList.append(ret)
 
 		return ordersList
@@ -248,12 +269,12 @@ class communicationGlobale():
 			idd = int(order[1])
 
 			if address in self.address:
-				if idd >= 64:
-					print("\nERREUR: l'arduino", self.address[address], " a mal recu un message.")
+				if idd >= 64:# cas impossible car verification lors de l'extraction des données
+					print "ERREUR: IMPOSSIBLE l'arduino", self.address[address], " a mal recu un message."
 				else:
 					if idd == self.getNextConfirmeId(address):
-						if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:# on affiche pas les PING automatique
-							print("\nSuccess: l'arduino", self.address[address]," a bien recu l'ordre d'id: ", idd)
+						#if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:# on affiche pas les PING automatique TODO
+						print "Success: l'arduino", self.address[address]," a bien recu l'ordre d'id: ", idd
 						self.incrementeLastConfirmedId(address)
 						self.lastConfirmationDate[address] = long(time.time()*1000)
 
@@ -261,24 +282,24 @@ class communicationGlobale():
 						index = 0
 						for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
 							if returnType == 'int':
-								print ("Retour int: ")
+								print "Retour int: "
 								print(conversion.binaryToInt(order[2][index*8:(index+2)*8]))
 								index += 2
 							elif returnType == 'float':
-								print ("Retour float: ")
+								print "Retour float: "
 								print(conversion.binaryToFloat(order[2][index*8:(index+4)*8]))
 								index += 4
 							elif returnType == 'long':
-								print ("Retour long: ")
+								print "Retour long: "
 								print(conversion.binaryToLong(order[2][index*8:(index+4)*8]))
 								index += 4
 							else:
-								print("\nERREUR: Parseur: le parseur a trouvé un type non supporté")
+								print "ERREUR: Parseur: le parseur a trouvé un type non supporté"
 
 					else:
-						print("WARNING: l'arduino a accepte le paquet ", idd, "alors que le paquet a confirmer est ", self.getNextConfirmeId(address))
+						print "WARNING: l'arduino a accepte le paquet ", idd, "alors que le paquet a confirmer est ", self.getNextConfirmeId(address)
 			else:
-				print("ERREUR: address: ", address, " inconnue")
+				print "ERREUR: address: ", address, " inconnue"
 				
 
 
@@ -307,7 +328,7 @@ class communicationGlobale():
 		""" ordersList est une liste de chaine de caractère sous la forme (adresse, id, data) où data est une chaine de char avec un ou plusieurs ordres"""
 		for commande in ordersList:
 			chaineTemp = self.applyProtocole(commande[0], commande[1], commande[2])
-			self.ordreLog[commande[0]][commande[1]] = (order,chaineTemp)
+			self.ordreLog[commande[0]][commande[1]] = (order, chaineTemp)
 			self.lastSendDate[commande[0]] = long(time.time()*1000)
 			self.liaisonXbee.send(chaineTemp)
 
