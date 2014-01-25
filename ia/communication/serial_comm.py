@@ -7,6 +7,7 @@
 
 import serial
 from collections import deque
+import conversion
 
 class ComSerial():
 	def __init__(self, name, baudrate):
@@ -23,32 +24,39 @@ class ComSerial():
 		else:
 			if self.liaison.inWaiting():
 				self.rawInput += self.liaison.read(self.liaison.inWaiting())
+			
+
+			#on crée un variable temporaire
+			chaineDeBoucle = []
 			i = 0
 			for leter in self.rawInput:
+				chaineDeBoucle.append(self.rawInput[i])
+				i += 1
+
+			i = 0
+			self.readyToRead = False
+			for leter in chaineDeBoucle:
 				value = ord(leter)
 
-				#detection les paquets qui commencent pas 1 car il delimites les trames
-				if value > 128:
+				if value > 128:#c'est forcement le premier paquet
 					if value > 192: # si c'est un packet de reset
-						rawInputList.append(self.rawInput[:i+1])
+						rawInputList.append(leter)
 						self.rawInput = self.rawInput[i+1:]
+						self.readyToRead = False
 						i = 0
+						
 					else: #si c'est un paquet de debut de trame
-						if self.readyToRead == False:
-							self.readyToRead = True
-						else: #si on a perdu le paquet de fin
-							self.rawInput = self.rawInput[i:]
-							i = 0	
+						self.rawInput = self.rawInput[i:]#également si on a perdu le paquet de fin
+						self.readyToRead = True
+						i = 0	
 									
 				if value == 128:
 					if self.readyToRead == True:#cas normal
-						self.readyToRead = False
 						rawInputList.append(self.rawInput[:i+1])
-						self.rawInput = self.rawInput[i+1:]
-						i = 0
-					else: # on a perdu le paquet de debut
-						self.rawInput = self.rawInput[i:]
-						i = 0
+					self.rawInput = self.rawInput[i:]#également quand on a perdu le paquet de debut
+					self.readyToRead = False
+					i = 0
+
 				i += 1
 		return rawInputList
 
