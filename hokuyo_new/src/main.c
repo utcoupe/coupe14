@@ -1,6 +1,7 @@
 #include "lidar.h"
 #include "global.h"
 #include "gui.h"
+#include "robot.h"
 #include <stdio.h>
 /*
        +-------------------------------------------------------------------------------------+-> X
@@ -40,6 +41,8 @@ void frame();
 static struct lidar l1;
 static struct color l1Color;
 
+static struct coord robots[MAX_ROBOTS];
+
 int main(int argc, char **argv){
 	struct coord pos1;
 	pos1.x = 25;
@@ -58,8 +61,13 @@ int main(int argc, char **argv){
 
 void frame(){
 	getPoints(&l1);
-	blitMap();
+  printf("nPoints:%i\n", l1.fm.n);
+  int nRobots = getRobots(l1.points, l1.fm.n, robots);
+	printf("robots\n");
+  blitMap();
 	blitLidar(l1.pos, l1Color);
+  //blitRobots(robots, nRobots);
 	blitPoints(l1.points, l1.fm.n, l1Color);
 	waitScreen();
 }
+

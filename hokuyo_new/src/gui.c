@@ -3,7 +3,7 @@
 #include "stdio.h"
 
 struct GUI_data{
-	SDL_Surface *ecran, *terrain, *lidar, *point;
+	SDL_Surface *ecran, *terrain, *lidar, *robot, *point;
 	SDL_Rect posTerrain;
 };
 static struct GUI_data gui;
@@ -46,8 +46,12 @@ initSDL(struct coord positionLidar){
 	SDL_FillRect(gui.terrain, NULL, SDL_MapRGB(gui.ecran->format, 200, 255, 200));
 	gui.posTerrain = getPixelCoord(0, 0);
 
+	gui.robot = SDL_CreateRGBSurface(SDL_HWSURFACE, GUI_ROBOT_SIZE, GUI_ROBOT_SIZE, 32, 0, 0, 0, 0);
+	SDL_FillRect(gui.robot, NULL, SDL_MapRGB(gui.ecran->format, 0, 0, 0));
+
 	gui.lidar = SDL_CreateRGBSurface(SDL_HWSURFACE, GUI_LIDAR_SIZE_X, GUI_LIDAR_SIZE_Y, 32, 0, 0, 0, 0);
 	gui.point = SDL_CreateRGBSurface(SDL_HWSURFACE, GUI_POINT_SIZE, GUI_POINT_SIZE, 32, 0, 0, 0, 0);
+
 
 }
 
@@ -65,9 +69,20 @@ blitLidar(struct coord positionLidar, struct color c){
 }
 
 void
+blitRobots(struct coord *robots, int nRobots){
+	for(int i=0; i<nRobots; i++){
+		SDL_Rect p = getPixelCoord(robots[i].x, robots[i].y);
+		SDL_BlitSurface(gui.robot, NULL, gui.ecran, &p );
+	}
+}
+
+void
 blitPoints(struct coord *points, int nPoints, struct color c){
 	SDL_FillRect(gui.point, NULL, SDL_MapRGB(gui.ecran->format, c.r, c.g, c.b));
 	for(int i=0; i<nPoints; i++){
+		#ifndef DEBUG_DO_NOT_REMOVE_POINTS
+		if( points[i].x == 0 && points[i].y == 0) continue;
+		#endif
 		SDL_Rect p = getPixelCoord(points[i].x, points[i].y);
 		SDL_BlitSurface(gui.point, NULL, gui.ecran, &p );
 	}
