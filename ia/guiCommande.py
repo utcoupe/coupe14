@@ -19,9 +19,9 @@ def gui(com):
 			ordre = int(orders[dataString])
 			data = conversion.orderToBinary(ordre)
 
-			if ordre[0] == 'A':
+			if dataString[0] == 'A':
 				address = 2
-			elif ordre[0] == 'O':
+			elif dataString[0] == 'O':
 				address = 1
 			else:
 				address = int(raw_input("Entrez adresse :"))
