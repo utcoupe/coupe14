@@ -2,10 +2,13 @@
 #define LIDAR_H
 
 #include "fast_math.h"
+#include "global.h"
 
 enum lidarModel {
 	hokuyo_urg
 };
+
+
 
 struct lidar {
 	enum lidarModel model;
@@ -15,7 +18,10 @@ struct lidar {
 	double orientation;
 	struct fastmathTrigo fm;
 
-	struct coord* points;
+	struct coord *points;
+	int *realPoints[PRESMOOTHING];
+
+	int preSmoothingIndex;
 };
 
 

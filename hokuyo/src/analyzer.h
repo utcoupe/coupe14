@@ -19,17 +19,9 @@ struct urg_params{
 	int side;
 };
 
-struct points_group{
-	struct coord first;
-	struct coord last;
-	struct coord coord;
-	int size;
-	int valid;
-};
-
 int init(urg_t *urg, int n_hokuyo);//renvoie un pointeur sur l'urg en échange de l'ID su port
 int get_points_2d(struct urg_params urg, struct coord *points);//*points peut être un pointeur NULL ou un pointeur déjà passé à cette fonction
-int get_robots_2d(struct coord *robot_pos, struct coord *points, int n); 
+int get_robots_2d(struct coord *points, int n, struct coord *robot_pos, char *group, char *nbGroup);
 void error_func(urg_t *urg, const char *message);//disconnect l'hokuyo, et écrit un message d'erreur
 
 #endif
