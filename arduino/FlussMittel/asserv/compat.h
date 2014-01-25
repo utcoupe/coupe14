@@ -12,6 +12,8 @@
 #include "encoder.h"
 #include "control.h"
 
+#define LOCAL_ADDR ADDR_FLUSSMITTEL_ASSERV //Ici l'adresse locale du client
+
 void interruptLeftA();
 void interruptRightA();
 #if ENCODER_EVAL == 4
@@ -26,6 +28,7 @@ void interruptRight0();
 void initPins();
 unsigned long timeMillis();
 unsigned long timeMicros();
+void serial_send(char data);
 char serial_read();
 
 #endif
