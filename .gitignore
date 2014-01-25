@@ -1,6 +1,7 @@
 *__pycache__*
 CMake*
 
+hokuyo/hokuyo_sdl
 *.dblite
 *build
 *.o
