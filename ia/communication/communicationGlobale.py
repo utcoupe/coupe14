@@ -30,11 +30,14 @@ class communicationGlobale():
 		self.lastIdSend = [63]*(len(self.address)/2+1)
 
 		self.liaisonXbee = serial_comm.ComSerial(port, 57600)
+		for address in range(1, len(self.address)/2+1, 1):
+			if self.arduinoIdReady[address] == False:
+				self.askResetId(address)
 
 		#defines de threads
 		self.threadActif = True
 		self.readInput = True
-		self.probingIdReset = True
+		self.probingIdReset = False
 		self.renvoieOrdre = True
 		self.keepContact = True
 
