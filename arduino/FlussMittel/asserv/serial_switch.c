@@ -34,14 +34,17 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		ret_size = 8;
 		break;
 	case A_GOTO:
-                PDEBUG("Arg 1 : "); PDEBUGLN(btoi(argv));
-                PDEBUG("Arg 2 : "); PDEBUGLN(btoi(argv+2));
 		if (!doublon) {
 			control.pushGoal(0, TYPE_POS, btoi(argv), btoi(argv+2), 0);
 		}
 		break;
+	case A_GOTOA:
+		if (!doublon) {
+			control.pushGoal(0, TYPE_POS, btoi(argv), btoi(argv+2), 0);
+			control.pushGoal(0, TYPE_ANG, btof(argv+4), 0, 0);
+		}
+		break;
 	case A_ROT:
-                PDEBUG("Arg : "); PDEBUGLN(btof(argv));
 		if (!doublon) {
 			control.pushGoal(0, TYPE_ANG, btof(argv), 0, 0);
 		}
@@ -80,6 +83,17 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 			control.pushPos(pos);
 		}
 		break;
+	case A_GET_POS:{
+		m_pos pos = control.getPos();
+		itob((int)pos.x, ret);
+		itob((int)pos.y, ret);
+		itob((int)pos.angle, ret);
+		ret_size = 6;
+		PDEBUG("X = "); PDEBUGLN(pos.x);
+		PDEBUG("Y = "); PDEBUGLN(pos.y);
+		PDEBUG("A = "); PDEBUGLN(pos.angle);
+		break;
+		}
 	case A_ACCMAX:
 		if(!doublon) {
 			control.setMaxAcc(btof(argv));
