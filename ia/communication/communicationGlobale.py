@@ -152,6 +152,7 @@ class communicationGlobale():
 		self.arduinoIdReady[address] = False
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
+		print "Demande de reset à l'arduino "+str(address)
 
 		chaineTemp = chr(address+192)
 		self.liaisonXbee.send(chaineTemp)
@@ -159,7 +160,7 @@ class communicationGlobale():
 
 	#cas où on reçoi
 	def acceptConfirmeResetId(self, address):#accepte la confirmation de reset d'un arduino
-		print("\naccepte la confirmation de reset du systeme ", address)
+		print "L'arduino "+ str(address)+" a accepte le reset"
 		self.lastConfirmationDate[address] = -1
 		self.lastSendDate[address] = -1
 		self.lastIdConfirm[address] = 63
@@ -167,7 +168,7 @@ class communicationGlobale():
 		self.arduinoIdReady[address] = True
 
 	def confirmeResetId(self, address):#renvoie une confirmation de reset
-		print("\nrenvoie une confirmation de reset du systeme ", address)
+		print "Reponse au reset de l'arduino "+ str(address)
 		self.lastConfirmationDate[address] = -1
 		self.lastSendDate[address] = -1
 		self.arduinoIdReady[address] = True
