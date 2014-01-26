@@ -1,5 +1,5 @@
 DEBUG=yes
-SDL=no
+SDL=yes
 
 CC=gcc
 SRC_FILES=main.c fast_math.c hokuyoUrg.c lidar.c robot.c namedpipe.c
