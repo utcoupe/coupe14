@@ -36,7 +36,7 @@
 #define DUREE_CYCLE 5 //période de calcul, en ms
 #define FREQ (1/(DUREE_CYCLE/1000.0))
 
-#define ACC_MAX 250 //consigne*s-2
+#define ACC_MAX 500 //consigne*s-2
 
 /* CONSIGNE OFFSET
  * DEVRAIT ETRE A 0

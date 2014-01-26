@@ -1,8 +1,8 @@
 DEBUG=yes
-SDL=yes
+SDL=no
 
 CC=gcc
-SRC_FILES=main.c fast_math.c hokuyoUrg.c lidar.c robot.c
+SRC_FILES=main.c fast_math.c hokuyoUrg.c lidar.c robot.c namedpipe.c
 SRC_DIR=src/
 EXEC=hokuyo
 
@@ -43,6 +43,7 @@ lidar.o: lidar.h hokuyoUrg.h fast_math.h
 main.o: lidar.h gui.h
 gui.o: gui.h
 robot.o: robot.h 
+namedpipe.o: namedpipe.h
 
 clean:
 	rm -rf build
