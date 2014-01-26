@@ -9,6 +9,7 @@ import time
 import parser_c
 import serial_comm
 import conversion
+import threading
 
 
 class communicationGlobale():
@@ -21,7 +22,9 @@ class communicationGlobale():
 		self.ordersSize = {}
 		(self.address, self.orders, self.ordersSize, self.ordersArguments, self.ordersRetour) = parser_c.parseConstante()
 		self.ordreLog = [[(-1,"")]*64 for x in xrange(len(self.address)/2+1)] #stock un historique des ordres envoyés, double tableau de tuple (ordre,data)
-		self.checkTypeSize()
+
+		for order in self.orders:
+			self.checkParsedOrderSize(order)
 		
 		self.arduinoIdReady = [False]*(len(self.address)/2+1)
 		self.lastConfirmationDate = [-1]*(len(self.address)/2+1)#date de la dernière confirmation(en milliseconde)
@@ -46,30 +49,14 @@ class communicationGlobale():
 		self.renvoieOrdre = True
 		self.keepContact = True
 
+		gestionThread = threading.Thread(target=self.gestion)
+		gestionThread.start()
+
 
 	def getConst(self):
 		return (self.address, self.orders, self.ordersSize, self.ordersArguments, self.ordersRetour)
 
-	def checkTypeSize(self):
-		for order in self.orders:
-			if isinstance(order, (str)):# on teste uniquement les ordres numériques, ils sont identiquent aux strings
-				if order in self.ordersSize:#verification
-					sizeExpected = self.ordersSize[order]
-					somme = 0
-					for argumentType in self.ordersArguments[order]:
-						if argumentType == 'int':
-							somme += 2
-						elif argumentType == 'long':
-							somme += 4
-						elif argumentType == 'float':
-							somme += 4
-						else:
-							print "ERREUR: type parse inconnu"
-					if somme != sizeExpected:
-						print "ERREUR: la constante de taille de l'ordre ", order, " ne correspond pas aux types indiqués attendu ", sizeExpected, " calculee ", somme
-				else:
-					print "ERREUR l'ordre ", order, "n'a pas été trouvé dans serial_defines.c"
-			
+		
 			
 
 						#Thread
@@ -365,3 +352,114 @@ class communicationGlobale():
 		ordersList.pop()
 
 
+
+
+
+
+						#fonctions de verifications diverses
+	def checkAddress(self, address):
+		"""verifie que l'address existe et la convertie en int si nécéssaire, sinon retourne -1"""
+		if address in self.address:
+			if isinstance(address, (str)):
+				address = self.address[address]
+			return address
+		else:
+			print "ERREUR COMM: L'address: ", address, " est invalide."
+			return -1
+
+	def checkOrder(self, order):
+		"""verifie l'ordre et le convertie en int si nécessaire, sinon retourne -1"""
+		if order in self.orders:
+			if isinstance(order, (str)):
+				order = self.orders[order]
+			return order
+		else:
+			print "ERREUR COMM: L'ordre: ", order, " est invalide."
+			return -1
+
+	def checkParsedOrderSize(self, order):
+		"""check parsed sizes"""
+		if isinstance(order, (int)):
+			order = self.orders[order]
+
+		if order in self.ordersSize:#verification
+			sizeExpected = self.ordersSize[order]
+			somme = 0
+			for argumentType in self.ordersArguments[order]:
+				if argumentType == 'int':
+					somme += 2
+				elif argumentType == 'long':
+					somme += 4
+				elif argumentType == 'float':
+					somme += 4
+				else:
+					print "ERREUR: type parse inconnu"
+			if somme != sizeExpected:
+				print "ERREUR: la constante de taille de l'ordre ", order, " ne correspond pas aux types indiqués attendu ", sizeExpected, " calculee ", somme
+		else:
+			print "ERREUR l'ordre ", order, "n'a pas été trouvé dans serial_defines.c"
+
+	def checkOrderArgument(self, order, *arguments):
+		"""check a given set of argument for an order, if all arguments type match return 0 else return -1"""
+		#orderSize need str argument
+		if isinstance(order, (int)):
+			order = self.orders[order]
+
+		if len(arguments) == self.ordersSize[order]:
+			i = 0
+			for argumentType in self.ordersArguments[order]:
+				if argumentType == 'int':
+					if not isinstance(arguments[0], (int)):
+						print "L'argument ", i, " de l'ordre ", order, " n'est pas du bon type, attendu (int)"
+						return -1
+				elif argumentType == 'long':
+					if not isinstance(arguments[0], (long)):
+						print "L'argument ", i, " de l'ordre ", order, " n'est pas du bon type, attendu (long)"
+						return -1
+				elif argumentType == 'int':
+					if not isinstance(arguments[0], (float)):
+						print "L'argument ", i, " de l'ordre ", order, " n'est pas du bon type, attendu (float)"
+						return -1
+				else:
+					print "ERREUR: atendu type inconnu"
+				i += 1
+					
+		else:
+			print "ERREUR: les arguments de l'ordre ", order, " ne font pas la bonne taille, arguments envoyés ", arguments
+			return -1
+
+		return 0
+
+
+
+
+
+	def sendOrderAPI(self, address, order, *arguments):
+		""""api d'envoie d'ordres avec verification des parametres, retourne False en cas d'erreur"""
+		#on verifie l'address
+		address = self.checkAddress(address)
+		order = self.checkOrder(order)
+		print "arguments ", arguments
+
+		if address !=-1 and order !=-1 and self.checkOrderArgument(order, *arguments) !=-1:
+			data = conversion.orderToBinary(order)
+			i = 0
+			for typeToGet in self.ordersArguments[order]:
+				if typeToGet == 'int':
+					data += conversion.longToBinary(int(arguments[i]))
+				elif typeToGet == 'long':
+					data += conversion.intToBinary(long(arguments[i]))
+				elif typeToGet == 'float':
+					data += conversion.floatToBinary(float(arguments[i]))
+				else:
+					print "ERREUR: Parseur: le parseur a trouvé un type non supporté"
+				i += 1
+
+			self.sendOrder(order, (address,data))
+
+		else:
+			return -1
+		
+
+
+		

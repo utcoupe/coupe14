@@ -14,7 +14,7 @@ def gui(com):
 		address = 2
 
 		if dataString == 'k':# arret d'urgence
-			com.sendOrder(orders['A_KILLG'], (address, conversion.orderToBinary(int(orders['A_KILLG']))))	
+			com.sendOrderAPI(2, 'A_KILLG')	
 		elif dataString in orders:
 			ordre = int(orders[dataString])
 			data = conversion.orderToBinary(ordre)
@@ -32,9 +32,10 @@ def gui(com):
 				elif typeToGet == 'float':
 					data += conversion.floatToBinary(float(raw_input("Entre un float\n")))
 				elif typeToGet == 'long':
-					data += conversion.intToBinary(long(raw_input("Entre  un long\n")))
+					data += conversion.longToBinary(long(raw_input("Entre  un long\n")))
 				else:
 					print "ERREUR: Parseur: le parseur a trouvé un type non supporté"
+			#com.sendOrderAPI(, 'A_KILLG')
 			com.sendOrder(ordre, (address,data))	
 		else:
 			print "L'ordre n'a pas été trouvé dans les fichiers arduino"
