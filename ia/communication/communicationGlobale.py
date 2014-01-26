@@ -328,6 +328,7 @@ class communicationGlobale():
 
 						self.mutex.acquire()
 						returnOrders.append((address, idd, arguments))
+						argument.clear()
 						self.mutex.release()
 
 					else:
@@ -445,12 +446,12 @@ class communicationGlobale():
 					if not isinstance(arguments[0], (long)):
 						print "L'argument ", i, " de l'ordre ", order, " n'est pas du bon type, attendu (long)"
 						return -1
-				elif argumentType == 'int':
+				elif argumentType == 'float':
 					if not isinstance(arguments[0], (float)):
 						print "L'argument ", i, " de l'ordre ", order, " n'est pas du bon type, attendu (float)"
 						return -1
 				else:
-					print "ERREUR: atendu type inconnu"
+					print "ERREUR: attendu type inconnu"
 				i += 1
 					
 		else:
