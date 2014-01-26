@@ -46,7 +46,7 @@ class communicationGlobale():
 		self.threadActif = True
 		self.readInput = True
 		self.probingDevices = True
-		self.renvoieOrdre = True
+		self.renvoieOrdre = False
 		self.keepContact = True
 
 		self.orderToExecute = deque()
@@ -83,6 +83,7 @@ class communicationGlobale():
 								self.lastConfirmationDate[address] = actualDate
 								indiceARenvoyer = self.getAllUnknowledgeId(address)
 								for indice in indiceARenvoyer:
+									print "adresse : "+str(address)
 									print "WARNING: Renvoie de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "au robot ", self.address[address]
 									self.liaisonXbee.send(self.ordreLog[address][indice][1])
 									self.lastSendDate[address] = actualDate 
@@ -254,7 +255,7 @@ class communicationGlobale():
 						print "WARNING: Le paquet ne fait pas la bonne taille, des données ont probablement été perdue, paquet droppé, taille attendu ", taille
 						return 0
 				elif packetId > 63:
-					print "L'arduino nous indique avoir mal reçu un message, code id avec erreur ", packetId
+					print "L'arduino "+str(self.address[packetAddress])+" nous indique avoir mal reçu un message, code id avec erreur ", packetId
 					return 0
 				else:
 					print "WARNING: Le paquet est mal formé, l'address ou l'id est invalide"
