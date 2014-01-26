@@ -45,7 +45,9 @@ int get_weight(IplImage *mask){
 }
 
 void detect_zone(IplImage *src_mask, IplImage *dest_mask, char *file){
-	IplImage *resized_color, *zone_mask = cvLoadImage("./mask.jpg", 0);
+	IplImage *resized_color, *zone_mask;
+
+	zone_mask = cvLoadImage(file, 0);
 	int i;
 
 	resized_color = cvCreateImage(cvGetSize(src_mask), src_mask->depth, 1);

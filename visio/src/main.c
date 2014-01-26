@@ -8,7 +8,7 @@
 #include "traitement.h"
 #include "global.h"
 
-#ifdef
+#ifdef VISUAL
 #include <highgui.h>
 #endif
 
@@ -16,7 +16,8 @@
 int main(int argc, char **argv){
 	// Touche clavier
 	char key = 0;
-	char *mask_name;
+	char default_name[] = "./mask.jpg";
+	char *mask_name = default_name;
 	int h_yellow = H_YEL, h_yellow_tol = H_YEL_TOL, s_yellow_tol = S_YEL_TOL, v_yellow_tol = V_YEL_TOL;
 	int h_red = H_RED, h_red_tol = H_RED_TOL, s_red_tol = S_RED_TOL, v_red_tol = V_RED_TOL;
 	int weight_yellow, weight_red;
