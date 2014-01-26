@@ -31,6 +31,7 @@ class communicationGlobale():
 		self.lastSendDate = [-1]*(len(self.address)/2+1)#date du dernier envoie(en milliseconde)
 		self.lastIdConfirm = [63]*(len(self.address)/2+1)
 		self.lastIdSend = [63]*(len(self.address)/2+1)
+		self.nbUnconfirmedPacket = [0]*(len(self.address)/2+1)
 
 		self.liaisonXbee = serial_comm.ComSerial(port, 57600)
 		for address in range(1, len(self.address)/2+1, 1):
@@ -42,6 +43,7 @@ class communicationGlobale():
 		self.highPrioSpeed = 20 #fréquence d'execution en ms
 		self.lastLowPrioTaskDate = 0
 		self.lowPrioSpeed = 1000
+		self.maxUnconfirmedPacket = 5 # attention maximum 32
 
 		self.threadActif = True
 		self.writeOutput = True
@@ -173,6 +175,7 @@ class communicationGlobale():
 
 	def askResetId(self, address): #demande a une arduino de reset
 		self.lastConfirmationDate[address] = -1
+		self.nbUnconfirmedPacket[address] = 0
 		self.lastSendDate[address] = -1
 		self.arduinoIdReady[address] = False
 		self.lastIdConfirm[address] = 63
@@ -186,18 +189,22 @@ class communicationGlobale():
 	def acceptConfirmeResetId(self, address):#accepte la confirmation de reset d'un arduino
 		print "L'arduino "+ str(address)+" a accepte le reset"
 		self.lastConfirmationDate[address] = -1
+		self.nbUnconfirmedPacket[address] = 0
 		self.lastSendDate[address] = -1
+		self.arduinoIdReady[address] = True
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
-		self.arduinoIdReady[address] = True
+		
 
 	def confirmeResetId(self, address):#renvoie une confirmation de reset
 		print "Reponse au reset de l'arduino "+ str(address)
 		self.lastConfirmationDate[address] = -1
+		self.nbUnconfirmedPacket[address] = 0
 		self.lastSendDate[address] = -1
 		self.arduinoIdReady[address] = True
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
+		
 		chaineTemp = chr(address+224)
 		self.liaisonXbee.send(chaineTemp)
 
