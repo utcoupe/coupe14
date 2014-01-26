@@ -49,8 +49,11 @@ class communicationGlobale():
 		self.renvoieOrdre = True
 		self.keepContact = True
 
+		self.orderToExecute = deque()
+		self.mutex = threading.Lock()
 		gestionThread = threading.Thread(target=self.gestion)
 		gestionThread.start()
+		
 
 
 	def getConst(self):
@@ -70,13 +73,13 @@ class communicationGlobale():
 				self.lastHighPrioTaskDate = actualDate
 				#Lecture des entrées
 				if self.readInput == True:
-					self.readOrders()
+					self.orderToExecute += self.readOrders()
 
 				#Renvoie des ordres non confirmés
 				if self.renvoieOrdre == True:
 					for address in self.address:
 						if isinstance(address, (int)):
-							if self.lastConfirmationDate[address] != -1 and self.lastSendDate != -1 and (self.lastSendDate[address] - self.lastConfirmationDate[address] > 700):#si il reste un ordre non confirmé en moins de 500 ms
+							if self.lastConfirmationDate[address] != -1 and self.lastSendDate != -1 and (self.lastSendDate[address] - self.lastConfirmationDate[address] > 300) and (actualDate - self.lastSendDate[address])> 100:#si il reste un ordre non confirmé en moins de 500 ms
 								indiceARenvoyer = self.getAllUnknowledgeId(address)
 								for indice in indiceARenvoyer:
 									print "WARNING: Renvoie de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "au robot ", self.address[address]
@@ -97,7 +100,7 @@ class communicationGlobale():
 					for address in self.address:
 						if isinstance(address, (int)):
 							if self.arduinoIdReady[address]:
-								if ((actualDate - self.lastSendDate[address]) > 5000) and self.lastSendDate[address] != -1:#le système est considere comme hors ligne
+								if ((actualDate - self.lastConfirmationDate[address]) > 5000) and self.lastConfirmationDate[address] != -1:#le système est considere comme hors ligne
 									self.arduinoIdReady[address] = False
 								elif (actualDate - self.lastSendDate[address]) > 1500:
 									self.sendOrder(self.orders['PINGPING_AUTO'], (address, conversion.orderToBinary(int(self.orders['PINGPING_AUTO']))))
@@ -197,16 +200,27 @@ class communicationGlobale():
 	def extractData(self, rawInput):
 		""" prend rawInput une chaine de caractère qui correspond  qui correspond à un ordre, retourne les autres packerData est prêt à être interpréter"""
 		
+		"""print "DEBUG"
+		for letter in rawInput:
+			print conversion.intToBinary(ord(letter))
+		print "FIN DEBUG"""
+
 		if len(rawInput) >0:#cas improbable, mais il semble que ça arrive
 
 			packetAddress = ord(rawInput[0]) - 128
 
 			if packetAddress > 96:# l'arduino confirme le reset
-				self.acceptConfirmeResetId(packetAddress-96)
+				if packetAddress-96 in self.address:
+					self.acceptConfirmeResetId(packetAddress-96)
+				else:
+					print "WARNING, corrupted address on reset confirme from arduino"
 				return 0
 
 			elif packetAddress > 64:# l'arduino demande un reset
-				self.confirmeResetId(packetAddress-64)
+				if packetAddress-64 in self.address:
+					self.confirmeResetId(packetAddress-64)
+				else:
+					print "WARNING, corrupted address on reset confirme from arduino"
 				return 0
 
 			elif len(rawInput)>=3:#cas normal
@@ -270,16 +284,19 @@ class communicationGlobale():
 	def readOrders(self):
 		ordersList = self.getXbeeOrders()
 
+		returnOrders = deque()
+
 		for order in ordersList:
 			address = int(order[0])
 			idd = int(order[1])
+			arguments = []
 
 			if address in self.address:
 				if idd >= 64:# cas impossible car verification lors de l'extraction des données
 					print "ERREUR: IMPOSSIBLE l'arduino", self.address[address], " a mal recu un message."
 				else:
 					if idd == self.getNextConfirmeId(address):
-						if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:# on affiche pas les PING automatique TODO
+						if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:
 							print "Success: l'arduino", self.address[address]," a bien recu l'ordre ", self.orders[self.ordreLog[address][idd][0]], " d'id: ", idd
 						self.incrementeLastConfirmedId(address)
 						self.lastConfirmationDate[address] = long(time.time()*1000)
@@ -288,25 +305,36 @@ class communicationGlobale():
 						index = 0
 						for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
 							if returnType == 'int':
+								retour = conversion.binaryToInt(order[2][index*8:(index+2)*8])
 								print "Retour int: "
-								print(conversion.binaryToInt(order[2][index*8:(index+2)*8]))
+								print retour
+								arguments.append(retour)
 								index += 2
 							elif returnType == 'float':
+								retour = conversion.binaryToFloat(order[2][index*8:(index+4)*8])
 								print "Retour float: "
-								print(conversion.binaryToFloat(order[2][index*8:(index+4)*8]))
+								print retour
+								arguments.append(retour)
 								index += 4
 							elif returnType == 'long':
+								retour = conversion.binaryToLong(order[2][index*8:(index+4)*8])
 								print "Retour long: "
-								print(conversion.binaryToLong(order[2][index*8:(index+4)*8]))
+								print retour
+								arguments.append(retour)
 								index += 4
 							else:
 								print "ERREUR: Parseur: le parseur a trouvé un type non supporté"
+
+						self.mutex.acquire()
+						returnOrders.append((address, idd, arguments))
+						self.mutex.release()
 
 					else:
 						print "WARNING: l'arduino a accepte le paquet ", idd, "alors que le paquet a confirmer est ", self.getNextConfirmeId(address)
 			else:
 				print "ERREUR: address: ", address, " inconnue"
-				
+			
+		return returnOrders
 
 
 
@@ -461,4 +489,10 @@ class communicationGlobale():
 		
 
 
-		
+	def readOrdersAPI(self):
+		retour = deque()
+		self.mutex.acquire()
+		for data in retour:
+			retour.append(data)
+		self.mutex.release()
+		return retour
