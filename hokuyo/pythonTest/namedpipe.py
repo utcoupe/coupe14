@@ -4,7 +4,10 @@ import os
 #handle, filename = tempfile.mkstemp()
 filename = "/tmp/lidarPipe"
 
-os.remove(filename)
+try:
+    os.remove(filename)
+except OSError:
+    pass
 os.mkfifo(filename)
 
 print("Opening fifo, waiting for c program...")
