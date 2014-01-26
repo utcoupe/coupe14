@@ -7,7 +7,7 @@
 #define MOTOR_H
 
 #include "brushlessMotor.h"
-#include "include_arduino.h"
+#include "Arduino.h"
 
 void set_pwm_right(int pwm);
 void set_pwm_left(int pwm);
