@@ -1,10 +1,12 @@
 #include "lidar.h"
 #include "global.h"
 #include "robot.h"
+#include "namedpipe.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "namedpipe.h"
+#include <signal.h>
+
 
 #ifdef SDL
 #include "gui.h"
@@ -43,7 +45,7 @@
 void frame();
 
 
-static int pipeactivated = 1;
+static int pipeactivated = 0;
 static struct lidar l1;
 #ifdef SDL
 static struct color l1Color;
@@ -51,14 +53,20 @@ static struct color l1Color;
 
 static struct coord robots[MAX_ROBOTS];
 
+
+static void catch_SIGPIPE(int signo) {
+    printf("Broken Pipe !!! exiting...\n");
+    exit(EXIT_SUCCESS);
+}
+
 int main(int argc, char **argv){
   
   if(argc <= 1 || ( strcmp(argv[1], "red") != 0 && strcmp(argv[1], "blue") ) ){
-    fprintf(stderr, "usage: hokuyo [red|blue] [nopipe]\n");
+    fprintf(stderr, "usage: hokuyo [red|blue] [pipe]\n");
     return EXIT_FAILURE;
   }
 
-  if(argc == 3 && strcmp(argv[2], "nopipe") == 0 ) pipeactivated = 0;
+  if(argc == 3 && strcmp(argv[2], "pipe") == 0 ) pipeactivated = 1;
 
 	struct coord pos1;
   if( strcmp(argv[1], "red") == 0 ){
@@ -76,7 +84,13 @@ int main(int argc, char **argv){
 	initSDL();
   #endif
 
-  if(pipeactivated) initNamedPipe();
+  if(pipeactivated){
+    if (signal(SIGPIPE, catch_SIGPIPE) == SIGPIPE) {
+        fputs("An error occurred while setting a SIGPIPE signal handler.\n", stderr);
+        return EXIT_FAILURE;
+    }
+    initNamedPipe();
+  } else printf("pipe desactivated !!!\n");
 
   printf("Running ! ...\n");
 	while(1){
@@ -97,5 +111,12 @@ void frame(){
 	waitScreen();
   #endif
   if(pipeactivated) printRobots(robots, nRobots);
+  else{
+    printf("%i", nRobots);
+    for(int i=0; i<nRobots; i++){
+      printf(";%i:%i", robots[i].x, robots[i].y);
+    }
+    printf("\n");
+  }
 }
 
