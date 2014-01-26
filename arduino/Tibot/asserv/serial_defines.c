@@ -11,6 +11,7 @@ void initSize()
 		ordreSize[i]=SIZE_ERROR;
 
 	//DEBUTPARSE
+	ordreSize[PINGPING_AUTO]=0;
 	ordreSize[PINGPING]=0;
 	ordreSize[A_GOTOA]=8;
 	ordreSize[A_GOTO]=4;
@@ -26,5 +27,9 @@ void initSize()
 	ordreSize[A_GET_CODER]=0;
 	ordreSize[A_ACCMAX]=4;
 	ordreSize[A_RESET_POS]=0;
+	ordreSize[A_GET_POS]=0;
+
+	ordreSize[O_BRAS_OUVRIR]=0;
+	ordreSize[O_BRAS_FERMER]=0;
 	//FINPARSE
 }
