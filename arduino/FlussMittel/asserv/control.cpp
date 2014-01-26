@@ -93,7 +93,7 @@ void Control::compute(){
 					}
 					order_started = true;
 				}
-				if(!aligne && abs(da) <= ERROR_ANGLE) {
+				if(!aligne && abs(da) <= ERROR_ANGLE && value_consigne_right < CONSIGNE_REACHED && value_consigne_left < CONSIGNE_REACHED) {
 					aligne = 1;
 				}
 
@@ -104,7 +104,7 @@ void Control::compute(){
 					controlPos(da, d + current_goal.data_3);//erreur en dist = dist au point + dist additionelle
 				}
 
-				if(abs(dd) <= ERROR_POS) {
+				if(abs(dd) <= ERROR_POS && value_consigne_right < CONSIGNE_REACHED && value_consigne_left < CONSIGNE_REACHED) {
 					setConsigne(0, 0);
 					fifo.pushIsReached();
 				}
