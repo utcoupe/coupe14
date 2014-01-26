@@ -62,7 +62,7 @@ static void catch_SIGPIPE(int signo) {
 int main(int argc, char **argv){
   
   if(argc <= 1 || ( strcmp(argv[1], "red") != 0 && strcmp(argv[1], "blue") ) ){
-    fprintf(stderr, "usage: hokuyo [red|blue] [pipe]\n");
+    fprintf(stderr, "usage: hokuyo {red|blue} [pipe]\n");
     return EXIT_FAILURE;
   }
 
