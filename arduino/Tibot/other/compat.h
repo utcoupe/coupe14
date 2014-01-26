@@ -8,27 +8,17 @@
 
 #include "Arduino.h"
 #include "parameters.h"
-#include "motor.h"
-#include "encoder.h"
-#include "control.h"
 
-#define LOCAL_ADDR ADDR_TIBOT_ASSERV //Ici l'adresse locale du client
-
-void interruptLeftA();
-void interruptRightA();
-#if ENCODER_EVAL == 4
-void interruptLeftB();
-void interruptRightB();
-#endif
-#if GESTION_3EME_FIL
-void interruptLeft0();
-void interruptRight0();
-#endif
+#define LOCAL_ADDR ADDR_TIBOT_OTHER //Ici l'adresse locale du client
+#define FORWARD_ADDR ADDR_TIBOT_ASSERV
 
 void initPins();
 unsigned long timeMillis();
 unsigned long timeMicros();
-void serial_send(char data);
+
+void serial_write(char data);
 char serial_read();
+void forward_serial_write(char c);
+char forward_serial_read();
 
 #endif

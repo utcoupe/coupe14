@@ -4,7 +4,7 @@
  * Date : 22/01/13			*
  ****************************************/
 #include "compat.h"
-#include "serial_decoder.h"
+#include "serial_decoder_forward.h"
 #include "serial_defines.h"
 #include "serial_switch.h"
 #include "serial_types.h"
@@ -22,34 +22,43 @@ void executeCmd(char serial_data){
 	static enum etape etape = wait_step;
 
 	if((serial_data & PROTOCOL_BIT) == PROTOCOL_BIT){ //Si 0b1xxxxxxx
-		if (serial_data == END && client_concerne) { //Fin de trame, execution de l'ordre
+		if((serial_data & 0x0F) == LOCAL_ADDR){ //Si début de paquet adressé au client
+			if ((serial_data & 0xF0) == RESET){ //Si demande de reset
+				ID_attendu = 0;
+				serial_write(RESET_CONF | LOCAL_ADDR);
+				PDEBUGLN("RESET CONFIRME");
+			}
+			else{
+				etape = ID_step; //Sinon le message nous est adressé
+				client_concerne = true;
+			}
+		}
+		else if ((serial_data & 0x0F) == FORWARD_ADDR) {
+			etape = forward;
+			forward_serial_write(serial_data);
+		}
+		else if (serial_data == END && client_concerne) { //Fin de trame, execution de l'ordre
 			unsigned char data_8bits[MAX_DATA];
 
                         data_counter = decode(data, data_8bits, data_counter);
                         if(data_counter == -1){ //Si données invalides
 				sendInvalid();
-				etape = wait_step;
 			}
 			else{
 				executeOrdre(data_8bits, data_counter, ID_recu, doublon); //Execute les ordres, envoit les réponses
 				if (!doublon){
 					ID_attendu=(ID_attendu + 1) % (ID_MAX+1);//ID sur 6 bits effectifs, incrémentée si non doublon
 				}
-				etape = wait_step;
 			}
+			etape = wait_step;
 			data_counter = 0;
 			doublon = false;
 			client_concerne = false;
 		}
-		else if((serial_data & 0x0F) == LOCAL_ADDR){ //Si début de paquet adressé au client
-			if ((serial_data & 0xF0) == RESET){ //Si demande de reset
-				ID_attendu = 0;
-				serial_send(RESET_CONF | LOCAL_ADDR);
-				PDEBUGLN("RESET CONFIRME");
-			}
-			else{
-				client_concerne = true;
-				etape = ID_step; //Sinon le message nous est adressé
+		else if (serial_data == END && etape == forward) {
+			forward_serial_write(serial_data);
+			if (serial_data == END) {
+				etape = wait_step;
 			}
 		}
 		else{ //Si fin de paquet ou packet non adressé au client
@@ -75,6 +84,9 @@ void executeCmd(char serial_data){
 		case data_step:
 			data[data_counter] = serial_data;
 			data_counter++;
+			break;
+		case forward:
+			forward_serial_write(serial_data);
 			break;
 		case wait_step:
 			break;
@@ -185,27 +197,27 @@ void sendResponse(unsigned char *data, int data_counter, unsigned char id){
 	unsigned char data_7bits[MAX_DATA];
 	int i, size;
 	size = encode(data, data_7bits, data_counter);
-	serial_send(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
-	serial_send(id);
+	serial_write(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
+	serial_write(id);
 	for(i = 0 ; i < size ; i++){
-		serial_send(data_7bits[i]); //contenu
+		serial_write(data_7bits[i]); //contenu
 	}
-	serial_send(END); //fin de réponse
+	serial_write(END); //fin de réponse
 }
 
 void sendInvalid() {//renvoit le code de message invalide (dépend de la plateforme)
         PDEBUGLN("Data error");
-	serial_send(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
-	serial_send(INVALID_MESSAGE);
-	serial_send(END);
+	serial_write(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
+	serial_write(INVALID_MESSAGE);
+	serial_write(END);
 }
 
 void protocol_reset(){
-	serial_send(RESET | LOCAL_ADDR);
+	serial_write(RESET | LOCAL_ADDR);
 	while(serial_read() != (RESET_CONF | LOCAL_ADDR)){
 		long t = timeMillis();
 		if (timeMillis() - t > 1000)
-			serial_send(RESET | LOCAL_ADDR);
+			serial_write(RESET | LOCAL_ADDR);
 	}
 	PDEBUGLN("RESET");
 }

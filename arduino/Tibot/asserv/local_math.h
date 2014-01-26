@@ -7,6 +7,8 @@
 #ifndef LOCAL_MATH_H
 #define LOCAL_MATH_H
 
+#define MAX(a,b) a > b ? a : b
+
 float moduloTwoPI(float angle);
 float moduloPI(float angle);
 

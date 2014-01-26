@@ -56,8 +56,9 @@ class Control{
 	PID PID_Angle;
 	PID PID_Distance;
 	//interface avec les PIDs
-	void setConsigne(int consigne_left, int consigne_right); //controles puis modification (renvoie l'overflow)
-	void check(float *consigne, float last);
+	void setConsigne(float consigne_left, float consigne_right); //controles puis modification (renvoie l'overflow)
+	void check_acc(float *consigne, float last);
+	void check_max(float *consigne);
 	void controlAngle(float goal_angle); //goal en radians
 	void controlPos(float e_angle, float e_dist); //goal en mm
 

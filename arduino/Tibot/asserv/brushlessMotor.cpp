@@ -1,7 +1,7 @@
 //Par Quentin pour UTCoupe2013 01/04/2013
 //Commande de shield arduino brushless by UTCoupe
 
-#include "include_arduino.h"
+#include "Arduino.h"
 
 #include "brushlessMotor.h"
 

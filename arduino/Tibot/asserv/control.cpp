@@ -31,6 +31,7 @@ void Control::compute(){
 	static bool reset = true, order_started = false;
 	static long start_time;
 	struct goal current_goal = fifo.getCurrentGoal();
+	static struct goal last_goal = current_goal;
 	m_pos current_pos = robot.getMmPos();
 	long now = timeMicros();
 	robot.update();
@@ -40,12 +41,16 @@ void Control::compute(){
 		value_consigne_left = 0;
 	}
 	else{
-		if(current_goal.isReached && fifo.getRemainingGoals() > 1){//Si le but est atteint et que ce n'est pas le dernier, on passe au suivant
+		if (current_goal.isReached && fifo.getRemainingGoals() > 1){//Si le but est atteint et que ce n'est pas le dernier, on passe au suivant
 			//PDEBUGLN("Next Goal");
 			current_goal = fifo.gotoNext();
 			reset = true;
 		}
-		if(reset){//permet de reset des variables entre les goals
+		else if (last_goal.data_1 != current_goal.data_1 || last_goal.data_2 != current_goal.data_2 || last_goal.data_3 != current_goal.data_3) { //On a cancel un goal
+			reset = true;
+		}
+		if (reset) {//permet de reset des variables entre les goals
+			current_goal = fifo.getCurrentGoal();
 			PID_Angle.reset();
 			PID_Distance.reset();
 			reset = false;
@@ -56,50 +61,53 @@ void Control::compute(){
 		switch(current_goal.type){
 			case TYPE_ANG :
 			{
-				float da = current_goal.data_1 - current_pos.angle;
-				if(abs(da) < ERROR_ANGLE && value_consigne_left <= CONSIGNE_REACHED && value_consigne_right <= CONSIGNE_REACHED)
+				//float da = current_goal.data_1 - current_pos.angle;
+				float da = moduloTwoPI(current_goal.data_1 - current_pos.angle);
+				if(abs(da) <= ERROR_ANGLE){
+					setConsigne(0, 0);
 					fifo.pushIsReached();
+				}
 				else
 					controlAngle(da);
-#ifdef DEBUG
-				static int counter = 0;
-				counter++;
-				if(counter > 100){
-					counter = 0;
-					PDEBUG("da : "); PDEBUGLN(da);
-				}
-#endif
 				break;
 			}
 
 			case TYPE_POS :
 			{
-				static char aligne_rot = 0;
 				float dx = current_goal.data_1 - current_pos.x;
 				float dy = current_goal.data_2 - current_pos.y;
 				float goal_a = atan2(dy, dx);
 				float da = moduloTwoPI(goal_a - current_pos.angle);
 				float dd = sqrt(pow(dx, 2.0)+pow(dy, 2.0));//erreur en distance
+				float d = dd * cos(da);
+				static char aligne = 0;
 
-				if (dd < DISTANCE_MIN_ASSERV_ANGLE) { //On est "à coté de l'objectif"
-					da = 0;
-				}
-
-				if (abs(da) > ERREUR_MARCHE_ARRIERE){ //Faire marche arriere
-					dd = - dd;
-				}
 				da = moduloPI(da);
 
-				if(!aligne_rot && abs(da) < max_angle && value_consigne_right <= CONSIGNE_REACHED && value_consigne_left <= CONSIGNE_REACHED) //On est aligné
-					aligne_rot = 1;
+				if (!order_started) {
+					if(abs(da) < max_angle) {
+						aligne = 1;
+					}
+					else {
+						aligne = 0;
+					}
+					order_started = true;
+				}
+				if(!aligne && abs(da) <= ERROR_ANGLE && value_consigne_right < CONSIGNE_REACHED && value_consigne_left < CONSIGNE_REACHED) {
+					aligne = 1;
+				}
 
-				if(!aligne_rot)//On tourne sur place avant de se déplacer
-					controlAngle(da);
-				else
-					controlPos(da, dd + current_goal.data_3);//erreur en dist = dist au point + dist additionelle
+				if(!aligne) {//On tourne sur place avant de se déplacer
+					controlPos(da, 0);
+				}
+				else {
+					controlPos(da, d + current_goal.data_3);//erreur en dist = dist au point + dist additionelle
+				}
 
-				if(abs(dd) < ERROR_POS && value_consigne_right <= CONSIGNE_REACHED && value_consigne_left <= CONSIGNE_REACHED)
+				if(abs(dd) <= ERROR_POS && value_consigne_right < CONSIGNE_REACHED && value_consigne_left < CONSIGNE_REACHED) {
+					setConsigne(0, 0);
 					fifo.pushIsReached();
+				}
 				break;
 			}
 
@@ -127,6 +135,7 @@ void Control::compute(){
 	}
 
 	applyPwm();
+	last_goal = current_goal;
 }
 
 void Control::update_robot_state(){
@@ -159,7 +168,12 @@ void Control::setMaxAngCurv(float n_max_ang){
 }
 
 void Control::setMaxAcc(float n_max_acc){
+	PDEBUGLN("");
+	PDEBUGLN(FREQ);
+	PDEBUGLN(n_max_acc);
+	PDEBUGLN(max_acc);
 	max_acc = n_max_acc / FREQ; 
+	PDEBUGLN(max_acc);
 }
 
 void Control::pushPos(m_pos n_pos){
@@ -200,7 +214,7 @@ void Control::resume(){
 
 /********** PRIVATE **********/
 
-void Control::setConsigne(int consigne_left, int consigne_right){
+void Control::setConsigne(float consigne_left, float consigne_right){
 	//Ajout des pwm minimale : "shift" des pwm
 	if(consigne_offset != 0){
 		if(consigne_right > 0)
@@ -214,20 +228,21 @@ void Control::setConsigne(int consigne_left, int consigne_right){
 	}
 
 	//Tests d'overflow
-	if(consigne_left > CONSIGNE_RANGE_MAX)
-		consigne_left = CONSIGNE_RANGE_MAX;
-	else if(consigne_left < CONSIGNE_RANGE_MIN)
-		consigne_left = CONSIGNE_RANGE_MIN;
-	if(consigne_right > CONSIGNE_RANGE_MAX)
-		consigne_right = CONSIGNE_RANGE_MAX;
-	else if(consigne_right < CONSIGNE_RANGE_MIN)
-		consigne_right = CONSIGNE_RANGE_MIN;
+	check_max(&consigne_left);
+	check_max(&consigne_right);
 	
-	value_consigne_right = consigne_right;
-	value_consigne_left = consigne_left;
+	value_consigne_right = (int)consigne_right;
+	value_consigne_left = (int)consigne_left;
 }
 
-void Control::check(float *consigne, float last)
+void Control::check_max(float *consigne) {
+	if(*consigne > CONSIGNE_RANGE_MAX)
+		*consigne = CONSIGNE_RANGE_MAX;
+	else if(*consigne < CONSIGNE_RANGE_MIN)
+		*consigne = CONSIGNE_RANGE_MIN;
+}
+
+void Control::check_acc(float *consigne, float last)
 {
 	//Check MAX_ACC
 	if(*consigne > last + max_acc){
@@ -247,8 +262,8 @@ void Control::controlAngle(float da)
 	//Asservissement en position, renvoie une consigne de vitesse
 	consigne = PID_Angle.compute(da);
 
-	check(&consigne, last_consigne);
-		
+	check_acc(&consigne, last_consigne);
+
 	consignePwmR = consigne;
 	consignePwmL = -consigne;
 
@@ -267,11 +282,14 @@ void Control::controlPos(float da, float dd)
 	//Calcul des spd de distance
 	consigneDistance = PID_Distance.compute(dd); //erreur = distance au goal
 
+	check_max(&consigneAngle);
+	check_max(&consigneDistance);
+
 	consigneR = consigneDistance + consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
 	consigneL = consigneDistance - consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
 
-	check(&consigneR, last_consigneR);
-	check(&consigneL, last_consigneL);
+	check_acc(&consigneR, last_consigneR);
+	check_acc(&consigneL, last_consigneL);
 
 	setConsigne(consigneL, consigneR);
 
