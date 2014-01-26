@@ -44,13 +44,16 @@ class communicationGlobale():
 		self.lowPrioSpeed = 1000
 
 		self.threadActif = True
+		self.writeOutput = True
 		self.readInput = True
 		self.probingDevices = True
-		self.renvoieOrdre = True
+		self.renvoieOrdre = False
 		self.keepContact = True
 
-		self.orderToExecute = deque()
-		self.mutex = threading.Lock()
+		self.orderToRead = deque()
+		self.orderToSend = deque()
+		self.mutexRetour = threading.Lock()
+		self.mutexEnvoi = threading.Lock()
 		gestionThread = threading.Thread(target=self.gestion)
 		gestionThread.start()
 		
@@ -71,9 +74,14 @@ class communicationGlobale():
 			#tâches de hautes priotités
 			if (actualDate - self.lastHighPrioTaskDate) > self.highPrioSpeed:
 				self.lastHighPrioTaskDate = actualDate
+
+				#Ecriture des ordres
+				if self.writeOutput == True:
+					self.sendOrders()
+
 				#Lecture des entrées
 				if self.readInput == True:
-					self.orderToExecute += self.readOrders()
+					self.orderToRead += self.readOrders()
 
 				#Renvoie des ordres non confirmés
 				if self.renvoieOrdre == True:
@@ -104,7 +112,7 @@ class communicationGlobale():
 								if ((actualDate - self.lastConfirmationDate[address]) > 5000) and self.lastConfirmationDate[address] != -1:#le système est considere comme hors ligne
 									self.arduinoIdReady[address] = False
 								elif (actualDate - self.lastSendDate[address]) > 1500:
-									self.sendOrder(self.orders['PINGPING_AUTO'], (address, conversion.orderToBinary(int(self.orders['PINGPING_AUTO']))))
+									self.sendOrderAPI(address, self.orders['PINGPING_AUTO'])
 
 			waitBeforeNextExec = (self.highPrioSpeed -(long(time.time()*1000) - actualDate))
 			if waitBeforeNextExec <1:
@@ -254,7 +262,7 @@ class communicationGlobale():
 						print "WARNING: Le paquet ne fait pas la bonne taille, des données ont probablement été perdue, paquet droppé, taille attendu ", taille
 						return 0
 				elif packetId > 63:
-					print "L'arduino nous indique avoir mal reçu un message, code id avec erreur ", packetId
+					print "L'arduino nous indique avoir mal reçu un message, message d'erreur ", packetId
 					return 0
 				else:
 					print "WARNING: Le paquet est mal formé, l'address ou l'id est invalide"
@@ -326,10 +334,10 @@ class communicationGlobale():
 							else:
 								print "ERREUR: Parseur: le parseur a trouvé un type non supporté"
 
-						self.mutex.acquire()
+						self.mutexRetour.acquire()
 						returnOrders.append((address, idd, arguments))
-						argument.clear()
-						self.mutex.release()
+						arguments = []
+						self.mutexRetour.release()
 
 					else:
 						print "WARNING: l'arduino a accepte le paquet ", idd, "alors que le paquet a confirmer est ", self.getNextConfirmeId(address)
@@ -341,6 +349,11 @@ class communicationGlobale():
 
 
 	#Envoi
+	def sendXbeeOrder(self, address, idd, order, chaineTemp):
+		self.ordreLog[address][idd] = (order, chaineTemp)
+		self.lastSendDate[address] = long(time.time()*1000)
+		self.liaisonXbee.send(chaineTemp)
+
 	def applyProtocole(self, address, packetId, data):
 		""" on concatène les trois parametres et on retourne chaineRetour en appliquant le protocole """
 		chaineRetour = ""
@@ -357,29 +370,33 @@ class communicationGlobale():
 		#on ajoute l'octet de fin
 		chaineRetour += chr(128)
 
-		return(chaineRetour)
+		return (chaineRetour)
 
+	def sendOrders(self):
+		"""fonction qui gère l'envoi des ordres, sous le contrôle du thread"""
 
-	def sendXbeeOrders(self, order, ordersList):
-		""" ordersList est une liste de chaine de caractère sous la forme (adresse, id, data) où data est une chaine de char avec un ou plusieurs ordres"""
-		for commande in ordersList:
-			chaineTemp = self.applyProtocole(commande[0], commande[1], commande[2])
-			self.ordreLog[commande[0]][commande[1]] = (order, chaineTemp)
-			self.lastSendDate[commande[0]] = long(time.time()*1000)
-			self.liaisonXbee.send(chaineTemp)
+		self.mutexEnvoi.acquire()
+		for packet in self.orderToSend:#packet contient(address, ordre, *argument)
 
-	def sendOrder(self, order, data):
-		"""c'est la fonction que l'utilisateur doit manipuler, ordre est de type (address, data)"""
-		#TODO:
-		#on get les packet à renvoyer
-		#on y ajoute notre packet
-		#on envoye tout à sendXbeeOrders
+			data = conversion.orderToBinary(packet[1])
+			i = 0
+			for typeToGet in self.ordersArguments[packet[1]]:
+				if typeToGet == 'int':
+					data += conversion.intToBinary(int(packet[2][i]))
+				elif typeToGet == 'long':
+					data += conversion.longToBinary(long(packet[2][i]))
+				elif typeToGet == 'float':
+					data += conversion.floatToBinary(float(packet[2][i]))
+				else:
+					print "ERREUR: Parseur: le parseur a trouvé un type non supporté"
+				i += 1
+			idd = self.getId(packet[0])
+			chaineTemp = self.applyProtocole(packet[0], idd, data)
+			self.sendXbeeOrder(packet[0], idd, packet[1], chaineTemp)
 
-		#bypass temporaire:
-		ordersList = deque()
-		ordersList.append((data[0], self.getId(data[0]), data[1]))
-		self.sendXbeeOrders(order, ordersList)
-		ordersList.pop()
+		self.orderToSend.clear()
+		self.mutexEnvoi.release()
+
 
 
 
@@ -455,7 +472,7 @@ class communicationGlobale():
 				i += 1
 					
 		else:
-			print "ERREUR: l'order", order, "attend", len(self.ordersArguments[order]), "ordres, recu:", len(arguments), "ordres"
+			print "ERREUR: l'order", order, "attend", len(self.ordersArguments[order]), "arguments, mais a recu:", len(arguments), "arguemnts"
 			return -1
 
 		return 0
@@ -471,30 +488,22 @@ class communicationGlobale():
 		order = self.checkOrder(order)
 
 		if address !=-1 and order !=-1 and self.checkOrderArgument(order, *arguments) !=-1:
-			data = conversion.orderToBinary(order)
-			i = 0
-			for typeToGet in self.ordersArguments[order]:
-				if typeToGet == 'int':
-					data += conversion.intToBinary(int(arguments[i]))
-				elif typeToGet == 'long':
-					data += conversion.longToBinary(long(arguments[i]))
-				elif typeToGet == 'float':
-					data += conversion.floatToBinary(float(arguments[i]))
-				else:
-					print "ERREUR: Parseur: le parseur a trouvé un type non supporté"
-				i += 1
-
-			self.sendOrder(order, (address,data))
-
+			self.mutexEnvoi.acquire()
+			self.orderToSend.append((address, order, arguments))
+			self.mutexEnvoi.release()
 		else:
 			return -1
 		
 
 
 	def readOrdersAPI(self):
-		retour = deque()
-		self.mutex.acquire()
-		for data in retour:
-			retour.append(data)
-		self.mutex.release()
-		return retour
+		"""Renvoi -1 si pas d'ordre en attente sinon renvoi un ordre """
+		self.mutexRetour.acquire()
+		if len(self.orderToRead) > 0:
+			order = self.orderToRead.pop()
+			self.mutexRetour.release()
+			return order
+		else:
+			self.mutexRetour.release()
+			return -1
+		
