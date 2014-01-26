@@ -171,7 +171,6 @@ class communicationGlobale():
 
 
 
-
 	def askResetId(self, address): #demande a une arduino de reset
 		self.lastConfirmationDate[address] = -1
 		self.nbUnconfirmedPacket[address] = (0, -1)
