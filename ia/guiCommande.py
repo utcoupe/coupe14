@@ -4,11 +4,17 @@ GUI minimaliste pour envoyer des commandes
 """
 
 from communication import conversion
+import time
 
 
 def gui(com):
 	(address, orders, ordersSize, ordersArguments, ordersRetour) = com.getConst()
-
+	arguments = []
+	while 1:
+		com.sendOrderAPI(1, 'A_KILLG', *arguments)
+		#com.sendOrderAPI(2, 'A_KILLG', *arguments)
+		time.sleep(0.1)
+	
 	while 1:
 		#address = str(raw_input("Entre une address:\n"))
 		address = 2
