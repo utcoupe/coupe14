@@ -170,8 +170,19 @@ class communicationGlobale():
 			self.lastIdConfirm[address] += 1
 
 
+	def removeOrdersInFile(self, address):# Warning, only on reset !
+		remainOrdersToSend = deque()
+		self.mutexEnvoi.acquire()
+		for packet in self.ordersToSend:
+			if packet[0] != address:
+				remainOrdersToSend.append(packet)
+			else:
+				print "ERREUR: drop de l'ordre", packet[1], " par l'arduino", packet[0], "suite à un reset"
+		self.ordersToSend = remainOrdersToSend
+		self.mutexEnvoi.release()
 
 	def askResetId(self, address): #demande a une arduino de reset
+		self.removeOrdersInFile(address)
 		self.lastConfirmationDate[address] = -1
 		self.nbUnconfirmedPacket[address] = (0, -1)
 		self.lastSendDate[address] = -1
@@ -186,6 +197,7 @@ class communicationGlobale():
 	#cas où on reçoi
 	def acceptConfirmeResetId(self, address):#accepte la confirmation de reset d'un arduino
 		print "L'arduino "+ str(address)+" a accepte le reset"
+		self.removeOrdersInFile(address)
 		self.lastConfirmationDate[address] = -1
 		self.nbUnconfirmedPacket[address] = (0, -1)
 		self.lastSendDate[address] = -1
@@ -196,6 +208,7 @@ class communicationGlobale():
 
 	def confirmeResetId(self, address):#renvoie une confirmation de reset
 		print "Reponse au reset de l'arduino "+ str(address)
+		self.removeOrdersInFile(address)
 		self.lastConfirmationDate[address] = -1
 		self.nbUnconfirmedPacket[address] = (0, -1)
 		self.lastSendDate[address] = -1
@@ -312,8 +325,6 @@ class communicationGlobale():
 				else:
 					if idd in self.getAllUnknowledgeId(address):
 						if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:
-							print self.getAllUnknowledgeId(address)
-							print self.nbUnconfirmedPacket[address]
 							print "Success: l'arduino", self.address[address]," a bien recu l'ordre ", self.orders[self.ordreLog[address][idd][0]], " d'id: ", idd
 						date = long(time.time()*1000)
 						self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - self.getAllUnknowledgeId(address).index(idd) - 1, date)#on bidone le chiffre date, mais c'est pas grave

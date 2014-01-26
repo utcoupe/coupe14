@@ -10,10 +10,6 @@ import time
 def gui(com):
 	(address, orders, ordersSize, ordersArguments, ordersRetour) = com.getConst()
 	arguments = []
-	while 1:
-		com.sendOrderAPI(1, 'A_KILLG', *arguments)
-		#com.sendOrderAPI(2, 'A_KILLG', *arguments)
-		time.sleep(0.1)
 	
 	while 1:
 		#address = str(raw_input("Entre une address:\n"))
@@ -37,7 +33,7 @@ def gui(com):
 				com.sendOrderAPI(2, 'A_GOTOA', *arguments)
 			elif order == 's':
 
-				for a in range(300):
+				for a in range(50):
 					arguments = [1000, 0]
 					com.sendOrderAPI(2, 'A_GOTO', *arguments)
 
