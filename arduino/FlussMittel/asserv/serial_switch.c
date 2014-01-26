@@ -85,13 +85,12 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		break;
 	case A_GET_POS:{
 		m_pos pos = control.getPos();
-		itob((int)pos.x, ret);
-		itob((int)pos.y, ret);
-		itob((int)pos.angle, ret);
-		ret_size = 6;
-		PDEBUG("X = "); PDEBUGLN(pos.x);
-		PDEBUG("Y = "); PDEBUGLN(pos.y);
-		PDEBUG("A = "); PDEBUGLN(pos.angle);
+		int x = pos.x, y = pos.y;
+		float a = pos.angle;
+		itob(x, ret);
+		itob(y, ret+2);
+		ftob(a, ret+4);
+		ret_size = 8;
 		break;
 		}
 	case A_ACCMAX:
