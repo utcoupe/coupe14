@@ -27,6 +27,7 @@ void waitScreen();
 #define LIDAR_SIZE 50 /*mm*/
 #define GUI_ROBOT_SIZE 15 /*px*/
 #define GUI_POINT_SIZE 3 /*px*/
+#define MARKER_SIZE 75/*mm*/
 
 
 

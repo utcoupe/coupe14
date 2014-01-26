@@ -1,7 +1,7 @@
 #ifndef FAST_MATH_H
 #define FAST_MATH_H
 
-
+#include "global.h"
 
 struct coord{
 	int x;

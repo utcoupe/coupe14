@@ -34,9 +34,11 @@ initFastmath(int n, double *angles)
 	r.sin = malloc(sizeof(double) * n);
 	if(r.cos == NULL || r.sin == NULL) exit(EXIT_FAILURE);
 
+	//printf("Should print anles from -90 to 0\n");
 	for(int i=0; i<n; i++){
 		r.cos[i] = cos(angles[i]);
 		r.sin[i] = sin(angles[i]);
+		//printf("%f\tx:%f\ty:%f\n", angles[i]*180/PI, r.cos[i], r.sin[i]);
 	}
 
 	return r;
