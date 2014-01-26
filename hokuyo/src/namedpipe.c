@@ -29,13 +29,17 @@ initNamedPipe(){
 
 void
 printRobots(struct coord *r, int nRobots){
-	if(pipefile == NULL) exit(EXIT_FAILURE);;
+	if(pipefile == NULL){
+		fprintf(stderr, "Pipe disconnected !, exiting\n");
+		exit(EXIT_FAILURE);
+	}
 
 	fprintf(pipefile, "%i", nRobots);
 	for(int i=0; i<nRobots; i++){
 		fprintf(pipefile, ";%i:%i", r[i].x, r[i].y);
 	}
 	fprintf(pipefile, "\n");
+	fflush(pipefile);
 }
 
 
