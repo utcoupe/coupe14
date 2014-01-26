@@ -470,8 +470,7 @@ class communicationGlobale():
 			order = self.orders[order]
 
 		if len(arguments) == len(self.ordersArguments[order]):
-			i = 0
-			for argumentType in self.ordersArguments[order]:
+			for i, argumentType in enumerate(self.ordersArguments[order]):
 				if argumentType == 'int':
 					if not isinstance(arguments[i], (int)):
 						print "L'argument ", i, " de l'ordre ", order, " n'est pas du bon type, attendu (int)"
@@ -486,7 +485,6 @@ class communicationGlobale():
 						return -1
 				else:
 					print "ERREUR: attendu type inconnu"
-				i += 1
 					
 		else:
 			print "ERREUR: l'order", order, "attend", len(self.ordersArguments[order]), "arguments, mais a recu:", len(arguments), "arguemnts"

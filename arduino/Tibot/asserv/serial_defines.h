@@ -59,7 +59,7 @@ enum ordre {
 	A_PWM_TEST, 	//@int @int @int
 	A_ACCMAX,	//@float
 	A_RESET_POS,
-	A_GET_POS,	//#int #int #int
+	A_GET_POS,	//#int #int #float
 
 	O_BRAS_OUVRIR,
 	O_BRAS_FERMER,

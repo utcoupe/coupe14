@@ -3,17 +3,21 @@
 // Derniere edition le 04/12/13
 
 #include <stdio.h>
-#include <highgui.h>
 #include <cv.h>
 
 #include "traitement.h"
 #include "global.h"
 
+#ifdef VISUAL
+#include <highgui.h>
+#endif
+
 // $0=programme $1=h $2=h_tol $3=sv_tol
 int main(int argc, char **argv){
 	// Touche clavier
-	char key;
-	char mask_name[20];
+	char key = 0;
+	char default_name[] = "./mask.jpg";
+	char *mask_name = default_name;
 	int h_yellow = H_YEL, h_yellow_tol = H_YEL_TOL, s_yellow_tol = S_YEL_TOL, v_yellow_tol = V_YEL_TOL;
 	int h_red = H_RED, h_red_tol = H_RED_TOL, s_red_tol = S_RED_TOL, v_red_tol = V_RED_TOL;
 	int weight_yellow, weight_red;
@@ -109,10 +113,10 @@ int main(int argc, char **argv){
 		cvShowImage("Mask_yellow", mask_yellow);
 		cvShowImage("Mask_red", mask_red);
 		cvShowImage("Origine", image);
-#endif
 
 		// On attend 50ms
 		key = cvWaitKey(50);
+#endif
 	}
 	cvReleaseCapture(&capture);
 	cvReleaseImage(&mask_yellow);
@@ -120,8 +124,10 @@ int main(int argc, char **argv){
 	cvReleaseImage(&image);
 	cvReleaseImage(&color_yellow_mask);
 	cvReleaseImage(&color_red_mask);
+#ifdef VISUAL
 	cvDestroyWindow("Mask_yellow");
 	cvDestroyWindow("Mask_red");
 	cvDestroyWindow("Origine");
+#endif
 	return 0;
 }

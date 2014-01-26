@@ -59,14 +59,13 @@
 
 #define ENC_RESOLUTION 500 //resolution du codeur
 
-#define ENC_RADIUS 33.5 //rayon de la roue codeuse
-#define ENTRAXE_ENC 261.0 // Distance entre chaque roue codeuse en mm
+#define ENC_RADIUS 34.0 //REGLE PAR TEST - rayon de la roue codeuse
+#define ENTRAXE_ENC 259.8 //REGLE PAR TES - Distance entre chaque roue codeuse en mm
 
 #define ERROR_ANGLE 0.05 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
 #define ERROR_POS 10 // erreur en position (mm)  maximale pour considérer l'objectif comme atteint
 
 #define MAX_ANGLE 0.20  //~10° angle en dessous duquel on décrit une trajectoire curviligne (trop bas, le robot s'arretera constamment pour se recaler au lieu d'avancer, trop haut, les trajectoires seront très courbes voir meme fausses (overflow spd -> overflow pwm).
-#define ERREUR_MARCHE_ARRIERE PI/2
 #define SIN_MIN_ASSERV_ANGLE 20
 
 //Intégrales et dérivée sont calculée avec un intervalle de temps en SECONDES
