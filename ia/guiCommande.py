@@ -10,32 +10,26 @@ def gui(com):
 	(address, orders, ordersSize, ordersArguments, ordersRetour) = com.getConst()
 
 	while 1:
-		dataString = str(raw_input("Entre le nom ou le numéro d'un ordre:\n"))
+		#address = str(raw_input("Entre une address:\n"))
 		address = 2
+		arguments = []
+		order = str(raw_input("Entre le nom ou le numéro d'un ordre:\n"))
 
-		if dataString == 'k':# arret d'urgence
-			com.sendOrderAPI(2, 'A_KILLG')	
-		elif dataString in orders:
-			ordre = int(orders[dataString])
-			data = conversion.orderToBinary(ordre)
+		if order == 'k':# arret d'urgence
+			com.sendOrderAPI(address, 'A_KILLG', *arguments)
+		elif order in com.orders:
+			if isinstance(order, (int)):
+				order = com.orders[order]
 
-			if dataString[0] == 'A':
-				address = 2
-			elif dataString[0] == 'O':
-				address = 1
-			else:
-				address = int(raw_input("Entrez adresse :"))
-
-			for typeToGet in ordersArguments[dataString]:
+			for typeToGet in ordersArguments[order]:
 				if typeToGet == 'int':
-					data += conversion.intToBinary(int(raw_input("Entre  un int\n")))
+					arguments.append(int(raw_input("Entre  un int\n")))
 				elif typeToGet == 'float':
-					data += conversion.floatToBinary(float(raw_input("Entre un float\n")))
+					arguments.append(float(raw_input("Entre un float\n")))
 				elif typeToGet == 'long':
-					data += conversion.longToBinary(long(raw_input("Entre  un long\n")))
+					arguments.append(long(raw_input("Entre  un long\n")))
 				else:
 					print "ERREUR: Parseur: le parseur a trouvé un type non supporté"
-			#com.sendOrderAPI(, 'A_KILLG')
-			com.sendOrder(ordre, (address,data))	
+			com.sendOrderAPI(address, order, *arguments)	
 		else:
 			print "L'ordre n'a pas été trouvé dans les fichiers arduino"

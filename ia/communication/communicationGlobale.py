@@ -79,7 +79,7 @@ class communicationGlobale():
 							if self.lastConfirmationDate[address] != -1 and self.lastSendDate != -1 and (self.lastSendDate[address] - self.lastConfirmationDate[address] > 700):#si il reste un ordre non confirmé en moins de 500 ms
 								indiceARenvoyer = self.getAllUnknowledgeId(address)
 								for indice in indiceARenvoyer:
-									print "WARNING: Renvoie de l'ordre: ", self.ordreLog[address][indice][0], "au robot ", self.address[address]
+									print "WARNING: Renvoie de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "au robot ", self.address[address]
 									self.liaisonXbee.send(self.ordreLog[address][indice][1])
 									self.lastSendDate[address] = actualDate 
 
@@ -280,7 +280,7 @@ class communicationGlobale():
 				else:
 					if idd == self.getNextConfirmeId(address):
 						if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:# on affiche pas les PING automatique TODO
-							print "Success: l'arduino", self.address[address]," a bien recu l'ordre d'id: ", idd
+							print "Success: l'arduino", self.address[address]," a bien recu l'ordre ", self.orders[self.ordreLog[address][idd][0]], " d'id: ", idd
 						self.incrementeLastConfirmedId(address)
 						self.lastConfirmationDate[address] = long(time.time()*1000)
 
@@ -405,7 +405,7 @@ class communicationGlobale():
 		if isinstance(order, (int)):
 			order = self.orders[order]
 
-		if len(arguments) == self.ordersSize[order]:
+		if len(arguments) == len(self.ordersArguments[order]):
 			i = 0
 			for argumentType in self.ordersArguments[order]:
 				if argumentType == 'int':
@@ -425,7 +425,7 @@ class communicationGlobale():
 				i += 1
 					
 		else:
-			print "ERREUR: les arguments de l'ordre ", order, " ne font pas la bonne taille, arguments envoyés ", arguments
+			print "ERREUR: l'order", order, "attend", len(self.ordersArguments[order]), "ordres, recu:", len(arguments), "ordres"
 			return -1
 
 		return 0
@@ -439,16 +439,15 @@ class communicationGlobale():
 		#on verifie l'address
 		address = self.checkAddress(address)
 		order = self.checkOrder(order)
-		print "arguments ", arguments
 
 		if address !=-1 and order !=-1 and self.checkOrderArgument(order, *arguments) !=-1:
 			data = conversion.orderToBinary(order)
 			i = 0
 			for typeToGet in self.ordersArguments[order]:
 				if typeToGet == 'int':
-					data += conversion.longToBinary(int(arguments[i]))
+					data += conversion.intToBinary(int(arguments[i]))
 				elif typeToGet == 'long':
-					data += conversion.intToBinary(long(arguments[i]))
+					data += conversion.longToBinary(long(arguments[i]))
 				elif typeToGet == 'float':
 					data += conversion.floatToBinary(float(arguments[i]))
 				else:

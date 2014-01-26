@@ -2,6 +2,7 @@
 CMake*
 
 hokuyo/hokuyo_sdl
+hokuyo/hokuyo
 *.dblite
 *build
 *.o
