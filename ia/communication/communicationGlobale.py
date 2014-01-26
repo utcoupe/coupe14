@@ -31,12 +31,10 @@ class communicationGlobale():
 		self.lastSendDate = [-1]*(len(self.address)/2+1)#date du dernier envoie(en milliseconde)
 		self.lastIdConfirm = [63]*(len(self.address)/2+1)
 		self.lastIdSend = [63]*(len(self.address)/2+1)
-		self.nbUnconfirmedPacket = [0]*(len(self.address)/2+1)
+		self.nbUnconfirmedPacket = [(0, -1)]*(len(self.address)/2+1) # (nbUnconfimed, dateFirstUnconfirmed)
 
 		self.liaisonXbee = serial_comm.ComSerial(port, 57600)
-		for address in range(1, len(self.address)/2+1, 1):
-			if self.arduinoIdReady[address] == False:
-				self.askResetId(address)
+
 
 		#defines de threads
 		self.lastHighPrioTaskDate = 0
@@ -49,11 +47,11 @@ class communicationGlobale():
 		self.writeOutput = True
 		self.readInput = True
 		self.probingDevices = True
-		self.renvoieOrdre = False
+		self.renvoieOrdre = True
 		self.keepContact = True
 
-		self.orderToRead = deque()
-		self.orderToSend = deque()
+		self.ordersToRead = deque()
+		self.ordersToSend = deque()
 		self.mutexRetour = threading.Lock()
 		self.mutexEnvoi = threading.Lock()
 		gestionThread = threading.Thread(target=self.gestion)
@@ -83,18 +81,17 @@ class communicationGlobale():
 
 				#Lecture des entrées
 				if self.readInput == True:
-					self.orderToRead += self.readOrders()
+					self.ordersToRead += self.readOrders()
 
 				#Renvoie des ordres non confirmés
 				if self.renvoieOrdre == True:
 					for address in self.address:
 						if isinstance(address, (int)):
-							if self.lastConfirmationDate[address] != -1 and self.lastSendDate != -1 and (actualDate - self.lastConfirmationDate[address] > 200) :#si il reste un ordre non confirmé en moins de 500 ms
-								self.lastConfirmationDate[address] = actualDate
+							if (self.lastConfirmationDate[address] != -1) and (self.lastSendDate != -1) and (self.nbUnconfirmedPacket[address][1] != -1) and (actualDate - self.nbUnconfirmedPacket[address][1] > 200) :#si il reste un ordre non confirmé en moins de 500 ms
+								self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], actualDate)
 								indiceARenvoyer = self.getAllUnknowledgeId(address)
 								for indice in indiceARenvoyer:
-									print "adresse : "+str(address)
-									print "WARNING: Renvoie de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "au robot ", self.address[address]
+									print "WARNING: Renvoie de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "d'idd ", indice, "au robot ", self.address[address]
 									self.liaisonXbee.send(self.ordreLog[address][indice][1])
 									self.lastSendDate[address] = actualDate 
 
@@ -154,15 +151,17 @@ class communicationGlobale():
 			return self.lastIdConfirm[address]+1
 
 	def getAllUnknowledgeId(self, address):
-		unconfirmedId = self.getNextConfirmeId(address)
-		unconfirmedIds = (unconfirmedId,)
-		while unconfirmedId != self.lastIdSend[address]:
-			if unconfirmedId == 63:
-				unconfirmedId = 0
-			else:
-				unconfirmedId +=1
-			unconfirmedIds += (unconfirmedId,)
-		return unconfirmedIds
+		if self.lastIdSend[address] != self.lastIdConfirm[address]:
+			unconfirmedId = self.getNextConfirmeId(address)
+			unconfirmedIds = (unconfirmedId,)
+			while unconfirmedId != self.lastIdSend[address]:
+				if unconfirmedId == 63:
+					unconfirmedId = 0
+				else:
+					unconfirmedId +=1
+				unconfirmedIds += (unconfirmedId,)
+			return unconfirmedIds
+		return ()
 
 	def incrementeLastConfirmedId(self, address):
 		if self.lastIdConfirm[address] == 63:
@@ -175,7 +174,7 @@ class communicationGlobale():
 
 	def askResetId(self, address): #demande a une arduino de reset
 		self.lastConfirmationDate[address] = -1
-		self.nbUnconfirmedPacket[address] = 0
+		self.nbUnconfirmedPacket[address] = (0, -1)
 		self.lastSendDate[address] = -1
 		self.arduinoIdReady[address] = False
 		self.lastIdConfirm[address] = 63
@@ -189,7 +188,7 @@ class communicationGlobale():
 	def acceptConfirmeResetId(self, address):#accepte la confirmation de reset d'un arduino
 		print "L'arduino "+ str(address)+" a accepte le reset"
 		self.lastConfirmationDate[address] = -1
-		self.nbUnconfirmedPacket[address] = 0
+		self.nbUnconfirmedPacket[address] = (0, -1)
 		self.lastSendDate[address] = -1
 		self.arduinoIdReady[address] = True
 		self.lastIdConfirm[address] = 63
@@ -199,12 +198,12 @@ class communicationGlobale():
 	def confirmeResetId(self, address):#renvoie une confirmation de reset
 		print "Reponse au reset de l'arduino "+ str(address)
 		self.lastConfirmationDate[address] = -1
-		self.nbUnconfirmedPacket[address] = 0
+		self.nbUnconfirmedPacket[address] = (0, -1)
 		self.lastSendDate[address] = -1
 		self.arduinoIdReady[address] = True
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
-		
+
 		chaineTemp = chr(address+224)
 		self.liaisonXbee.send(chaineTemp)
 
@@ -312,13 +311,16 @@ class communicationGlobale():
 				if idd >= 64:# cas impossible car verification lors de l'extraction des données
 					print "ERREUR: IMPOSSIBLE l'arduino", self.address[address], " a mal recu un message."
 				else:
-					if idd == self.getNextConfirmeId(address):
+					if idd in self.getAllUnknowledgeId(address):
 						if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:
+							print self.getAllUnknowledgeId(address)
+							print self.nbUnconfirmedPacket[address]
 							print "Success: l'arduino", self.address[address]," a bien recu l'ordre ", self.orders[self.ordreLog[address][idd][0]], " d'id: ", idd
-						self.incrementeLastConfirmedId(address)
-						self.lastConfirmationDate[address] = long(time.time()*1000)
-
-
+						date = long(time.time()*1000)
+						self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - self.getAllUnknowledgeId(address).index(idd) - 1, date)#on bidone le chiffre date, mais c'est pas grave
+						self.lastIdConfirm[address] = idd
+						self.lastConfirmationDate[address] = date
+						
 						index = 0
 						for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
 							if returnType == 'int':
@@ -348,7 +350,8 @@ class communicationGlobale():
 						self.mutexRetour.release()
 
 					else:
-						print "WARNING: l'arduino a accepte le paquet ", idd, "alors que le paquet a confirmer est ", self.getNextConfirmeId(address)
+						print self.nbUnconfirmedPacket[address]
+						print "WARNING: l'arduino a accepte le paquet ", idd, "alors que les paquets a confirmer sont ", self.getAllUnknowledgeId(address)
 			else:
 				print "ERREUR: address: ", address, " inconnue"
 			
@@ -359,7 +362,8 @@ class communicationGlobale():
 	#Envoi
 	def sendXbeeOrder(self, address, idd, order, chaineTemp):
 		self.ordreLog[address][idd] = (order, chaineTemp)
-		self.lastSendDate[address] = long(time.time()*1000)
+		date = long(time.time()*1000)
+		self.lastSendDate[address] = date
 		self.liaisonXbee.send(chaineTemp)
 
 	def applyProtocole(self, address, packetId, data):
@@ -383,26 +387,32 @@ class communicationGlobale():
 	def sendOrders(self):
 		"""fonction qui gère l'envoi des ordres, sous le contrôle du thread"""
 
+		remainOrdersToSend = deque()
 		self.mutexEnvoi.acquire()
-		for packet in self.orderToSend:#packet contient(address, ordre, *argument)
+		for packet in self.ordersToSend:#packet contient(address, ordre, *argument)
+			#si il n'y a pas déjà trop d'ordres en atente on envoie
+			if self.nbUnconfirmedPacket[packet[0]][0] < self.maxUnconfirmedPacket:
+				self.nbUnconfirmedPacket[packet[0]] = (self.nbUnconfirmedPacket[packet[0]][0]+1, long(time.time()*1000)) # on s'occupe de [1] dans sendXbeeOrder
+				data = conversion.orderToBinary(packet[1])
+				i = 0
 
-			data = conversion.orderToBinary(packet[1])
-			i = 0
-			for typeToGet in self.ordersArguments[packet[1]]:
-				if typeToGet == 'int':
-					data += conversion.intToBinary(int(packet[2][i]))
-				elif typeToGet == 'long':
-					data += conversion.longToBinary(long(packet[2][i]))
-				elif typeToGet == 'float':
-					data += conversion.floatToBinary(float(packet[2][i]))
-				else:
-					print "ERREUR: Parseur: le parseur a trouvé un type non supporté"
-				i += 1
-			idd = self.getId(packet[0])
-			chaineTemp = self.applyProtocole(packet[0], idd, data)
-			self.sendXbeeOrder(packet[0], idd, packet[1], chaineTemp)
+				for typeToGet in self.ordersArguments[packet[1]]:
+					if typeToGet == 'int':
+						data += conversion.intToBinary(int(packet[2][i]))
+					elif typeToGet == 'long':
+						data += conversion.longToBinary(long(packet[2][i]))
+					elif typeToGet == 'float':
+						data += conversion.floatToBinary(float(packet[2][i]))
+					else:
+						print "ERREUR: Parseur: le parseur a trouvé un type non supporté"
+					i += 1
+				idd = self.getId(packet[0])
+				chaineTemp = self.applyProtocole(packet[0], idd, data)
+				self.sendXbeeOrder(packet[0], idd, packet[1], chaineTemp)
+			else:
+				remainOrdersToSend.append(packet)
 
-		self.orderToSend.clear()
+		self.ordersToSend = remainOrdersToSend
 		self.mutexEnvoi.release()
 
 
@@ -464,15 +474,15 @@ class communicationGlobale():
 			i = 0
 			for argumentType in self.ordersArguments[order]:
 				if argumentType == 'int':
-					if not isinstance(arguments[0], (int)):
+					if not isinstance(arguments[i], (int)):
 						print "L'argument ", i, " de l'ordre ", order, " n'est pas du bon type, attendu (int)"
 						return -1
 				elif argumentType == 'long':
-					if not isinstance(arguments[0], (long)):
+					if not isinstance(arguments[i], (long)):
 						print "L'argument ", i, " de l'ordre ", order, " n'est pas du bon type, attendu (long)"
 						return -1
 				elif argumentType == 'float':
-					if not isinstance(arguments[0], (float)):
+					if not isinstance(arguments[i], (float)):
 						print "L'argument ", i, " de l'ordre ", order, " n'est pas du bon type, attendu (float)"
 						return -1
 				else:
@@ -497,8 +507,9 @@ class communicationGlobale():
 
 		if address !=-1 and order !=-1 and self.checkOrderArgument(order, *arguments) !=-1:
 			self.mutexEnvoi.acquire()
-			self.orderToSend.append((address, order, arguments))
+			self.ordersToSend.append((address, order, arguments))
 			self.mutexEnvoi.release()
+			return 0
 		else:
 			return -1
 		
@@ -507,8 +518,8 @@ class communicationGlobale():
 	def readOrdersAPI(self):
 		"""Renvoi -1 si pas d'ordre en attente sinon renvoi un ordre """
 		self.mutexRetour.acquire()
-		if len(self.orderToRead) > 0:
-			order = self.orderToRead.pop()
+		if len(self.ordersToRead) > 0:
+			order = self.ordersToRead.pop()
 			self.mutexRetour.release()
 			return order
 		else:
