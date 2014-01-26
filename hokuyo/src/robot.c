@@ -41,7 +41,7 @@ clusterize(struct coord *points, int n, int *group, int *groupNbPoints){
 			}
 			group[i] = group[i-jmin];
 			groupNbPoints[group[i-jmin]]++;
-			printf("group= %i <- point[ %i ]; group_size= %i\n", group[i-jmin], i, groupNbPoints[group[i-jmin]]);
+			//printf("group= %i <- point[ %i ]; group_size= %i\n", group[i-jmin], i, groupNbPoints[group[i-jmin]]);
 		}
 	}
 	return nbGroup;
@@ -49,7 +49,7 @@ clusterize(struct coord *points, int n, int *group, int *groupNbPoints){
 
 void
 bestClusters(int nbClusters, int *clustersNbPoints, int *bestClusters){
-	printf("bestClusters(%i,,)", nbClusters);
+	//printf("bestClusters(%i,,)", nbClusters);
 	for(int i=0; i<MAX_ROBOTS; i++){
 		int currentMax = 1, currentMaxId = 0;
 		for(int j=0; j<nbClusters; j++){
@@ -58,7 +58,7 @@ bestClusters(int nbClusters, int *clustersNbPoints, int *bestClusters){
 				currentMaxId = j;
 			}
 		}
-		printf("BestGroup %i %i\n", currentMaxId, clustersNbPoints[currentMaxId]);
+		//printf("BestGroup %i %i\n", currentMaxId, clustersNbPoints[currentMaxId]);
 		clustersNbPoints[currentMaxId] = 0;
 		bestClusters[i] = currentMaxId;
 	}
@@ -100,7 +100,7 @@ getRobots(struct coord *points, int n, struct coord *robots){
 	else{
 		for(int i=0; i<nbClusters; i++){
 			bestClustersId[i] = i;
-			printf("clusters[%i], nbPoints:%i\n", i, clustersNbPoints[bestClustersId[i]]);
+			//printf("clusters[%i], nbPoints:%i\n", i, clustersNbPoints[bestClustersId[i]]);
 		}
 	}
 
