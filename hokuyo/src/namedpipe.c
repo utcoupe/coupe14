@@ -15,23 +15,23 @@ void
 initNamedPipe(){
 	if(pipefile != NULL) exit(EXIT_FAILURE);
 
-	printf("named pipe opening at %s\n", PIPENAME);
+	printf("%snamed pipe opening at %s\n", PREFIX, PIPENAME);
 
 	if( ( pipefile = fopen(PIPENAME, "w") ) == NULL ){
-		perror("named pipe closed, exiting\n");
+		fprintf(stderr, "%snamed pipe closed, exiting\n", PREFIX);
 		exit(EXIT_FAILURE);
 	}
-	printf("named pipe openened !\n");
+	printf("%snamed pipe openened !\n", PREFIX);
 
 	fprintf(pipefile, "Hi!\n");
 
-	printf("named pipe connected !\n");
+	printf("%snamed pipe connected !\n", PREFIX);
 }
 
 void
 printRobots(struct coord *r, int nRobots){
 	if(pipefile == NULL){
-		fprintf(stderr, "Pipe disconnected !, exiting\n");
+		fprintf(stderr, "%sPipe disconnected !, exiting\n", PREFIX);
 		exit(EXIT_FAILURE);
 	}
 

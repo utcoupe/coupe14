@@ -1,19 +1,27 @@
 import os
+from threading import Thread
+
+FILENAME = "/tmp/lidarPipe"
+LIDARPROGRAM = "../hokuyo/hokuyo_sdl"
+LIDARARGS = " red pipe"
 
 class Lidar:
     def __init__(self, debug=True):
         self._debug = debug
-        filename = "/tmp/lidarPipe"
+        self.thread = Thread(target = self.startLidarC)
 
         try:
-            os.remove(filename)
+            os.remove(FILENAME)
         except OSError:
             pass
-        os.mkfifo(filename)
+        os.mkfifo(FILENAME)
 
-        print("Opening fifo, waiting for c program...")
-        pipe = os.open(filename, os.O_RDONLY|os.O_NONBLOCK)
+        print("Opening fifo")
+        pipe = os.open(FILENAME, os.O_RDONLY|os.O_NONBLOCK)
         self._reader = os.fdopen(pipe) 
+
+        print("lauching c program, waiting for it to open fifo...")
+        self.thread.start()
 
         firstread = self._reader.readline()
         while firstread == "" :
@@ -24,6 +32,11 @@ class Lidar:
             print("FIFO connected !")
         else :
             raise("FIFO error")
+
+    def startLidarC(self) :
+        os.system("pwd")
+        os.system(LIDARPROGRAM+LIDARARGS)
+        print(LIDARPROGRAM+LIDARARGS+" closed!!!")
 
     def poll(self):
         r = self._reader.readline()

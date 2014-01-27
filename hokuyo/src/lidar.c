@@ -18,7 +18,7 @@ theta(struct coord lidar, struct coord marker){
 	delta.x = lidar.x - marker.x;
 	delta.y = lidar.y - marker.y;
 
-	printf("dx=%i\tdy=%i\n", delta.x, delta.y);
+	//printf("dx=%i\tdy=%i\n", delta.x, delta.y);
 	if(delta.x == 0) return -PI/2;
 
 	return atan((double)delta.y / (double)delta.x); // -(-) -> +
@@ -37,8 +37,8 @@ initLidarAndCalibrate(enum lidarModel model, char* device, struct coord position
 	distanceThMax = pow(sqrt(distanceThMin)+MARKER_DETECTION_ZONE_SIZE/2,2);
 	distanceThMin = pow(sqrt(distanceThMin)-MARKER_DETECTION_ZONE_SIZE/2,2);
 	double thetaTh = theta(position, markerPos);
-	printf("thetha TH:%f  -> %f\n", thetaTh, thetaTh*180/PI);
-	printf("detectionMinAngle:%f\tdetectionMaxAngle%f\n", (thetaTh-MARKER_DETECTION_ANGLE/2)*180/PI, (thetaTh+MARKER_DETECTION_ANGLE/2)*180/PI );
+	printf("%sthetha TH:%f  -> %f\n", PREFIX, thetaTh, thetaTh*180/PI);
+	//printf("detectionMinAngle:%f\tdetectionMaxAngle%f\n", (thetaTh-MARKER_DETECTION_ANGLE/2)*180/PI, (thetaTh+MARKER_DETECTION_ANGLE/2)*180/PI );
 	
 	struct lidar l = initLidar(model, device, position, orientation, thetaTh-MARKER_DETECTION_ANGLE/2, thetaTh+MARKER_DETECTION_ANGLE);
 
@@ -49,7 +49,7 @@ initLidarAndCalibrate(enum lidarModel model, char* device, struct coord position
 		struct coord clusters[MAX_ROBOTS];
 		int nClusters = getRobots(l.points, l.fm.n, clusters);
 		if(nClusters != 1){
-			printf("could not calibrate !!! (%i clusters found in zone on iteration %i)\n", nClusters, i);
+			printf("%scould not calibrate !!! (%i clusters found in zone on iteration %i)\n", PREFIX, nClusters, i);
 		}else{
 			sumMarkerPos_x += clusters[0].x;
 			sumMarkerPos_y += clusters[0].y;
@@ -57,7 +57,7 @@ initLidarAndCalibrate(enum lidarModel model, char* device, struct coord position
 		}
 	}
 	if(nbClustersFound < MARKER_DETECTION_STEPS/2){
-		printf("Calibration could not be done !\nexiting...\n");
+		printf("%sCalibration could not be done !\nexiting...\n", PREFIX);
 		exit(EXIT_SUCCESS);
 	}
 	struct coord markerRPos;
@@ -65,9 +65,9 @@ initLidarAndCalibrate(enum lidarModel model, char* device, struct coord position
 	markerRPos.y = sumMarkerPos_y / nbClustersFound;
 
 	double thetaR = theta(position, markerRPos);
-	printf("thetha R:%f  -> %f\tcalculated on %i iterations\n", thetaR, thetaR*180/PI, nbClustersFound);
+	printf("%sthetha R:%f  -> %f\tcalculated on %i iterations\n", PREFIX, thetaR, thetaR*180/PI, nbClustersFound);
 	l.orientation += thetaTh - thetaR;
-	printf("new orientation:%f\n", l.orientation*180/PI);
+	printf("%snew orientation:%f\n", PREFIX, l.orientation*180/PI);
 
 	///////
 	resetHokuyoUrg(l.lidarObject, angleMin-l.orientation, angleMax-l.orientation);
@@ -94,7 +94,7 @@ initLidar(enum lidarModel model, char* device, struct coord position, double ori
 	l.pos = position;
 	l.orientation = orientation;
 
-	printf("orientation:%f\n", orientation*180/PI);
+	printf("%sorientation:%f\n", PREFIX, orientation*180/PI);
 
 	if(model == hokuyo_urg){
 

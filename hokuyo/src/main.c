@@ -87,13 +87,13 @@ int main(int argc, char **argv){
 
   if(pipeactivated){
     if (signal(SIGPIPE, catch_SIGPIPE) == SIG_ERR) {
-        fputs("An error occurred while setting a SIGPIPE signal handler.\n", stderr);
+        fprintf(stderr, "%sAn error occurred while setting a SIGPIPE signal handler.\n", PREFIX);
         return EXIT_FAILURE;
     }
     initNamedPipe();
-  } else printf("pipe desactivated !!!\n");
+  } else printf("%spipe desactivated !!!\n", PREFIX);
 
-  printf("Running ! ...\n");
+  printf("%sRunning ! ...\n", PREFIX);
 	while(1){
 		frame();
 	}
@@ -113,7 +113,7 @@ void frame(){
   #endif
   if(pipeactivated) printRobots(robots, nRobots);
   else{
-    printf("%i", nRobots);
+    printf("%s%i", PREFIX, nRobots);
     for(int i=0; i<nRobots; i++){
       printf(";%i:%i", robots[i].x, TAILLE_TABLE_Y-robots[i].y);
     }

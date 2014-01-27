@@ -1,6 +1,7 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+#define PREFIX "[C]: "
 
 #define TAILLE_TABLE_X 3000
 #define TAILLE_TABLE_Y 2000
