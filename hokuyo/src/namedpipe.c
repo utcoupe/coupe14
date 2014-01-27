@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include "global.h"
 
 
 static FILE* pipefile = NULL;
@@ -36,7 +37,7 @@ printRobots(struct coord *r, int nRobots){
 
 	fprintf(pipefile, "%i", nRobots);
 	for(int i=0; i<nRobots; i++){
-		fprintf(pipefile, ";%i:%i", r[i].x, r[i].y);
+		fprintf(pipefile, ";%i:%i", r[i].x, TAILLE_TABLE_Y-r[i].y);
 	}
 	fprintf(pipefile, "\n");
 	fflush(pipefile);
