@@ -353,10 +353,8 @@ class communicationGlobale():
 							else:
 								print("ERREUR: Parseur: le parseur a trouvé un type non supporté")
 
-						self.mutexRetour.acquire()
 						returnOrders.append((address, idd, arguments))
 						arguments = []
-						self.mutexRetour.release()
 
 					else:
 						print(self.nbUnconfirmedPacket[address])
