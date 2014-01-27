@@ -4,7 +4,7 @@ EXEC_VISIO=visio
 EXEC_COM=com
 
 SRCS_FILES_VISIO=visio.c traitement.c pipe.c
-SRCS_FILES_COM=
+SRCS_FILES_COM=com.c compat.c serial_switch.c serial_types.c serial_decoder.c serial_defines.c
 
 CC=gcc
 CFLAGS+=-Wall `pkg-config --cflags opencv`
@@ -46,7 +46,7 @@ pipe.o: pipe.h
 clean:
 	rm -rf build/
 mrproper: clean
-	rm -f $(EXEC)
+	rm -f $(EXEC_VISIO) $(EXEC_COM)
 
 build/:
 	mkdir build

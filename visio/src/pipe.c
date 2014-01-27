@@ -35,7 +35,7 @@ void writePipe(int red, int yellow){
 		exit(EXIT_FAILURE);
 	}
 
-	fprintf(pipefile, "%d;%d\n", red, yellow);
+	fprintf(pipefile, "%5d;%5d\n", red, yellow);
 	fflush(pipefile);
 }
 

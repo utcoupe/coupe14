@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <cv.h>
+#include <unistd.h>
 
 #include "traitement.h"
 #include "global.h"
@@ -48,6 +49,13 @@ int main(int argc, char **argv){
 
 	//Init pipe
 	initPipe();
+
+	//Lancement communication
+	pid_t pid = fork();
+	if (pid == 0) {
+		system("./com");
+		return 0;
+	}
 
 	// Boucle tant que l'utilisateur n'appuie pas sur la touche q (ou Q)
 #ifdef VISUAL
@@ -114,7 +122,6 @@ int main(int argc, char **argv){
 		weight_red = get_weight(mask_red);
 
 		//Affichage resultat
-		printf("weight_red : %d \t weight_yellow : %d\n", weight_red, weight_yellow);
 		writePipe(weight_red, weight_yellow);
 #ifdef VISUAL
 		// On affiche l'image dans une fenêtre
