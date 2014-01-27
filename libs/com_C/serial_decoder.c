@@ -21,7 +21,7 @@ void executeCmd(char serial_data){
 	static enum etape etape = wait_step;
 
 	if((serial_data & PROTOCOL_BIT) == PROTOCOL_BIT){ //Si 0b1xxxxxxx
-		if (serial_data == END) { //Fin de trame, execution de l'ordre
+		if ((serial_data & 0xFF) == END) { //Fin de trame, execution de l'ordre
 			unsigned char data_8bits[MAX_DATA];
 
                         data_counter = decode(data, data_8bits, data_counter);
