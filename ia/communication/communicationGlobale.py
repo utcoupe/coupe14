@@ -70,9 +70,9 @@ class communicationGlobale():
 	def gestion(self):
 		while self.threadActif:
 			actualDate = long(time.time()*1000)
-
 			#tâches de hautes priotités
 			if (actualDate - self.lastHighPrioTaskDate) > self.highPrioSpeed:
+				print(actualDate)
 				self.lastHighPrioTaskDate = actualDate
 
 				#Ecriture des ordres
@@ -275,7 +275,7 @@ class communicationGlobale():
 						else:
 							print "ERREUR: Parseur: le parseur a trouvé un type non supporté"
 
-					if len(packetData)/8 == taille:# si la longeur des données reçu est bonne
+					if len(packetData)//8 == taille:# si la longeur des données reçu est bonne
 						return (packetAddress, packetId, packetData)
 					else:
 						print "WARNING: Le paquet ne fait pas la bonne taille, des données ont probablement été perdue, paquet droppé, taille attendu ", taille

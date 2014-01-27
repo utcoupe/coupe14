@@ -33,7 +33,7 @@ def gui(com):
 				com.sendOrderAPI(2, 'A_GOTOA', *arguments)
 			elif order == 's':
 
-				for a in range(50):
+				for a in range(500):
 					arguments = [1000, 0]
 					com.sendOrderAPI(2, 'A_GOTO', *arguments)
 
