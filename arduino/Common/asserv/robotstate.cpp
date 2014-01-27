@@ -31,8 +31,8 @@ void RobotState::reset(){
 m_pos RobotState::getMmPos(){
 	m_pos mm_pos;
 	mm_pos.angle = current_pos.angle;
-	mm_pos.x = current_pos.x * ENC_TICKS_TO_MM / FIXED_POINT_PRECISION;
-	mm_pos.y = current_pos.y * ENC_TICKS_TO_MM / FIXED_POINT_PRECISION;
+	mm_pos.x = current_pos.x / FIXED_POINT_PRECISION;
+	mm_pos.y = current_pos.y / FIXED_POINT_PRECISION;
 	return mm_pos;
 }
 
@@ -45,23 +45,31 @@ Encoder* RobotState::getLenc(){
 }
 
 void RobotState::pushMmPos(m_pos n_pos){
-	current_pos.x = n_pos.x * ENC_MM_TO_TICKS * FIXED_POINT_PRECISION;
-	current_pos.y = n_pos.y * ENC_MM_TO_TICKS * FIXED_POINT_PRECISION;
+	current_pos.x = n_pos.x * FIXED_POINT_PRECISION;
+	current_pos.y = n_pos.y * FIXED_POINT_PRECISION;
 	current_pos.angle = n_pos.angle;
 }
 
 void RobotState::update(){
 	long ticksR = encoderRight.getTicks();
 	long ticksL = encoderLeft.getTicks();
-	int dl = (ticksL - last_ticksL)*FIXED_POINT_PRECISION;
-	int dr = (ticksR - last_ticksR)*FIXED_POINT_PRECISION;
+	int dl = (ticksL - last_ticksL)*(TICKS_TO_MM_LEFT*FIXED_POINT_PRECISION);
+	int dr = (ticksR - last_ticksR)*(TICKS_TO_MM_RIGHT*FIXED_POINT_PRECISION)
 
-	float d_angle = tan((dr - dl)/(ENTRAXE_ENC * ENC_MM_TO_TICKS * FIXED_POINT_PRECISION)); //sans approximation tan
-	current_pos.angle = current_pos.angle + d_angle;
-	current_pos.rangle = moduloTwoPI(current_pos.rangle + d_angle);
+	float d_angle = arctan((dr - dl)/(ENTRAXE_ENC)); //sans approximation tan
+	float last_angle = current_pos.angle; 
+	current_pos.angle += d_angle;
+	if (current_pos.angle >= M_PI) {
+		current_pos.angle -= 2.0*M_PI;
+		current_pos.modulo_angle++;
+	}
+	else if (current_pos.angle < M_PI) {
+		current_pos.angle += 2.0*M_PI;
+		current_pos.modulo_angle--;
+	}
 
-	current_pos.x = current_pos.x + round(((dr + dl)/2.0)*cos(current_pos.angle));
-	current_pos.y = current_pos.y + round(((dr + dl)/2.0)*sin(current_pos.angle));
+	current_pos.x += round(((dr + dl)/2.0)*cos((current_pos.angle + last_angle)/2.0);
+	current_pos.y += round(((dr + dl)/2.0)*sin((current_pos.angle + last_angle)/2.0);
 
 	//prepare la prochaine update
 	last_ticksR = ticksR;
