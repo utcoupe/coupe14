@@ -1,17 +1,8 @@
 #ifndef COMPAT_H
 #define COMPAT_H
 
-#define LOCAL_ADDR ADDR_FLUSSMITTEL_CAM
-
 #include <stdio.h>
-
-#ifdef DEBUG
-#define PDEBUGLN(x) printf(x);printf("\n");
-#define PDEBUG(x) printf(x);
-#else
-#define PDEBUGLN(x)
-#define PDEBUG(x)
-#endif
+#include "global.h"
 
 typedef enum bool 
 { 
