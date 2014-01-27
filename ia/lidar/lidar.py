@@ -29,6 +29,8 @@ class Lidar:
         r = self._reader.readline()
         if r == "":
             return None
-        return list([list([int(f) for f in e.split(":")]) for e in r[:-1].split(";")[1:]])
+        return list(map(    lambda e: list(map( lambda f:int(f), e.split(":") )), \
+                            r[:-1].split(";")[1:] \
+                        ))
 
 

@@ -15,7 +15,7 @@ def gui(com):
 		#address = str(raw_input("Entre une address:\n"))
 		address = 2
 		arguments = []
-		order = str(input("Entre le nom ou le numéro d'un ordre:\n"))
+		order = str(raw_input("Entre le nom ou le numéro d'un ordre:\n"))
 		if order:
 			if order[0] == 'A':
 				address = 2
@@ -43,13 +43,13 @@ def gui(com):
 
 				for typeToGet in ordersArguments[order]:
 					if typeToGet == 'int':
-						arguments.append(int(input("Entre  un int\n")))
+						arguments.append(int(raw_input("Entre  un int\n")))
 					elif typeToGet == 'float':
-						arguments.append(float(input("Entre un float\n")))
+						arguments.append(float(raw_input("Entre un float\n")))
 					elif typeToGet == 'long':
-						arguments.append(int(input("Entre  un long\n")))
+						arguments.append(long(raw_input("Entre  un long\n")))
 					else:
-						print("ERREUR: Parseur: le parseur a trouvé un type non supporté")
+						print "ERREUR: Parseur: le parseur a trouvé un type non supporté"
 				com.sendOrderAPI(address, order, *arguments)	
 			else:
-				print("L'ordre n'a pas été trouvé dans les fichiers arduino")
+				print "L'ordre n'a pas été trouvé dans les fichiers arduino"

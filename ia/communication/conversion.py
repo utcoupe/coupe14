@@ -64,7 +64,7 @@ def binaryToLong(string):
 	for i in range(0, 8, 1):
 		temp += string[i]
 
-	resultat = int(temp, 2)
+	resultat = long(temp, 2)
 	if resultat>2147483647: #si le nombre est négatif
 		resultat -= 4294967295
 	return resultat
