@@ -1,6 +1,5 @@
 // Visio UTCoupe 2014
 // Par Quentin CHATEAU
-// Derniere edition le 04/12/13
 
 #include "traitement.h"
 #include <stdio.h>
@@ -44,25 +43,6 @@ int get_weight(IplImage *mask){
 	return weight;
 }
 
-void detect_zone(IplImage *src_mask, IplImage *dest_mask, char *file){
-	IplImage *resized_color, *zone_mask;
-
-	zone_mask = cvLoadImage(file, 0);
-	int i;
-
-	resized_color = cvCreateImage(cvGetSize(src_mask), src_mask->depth, 1);
-
-	cvResize(zone_mask, resized_color,CV_INTER_LINEAR);//Resize de l'image de zone pour qu'elle colle sur l'image source
-	//On transforme les niveaux de gris en noir et blanc
-	for(i=0;i<resized_color->width*resized_color->height;i++){
-		if(resized_color->imageData[i] < 0)//signed char 
-			resized_color->imageData[i] = -1;//signed char : -1 = 0b11111111 = valeur max (blanc)
-		else
-			resized_color->imageData[i] = 0;//0 = noir
-	}
-
-	cvMul(src_mask, resized_color, dest_mask, 1);
-	
-	cvReleaseImage(&resized_color);
-	cvReleaseImage(&zone_mask);
+void detect_zone(IplImage *src_mask, IplImage *dest_mask, IplImage *zone_mask){
+	cvMul(src_mask, zone_mask, dest_mask, 1);
 }

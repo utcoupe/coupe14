@@ -1,14 +1,15 @@
 /****************************************
  * Author : Quentin C			*
  * Mail : quentin.chateau@gmail.com	*
- * Date : 13/10/13			*
+ * Date : 25/10/13			*
  ****************************************/
-#ifndef COMPAARDUINO_H
-#define COMPAARDUINO_H
 
-#include "arduino.h"
-#include "parameters.h"
+#ifndef LOCAL_MATH_H
+#define LOCAL_MATH_H
 
-char serial_read();
+#define MAX(a,b) a > b ? a : b
+
+float moduloTwoPI(float angle);
+float moduloPI(float angle);
 
 #endif

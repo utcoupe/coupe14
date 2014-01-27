@@ -1,6 +1,5 @@
 // Visio UTCoupe 2014
 // Par Quentin CHATEAU
-// Derniere edition le 04/12/13
 
 #ifndef GLOBAL_H
 #define GLOBAL_H
@@ -14,5 +13,15 @@
 #define H_RED_TOL 15
 #define S_RED_TOL 185
 #define V_RED_TOL 185
+
+#define LOCAL_ADDR ADDR_FLUSSMITTEL_CAM
+
+#ifdef DEBUG
+#define PDEBUGLN(x) printf(x);printf("\n");
+#define PDEBUG(x) printf(x);
+#else
+#define PDEBUGLN(x)
+#define PDEBUG(x)
+#endif
 
 #endif
