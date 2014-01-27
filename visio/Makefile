@@ -2,7 +2,7 @@ VISUAL=no
 DEBUG=yes
 EXEC=test
 
-SRCS_FILES=main.c traitement.c
+SRCS_FILES=main.c traitement.c compat.c serial_decoder_raspy.c serial_types.c serial_defines.c
 
 CC=gcc
 CFLAGS+=-Wall `pkg-config --cflags opencv`
@@ -32,6 +32,9 @@ $(BUILD_DIR)%.o: $(SRC_DIR)%.c build
 
 main.o: global.h traitement.h
 traitement.o: traitement.h
+serial_decoder_raspy.o: serial_decoder_raspy.h serial_defines.c serial_defines.h
+serial_types.o: serial_types.h
+serial_defines.o: serial_defines.h
 
 clean:
 	rm -rf build/

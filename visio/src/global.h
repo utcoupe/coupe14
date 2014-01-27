@@ -4,6 +4,8 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+#define PORTNAME "/dev/ttyUSB0"
+
 #define H_YEL 25
 #define H_YEL_TOL 15
 #define S_YEL_TOL 185
