@@ -1,1 +1,1 @@
-../../../libs/com_C/serial_defines.c
+../../Common/other/serial_defines.c

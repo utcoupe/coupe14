@@ -1,1 +1,1 @@
-../../../libs/com_C/serial_decoder_forward.c
+../../Common/other/serial_decoder_forward.c
