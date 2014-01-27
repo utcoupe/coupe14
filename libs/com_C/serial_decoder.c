@@ -3,6 +3,7 @@
  * Mail : quentin.chateau@gmail.com	*
  * Date : 22/01/13			*
  ****************************************/
+
 #include "compat.h"
 #include "serial_decoder.h"
 #include "serial_defines.h"
