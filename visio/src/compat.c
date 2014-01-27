@@ -12,7 +12,7 @@ long timeMillis() {
 	return 1000*((float)clock())/CLOCKS_PER_SEC;
 }
 
-void sendByte(char c){
+void serial_send(char c){
 	write (serial, &c, 1);           // send 7 character greeting
 	printf("send %x\n", c);
 }

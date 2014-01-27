@@ -20,7 +20,7 @@ typedef enum bool
 
 long timeMillis();
 unsigned char serial_read();
-void sendByte(char c);
+void serial_send(char c);
 int set_interface_attribs (int fd, int speed, int parity);
 void set_blocking (int fd, int should_block);
 
