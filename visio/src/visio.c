@@ -1,12 +1,12 @@
 // Visio UTCoupe 2014
 // Par Quentin CHATEAU
-// Derniere edition le 04/12/13
 
 #include <stdio.h>
 #include <cv.h>
 
 #include "traitement.h"
 #include "global.h"
+#include "pipe.h"
 
 #ifdef VISUAL
 #include <highgui.h>
@@ -15,25 +15,11 @@
 // $0=programme $1=h $2=h_tol $3=sv_tol
 int main(int argc, char **argv){
 	// Touche clavier
-	char key = 0;
 	char default_name[] = "./mask.jpg";
 	char *mask_name = default_name;
 	int h_yellow = H_YEL, h_yellow_tol = H_YEL_TOL, s_yellow_tol = S_YEL_TOL, v_yellow_tol = V_YEL_TOL;
 	int h_red = H_RED, h_red_tol = H_RED_TOL, s_red_tol = S_RED_TOL, v_red_tol = V_RED_TOL;
 	int weight_yellow, weight_red;
-#ifdef VISUAL
-	if(argc >= 2)
-		h_yellow = atoi(argv[1]);
-	if(argc >= 3)
-		h_yellow_tol = atoi(argv[2]);
-	if(argc >= 4){
-		s_yellow_tol = atoi(argv[3]);
-		v_yellow_tol = atoi(argv[3]);
-	}
-#else
-	if(argc >= 2)
-		mask_name = argv[1];
-#endif
 
 	// Capture vidéo
 	CvCapture *capture=NULL;
@@ -60,15 +46,26 @@ int main(int argc, char **argv){
 	color_red_mask = cvCreateImage(cvGetSize(image), image->depth, 1);
 	mask_red = cvCreateImage(cvGetSize(image), image->depth, 1);
 
+	//Init pipe
+	initPipe();
+
+	// Boucle tant que l'utilisateur n'appuie pas sur la touche q (ou Q)
 #ifdef VISUAL
+	if(argc >= 2)
+		h_yellow = atoi(argv[1]);
+	if(argc >= 3)
+		h_yellow_tol = atoi(argv[2]);
+	if(argc >= 4){
+		s_yellow_tol = atoi(argv[3]);
+		v_yellow_tol = atoi(argv[3]);
+	}
 	// Définition de la fenêtre
 	cvNamedWindow("Origine", CV_WINDOW_AUTOSIZE);
 	cvNamedWindow("Mask_yellow", CV_WINDOW_AUTOSIZE);
 	cvNamedWindow("Mask_red", CV_WINDOW_AUTOSIZE);
-#endif
-	// Boucle tant que l'utilisateur n'appuie pas sur la touche q (ou Q)
+
+	char key = 0;
 	while(key != 'q' && key != 'Q') {
-#ifdef VISUAL
 		if(key == 'p'){
 			h_yellow=(h_yellow+5)%180;
 			printf("h=%d\n", h_yellow);
@@ -101,6 +98,8 @@ int main(int argc, char **argv){
 			v_yellow_tol--;
 			printf("v_tol=%d\n", v_yellow_tol);
 		}
+#else
+	while (1) {
 #endif
 		// On récupère une image
 		image = cvQueryFrame(capture);
@@ -115,7 +114,8 @@ int main(int argc, char **argv){
 		weight_red = get_weight(mask_red);
 
 		//Affichage resultat
-		printf("weight_yellow : %d \t weight_red : %d\n", weight_yellow, weight_red);
+		printf("weight_red : %d \t weight_yellow : %d\n", weight_red, weight_yellow);
+		writePipe(weight_red, weight_yellow);
 #ifdef VISUAL
 		// On affiche l'image dans une fenêtre
 		cvShowImage("Mask_yellow", mask_yellow);

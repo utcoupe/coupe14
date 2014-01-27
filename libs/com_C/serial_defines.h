@@ -63,6 +63,8 @@ enum ordre {
 
 	O_BRAS_OUVRIR,
 	O_BRAS_FERMER,
+
+	GET_CAM,	//#long #long
 	ORDRE_NON_PARSE
 	//FINPARSE
 };
