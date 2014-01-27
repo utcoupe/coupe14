@@ -11,6 +11,9 @@ extern Servo servoBras;
 void initPins(){
 	pinMode(PIN_SERVO_BRAS, OUTPUT);
 	servoBras.attach(PIN_SERVO_BRAS);
+
+	pinMode(PIN_INT_HAUT_ASC, INPUT_PULLUP);
+	pinMode(PIN_INT_BAS_ASC, INPUT_PULLUP);
 }
 
 unsigned long timeMillis(){

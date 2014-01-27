@@ -6,6 +6,7 @@
   
 #include "Arduino.h"
 #include "Servo.h"
+#include "AFMotor.h"
 
 #include "serial_decoder_forward.h"
 #include "serial_defines.h"
@@ -13,6 +14,7 @@
 #include "parameters.h"
 
 Servo servoBras;
+AF_DCMotor motor_ascenseur(1);
 
 #define MAX_READ 64 
 void setup(){
@@ -32,6 +34,9 @@ void setup(){
 
 	init_protocol();
 	PDEBUGLN("INIT DONE");
+	//Moteurs :
+	motor_ascenseur.run(RELEASE);
+	servoBras.write(0);
 	// LED qui n'en est pas une
 	pinMode(16,OUTPUT);
 }
