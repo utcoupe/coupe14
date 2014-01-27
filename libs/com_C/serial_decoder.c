@@ -42,7 +42,7 @@ void executeCmd(char serial_data){
 		else if((serial_data & 0x0F) == LOCAL_ADDR){ //Si début de paquet adressé au client
 			if ((serial_data & 0xF0) == RESET){ //Si demande de reset
 				ID_attendu = 0;
-				sendByte(RESET_CONF | LOCAL_ADDR);
+				serial_send(RESET_CONF | LOCAL_ADDR);
 				PDEBUGLN("RESET CONFIRME");
 			}
 			else{
@@ -183,24 +183,24 @@ void sendResponse(unsigned char *data, int data_counter, unsigned char id){
 	unsigned char data_7bits[MAX_DATA];
 	int i, size;
 	size = encode(data, data_7bits, data_counter);
-	sendByte(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
-	sendByte(id);
+	serial_send(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
+	serial_send(id);
 	for(i = 0 ; i < size ; i++){
-		sendByte(data_7bits[i]); //contenu
+		serial_send(data_7bits[i]); //contenu
 	}
-	sendByte(END); //fin de réponse
+	serial_send(END); //fin de réponse
 }
 
 void sendInvalid() {//renvoit le code de message invalide (dépend de la plateforme)
         PDEBUGLN("Data error");
-	sendByte(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
-	sendByte(INVALID_MESSAGE);
-	sendByte(END);
+	serial_send(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
+	serial_send(INVALID_MESSAGE);
+	serial_send(END);
 }
 
 void protocol_reset(){
 	while(serial_read() != (RESET_CONF | LOCAL_ADDR)){
-		sendByte(RESET | LOCAL_ADDR);
+		serial_send(RESET | LOCAL_ADDR);
 		long t = timeMillis();
 		while (timeMillis() - t < 500);
 	}
