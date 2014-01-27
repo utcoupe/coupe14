@@ -6,6 +6,8 @@
 #ifndef SERIAL_DECODER_H
 #define SERIAL_DECODER_H
 
+#include "compat.h"
+
 #define MAX_DATA 20 //Nombre max d'octet par frame
 
 enum etape {ID_step,data_step,wait_step};

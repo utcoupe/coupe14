@@ -6,7 +6,6 @@
 #include "compat.h"
 #include "serial_decoder.h"
 #include "serial_defines.h"
-#include "serial_local.h"
 #include "serial_switch.h"
 #include "serial_types.h"
 
