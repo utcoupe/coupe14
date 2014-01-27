@@ -7,7 +7,8 @@
 
 import serial
 from collections import deque
-import conversion
+from . import conversion
+import binascii
 
 class ComSerial():
 	def __init__(self, name, baudrate):
@@ -23,7 +24,10 @@ class ComSerial():
 			print('comSerial,fct send: La liaison demandé n\'a pas été initializé')
 		else:
 			if self.liaison.inWaiting():
-				self.rawInput += self.liaison.read(self.liaison.inWaiting())
+				#self.rawInput += self.liaison.read(self.liaison.inWaiting())
+				temp = self.liaison.read(self.liaison.inWaiting())
+				for letter in temp:
+						self.rawInput += chr(letter)
 			
 
 			#on crée un variable temporaire
@@ -66,10 +70,19 @@ class ComSerial():
 			print('comSerial,fct send: La liaison demandé n\'a pas été initializé k')
 		else:
 			#Affichage de debug
+			formatedString = ""
 			for char in rawOutputString:
-				temp = bin(ord(char))[2:]
+				self.liaison.write(bytes(char, 'latin-1'))
+				#bytes(char, 'latin-1'))
+				"""temp = bin(ord(char))[2:]
 				while len(temp) < 8:
 					temp = '0' + temp
-
-			self.liaison.write(rawOutputString)
+				formatedString += conversion.binaryToInt(temp)
+			
+			#encodedArray = rawOutputString.encode("Utf-8") 
+			#encodedArray = binascii.a2b_uu(rawOutputString)
+			#ser.write(bytes(Vcorrt.encode('ascii')))
+			for letter in rawOutputString:
+				#print(bytes(chr(letter), 'latin-1'))
+				self.liaison.write(bytes(chr(letter), 'latin-1'))"""
 
