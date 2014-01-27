@@ -31,8 +31,8 @@ int main(int argc, char **argv){
 		v_yellow_tol = atoi(argv[3]);
 	}
 #else
-	if(argc >= 2)
-		mask_name = argv[1];
+	//if(argc >= 2)
+	//	mask_name = argv[1];
 #endif
 
 	// Capture vidéo
@@ -59,9 +59,9 @@ int main(int argc, char **argv){
 	cvNamedWindow("Mask_yellow", CV_WINDOW_AUTOSIZE);
 	cvNamedWindow("Mask_red", CV_WINDOW_AUTOSIZE);
 #endif
-
+	int i = 0, times = atoi(argv[1]);
 	// Boucle tant que l'utilisateur n'appuie pas sur la touche q (ou Q)
-	while(key != 'q' && key != 'Q') {
+	while(i < times && key != 'q' && key != 'Q') {
 #ifdef VISUAL
 		if(key == 'p'){
 			h_yellow=(h_yellow+5)%180;
@@ -98,7 +98,6 @@ int main(int argc, char **argv){
 #endif
 		// On récupère une image
 		image = cvQueryFrame(capture);
-
 		detect_color(image, color_yellow_mask, h_yellow, h_yellow_tol, s_yellow_tol, v_yellow_tol);
 		detect_zone(color_yellow_mask, mask_yellow, mask_name);
 		weight_yellow = get_weight(mask_yellow);
@@ -117,6 +116,7 @@ int main(int argc, char **argv){
 		// On attend 50ms
 		key = cvWaitKey(50);
 #endif
+		i++;
 	}
 	cvReleaseCapture(&capture);
 	cvReleaseImage(&mask_yellow);

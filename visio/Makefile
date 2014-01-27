@@ -1,4 +1,4 @@
-VISUAL=yes
+VISUAL=no
 DEBUG=yes
 EXEC=test
 
