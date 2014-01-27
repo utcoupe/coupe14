@@ -19,7 +19,7 @@
 			"file": "guiCommande.py",
 			"settings":
 			{
-				"buffer_size": 1577,
+				"buffer_size": 1562,
 				"line_ending": "Unix"
 			}
 		},
@@ -27,7 +27,7 @@
 			"file": "communication/communicationGlobale.py",
 			"settings":
 			{
-				"buffer_size": 17973,
+				"buffer_size": 18117,
 				"line_ending": "Unix"
 			}
 		},
@@ -35,7 +35,15 @@
 			"file": "communication/conversion.py",
 			"settings":
 			{
-				"buffer_size": 2953,
+				"buffer_size": 2952,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "communication/serial_comm.py",
+			"settings":
+			{
+				"buffer_size": 2643,
 				"line_ending": "Unix"
 			}
 		},
@@ -48,10 +56,18 @@
 			}
 		},
 		{
-			"file": "communication/serial_comm.py",
+			"file": "/home/noxy/vrac/Projets/utcoupe/coupe14/libs/com_C/serial_defines.c",
 			"settings":
 			{
-				"buffer_size": 2106,
+				"buffer_size": 878,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/noxy/vrac/Projets/utcoupe/coupe14/libs/com_C/serial_defines.h",
+			"settings":
+			{
+				"buffer_size": 1784,
 				"line_ending": "Unix"
 			}
 		}
@@ -93,7 +109,7 @@
 	],
 	"find":
 	{
-		"height": 0.0
+		"height": 35.0
 	},
 	"find_in_files":
 	{
@@ -107,6 +123,9 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"renvoi",
+			"long",
+			"/"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -124,7 +143,7 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 7,
 			"sheets":
 			[
 				{
@@ -160,15 +179,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1577,
+						"buffer_size": 1562,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								1029,
+								1029
 							]
 						],
 						"settings":
@@ -176,7 +195,7 @@
 							"syntax": "Packages/Python/Python.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 578.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -187,15 +206,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 17973,
+						"buffer_size": 18117,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								4531,
+								4531
 							]
 						],
 						"settings":
@@ -204,7 +223,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1751.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -215,7 +234,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2953,
+						"buffer_size": 2952,
 						"regions":
 						{
 						},
@@ -239,6 +258,34 @@
 				},
 				{
 					"buffer": 4,
+					"file": "communication/serial_comm.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2643,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
 					"file": "communication/parser_c.py",
 					"semi_transient": false,
 					"settings":
@@ -266,12 +313,12 @@
 					"type": "text"
 				},
 				{
-					"buffer": 5,
-					"file": "communication/serial_comm.py",
+					"buffer": 6,
+					"file": "/home/noxy/vrac/Projets/utcoupe/coupe14/libs/com_C/serial_defines.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2106,
+						"buffer_size": 878,
 						"regions":
 						{
 						},
@@ -284,7 +331,35 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/Python/Python.tmLanguage",
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "/home/noxy/vrac/Projets/utcoupe/coupe14/libs/com_C/serial_defines.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1784,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
@@ -298,7 +373,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 0.0
+		"height": 25.0
 	},
 	"input":
 	{
@@ -330,7 +405,7 @@
 	"project": "",
 	"replace":
 	{
-		"height": 0.0
+		"height": 46.0
 	},
 	"save_all_on_build": true,
 	"select_file":

@@ -13,7 +13,7 @@ def gui(com):
 	
 	while 1:
 		#address = str(raw_input("Entre une address:\n"))
-		address = 2
+		address = 3
 		arguments = []
 		order = str(input("Entre le nom ou le numéro d'un ordre:\n"))
 		if order:

@@ -52,8 +52,8 @@ class communicationGlobale():
 
 		self.ordersToRead = deque()
 		self.ordersToSend = deque()
-		self.mutexRetour = threading.Lock()
-		self.mutexEnvoi = threading.Lock()
+		self.mutexOrdersToRead = threading.Lock()
+		self.mutexOrdersToSend = threading.Lock()
 		gestionThread = threading.Thread(target=self.gestion)
 		gestionThread.start()
 		
@@ -81,7 +81,9 @@ class communicationGlobale():
 
 				#Lecture des entrées
 				if self.readInput == True:
+					self.mutexOrdersToRead.acquire()
 					self.ordersToRead += self.readOrders()
+					self.mutexOrdersToRead.release()
 
 				#Renvoie des ordres non confirmés
 				if self.renvoieOrdre == True:
@@ -91,7 +93,7 @@ class communicationGlobale():
 								self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], actualDate)
 								indiceARenvoyer = self.getAllUnknowledgeId(address)
 								for indice in indiceARenvoyer:
-									print(("WARNING: Renvoie de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "d'idd ", indice, "au robot ", self.address[address]))
+									print(("WARNING: Renvoie de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "d'idd ", indice, "au robot ", self.address[address]), "binaire :", self.ordreLog[address][indice])
 									self.liaisonXbee.send(self.ordreLog[address][indice][1])
 									self.lastSendDate[address] = actualDate 
 
@@ -118,7 +120,7 @@ class communicationGlobale():
 			if waitBeforeNextExec <1:
 				print(("Warning: La boucle de pool de communication n'est pas assez rapide ", waitBeforeNextExec))
 			else:
-				time.sleep(waitBeforeNextExec//1000.0)
+				time.sleep(waitBeforeNextExec/1000.0)
 
 
 	def stopGestion(self):
@@ -172,14 +174,14 @@ class communicationGlobale():
 
 	def removeOrdersInFile(self, address):# Warning, only on reset !
 		remainOrdersToSend = deque()
-		self.mutexEnvoi.acquire()
+		self.mutexOrdersToSend.acquire()
 		for packet in self.ordersToSend:
 			if packet[0] != address:
 				remainOrdersToSend.append(packet)
 			else:
 				print(("ERREUR: drop de l'ordre", packet[1], " par l'arduino", packet[0], "suite à un reset"))
 		self.ordersToSend = remainOrdersToSend
-		self.mutexEnvoi.release()
+		self.mutexOrdersToSend.release()
 
 	def askResetId(self, address): #demande a une arduino de reset
 		self.removeOrdersInFile(address)
@@ -357,9 +359,11 @@ class communicationGlobale():
 						self.mutexRetour.release()
 
 					else:
-						print(("WARNING: l'arduino a accepte le paquet ", idd, "alors que les paquets a confirmer sont ", self.getAllUnknowledgeId(address)))
+						print(self.nbUnconfirmedPacket[address])
+						print(self.ordreLog[address])
+						print("WARNING: l'arduino", self.address[address], "a accepte le paquet", idd, "alors que les paquets a confirmer sont ", self.getAllUnknowledgeId(address))
 			else:
-				print(("ERREUR: address: ", address, " inconnue"))
+				print("ERREUR: address: ", address, " inconnue")
 			
 		return returnOrders
 
@@ -394,7 +398,7 @@ class communicationGlobale():
 		"""fonction qui gère l'envoi des ordres, sous le contrôle du thread"""
 
 		remainOrdersToSend = deque()
-		self.mutexEnvoi.acquire()
+		self.mutexOrdersToSend.acquire()
 		for packet in self.ordersToSend:#packet contient(address, ordre, *argument)
 			#si il n'y a pas déjà trop d'ordres en atente on envoie
 			if self.nbUnconfirmedPacket[packet[0]][0] < self.maxUnconfirmedPacket:
@@ -419,7 +423,7 @@ class communicationGlobale():
 				remainOrdersToSend.append(packet)
 
 		self.ordersToSend = remainOrdersToSend
-		self.mutexEnvoi.release()
+		self.mutexOrdersToSend.release()
 
 
 
@@ -510,9 +514,9 @@ class communicationGlobale():
 		order = self.checkOrder(order)
 
 		if address !=-1 and order !=-1 and self.checkOrderArgument(order, *arguments) !=-1:
-			self.mutexEnvoi.acquire()
+			self.mutexOrdersToSend.acquire()
 			self.ordersToSend.append((address, order, arguments))
-			self.mutexEnvoi.release()
+			self.mutexOrdersToSend.release()
 			return 0
 		else:
 			return -1
@@ -521,11 +525,11 @@ class communicationGlobale():
 
 	def readOrdersAPI(self):
 		"""Renvoi -1 si pas d'ordre en attente sinon renvoi un ordre """
-		self.mutexRetour.acquire()
+		self.mutexOrdersToRead.acquire()
 		if len(self.ordersToRead) > 0:
 			order = self.ordersToRead.pop()
-			self.mutexRetour.release()
+			self.mutexOrdersToRead.release()
 			return order
 		else:
-			self.mutexRetour.release()
+			self.mutexOrdersToRead.release()
 			return -1
