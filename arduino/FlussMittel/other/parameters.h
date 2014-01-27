@@ -6,10 +6,10 @@
 #define PIN_SERVO_BRAS 2
 
 #ifdef DEBUG
-#define PDEBUG(x) Serial.print(x)
-#define PDEBUGLN(x) Serial.println(x)
-#define WRDEBUG(x) Serial.write(x)
-#define BINPR(x) Serial.print(x, BIN)
+#define PDEBUG(x) Serial3.print(x)
+#define PDEBUGLN(x) Serial3.println(x)
+#define WRDEBUG(x) Serial3.write(x)
+#define BINPR(x) Serial3.print(x, BIN)
 #else
 #define PDEBUG(x)
 #define PDEBUGLN(x)

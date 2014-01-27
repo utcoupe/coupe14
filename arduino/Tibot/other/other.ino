@@ -50,7 +50,7 @@ void loop(){
 		available = MAX_READ;
 	}
 	for(int i = 0; i < available; i++) {
-		serial_write(forward_serial_read());
+		serial_write(Serial1.read());
 	}
 
 	/* fin zone de programmation libre */

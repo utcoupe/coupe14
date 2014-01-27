@@ -28,10 +28,11 @@ char serial_read(){
 	return Serial2.read();
 }
 
-void forward_serial_write(char c) {
-	Serial1.write(c);
-}
-
-char forward_serial_read() {
-	return Serial1.read();
+void forward_serial_write(char c, char addr) {
+	if (addr == FORWARD_ADDR_ASSERV) {
+		Serial1.write(c);
+	}
+	else if (addr == FORWARD_ADDR_CAM) {
+		Serial.write(c);
+	}
 }

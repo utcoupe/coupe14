@@ -18,6 +18,7 @@ void executeCmd(char serial_data){
 	static int data_counter = 0;
 	static bool doublon = false;
 	static bool client_concerne = false;
+	static char forward_addr;
 
 	static enum etape etape = wait_step;
 
@@ -33,9 +34,14 @@ void executeCmd(char serial_data){
 				client_concerne = true;
 			}
 		}
-		else if ((serial_data & 0x0F) == FORWARD_ADDR) {
+#ifdef FORWARD_ADDR_CAM
+		else if ((serial_data & 0x0F) == FORWARD_ADDR_ASSERV || (serial_data & 0x0F) == FORWARD_ADDR_CAM) {
+#else
+		else if ((serial_data & 0x0F) == FORWARD_ADDR_ASSERV) {
+#endif
+			forward_addr = serial_data & 0x0F;
 			etape = forward;
-			forward_serial_write(serial_data);
+			forward_serial_write(serial_data, forward_addr);
 		}
 		else if (serial_data == END && client_concerne) { //Fin de trame, execution de l'ordre
 			unsigned char data_8bits[MAX_DATA];
@@ -56,7 +62,7 @@ void executeCmd(char serial_data){
 			client_concerne = false;
 		}
 		else if (serial_data == END && etape == forward) {
-			forward_serial_write(serial_data);
+			forward_serial_write(serial_data, forward_addr);
 			if (serial_data == END) {
 				etape = wait_step;
 			}
@@ -86,7 +92,7 @@ void executeCmd(char serial_data){
 			data_counter++;
 			break;
 		case forward:
-			forward_serial_write(serial_data);
+			forward_serial_write(serial_data, forward_addr);
 			break;
 		case wait_step:
 			break;
