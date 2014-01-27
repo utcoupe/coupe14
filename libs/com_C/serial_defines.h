@@ -64,6 +64,8 @@ enum ordre {
 
 	O_BRAS_OUVRIR,
 	O_BRAS_FERMER,
+	O_MONTER_ASC,	
+	O_BAISSER_ASC,
 
 	GET_CAM,	//#long #long
 	ORDRE_NON_PARSE
