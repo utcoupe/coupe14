@@ -31,6 +31,8 @@ void initSize()
 
 	ordreSize[O_BRAS_OUVRIR]=0;
 	ordreSize[O_BRAS_FERMER]=0;
+	ordreSize[O_MONTER_ASC]=0;
+	ordreSize[O_BAISSER_ASC]=0;
 
 	ordreSize[GET_CAM]=0;
 	//FINPARSE

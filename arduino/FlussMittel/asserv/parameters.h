@@ -28,7 +28,7 @@
 
 #define ENCODER_EVAL 4
 
-#define FIXED_POINT_PRECISION 100 //The robot's position is stocked with a precision of 1/FIXED_POINT_PRECISION ticks
+#define FIXED_POINT_PRECISION 1000 //The robot's position is stocked with a precision of 1/FIXED_POINT_PRECISION mm 
 
 #define GESTION_3EME_FIL false
 
@@ -59,7 +59,8 @@
 
 #define ENC_RESOLUTION 500 //resolution du codeur
 
-#define ENC_RADIUS 34.0 //REGLE PAR TEST - rayon de la roue codeuse
+#define ENC_LEFT_RADIUS 34.0 //REGLE PAR TEST - rayon de la roue codeuse
+#define ENC_RIGHT_RADIUS 34.0 //REGLE PAR TEST - rayon de la roue codeuse
 #define ENTRAXE_ENC 259.8 //REGLE PAR TES - Distance entre chaque roue codeuse en mm
 
 #define ERROR_ANGLE 0.05 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
