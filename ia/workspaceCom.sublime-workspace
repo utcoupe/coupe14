@@ -8,15 +8,7 @@
 	"buffers":
 	[
 		{
-			"file": "/home/noxy/vrac/Projets/utcoupe/coupe14/ia/guiCommande.py",
-			"settings":
-			{
-				"buffer_size": 1576,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/home/noxy/vrac/Projets/utcoupe/coupe14/ia/main.py",
+			"file": "main.py",
 			"settings":
 			{
 				"buffer_size": 330,
@@ -24,15 +16,23 @@
 			}
 		},
 		{
-			"file": "communicationGlobale.py",
+			"file": "guiCommande.py",
 			"settings":
 			{
-				"buffer_size": 17951,
+				"buffer_size": 1577,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "conversion.py",
+			"file": "communication/communicationGlobale.py",
+			"settings":
+			{
+				"buffer_size": 17973,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "communication/conversion.py",
 			"settings":
 			{
 				"buffer_size": 2953,
@@ -40,15 +40,7 @@
 			}
 		},
 		{
-			"file": "__init__.py",
-			"settings":
-			{
-				"buffer_size": 0,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "parser_c.py",
+			"file": "communication/parser_c.py",
 			"settings":
 			{
 				"buffer_size": 2251,
@@ -56,7 +48,7 @@
 			}
 		},
 		{
-			"file": "serial_comm.py",
+			"file": "communication/serial_comm.py",
 			"settings":
 			{
 				"buffer_size": 2106,
@@ -91,6 +83,13 @@
 	},
 	"file_history":
 	[
+		"/home/noxy/vrac/Projets/utcoupe/coupe14/ia/communication/__init__.py",
+		"/home/noxy/vrac/Projets/utcoupe/coupe14/ia/communication/*.",
+		"/home/noxy/vrac/Projets/utcoupe/coupe14/ia/serial_comm.py",
+		"/home/noxy/vrac/Projets/utcoupe/coupe14/ia/parser_c.py",
+		"/home/noxy/vrac/Projets/utcoupe/coupe14/ia/__init__.py",
+		"/home/noxy/vrac/Projets/utcoupe/coupe14/ia/conversion.py",
+		"/home/noxy/vrac/Projets/utcoupe/coupe14/ia/communicationGlobale.py"
 	],
 	"find":
 	{
@@ -125,39 +124,12 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 3,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "/home/noxy/vrac/Projets/utcoupe/coupe14/ia/guiCommande.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1576,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "/home/noxy/vrac/Projets/utcoupe/coupe14/ia/main.py",
+					"file": "main.py",
 					"semi_transient": false,
 					"settings":
 					{
@@ -183,20 +155,47 @@
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "communicationGlobale.py",
+					"buffer": 1,
+					"file": "guiCommande.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 17951,
+						"buffer_size": 1577,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								733,
-								733
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "communication/communicationGlobale.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 17973,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
 							]
 						],
 						"settings":
@@ -205,14 +204,14 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 306.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "conversion.py",
+					"file": "communication/conversion.py",
 					"semi_transient": false,
 					"settings":
 					{
@@ -240,34 +239,7 @@
 				},
 				{
 					"buffer": 4,
-					"file": "__init__.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 0,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "parser_c.py",
+					"file": "communication/parser_c.py",
 					"semi_transient": false,
 					"settings":
 					{
@@ -294,8 +266,8 @@
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "serial_comm.py",
+					"buffer": 5,
+					"file": "communication/serial_comm.py",
 					"semi_transient": false,
 					"settings":
 					{
