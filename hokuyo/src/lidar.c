@@ -10,6 +10,7 @@
 #include "robot.h"
 
 static long maxDistance;
+static long distanceThMin, distanceThMax;
 
 double
 theta(struct coord lidar, struct coord marker){
@@ -32,6 +33,9 @@ initLidarAndCalibrate(enum lidarModel model, char* device, struct coord position
 	struct coord markerPos;
 	markerPos.x = MARKER_R_POS_X;
 	markerPos.y = MARKER_R_POS_Y;
+	distanceThMin = dist_squared(position, markerPos);
+	distanceThMax = pow(sqrt(distanceThMin)+MARKER_DETECTION_ZONE_SIZE/2,2);
+	distanceThMin = pow(sqrt(distanceThMin)-MARKER_DETECTION_ZONE_SIZE/2,2);
 	double thetaTh = theta(position, markerPos);
 	printf("thetha TH:%f  -> %f\n", thetaTh, thetaTh*180/PI);
 	printf("detectionMinAngle:%f\tdetectionMaxAngle%f\n", (thetaTh-MARKER_DETECTION_ANGLE/2)*180/PI, (thetaTh+MARKER_DETECTION_ANGLE/2)*180/PI );
@@ -133,11 +137,14 @@ invalidPoint(struct coord p){
 }
 
 char
-invalidPointCalibration(struct coord lidar, struct coord p){	
-	if(p.x < MARKER_R_POS_X-MARKER_DETECTION_ZONE_SIZE/2 || p.x > MARKER_R_POS_X+MARKER_DETECTION_ZONE_SIZE/2
-		|| p.y < MARKER_R_POS_Y-MARKER_DETECTION_ZONE_SIZE/2 || p.y > MARKER_R_POS_Y+MARKER_DETECTION_ZONE_SIZE/2){
+invalidPointCalibration(struct coord lidar, struct coord p){
+	long dist = dist_squared(lidar, p);
+	//printf("validCalibrationPoint?:%f\tin [%f\t,\t%f]\n", sqrt(dist), sqrt(distanceThMin), sqrt(distanceThMax));
+	if(dist < distanceThMin || dist > distanceThMax)
 		return 1;
-	}
+	/*if(p.x < MARKER_R_POS_X-MARKER_DETECTION_ZONE_SIZE/2 || p.x > MARKER_R_POS_X+MARKER_DETECTION_ZONE_SIZE/2
+		|| p.y < MARKER_R_POS_Y-MARKER_DETECTION_ZONE_SIZE/2 || p.y > MARKER_R_POS_Y+MARKER_DETECTION_ZONE_SIZE/2)
+		return 1;*/
 	return 0;
 }
 

@@ -75,9 +75,10 @@ int main(int argc, char **argv){
     pos1.x = TAILLE_TABLE_Y+25;
   }
 
-  pos1.y = TAILLE_TABLE_Y-25;
+  pos1.y = TAILLE_TABLE_Y/2;
 
-	l1 = initLidarAndCalibrate( hokuyo_urg, "/dev/ttyACM0", pos1, -PI/2, -PI/2, 0);
+	//l1 = initLidarAndCalibrate( hokuyo_urg, "/dev/ttyACM0", pos1, -PI/2, -PI/2, 0);
+  l1 = initLidarAndCalibrate( hokuyo_urg, "/dev/ttyACM0", pos1, 0, -PI/2, PI/2);
 
   #ifdef SDL
 	l1Color = newColor(255, 0, 0);

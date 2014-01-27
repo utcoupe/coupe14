@@ -10,7 +10,7 @@ static inline int min(int a,int b){ return (a<b) ? a : b ; }
 int
 dist_squared(struct coord p1, struct coord p2)
 {
-	int r = p1.x*p1.x + p1.y*p2.y;
+	int r = pow(p2.x-p1.x, 2) + pow(p2.y-p1.y, 2);
 	return r;
 }
 
