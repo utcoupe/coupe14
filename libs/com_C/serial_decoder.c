@@ -100,25 +100,19 @@ int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){
         data_counter = j; //nouveau compte de datas
 
         //recalage des ordres 6bits
-        i = 0;
-	while(i<data_counter){
-                unsigned char overflow = right_shift_array(data_out + i, data_out + i, data_counter - i, 2); //Shift tout le tableau à droite de 1 à partir de i (le premier ordre est calé)
-                if(overflow != 0){
-                        data_out[data_counter] = overflow; //Si overflow, on le met (attention aux segfault)
-                }
-                //Ici le premier ordre est calé à la première boucle, le deuxieme à la deuxieme,etc ...
-                
-                unsigned char ordre = data_out[i];
-		if(ordre > MAX_ORDRES){//L'odre n'existe pas => corruption
-			return -1;
-		}
-		unsigned char size = ordreSize[(int)ordre];
-		if(size == SIZE_ERROR){//L'ordre n'existe pas => corruption de données
-			return -1;
-		}
-		else{
-			i += size + 1; //On se décale de la taille de l'ordre + 1 (+1 car on se décale aussi de l'ordre)
-		}
+        unsigned char overflow = right_shift_array(data_out, data_out, data_counter, 2); //Shift tout le tableau à droite de 1 à partir de i (le premier ordre est calé)
+        if(overflow != 0){
+                data_out[data_counter] = overflow; //Si overflow, on le met (attention aux segfault)
+		data_counter++;
+		PDEBUGLN("Pas normal\n");
+        }
+        unsigned char ordre = data_out[0];
+	if(ordre > MAX_ORDRES){//L'odre n'existe pas => corruption
+		return -1;
+	}
+	unsigned char size = ordreSize[(int)ordre];
+	if(size != data_counter-1){//Mauvaise taille => corruption
+		return -1;
 	}
 	return data_counter;
 }
@@ -166,22 +160,19 @@ int encode(unsigned char *data_in, unsigned char *data_out, int data_counter){ /
 }
 
 void executeOrdre(unsigned char *data, int data_counter, unsigned char id, bool doublon){
-	int i = 0, ret_size = 0;
+	int ret_size = 0;
 	unsigned char ordre;
 	unsigned char *params;
 	unsigned char ret[MAX_DATA];
-	//while (i < data_counter) { PROBLEME : les bits poubelles crée un ordre en trop - Solution : On commente la boucle : un seule ordre par tramme
-		ordre = data[i];
-		params = data + i + 1;
-		ret_size += switchOrdre(ordre, params, (ret + ret_size), doublon);//execution ordres, enregistrement du retour
-		i += ordreSize[ordre] + 1;
-	//}
+	ordre = data[0];
+	params = data + 1;
+	ret_size = switchOrdre(ordre, params, (ret + ret_size), doublon);//execution ordres, enregistrement du retour
 	sendResponse(ret, ret_size, id);
 }
 
 void sendResponse(unsigned char *data, int data_counter, unsigned char id){
 	unsigned char data_7bits[MAX_DATA];
-	int i, size;
+	int i, size = 0;
 	size = encode(data, data_7bits, data_counter);
 	serial_send(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
 	serial_send(id);
