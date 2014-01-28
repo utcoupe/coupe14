@@ -36,7 +36,6 @@ void executeCmd(char serial_data){
 				}
 				etape = wait_step;
 			}
-			data_counter = 0;
 			doublon = false;
 		}
 		else if((serial_data & 0x0F) == LOCAL_ADDR){ //Si début de paquet adressé au client
@@ -52,6 +51,7 @@ void executeCmd(char serial_data){
 		else{ //Si fin de paquet ou packet non adressé au client
 			etape = wait_step;
 		}
+		data_counter = 0;
 	}
 	else{
 		switch(etape){
@@ -204,7 +204,12 @@ void protocol_reset(){
 		long t = timeMillis();
 		serial_send(RESET | LOCAL_ADDR);
 		while (timeMillis() - t < 1000 && !reset) {
-			if (generic_serial_read() == (RESET_CONF | LOCAL_ADDR)) {
+			char data = generic_serial_read();
+			if (data == (RESET_CONF | LOCAL_ADDR)) {
+				reset = 1;
+			}
+			else if (data == (RESET | LOCAL_ADDR)) {
+				serial_send(RESET_CONF | LOCAL_ADDR);
 				reset = 1;
 			}
 		}
