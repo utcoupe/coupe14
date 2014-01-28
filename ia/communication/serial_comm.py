@@ -60,7 +60,7 @@ class ComSerial():
 		return rawInputList
 
 	def send(self, rawOutputString):
-		""" rawInputList doit être une liste de chaine de char, qui ont pour en-tête 1XXXXXXX et pour fin fin 10000000""" 
+		""" rawInputList doit être une liste de chaine de char, qui ont pour en-tête 1XXXXXXX et pour fin 10000000""" 
 		"""if self.liaison.isOpen() == False:
 			print('comSerial,fct send: La liaison demandé n\'a pas été initializé k')"""
 		

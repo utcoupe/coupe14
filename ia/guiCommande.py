@@ -10,7 +10,7 @@ import time
 def gui(com):
 	(address, orders, ordersSize, ordersArguments, ordersRetour) = com.getConst()
 	arguments = []
-	
+
 	while 1:
 		#address = str(raw_input("Entre une address:\n"))
 		address = 3
