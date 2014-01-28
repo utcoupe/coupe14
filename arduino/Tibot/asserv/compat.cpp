@@ -78,6 +78,6 @@ void serial_send(char data) { //Envoi d'un octet en serial, dépend de la platef
 	Serial2.write(data);
 }
 
-char serial_read(){
+char generic_serial_read(){
 	return Serial2.read();
 }

@@ -34,8 +34,8 @@ def gui(com):
 			elif order == 's':
 
 				for a in range(500):
-					arguments = [1000, 0]
-					com.sendOrderAPI(2, 'A_GOTO', *arguments)
+					arguments = []
+					com.sendOrderAPI(2, 'A_GET_CODER', *arguments)
 
 			elif order in com.orders:
 				if isinstance(order, (int)):
