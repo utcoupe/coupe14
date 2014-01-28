@@ -13,7 +13,7 @@ import binascii
 class ComSerial():
 	def __init__(self, name, baudrate):
 		self.liaison = serial.Serial(name, baudrate, parity=serial.PARITY_ODD, stopbits=serial.STOPBITS_ONE)
-		self.rawInput = ""
+		self.rawInput = []
 		self.readyToRead = False
 
 	def read(self):
@@ -25,9 +25,8 @@ class ComSerial():
 		rawInputList = deque()
 		if self.liaison.inWaiting():
 			#self.rawInput += self.liaison.read(self.liaison.inWaiting())
-			temp = self.liaison.read(self.liaison.inWaiting())
-			for letter in temp:
-					self.rawInput += chr(letter)
+			self.rawInput += self.liaison.read(self.liaison.inWaiting())
+			
 
 			i = 0
 			debutChaine = 0
