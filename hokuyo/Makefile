@@ -2,7 +2,7 @@ DEBUG=yes
 SDL=no
 
 CC=gcc
-SRC_FILES=main.c fast_math.c hokuyoUrg.c lidar.c robot.c protocole.c serial_switch.c serial_defines.c serial_decoder.c serial_types.c compat.c
+SRC_FILES=main.c fast_math.c hokuyoUrg.c lidar.c robot.c protocole_serial.c serial_switch.c serial_defines.c serial_decoder.c serial_types.c compat.c
 SRC_DIR=src/
 EXEC=hokuyo
 

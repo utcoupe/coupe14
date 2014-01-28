@@ -9,7 +9,7 @@
 #include "traitement.h"
 #include "global.h"
 #include "serial_switch.h"
-#include "protocole.h"
+#include "protocole_serial.h"
 
 #ifdef VISUAL
 #include <highgui.h>

@@ -2,7 +2,7 @@ VISUAL=no
 DEBUG=yes
 EXEC=visio
 
-SRCS_FILES=main.c compat.c serial_switch.c serial_types.c serial_decoder.c serial_defines.c protocole.c traitement.c
+SRCS_FILES=main.c compat.c serial_switch.c serial_types.c serial_decoder.c serial_defines.c protocole_serial.c traitement.c
 
 CC=gcc
 CFLAGS+=-Wall `pkg-config --cflags opencv`
