@@ -18,8 +18,8 @@ void initPins();
 unsigned long timeMillis();
 unsigned long timeMicros();
 
-void serial_write(char data);
+void serial_send(char data);
 char generic_serial_read();
-void forward_serial_write(char c, char addr);
+void forward_serial_send(char c, char addr);
 
 #endif
