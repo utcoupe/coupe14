@@ -37,7 +37,7 @@ void loop(){
 
 
 	/* zone programmation libre */
-	int available = Serial2.available();
+	int available = Serial.available();
 	if (available > MAX_READ) {
 		available = MAX_READ;
 	}
