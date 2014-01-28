@@ -32,7 +32,7 @@ void Control::compute(){
 	static long start_time;
 	struct goal current_goal = fifo.getCurrentGoal();
 	static struct goal last_goal = current_goal;
-	m_pos current_pos = robot.getMmPos();
+	pos current_pos = robot.getMmPos();
 	long now = timeMicros();
 	robot.update();
 
@@ -176,7 +176,7 @@ void Control::setMaxAcc(float n_max_acc){
 	PDEBUGLN(max_acc);
 }
 
-void Control::pushPos(m_pos n_pos){
+void Control::pushPos(pos n_pos){
 	robot.pushMmPos(n_pos);
 }
 
@@ -192,7 +192,7 @@ void Control::clearGoals(){
 	fifo.clearGoals();
 }
 
-m_pos Control::getPos(){
+pos Control::getPos(){
 	return robot.getMmPos();
 }
 

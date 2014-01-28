@@ -59,7 +59,8 @@
 
 #define ENC_RESOLUTION 1024 //resolution du codeur
 
-#define ENC_RADIUS 34 //rayon de la roue codeuse
+#define ENC_LEFT_RADIUS 34 //rayon de la roue codeuse
+#define ENC_RIGHT_RADIUS 34 //rayon de la roue codeuse
 #define ENTRAXE_ENC 130.0 // Distance entre chaque roue codeuse en mm
 #define ENTRAXE_MOTOR 70.0 // Distance entre chaque roue motrice en mm
 

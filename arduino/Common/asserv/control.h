@@ -39,8 +39,8 @@ class Control{
 	void clearGoals();
 
 	//Toutes les positions sont renvoyée en mm, toutes les vitess en mm/ms = m/s
-	void pushPos(m_pos n_pos); 
-	m_pos getPos();
+	void pushPos(pos n_pos); 
+	pos getPos();
 
 	//Renvoie les valeurs des codeur (utile pour debug)
 	Encoder* getLenc();

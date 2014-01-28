@@ -76,7 +76,7 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		break;
 	case A_RESET_POS:
 		if (!doublon) {
-			m_pos pos;
+			pos pos;
 			pos.x = 0;
 			pos.y = 0;
 			pos.angle = 0;
@@ -84,7 +84,7 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		}
 		break;
 	case A_GET_POS:{
-		m_pos pos = control.getPos();
+		pos pos = control.getPos();
 		int x = pos.x, y = pos.y;
 		float a = pos.angle;
 		itob(x, ret);
