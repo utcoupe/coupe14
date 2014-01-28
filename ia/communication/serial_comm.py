@@ -28,40 +28,36 @@ class ComSerial():
 				temp = self.liaison.read(self.liaison.inWaiting())
 				for letter in temp:
 						self.rawInput += chr(letter)
-			
 
-			#on crée un variable temporaire
-			chaineDeBoucle = []
-			i = 0
-			for leter in self.rawInput:
-				chaineDeBoucle.append(self.rawInput[i])
-				i += 1
+				i = 0
+				debutChaine = 0
+				self.readyToRead = False
+				for leter in self.rawInput:
+					value = ord(leter)
 
-			i = 0
-			self.readyToRead = False
-			for leter in chaineDeBoucle:
-				value = ord(leter)
-
-				if value > 128:#c'est forcement le premier paquet
-					if value > 192: # si c'est un packet de reset
-						rawInputList.append(leter)
-						self.rawInput = self.rawInput[i+1:]
+					if value > 128:#c'est forcement le premier paquet
+						if value > 192: # si c'est un packet de reset
+							rawInputList.append(leter)
+							self.readyToRead = False
+							debutChaine = i+1
+							
+							
+						else: #si c'est un paquet de debut de trame
+							#également si on a perdu le paquet de fin
+							self.readyToRead = True
+							debutChaine = i
+								
+										
+					if value == 128:
+						if self.readyToRead == True:#cas normal
+							rawInputList.append(self.rawInput[debutChaine:i+1])
+						#également quand on a perdu le paquet de debut
 						self.readyToRead = False
-						i = 0
+						debutChaine = i
 						
-					else: #si c'est un paquet de debut de trame
-						self.rawInput = self.rawInput[i:]#également si on a perdu le paquet de fin
-						self.readyToRead = True
-						i = 0	
-									
-				if value == 128:
-					if self.readyToRead == True:#cas normal
-						rawInputList.append(self.rawInput[:i+1])
-					self.rawInput = self.rawInput[i:]#également quand on a perdu le paquet de debut
-					self.readyToRead = False
-					i = 0
 
-				i += 1
+					i += 1
+				self.rawInput = self.rawInput[debutChaine:]
 		return rawInputList
 
 	def send(self, rawOutputString):

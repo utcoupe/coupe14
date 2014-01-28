@@ -38,7 +38,7 @@ class communicationGlobale():
 
 		#defines de threads
 		self.lastHighPrioTaskDate = 0
-		self.highPrioSpeed = 20 #fréquence d'execution en ms
+		self.highPrioSpeed = 10 #fréquence d'execution en ms
 		self.lastLowPrioTaskDate = 0
 		self.lowPrioSpeed = 1000
 		self.maxUnconfirmedPacket = 5 # attention maximum 32
@@ -69,11 +69,11 @@ class communicationGlobale():
 
 	def gestion(self):
 		while self.threadActif:
-			actualDate = int(time.time()*1000)
+			date = int(time.time()*1000)
 			
 			#tâches de hautes priotités
-			if (actualDate - self.lastHighPrioTaskDate) > self.highPrioSpeed:
-				self.lastHighPrioTaskDate = actualDate
+			if (date - self.lastHighPrioTaskDate) > self.highPrioSpeed:
+				self.lastHighPrioTaskDate = date
 
 				#Ecriture des ordres
 				if self.writeOutput == True:
@@ -89,17 +89,17 @@ class communicationGlobale():
 				if self.renvoieOrdre == True:
 					for address in self.address:
 						if isinstance(address, (int)):
-							if (self.lastConfirmationDate[address] != -1) and (self.lastSendDate != -1) and (self.nbUnconfirmedPacket[address][1] != -1) and (actualDate - self.nbUnconfirmedPacket[address][1] > 200) :#si il reste un ordre non confirmé en moins de 500 ms
-								self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], actualDate)
+							if (date - self.nbUnconfirmedPacket[address][1] > 40) and(self.nbUnconfirmedPacket[address][1] != -1):#si il reste un ordre non confirmé en moins de X ms
+								self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], date)
 								indiceARenvoyer = self.getAllUnknowledgeId(address)
 								for indice in indiceARenvoyer:
 									print(("WARNING: Renvoie de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "d'idd ", indice, "au robot ", self.address[address]), "binaire :", self.ordreLog[address][indice])
 									self.liaisonXbee.send(self.ordreLog[address][indice][1])
-									self.lastSendDate[address] = actualDate 
+									self.lastSendDate[address] = date 
 
 			#tâche de faibles priorités
-			if (actualDate - self.lastLowPrioTaskDate) > self.lowPrioSpeed:
-				self.lastLowPrioTaskDate = actualDate
+			if (date - self.lastLowPrioTaskDate) > self.lowPrioSpeed:
+				self.lastLowPrioTaskDate = date
 				#recherche d'arduino
 				if self.probingDevices == True:
 					for address in range(1, len(self.address)//2+1, 1):
@@ -111,13 +111,13 @@ class communicationGlobale():
 					for address in self.address:
 						if isinstance(address, (int)):
 							if self.arduinoIdReady[address]:
-								if ((actualDate - self.lastConfirmationDate[address]) > 5000) and self.lastConfirmationDate[address] != -1:#le système est considere comme hors ligne
+								if ((date - self.lastConfirmationDate[address]) > 5000) and self.lastConfirmationDate[address] != -1:#le système est considere comme hors ligne
 									self.arduinoIdReady[address] = False
-								elif (actualDate - self.lastSendDate[address]) > 1500:
+								elif (date - self.lastSendDate[address]) > 1000:
 									self.sendOrderAPI(address, self.orders['PINGPING_AUTO'])
 
-			waitBeforeNextExec = (self.highPrioSpeed -(int(time.time()*1000) - actualDate))
-			if waitBeforeNextExec <1:
+			waitBeforeNextExec = (self.highPrioSpeed -(int(time.time()*1000) - date))
+			if waitBeforeNextExec < 1:
 				print(("Warning: La boucle de pool de communication n'est pas assez rapide ", waitBeforeNextExec))
 			else:
 				time.sleep(waitBeforeNextExec/1000.0)
@@ -357,8 +357,6 @@ class communicationGlobale():
 						arguments = []
 
 					else:
-						print(self.nbUnconfirmedPacket[address])
-						print(self.ordreLog[address])
 						print("WARNING: l'arduino", self.address[address], "a accepte le paquet", idd, "alors que les paquets a confirmer sont ", self.getAllUnknowledgeId(address))
 			else:
 				print("ERREUR: address: ", address, " inconnue")
