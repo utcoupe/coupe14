@@ -20,8 +20,9 @@ void serial_send(char c){
 unsigned char generic_serial_read() {
 	char data;
 	read (serial, &data, 1); 
+	data &= 0xFF;
 	printf("read %x\n", data);
-	return data & 0xFF;
+	return data;
 }
 
 int
