@@ -20,17 +20,30 @@ class communicationGlobale():
 		self.ordersArguments = {}
 		self.ordersRetour = {}
 		self.argumentSize = {}
+		self.returnSize = {}
 		(self.address, self.orders, self.argumentSize, self.ordersArguments, self.ordersRetour) = parser_c.parseConstante()
 		self.nbAddress = len(self.address)//2
 
 		self.ordreLog = [[(-1,"")]*64 for x in range(self.nbAddress)] #stock un historique des ordres envoyés, double tableau de tuple (ordre,data)
 
-		for order in self.orders:#revertion 
+		for order in self.orders:#revertion de self.argumentSize
 			if isinstance(order, (str)):
 				size = self.argumentSize[order]
 				self.argumentSize[self.orders[order]] = size
 
-		print(self.argumentSize)
+		#on crée un dico de taille de retour
+		for order in self.orders:
+			size = 0
+			for i,typeToGet in enumerate(self.ordersRetour[order]):
+				if typeToGet == 'int':
+					size += 2
+				elif typeToGet == 'long':
+					size += 4				
+				elif typeToGet == 'float':
+					size += 4
+				else:
+					print("ERREUR: Parseur: le parseur a trouvé un type non supporté")
+			self.returnSize[order] = size
 
 		for order in self.orders:# on vérifie la cohérance entre serial_defines.c et serial_defines.h
 			self.checkParsedOrderSize(order)
@@ -213,7 +226,7 @@ class communicationGlobale():
 		
 
 	def confirmeResetId(self, address):#renvoie une confirmation de reset
-		print(("Reponse au reset de l'arduino "+ str(address)))
+		print(("Reponse à la demande de confirmation de reset de l'arduino "+ str(address)))
 		self.removeOrdersInFile(address)
 		self.lastConfirmationDate[address] = -1
 		self.nbUnconfirmedPacket[address] = (0, -1)
@@ -261,33 +274,10 @@ class communicationGlobale():
 
 		elif len(rawInput)>=3:#cas normal
 			packetId = rawInput[1]
-			rawInput = rawInput[2:-1] # on supprime les deux carctères du dessus et le paquet de fin
-			
-			#python enleve les zero lors de la conversion en binaire donc on les rajoute, sauf le premier du protocole
-			packetData = ""
-			for octet in rawInput:
-				temp = bin(octet)[2:]
-				while len(temp) < 7:
-					temp = '0' + temp
-				packetData += temp
 
-			if packetAddress >0 and packetAddress<self.nbAddress and packetId >= 0 and packetId < 64:
-				taille = 0
-				for returnType in self.ordersRetour[self.orders[ self.ordreLog[packetAddress][packetId][0] ]]:
-					if returnType == 'int':
-						taille += 2
-					elif returnType == 'float':
-						taille += 4
-					elif returnType == 'long':
-						taille += 4
-					else:
-						print("ERREUR: Parseur: le parseur a trouvé un type non supporté")
-
-				if len(packetData)//8 == taille:# si la longeur des données reçu est bonne
-					return (packetAddress, packetId, packetData)
-				else:
-					print(("WARNING: Le paquet ne fait pas la bonne taille, des données ont probablement été perdue, paquet droppé, taille attendu ", taille))
-					return -1
+			# si la longeur des données reçu est bonne
+			if packetAddress >0 and packetAddress<self.nbAddress and packetId >= 0 and packetId < 64 and (len(rawInput[2:-1])*7//8 == self.returnSize[ self.ordreLog[packetAddress][packetId][0] ]):
+				return (packetAddress, packetId, rawInput[2:-1])# on supprime les deux carctères du dessus et le paquet de fin
 			elif packetId > 63:
 				print(("L'arduino", self.address[packetAddress], "nous indique avoir mal reçu un message, message d'erreur ", packetId))
 				return -1
@@ -314,53 +304,61 @@ class communicationGlobale():
 
 	def readOrders(self):
 		ordersList = self.getXbeeOrders()
-
 		returnOrders = deque()
 
 		for order in ordersList:
 			address = int(order[0])
 			idd = int(order[1])
-			arguments = []
+			
+			unconfirmedIds = self.getAllUnknowledgeId(address)
+			if idd in unconfirmedIds:
+				if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:
+					print(("Success: l'arduino", self.address[address]," a bien recu l'ordre ", self.orders[self.ordreLog[address][idd][0]], " d'id: ", idd))
+				
+				#TODO checker si les packets qui n'ont pas été confirmés n'avait pas de retour
+				date = int(time.time()*1000)
+				self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(idd) - 1, date)#on bidone le chiffre date, mais c'est pas grave
+				self.lastIdConfirm[address] = idd
+				self.lastConfirmationDate[address] = date
+				
 
-			if address in self.address:
-				if idd >= 64:# cas impossible car verification lors de l'extraction des données
-					print(("ERREUR: IMPOSSIBLE l'arduino", self.address[address], " a mal recu un message."))
-				else:
-					if idd in self.getAllUnknowledgeId(address):
-						if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:
-							print(("Success: l'arduino", self.address[address]," a bien recu l'ordre ", self.orders[self.ordreLog[address][idd][0]], " d'id: ", idd))
-						date = int(time.time()*1000)
-						self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - self.getAllUnknowledgeId(address).index(idd) - 1, date)#on bidone le chiffre date, mais c'est pas grave
-						self.lastIdConfirm[address] = idd
-						self.lastConfirmationDate[address] = date
-						
-						index = 0
-						for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
-							if returnType == 'int':
-								retour = conversion.binaryToInt(order[2][index*8:(index+2)*8])
-								print(("Retour int: ", retour))
-								arguments.append(retour)
-								index += 2
-							elif returnType == 'float':
-								retour = conversion.binaryToFloat(order[2][index*8:(index+4)*8])
-								print(("Retour float: ", retour))
-								arguments.append(retour)
-								index += 4
-							elif returnType == 'long':
-								retour = conversion.binaryToLong(order[2][index*8:(index+4)*8])
-								print(("Retour long: ", retour))
-								arguments.append(retour)
-								index += 4
-							else:
-								print("ERREUR: Parseur: le parseur a trouvé un type non supporté")
+				#python enleve les zero lors de la conversion en binaire donc on les rajoute, sauf le premier du protocole
+				argumentData = ""
+				for octet in order[2]:
+					temp = bin(octet)[2:].zfill(7)
+					argumentData += temp
 
-						returnOrders.append((address, idd, arguments))
-						arguments = []
+				arguments = []
+				index = 0
+				for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
+					if returnType == 'int':
+						size = 2
+						retour = conversion.binaryToInt(argumentData[index*8:(index+size)*8])
+						print(("Retour int: ", retour))
+						arguments.append(retour)
+						index += size
+					elif returnType == 'float':
+						size = 4
+						retour = conversion.binaryToFloat(argumentData[index*8:(index+size)*8])
+						print(("Retour float: ", retour))
+						arguments.append(retour)
+						index += size
+					elif returnType == 'long':
+						size = 4
+						#print(order[2][-(size+index):])
 
+
+						retour = conversion.binaryToLong(argumentData[index*8:(index+size)*8])
+						print(("Retour long: ", retour))
+						arguments.append(retour)
+						index += size
 					else:
-						print("WARNING: l'arduino", self.address[address], "a accepte le paquet", idd, "alors que les paquets a confirmer sont ", self.getAllUnknowledgeId(address))
+						print("ERREUR: Parseur: le parseur a trouvé un type non supporté")
+
+				returnOrders.append((address, idd, arguments))
+
 			else:
-				print("ERREUR: address: ", address, " inconnue")
+				print("WARNING: l'arduino", self.address[address], "a accepte le paquet", idd, "alors que les paquets a confirmer sont ", self.getAllUnknowledgeId(address))
 			
 		return returnOrders
 
@@ -451,8 +449,6 @@ class communicationGlobale():
 
 	def checkParsedOrderSize(self, order):
 		"""check parsed sizes"""
-		if isinstance(order, (int)):
-			order = self.orders[order]
 
 		if order in self.argumentSize:#verification
 			sizeExpected = self.argumentSize[order]

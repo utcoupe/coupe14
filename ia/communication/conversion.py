@@ -55,8 +55,6 @@ def binaryToInt(string):
 
 def binaryToLong(string):
 	temp = ""
-	for i in range(24, 32, 1):
-		temp += string[i]
 	for i in range(16, 24, 1):
 		temp += string[i]
 	for i in range(8, 16, 1):
