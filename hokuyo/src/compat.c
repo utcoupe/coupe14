@@ -18,7 +18,7 @@ void serial_send(char c){
 
 unsigned char generic_serial_read() {
 	char data;
-	while(read (serial, &data, 1) == 0);
+	read (serial, &data, 1);
 	data &= 0xFF;
 	return data;
 }
