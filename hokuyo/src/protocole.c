@@ -14,7 +14,7 @@
 
 static pthread_t poll_ordre;
 pthread_mutex_t mutex;
-static int serial;
+extern int serial;
 
 void* poll_proto () {
 	while (1) {
