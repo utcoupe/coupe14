@@ -150,20 +150,20 @@ class communicationGlobale():
 
 	def getNextConfirmeId(self, address):
 		"""retourne le prochain id attendu"""
-		if self.lastIdConfirm[address] == 63:
-			return 0
-		else:
+		if self.lastIdConfirm[address] != 63:
 			return self.lastIdConfirm[address]+1
+		else:
+			return 0
 
 	def getAllUnknowledgeId(self, address):
 		if self.lastIdSend[address] != self.lastIdConfirm[address]:
 			unconfirmedId = self.getNextConfirmeId(address)
 			unconfirmedIds = (unconfirmedId,)
 			while unconfirmedId != self.lastIdSend[address]:
-				if unconfirmedId == 63:
-					unconfirmedId = 0
+				if unconfirmedId != 63:
+					unconfirmedId += 1
 				else:
-					unconfirmedId +=1
+					unconfirmedId = 0
 				unconfirmedIds += (unconfirmedId,)
 			return unconfirmedIds
 		return ()
