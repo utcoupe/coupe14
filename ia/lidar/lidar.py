@@ -2,7 +2,7 @@ import os
 from threading import Thread
 
 FILENAME = "/tmp/lidarPipe"
-LIDARPROGRAM = "../hokuyo/hokuyo_sdl"
+LIDARPROGRAM = "../hokuyo/hokuyo"
 LIDARARGS = " red pipe"
 
 class Lidar:
@@ -20,7 +20,7 @@ class Lidar:
         pipe = os.open(FILENAME, os.O_RDONLY|os.O_NONBLOCK)
         self._reader = os.fdopen(pipe) 
 
-        print("lauching c program, waiting for it to open fifo...")
+        print("launching c program, waiting for it to open fifo...")
         self.thread.start()
 
         firstread = self._reader.readline()
@@ -42,6 +42,7 @@ class Lidar:
         r = self._reader.readline()
         if r == "":
             return None
+
         return list(map(    lambda e: list(map( lambda f:int(f), e.split(":") )), \
                             r[:-1].split(";")[1:] \
                         ))
