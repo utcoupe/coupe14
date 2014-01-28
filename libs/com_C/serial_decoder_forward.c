@@ -26,13 +26,14 @@ void executeCmd(char serial_data){
 		if((serial_data & 0x0F) == LOCAL_ADDR){ //Si début de paquet adressé au client
 			if ((serial_data & 0xF0) == RESET){ //Si demande de reset
 				ID_attendu = 0;
-				serial_write(RESET_CONF | LOCAL_ADDR);
+				serial_send(RESET_CONF | LOCAL_ADDR);
 				PDEBUGLN("RESET CONFIRME");
 			}
 			else{
 				etape = ID_step; //Sinon le message nous est adressé
 				client_concerne = true;
 			}
+			data_counter = 0;
 		}
 #ifdef FORWARD_ADDR_CAM
 		else if ((serial_data & 0x0F) == FORWARD_ADDR_ASSERV || (serial_data & 0x0F) == FORWARD_ADDR_CAM) {
@@ -41,7 +42,7 @@ void executeCmd(char serial_data){
 #endif
 			forward_addr = serial_data & 0x0F;
 			etape = forward;
-			forward_serial_write(serial_data, forward_addr);
+			forward_serial_send(serial_data, forward_addr);
 		}
 		else if (serial_data == END && client_concerne) { //Fin de trame, execution de l'ordre
 			unsigned char data_8bits[MAX_DATA];
@@ -62,13 +63,14 @@ void executeCmd(char serial_data){
 			client_concerne = false;
 		}
 		else if (serial_data == END && etape == forward) {
-			forward_serial_write(serial_data, forward_addr);
+			forward_serial_send(serial_data, forward_addr);
 			if (serial_data == END) {
 				etape = wait_step;
 			}
 		}
 		else{ //Si fin de paquet ou packet non adressé au client
 			etape = wait_step;
+			data_counter = 0;
 		}
 	}
 	else{
@@ -92,7 +94,7 @@ void executeCmd(char serial_data){
 			data_counter++;
 			break;
 		case forward:
-			forward_serial_write(serial_data, forward_addr);
+			forward_serial_send(serial_data, forward_addr);
 			break;
 		case wait_step:
 			break;
@@ -120,25 +122,19 @@ int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){
         data_counter = j; //nouveau compte de datas
 
         //recalage des ordres 6bits
-        i = 0;
-	while(i<data_counter){
-                unsigned char overflow = right_shift_array(data_out + i, data_out + i, data_counter - i, 2); //Shift tout le tableau à droite de 1 à partir de i (le premier ordre est calé)
-                if(overflow != 0){
-                        data_out[data_counter] = overflow; //Si overflow, on le met (attention aux segfault)
-                }
-                //Ici le premier ordre est calé à la première boucle, le deuxieme à la deuxieme,etc ...
-                
-                unsigned char ordre = data_out[i];
-		if(ordre > MAX_ORDRES){//L'odre n'existe pas => corruption
-			return -1;
-		}
-		unsigned char size = ordreSize[(int)ordre];
-		if(size == SIZE_ERROR){//L'ordre n'existe pas => corruption de données
-			return -1;
-		}
-		else{
-			i += size + 1; //On se décale de la taille de l'ordre + 1 (+1 car on se décale aussi de l'ordre)
-		}
+        unsigned char overflow = right_shift_array(data_out, data_out, data_counter, 2); //Shift tout le tableau à droite de 1 à partir de i (le premier ordre est calé)
+        if(overflow != 0){
+                data_out[data_counter] = overflow; //Si overflow, on le met (attention aux segfault)
+		data_counter++;
+		PDEBUGLN("Pas normal\n");
+        }
+        unsigned char ordre = data_out[0];
+	if(ordre > MAX_ORDRES){//L'odre n'existe pas => corruption
+		return -1;
+	}
+	unsigned char size = ordreSize[(int)ordre];
+	if(size != data_counter-1){//Mauvaise taille => corruption
+		return -1;
 	}
 	return data_counter;
 }
@@ -186,16 +182,13 @@ int encode(unsigned char *data_in, unsigned char *data_out, int data_counter){ /
 }
 
 void executeOrdre(unsigned char *data, int data_counter, unsigned char id, bool doublon){
-	int i = 0, ret_size = 0;
+	int ret_size = 0;
 	unsigned char ordre;
 	unsigned char *params;
 	unsigned char ret[MAX_DATA];
-	//while (i < data_counter) { PROBLEME : les bits poubelles crée un ordre en trop - Solution : On commente la boucle : un seule ordre par tramme
-		ordre = data[i];
-		params = data + i + 1;
-		ret_size += switchOrdre(ordre, params, (ret + ret_size), doublon);//execution ordres, enregistrement du retour
-		i += ordreSize[ordre] + 1;
-	//}
+	ordre = data[0];
+	params = data + 1;
+	ret_size = switchOrdre(ordre, params, (ret + ret_size), doublon);//execution ordres, enregistrement du retour
 	sendResponse(ret, ret_size, id);
 }
 
@@ -203,27 +196,36 @@ void sendResponse(unsigned char *data, int data_counter, unsigned char id){
 	unsigned char data_7bits[MAX_DATA];
 	int i, size;
 	size = encode(data, data_7bits, data_counter);
-	serial_write(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
-	serial_write(id);
+	serial_send(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
+	serial_send(id);
 	for(i = 0 ; i < size ; i++){
-		serial_write(data_7bits[i]); //contenu
+		serial_send(data_7bits[i]); //contenu
 	}
-	serial_write(END); //fin de réponse
+	serial_send(END); //fin de réponse
 }
 
 void sendInvalid() {//renvoit le code de message invalide (dépend de la plateforme)
         PDEBUGLN("Data error");
-	serial_write(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
-	serial_write(INVALID_MESSAGE);
-	serial_write(END);
+	serial_send(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
+	serial_send(INVALID_MESSAGE);
+	serial_send(END);
 }
 
 void protocol_reset(){
-	serial_write(RESET | LOCAL_ADDR);
-	while(generic_serial_read() != (RESET_CONF | LOCAL_ADDR)){
+	int reset = 0;
+	while (!reset) {
 		long t = timeMillis();
-		if (timeMillis() - t > 1000)
-			serial_write(RESET | LOCAL_ADDR);
+		serial_send(RESET | LOCAL_ADDR);
+		while (timeMillis() - t < 1000 && !reset) {
+			char data = generic_serial_read();
+			if (data == (RESET_CONF | LOCAL_ADDR)) {
+				reset = 1;
+			}
+			else if (data == (RESET | LOCAL_ADDR)) {
+				serial_send(RESET_CONF | LOCAL_ADDR);
+				reset = 1;
+			}
+		}
 	}
 	PDEBUGLN("RESET");
 }
