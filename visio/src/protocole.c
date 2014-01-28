@@ -24,7 +24,7 @@ void* poll_proto () {
 }
 
 void init_protocol_thread () {
-	serial = open ("/dev/ttyUSB1", O_RDWR | O_NOCTTY | O_SYNC);
+	serial = open (SERIAL_PATH, O_RDWR | O_NOCTTY | O_SYNC);
 	if (serial < 0) {
 		perror("Can't open serial\n");
 		exit (EXIT_FAILURE);
