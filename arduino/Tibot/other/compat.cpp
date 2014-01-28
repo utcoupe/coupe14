@@ -24,7 +24,7 @@ void serial_write(char data) { //Envoi d'un octet en serial, dépend de la plate
 	Serial2.write(data);
 }
 
-char serial_read(){
+char generic_serial_read(){
 	return Serial2.read();
 }
 

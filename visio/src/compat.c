@@ -17,7 +17,7 @@ void serial_send(char c){
 	printf("send %x\n", c);
 }
 
-unsigned char serial_read() {
+unsigned char generic_serial_read() {
 	char data;
 	read (serial, &data, 1); 
 	printf("read %x\n", data);

@@ -10,9 +10,19 @@ typedef enum bool
 } bool;
 
 long timeMillis();
-unsigned char serial_read();
+unsigned char generic_serial_read();
 void serial_send(char c);
 int set_interface_attribs (int fd, int speed, int parity);
 void set_blocking (int fd, int should_block);
+
+#define LOCAL_ADDR ADDR_FLUSSMITTEL_CAM
+
+#ifdef DEBUG
+#define PDEBUGLN(x) printf(x);printf("\n");
+#define PDEBUG(x) printf(x);
+#else
+#define PDEBUGLN(x)
+#define PDEBUG(x)
+#endif
 
 #endif

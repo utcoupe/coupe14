@@ -199,7 +199,7 @@ void sendInvalid() {//renvoit le code de message invalide (dépend de la platefo
 }
 
 void protocol_reset(){
-	while(serial_read() != (RESET_CONF | LOCAL_ADDR)){
+	while(generic_serial_read() != (RESET_CONF | LOCAL_ADDR)){
 		serial_send(RESET | LOCAL_ADDR);
 		long t = timeMillis();
 		while (timeMillis() - t < 500);

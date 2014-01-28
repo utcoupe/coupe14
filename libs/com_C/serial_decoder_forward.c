@@ -220,7 +220,7 @@ void sendInvalid() {//renvoit le code de message invalide (dépend de la platefo
 
 void protocol_reset(){
 	serial_write(RESET | LOCAL_ADDR);
-	while(serial_read() != (RESET_CONF | LOCAL_ADDR)){
+	while(generic_serial_read() != (RESET_CONF | LOCAL_ADDR)){
 		long t = timeMillis();
 		if (timeMillis() - t > 1000)
 			serial_write(RESET | LOCAL_ADDR);

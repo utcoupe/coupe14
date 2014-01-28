@@ -14,14 +14,4 @@
 #define S_RED_TOL 185
 #define V_RED_TOL 185
 
-#define LOCAL_ADDR ADDR_FLUSSMITTEL_CAM
-
-#ifdef DEBUG
-#define PDEBUGLN(x) printf(x);printf("\n");
-#define PDEBUG(x) printf(x);
-#else
-#define PDEBUGLN(x)
-#define PDEBUG(x)
-#endif
-
 #endif

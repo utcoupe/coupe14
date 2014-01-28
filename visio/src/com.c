@@ -28,7 +28,7 @@ int main () {
 	printf("Protocole pret\n");
 
 	while (1) {
-		char data = serial_read();
+		char data = generic_serial_read();
 		executeCmd(data);
 	}
 	return 0;
