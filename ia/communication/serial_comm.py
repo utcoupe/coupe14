@@ -26,7 +26,6 @@ class ComSerial():
 		if self.liaison.inWaiting():
 			#self.rawInput += self.liaison.read(self.liaison.inWaiting())
 			self.rawInput += self.liaison.read(self.liaison.inWaiting())
-			
 
 			i = 0
 			debutChaine = 0

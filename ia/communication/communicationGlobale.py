@@ -104,7 +104,9 @@ class communicationGlobale():
 				#Lecture des entrées
 				if self.readInput == True:
 					self.mutexOrdersToRead.acquire()
-					self.ordersToRead += self.readOrders()
+					#TODO
+					#self.ordersToRead += self.readOrders()
+					self.readOrders()
 					self.mutexOrdersToRead.release()
 
 				#Renvoie des ordres non confirmés
@@ -247,10 +249,10 @@ class communicationGlobale():
 	def extractData(self, rawInput):
 		""" prend rawInput une chaine de caractère qui correspond  qui correspond à un ordre, retourne les autres packerData est prêt à être interpréter"""
 		
-		"""print "DEBUG"
+		"""print("DEBUG")
 		for letter in rawInput:
-			print conversion.intToBinary(ord(letter))
-		print "FIN DEBUG"""
+			print(conversion.intToBinary(letter))
+		print("FIN DEBUG")"""
 
 	
 
@@ -276,8 +278,12 @@ class communicationGlobale():
 			packetId = rawInput[1]
 
 			# si la longeur des données reçu est bonne
-			if packetAddress >0 and packetAddress<self.nbAddress and packetId >= 0 and packetId < 64 and (len(rawInput[2:-1])*7//8 == self.returnSize[ self.ordreLog[packetAddress][packetId][0] ]):
-				return (packetAddress, packetId, rawInput[2:-1])# on supprime les deux carctères du dessus et le paquet de fin
+			if packetAddress > 0 and packetAddress < (self.nbAddress+1) and packetId >= 0 and packetId < 64:
+				if len(rawInput[2:-1])*7//8 == self.returnSize[ self.ordreLog[packetAddress][packetId][0] ]:
+					return (packetAddress, packetId, rawInput[2:-1])# on supprime les deux carctères du dessus et le paquet de fin
+				else:
+					print("WARNING: Le paquet est mal formé, l'address ou l'id est invalide debug_A")
+					return -1
 			elif packetId > 63:
 				print(("L'arduino", self.address[packetAddress], "nous indique avoir mal reçu un message, message d'erreur ", packetId))
 				return -1
@@ -332,23 +338,20 @@ class communicationGlobale():
 				index = 0
 				for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
 					if returnType == 'int':
-						size = 2
-						retour = conversion.binaryToInt(argumentData[index*8:(index+size)*8])
+						size = 16
+						retour = conversion.binaryToInt(argumentData[index:index+size])
 						print(("Retour int: ", retour))
 						arguments.append(retour)
 						index += size
 					elif returnType == 'float':
-						size = 4
-						retour = conversion.binaryToFloat(argumentData[index*8:(index+size)*8])
+						size = 32
+						retour = conversion.binaryToFloat(argumentData[index:index+size])
 						print(("Retour float: ", retour))
 						arguments.append(retour)
 						index += size
 					elif returnType == 'long':
-						size = 4
-						#print(order[2][-(size+index):])
-
-
-						retour = conversion.binaryToLong(argumentData[index*8:(index+size)*8])
+						size = 32
+						retour = conversion.binaryToLong(argumentData[index:index+size])
 						print(("Retour long: ", retour))
 						arguments.append(retour)
 						index += size
@@ -364,26 +367,28 @@ class communicationGlobale():
 
 
 
-	#Envoi
-	def sendXbeeOrder(self, address, idd, order, chaineTemp):
-		self.ordreLog[address][idd] = (order, chaineTemp)
-		date = int(time.time()*1000)
-		self.lastSendDate[address] = date
-		self.liaisonXbee.send(chaineTemp)
-
-	def applyProtocole(self, address, packetId, data):
+	def applyProtocole(self, address, idd, order, data):
 		""" on concatène les trois parametres et on retourne chaineRetour en appliquant le protocole """
+		rawBinary = conversion.orderToBinary(order)
+		for i,typeToGet in enumerate(self.ordersArguments[order]):
+			if typeToGet == 'int':
+				rawBinary += conversion.intToBinary(data[i])
+			elif typeToGet == 'long':
+				rawBinary += conversion.longToBinary(data[i])
+			elif typeToGet == 'float':
+				rawBinary += conversion.floatToBinary(data[i])
+			else:
+				print("ERREUR: Parseur: le parseur serial_defines a trouvé un type non supporté")
+		
+		while len(rawBinary)%7 != 0: # hack pour former correctement le dernier octet
+			rawBinary += '0'
+		
 		chaineRetour = ""
 		chaineRetour += chr(address + 128)
-		chaineRetour += chr(packetId)
-
-		rawBinary = data
-		
-		while len(rawBinary)%7!=0: # hack pour former correctement le dernier octet
-			rawBinary += '0'
+		chaineRetour += chr(idd)
 		for i in range(0, len(rawBinary), 7):
 			chaineRetour += chr(int(rawBinary[i:i+7], 2))
-		
+
 		#on ajoute l'octet de fin
 		chaineRetour += chr(128)
 
@@ -391,29 +396,23 @@ class communicationGlobale():
 
 	def sendOrders(self):
 		"""fonction qui gère l'envoi des ordres, sous le contrôle du thread"""
+		date = int(time.time()*1000)
 
 		remainOrdersToSend = deque()
 		self.mutexOrdersToSend.acquire()
 		for packet in self.ordersToSend:#packet contient(address, ordre, *argument)
 			#si il n'y a pas déjà trop d'ordres en atente on envoie
 			if self.nbUnconfirmedPacket[packet[0]][0] < self.maxUnconfirmedPacket:
-				self.nbUnconfirmedPacket[packet[0]] = (self.nbUnconfirmedPacket[packet[0]][0]+1, int(time.time()*1000)) # on s'occupe de [1] dans sendXbeeOrder
-				data = conversion.orderToBinary(packet[1])
-				i = 0
+				address = packet[0]
+				order = packet[1]
+				self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0]+1, date)
+				
+				idd = self.getId(address)
+				chaineTemp = self.applyProtocole(address, idd, order, packet[2])
 
-				for typeToGet in self.ordersArguments[packet[1]]:
-					if typeToGet == 'int':
-						data += conversion.intToBinary(int(packet[2][i]))
-					elif typeToGet == 'long':
-						data += conversion.longToBinary(int(packet[2][i]))
-					elif typeToGet == 'float':
-						data += conversion.floatToBinary(float(packet[2][i]))
-					else:
-						print("ERREUR: Parseur: le parseur a trouvé un type non supporté")
-					i += 1
-				idd = self.getId(packet[0])
-				chaineTemp = self.applyProtocole(packet[0], idd, data)
-				self.sendXbeeOrder(packet[0], idd, packet[1], chaineTemp)
+				self.ordreLog[int(address)][idd] = (order, chaineTemp)
+				self.lastSendDate[address] = int(time.time()*1000)
+				self.liaisonXbee.send(chaineTemp)
 			else:
 				remainOrdersToSend.append(packet)
 
@@ -430,9 +429,13 @@ class communicationGlobale():
 	def checkAddress(self, address):
 		"""verifie que l'address existe et la convertie en int si nécéssaire, sinon retourne -1"""
 		if address in self.address:
-			if isinstance(address, (str)):
-				address = self.address[address]
-			return address
+			if self.arduinoIdReady[address] == True:
+				if isinstance(address, (str)):
+					address = self.address[address]
+				return address
+			else:
+				print(("ERREUR COMM: L'arduino", self.address[address], " n'est pas prête."))
+				return -1
 		else:
 			print(("ERREUR COMM: L'address: ", address, " est invalide."))
 			return -1
@@ -470,9 +473,6 @@ class communicationGlobale():
 
 	def checkOrderArgument(self, order, *arguments):
 		"""check a given set of argument for an order, if all arguments type match return 0 else return -1"""
-		#orderSize need str argument
-		if isinstance(order, (int)):
-			order = self.orders[order]
 
 		if len(arguments) == len(self.ordersArguments[order]):
 			for i, argumentType in enumerate(self.ordersArguments[order]):
@@ -481,7 +481,7 @@ class communicationGlobale():
 						print(("L'argument ", i, " de l'ordre ", order, " n'est pas du bon type, attendu (int)"))
 						return -1
 				elif argumentType == 'long':
-					if not isinstance(arguments[i], (int)):
+					if not isinstance(arguments[i], (long)):
 						print(("L'argument ", i, " de l'ordre ", order, " n'est pas du bon type, attendu (long)"))
 						return -1
 				elif argumentType == 'float':
@@ -489,7 +489,8 @@ class communicationGlobale():
 						print(("L'argument ", i, " de l'ordre ", order, " n'est pas du bon type, attendu (float)"))
 						return -1
 				else:
-					print("ERREUR: attendu type inconnu")
+					print("ERREUR: l'argument parsé dans serial_define est de type inconnu")
+					return -1
 					
 		else:
 			print(("ERREUR: l'order", order, "attend", len(self.ordersArguments[order]), "arguments, mais a recu:", len(arguments), "arguemnts"))
@@ -502,7 +503,7 @@ class communicationGlobale():
 
 
 	def sendOrderAPI(self, address, order, *arguments):
-		""""api d'envoie d'ordres avec verification des parametres, retourne False en cas d'erreur"""
+		""""api d'envoie d'ordres avec verification des parametres, retourne -1 en cas d'erreur, sinon 0"""
 		#on verifie l'address
 		address = self.checkAddress(address)
 		order = self.checkOrder(order)
