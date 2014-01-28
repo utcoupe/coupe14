@@ -68,7 +68,6 @@ void executeCmd(char serial_data){
 		}
 		else{ //Si fin de paquet ou packet non adressé au client
 			etape = wait_step;
-			data_counter = 0;
 		}
 	}
 	else{
