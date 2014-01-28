@@ -33,9 +33,9 @@ class ComSerial():
 			self.readyToRead = False
 			for leter in self.rawInput:
 
-				if leter > '\x80':#c'est forcement le premier paquet, '\x80'=128
-					if leter > 'À': # si c'est un packet de reset, 'À'=192
-						rawInputList.append(leter)
+				if leter > 128:#c'est forcement le premier paquet,
+					if leter > 192: # si c'est un packet de reset,
+						rawInputList.append(chr(leter))
 						self.readyToRead = False
 						debutChaine = i+1
 						
@@ -46,9 +46,13 @@ class ComSerial():
 						debutChaine = i
 							
 									
-				if leter == '\x80': #'\x80'=128
+				if leter == 128:
 					if self.readyToRead == True:#cas normal
-						rawInputList.append(self.rawInput[debutChaine:i+1])
+						#TODO return int instead of chr to avoid converting
+						temp=[]
+						for nombre in self.rawInput[debutChaine:i+1]:
+							temp.append(chr(nombre))
+						rawInputList.append(temp)
 					#également quand on a perdu le paquet de debut
 					self.readyToRead = False
 					debutChaine = i
@@ -63,7 +67,6 @@ class ComSerial():
 		"""if self.liaison.isOpen() == False:
 			print('comSerial,fct send: La liaison demandé n\'a pas été initializé k')"""
 		
-		formatedString = ""
 		for char in rawOutputString:
 			self.liaison.write(bytes(char, 'latin-1'))
 			

@@ -21,17 +21,19 @@ class communicationGlobale():
 		self.ordersRetour = {}
 		self.ordersSize = {}
 		(self.address, self.orders, self.ordersSize, self.ordersArguments, self.ordersRetour) = parser_c.parseConstante()
-		self.ordreLog = [[(-1,"")]*64 for x in range(len(self.address)//2+1)] #stock un historique des ordres envoyés, double tableau de tuple (ordre,data)
+		self.nbAddress = len(self.address)//2+1
+
+		self.ordreLog = [[(-1,"")]*64 for x in range(self.nbAddress)] #stock un historique des ordres envoyés, double tableau de tuple (ordre,data)
 
 		for order in self.orders:
 			self.checkParsedOrderSize(order)
 		
-		self.arduinoIdReady = [False]*(len(self.address)//2+1)
-		self.lastConfirmationDate = [-1]*(len(self.address)//2+1)#date de la dernière confirmation(en milliseconde)
-		self.lastSendDate = [-1]*(len(self.address)//2+1)#date du dernier envoie(en milliseconde)
-		self.lastIdConfirm = [63]*(len(self.address)//2+1)
-		self.lastIdSend = [63]*(len(self.address)//2+1)
-		self.nbUnconfirmedPacket = [(0, -1)]*(len(self.address)//2+1) # (nbUnconfimed, dateFirstUnconfirmed)
+		self.arduinoIdReady = [False]*self.nbAddress
+		self.lastConfirmationDate = [-1]*self.nbAddress#date de la dernière confirmation(en milliseconde)
+		self.lastSendDate = [-1]*self.nbAddress#date du dernier envoie(en milliseconde)
+		self.lastIdConfirm = [63]*self.nbAddress
+		self.lastIdSend = [63]*self.nbAddress
+		self.nbUnconfirmedPacket = [(0, -1)]*self.nbAddress # (nbUnconfimed, dateFirstUnconfirmed)
 
 		self.liaisonXbee = serial_comm.ComSerial(port, 57600)
 
@@ -89,7 +91,7 @@ class communicationGlobale():
 				if self.renvoieOrdre == True:
 					for address in self.address:
 						if isinstance(address, (int)):
-							if (date - self.nbUnconfirmedPacket[address][1] > 40) and(self.nbUnconfirmedPacket[address][1] != -1):#si il reste un ordre non confirmé en moins de X ms
+							if (date - self.nbUnconfirmedPacket[address][1] > 75) and(self.nbUnconfirmedPacket[address][1] != -1):#si il reste un ordre non confirmé en moins de X ms
 								self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], date)
 								indiceARenvoyer = self.getAllUnknowledgeId(address)
 								for indice in indiceARenvoyer:
@@ -100,9 +102,10 @@ class communicationGlobale():
 			#tâche de faibles priorités
 			if (date - self.lastLowPrioTaskDate) > self.lowPrioSpeed:
 				self.lastLowPrioTaskDate = date
+
 				#recherche d'arduino
 				if self.probingDevices == True:
-					for address in range(1, len(self.address)//2+1, 1):
+					for address in range(self.nbAddress):
 						if self.arduinoIdReady[address] == False:
 							self.askResetId(address)
 
@@ -110,8 +113,8 @@ class communicationGlobale():
 				if self.keepContact == True:# On envoie un PING pour verifier si le device est toujours présent
 					for address in self.address:
 						if isinstance(address, (int)):
-							if self.arduinoIdReady[address]:
-								if ((date - self.lastConfirmationDate[address]) > 5000) and self.lastConfirmationDate[address] != -1:#le système est considere comme hors ligne
+							if self.arduinoIdReady[address] and self.lastConfirmationDate[address] != -1:
+								if (date - self.lastConfirmationDate[address]) > 5000:#le système est considere comme hors ligne
 									self.arduinoIdReady[address] = False
 								elif (date - self.lastSendDate[address]) > 1000:
 									self.sendOrderAPI(address, self.orders['PINGPING_AUTO'])
@@ -242,16 +245,18 @@ class communicationGlobale():
 			if packetAddress > 96:# l'arduino confirme le reset
 				if packetAddress-96 in self.address:
 					self.acceptConfirmeResetId(packetAddress-96)
+					return 0
 				else:
 					print("WARNING, corrupted address on reset confirme from arduino")
-				return 0
+					return -1
 
 			elif packetAddress > 64:# l'arduino demande un reset
 				if packetAddress-64 in self.address:
 					self.confirmeResetId(packetAddress-64)
+					return 0
 				else:
 					print("WARNING, corrupted address on reset confirme from arduino")
-				return 0
+					return -1
 
 			elif len(rawInput)>=3:#cas normal
 				packetId = ord(rawInput[1])
@@ -281,21 +286,21 @@ class communicationGlobale():
 						return (packetAddress, packetId, packetData)
 					else:
 						print(("WARNING: Le paquet ne fait pas la bonne taille, des données ont probablement été perdue, paquet droppé, taille attendu ", taille))
-						return 0
+						return -1
 				elif packetId > 63:
 					print(("L'arduino", self.address[packetAddress], "nous indique avoir mal reçu un message, message d'erreur ", packetId))
-					return 0
+					return -1
 				else:
 					print("WARNING: Le paquet est mal formé, l'address ou l'id est invalide")
-					return 0
+					return -1
 			else:
 				print("WARNING: Le paquet ne fait même pas 3 octet, des données ont probablement été perdue, paquet droppé")
-				return 0
+				return -1
 		else:
 			print("WARNING: Le paquet ne fait même pas 1 octet, des données ont probablement été perdue, paquet droppé")
-			return 0
+			return -1
 		print("Erreur: erreur de code, cas non gérer")
-		return 0# ne doit pas arriver
+		return -1# ne doit pas arriver
 
 	def getXbeeOrders(self):
 		""" retourne ordersList, une liste d'élements sous la forme(adresse, id, data) où data est prêt à être interpréter"""
@@ -305,7 +310,7 @@ class communicationGlobale():
 
 		for rawInput in rawInputList:
 			ret = self.extractData(rawInput)
-			if ret != 0 and ret != None:# cas où les données sont de la bonne taille et que ça n'a rien à voir avec le système de reset
+			if ret != -1 and ret != 0 and ret != None:# cas où les données sont de la bonne taille et que ça n'a rien à voir avec le système de reset
 				ordersList.append(ret)
 
 		return ordersList
