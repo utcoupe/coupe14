@@ -11,7 +11,8 @@ def binaryToFloat(string):
 	    """
 	    See: http://en.wikipedia.org/wiki/IEEE_754-2008
 	    """
-	    return struct.unpack("f",struct.pack("I", bits2int(s)))
+	    from struct import pack,unpack
+	    return unpack("f",pack("I", bits2int(s)))
 
 	# Where the bits2int function converts bits to an integer.  
 	def bits2int(bits):
