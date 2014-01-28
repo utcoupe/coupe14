@@ -26,13 +26,14 @@ void* poll_proto () {
 void init_protocol_thread () {
 	printf("Essai d'ouverture de %s\n", SERIAL_PATH);
 	FILE* file_serial = fopen (SERIAL_PATH, "rb+");
-	serial = fileno(file_serial);
-	if (serial < 0) {
+	if (file_serial == 0) {
 		perror("Can't open serial\n");
 		exit (EXIT_FAILURE);
 	}
+	serial = fileno(file_serial);
 	set_interface_attribs (serial, B57600, PARENB|PARODD);  
 	set_blocking (serial, 1);                // set blocking
+	printf("Initialisation protocole\n");
 	init_protocol();
 	printf("Protocole pret\n");
 	pthread_mutex_init (&mutex, NULL);
