@@ -19,21 +19,28 @@ class communicationGlobale():
 		self.orders = {}
 		self.ordersArguments = {}
 		self.ordersRetour = {}
-		self.ordersSize = {}
-		(self.address, self.orders, self.ordersSize, self.ordersArguments, self.ordersRetour) = parser_c.parseConstante()
-		self.nbAddress = len(self.address)//2+1
+		self.argumentSize = {}
+		(self.address, self.orders, self.argumentSize, self.ordersArguments, self.ordersRetour) = parser_c.parseConstante()
+		self.nbAddress = len(self.address)//2
 
 		self.ordreLog = [[(-1,"")]*64 for x in range(self.nbAddress)] #stock un historique des ordres envoyés, double tableau de tuple (ordre,data)
 
-		for order in self.orders:
+		for order in self.orders:#revertion 
+			if isinstance(order, (str)):
+				size = self.argumentSize[order]
+				self.argumentSize[self.orders[order]] = size
+
+		print(self.argumentSize)
+
+		for order in self.orders:# on vérifie la cohérance entre serial_defines.c et serial_defines.h
 			self.checkParsedOrderSize(order)
 		
-		self.arduinoIdReady = [False]*self.nbAddress
-		self.lastConfirmationDate = [-1]*self.nbAddress#date de la dernière confirmation(en milliseconde)
-		self.lastSendDate = [-1]*self.nbAddress#date du dernier envoie(en milliseconde)
-		self.lastIdConfirm = [63]*self.nbAddress
-		self.lastIdSend = [63]*self.nbAddress
-		self.nbUnconfirmedPacket = [(0, -1)]*self.nbAddress # (nbUnconfimed, dateFirstUnconfirmed)
+		self.arduinoIdReady = [False]*(self.nbAddress+1)
+		self.lastConfirmationDate = [-1]*(self.nbAddress+1)#date de la dernière confirmation(en milliseconde)
+		self.lastSendDate = [-1]*(self.nbAddress+1)#date du dernier envoie(en milliseconde)
+		self.lastIdConfirm = [63]*(self.nbAddress+1)
+		self.lastIdSend = [63]*(self.nbAddress+1)
+		self.nbUnconfirmedPacket = [(0, -1)]*(self.nbAddress+1) # (nbUnconfimed, dateFirstUnconfirmed)
 
 		self.liaisonXbee = serial_comm.ComSerial(port, 57600)
 
@@ -62,7 +69,7 @@ class communicationGlobale():
 
 
 	def getConst(self):
-		return (self.address, self.orders, self.ordersSize, self.ordersArguments, self.ordersRetour)
+		return (self.address, self.orders, self.argumentSize, self.ordersArguments, self.ordersRetour)
 
 		
 			
@@ -168,12 +175,6 @@ class communicationGlobale():
 			return unconfirmedIds
 		return ()
 
-	def incrementeLastConfirmedId(self, address):
-		if self.lastIdConfirm[address] == 63:
-			self.lastIdConfirm[address] = 0
-		else:
-			self.lastIdConfirm[address] += 1
-
 
 	def removeOrdersInFile(self, address):# Warning, only on reset !
 		remainOrdersToSend = deque()
@@ -238,69 +239,64 @@ class communicationGlobale():
 			print conversion.intToBinary(ord(letter))
 		print "FIN DEBUG"""
 
-		if len(rawInput) >0:#cas improbable, mais il semble que ça arrive
+	
 
-			packetAddress = ord(rawInput[0]) - 128
+		packetAddress = rawInput[0] - 128
 
-			if packetAddress > 96:# l'arduino confirme le reset
-				if packetAddress-96 in self.address:
-					self.acceptConfirmeResetId(packetAddress-96)
-					return 0
-				else:
-					print("WARNING, corrupted address on reset confirme from arduino")
-					return -1
-
-			elif packetAddress > 64:# l'arduino demande un reset
-				if packetAddress-64 in self.address:
-					self.confirmeResetId(packetAddress-64)
-					return 0
-				else:
-					print("WARNING, corrupted address on reset confirme from arduino")
-					return -1
-
-			elif len(rawInput)>=3:#cas normal
-				packetId = ord(rawInput[1])
-				rawInput = rawInput[2:-1] # on supprime les deux carctères du dessus et le paquet de fin
-				
-				#python enleve les zero lors de la conversion en binaire donc on les rajoute, sauf le premier du protocole
-				packetData = ""
-				for octet in rawInput:
-					temp = bin(ord(octet))[2:]
-					while len(temp) < 7:
-						temp = '0' + temp
-					packetData += temp
-
-				if (packetAddress in self.address) and packetId >= 0 and packetId < 64:
-					taille = 0
-					for returnType in self.ordersRetour[self.orders[ self.ordreLog[packetAddress][packetId][0] ]]:
-						if returnType == 'int':
-							taille += 2
-						elif returnType == 'float':
-							taille += 4
-						elif returnType == 'long':
-							taille += 4
-						else:
-							print("ERREUR: Parseur: le parseur a trouvé un type non supporté")
-
-					if len(packetData)//8 == taille:# si la longeur des données reçu est bonne
-						return (packetAddress, packetId, packetData)
-					else:
-						print(("WARNING: Le paquet ne fait pas la bonne taille, des données ont probablement été perdue, paquet droppé, taille attendu ", taille))
-						return -1
-				elif packetId > 63:
-					print(("L'arduino", self.address[packetAddress], "nous indique avoir mal reçu un message, message d'erreur ", packetId))
-					return -1
-				else:
-					print("WARNING: Le paquet est mal formé, l'address ou l'id est invalide")
-					return -1
+		if packetAddress > 96:# l'arduino confirme le reset
+			if packetAddress-96 in self.address:
+				self.acceptConfirmeResetId(packetAddress-96)
+				return 0
 			else:
-				print("WARNING: Le paquet ne fait même pas 3 octet, des données ont probablement été perdue, paquet droppé")
+				print("WARNING, corrupted address on reset confirme from arduino")
+				return -1
+
+		elif packetAddress > 64:# l'arduino demande un reset
+			if packetAddress-64 in self.address:
+				self.confirmeResetId(packetAddress-64)
+				return 0
+			else:
+				print("WARNING, corrupted address on reset confirme from arduino")
+				return -1
+
+		elif len(rawInput)>=3:#cas normal
+			packetId = rawInput[1]
+			rawInput = rawInput[2:-1] # on supprime les deux carctères du dessus et le paquet de fin
+			
+			#python enleve les zero lors de la conversion en binaire donc on les rajoute, sauf le premier du protocole
+			packetData = ""
+			for octet in rawInput:
+				temp = bin(octet)[2:]
+				while len(temp) < 7:
+					temp = '0' + temp
+				packetData += temp
+
+			if packetAddress >0 and packetAddress<self.nbAddress and packetId >= 0 and packetId < 64:
+				taille = 0
+				for returnType in self.ordersRetour[self.orders[ self.ordreLog[packetAddress][packetId][0] ]]:
+					if returnType == 'int':
+						taille += 2
+					elif returnType == 'float':
+						taille += 4
+					elif returnType == 'long':
+						taille += 4
+					else:
+						print("ERREUR: Parseur: le parseur a trouvé un type non supporté")
+
+				if len(packetData)//8 == taille:# si la longeur des données reçu est bonne
+					return (packetAddress, packetId, packetData)
+				else:
+					print(("WARNING: Le paquet ne fait pas la bonne taille, des données ont probablement été perdue, paquet droppé, taille attendu ", taille))
+					return -1
+			elif packetId > 63:
+				print(("L'arduino", self.address[packetAddress], "nous indique avoir mal reçu un message, message d'erreur ", packetId))
+				return -1
+			else:
+				print("WARNING: Le paquet est mal formé, l'address ou l'id est invalide")
 				return -1
 		else:
-			print("WARNING: Le paquet ne fait même pas 1 octet, des données ont probablement été perdue, paquet droppé")
+			print("WARNING: Le paquet n'est pas un reset et ne fait même pas 3 octet, des données ont probablement été perdue, paquet droppé")
 			return -1
-		print("Erreur: erreur de code, cas non gérer")
-		return -1# ne doit pas arriver
 
 	def getXbeeOrders(self):
 		""" retourne ordersList, une liste d'élements sous la forme(adresse, id, data) où data est prêt à être interpréter"""
@@ -458,8 +454,8 @@ class communicationGlobale():
 		if isinstance(order, (int)):
 			order = self.orders[order]
 
-		if order in self.ordersSize:#verification
-			sizeExpected = self.ordersSize[order]
+		if order in self.argumentSize:#verification
+			sizeExpected = self.argumentSize[order]
 			somme = 0
 			for argumentType in self.ordersArguments[order]:
 				if argumentType == 'int':
@@ -474,6 +470,7 @@ class communicationGlobale():
 				print(("ERREUR: la constante de taille de l'ordre ", order, " ne correspond pas aux types indiqués attendu ", sizeExpected, " calculee ", somme))
 		else:
 			print(("ERREUR l'ordre ", order, "n'a pas été trouvé dans serial_defines.c"))
+
 
 	def checkOrderArgument(self, order, *arguments):
 		"""check a given set of argument for an order, if all arguments type match return 0 else return -1"""

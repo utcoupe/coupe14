@@ -35,7 +35,7 @@ class ComSerial():
 
 				if leter > 128:#c'est forcement le premier paquet,
 					if leter > 192: # si c'est un packet de reset,
-						rawInputList.append(chr(leter))
+						rawInputList.append([leter])
 						self.readyToRead = False
 						debutChaine = i+1
 						
@@ -49,10 +49,8 @@ class ComSerial():
 				if leter == 128:
 					if self.readyToRead == True:#cas normal
 						#TODO return int instead of chr to avoid converting
-						temp=[]
-						for nombre in self.rawInput[debutChaine:i+1]:
-							temp.append(chr(nombre))
-						rawInputList.append(temp)
+						
+						rawInputList.append(self.rawInput[debutChaine:i+1])
 					#également quand on a perdu le paquet de debut
 					self.readyToRead = False
 					debutChaine = i
