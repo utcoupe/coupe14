@@ -24,11 +24,6 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		}
 		break;
 	case A_GET_CODER:
-                if (!doublon) {
-			PDEBUG("Codeur L : ");PDEBUGLN(control.getLenc()->getTicks());
-			PDEBUG("Codeur R : ");PDEBUGLN(control.getRenc()->getTicks());
-			PDEBUG("Angle pos : ");PDEBUGLN(control.getPos().angle);
-                }
 		ltob(control.getLenc()->getTicks(), ret);
 		ltob(control.getRenc()->getTicks(), ret + 4);
 		ret_size = 8;
@@ -112,7 +107,10 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		//Coder ici la formation des données de retour
 
 		break;*/
+	case PINGPING_AUTO:
+		break;
 	default:
+		PDEBUGLN("ORDRE INCONNU");
 		return -1;//commande inconnue
 	}
 	return ret_size;
