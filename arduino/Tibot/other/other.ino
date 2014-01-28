@@ -41,7 +41,7 @@ void loop(){
 	}
 	for(int i = 0; i < available; i++) {
 		// recuperer l'octet courant
-		executeCmd(serial_read());
+		executeCmd(generic_serial_read());
 	}
 
 	//Forward des retours asserv
@@ -50,7 +50,7 @@ void loop(){
 		available = MAX_READ;
 	}
 	for(int i = 0; i < available; i++) {
-		serial_write(Serial1.read());
+		serial_send(Serial1.read());
 	}
 
 	/* fin zone de programmation libre */

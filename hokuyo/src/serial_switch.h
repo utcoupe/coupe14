@@ -6,9 +6,10 @@
 #ifndef SERIAL_SWITCH_H
 #define SERIAL_SWITCH_H
 
+#include "fast_math.h"
 #include "compat.h"
 
-void pushData(int p_red, int p_yellow);
+void pushCoords(struct coord *n_robots, int n);
 int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bool doublon);//Si doublon, ne pas executer d'ordre mais renvoyer les données à renvoyer 
 
 #endif
