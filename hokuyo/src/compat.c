@@ -14,14 +14,12 @@ long timeMillis() {
 
 void serial_send(char c){
 	write (serial, &c, 1);           // send 7 character greeting
-	printf("send %x\n", c);
 }
 
 unsigned char generic_serial_read() {
 	char data;
 	while(read (serial, &data, 1) == 0);
 	data &= 0xFF;
-	printf("read %x\n", data);
 	return data;
 }
 
