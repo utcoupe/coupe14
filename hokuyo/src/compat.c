@@ -1,8 +1,10 @@
-#include <errno.h>
+//#include <errno.h>
+#include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
+#include <fcntl.h>
 
 #include "compat.h"
 
@@ -94,4 +96,3 @@ int n = read (fd, buf, sizeof buf);
 
 The values for speed are B115200, B230400, B9600, B19200, B38400, B57600, B1200, B2400, B4800, etc. The values for parity are 0 (meaning no parity), PARENB|PARODD (enable parity and use odd), PARENB (enable parity and use even), PARENB|PARODD|CMSPAR (mark parity), and PARENB|CMSPAR (space parity).
 */
-

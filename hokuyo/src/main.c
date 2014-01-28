@@ -79,7 +79,7 @@ int main(int argc, char **argv){
 	}
 
 	//l1 = initLidarAndCalibrate( hokuyo_urg, "/dev/ttyACM0", pos1, -PI/2, -PI/2, 0);
-	l1 = initLidarAndCalibrate( hokuyo_urg, "/dev/ttyACM0", pos1, -PI/2, -PI/2, 0);
+	l1 = initLidar( hokuyo_urg, "/dev/ttyACM0", pos1, -PI/2, -PI/2, 0);
 
 	#ifdef SDL
 	l1Color = newColor(255, 0, 0);

@@ -36,7 +36,7 @@ void executeCmd(char serial_data){
 			data_counter = 0;
 		}
 #ifdef FORWARD_ADDR_CAM
-		else if ((serial_data & 0x0F) == FORWARD_ADDR_ASSERV || (serial_data & 0x0F) == FORWARD_ADDR_CAM) {
+		else if (((serial_data & 0x0F) == FORWARD_ADDR_ASSERV) || ((serial_data & 0x0F) == FORWARD_ADDR_CAM)) {
 #else
 		else if ((serial_data & 0x0F) == FORWARD_ADDR_ASSERV) {
 #endif
@@ -64,9 +64,7 @@ void executeCmd(char serial_data){
 		}
 		else if (serial_data == END && etape == forward) {
 			forward_serial_send(serial_data, forward_addr);
-			if (serial_data == END) {
-				etape = wait_step;
-			}
+			etape = wait_step;
 		}
 		else{ //Si fin de paquet ou packet non adressé au client
 			etape = wait_step;
