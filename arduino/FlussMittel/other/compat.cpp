@@ -6,6 +6,8 @@
 #include "compat.h"
 #include "Servo.h"
 
+#include <Arduino.h>
+
 extern Servo servoBras;
 
 void initPins(){
@@ -23,19 +25,10 @@ unsigned long timeMicros(){
 	return micros();
 }
 
-void serial_write(char data) { //Envoi d'un octet en serial, dépend de la plateforme
-	Serial2.write(data);
+void serial_send(char data) { //Envoi d'un octet en serial, dépend de la plateforme
+	Serial.write(data);
 }
 
 char serial_read(){
-	return Serial2.read();
-}
-
-void forward_serial_write(char c, char addr) {
-	if (addr == FORWARD_ADDR_ASSERV) {
-		Serial1.write(c);
-	}
-	else if (addr == FORWARD_ADDR_CAM) {
-		Serial.write(c);
-	}
+	return Serial.read();
 }

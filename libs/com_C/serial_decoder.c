@@ -43,7 +43,6 @@ void executeCmd(char serial_data){
 			if ((serial_data & 0xF0) == RESET){ //Si demande de reset
 				ID_attendu = 0;
 				serial_send(RESET_CONF | LOCAL_ADDR);
-				PDEBUGLN("RESET CONFIRME");
 			}
 			else{
 				etape = ID_step; //Sinon le message nous est adressé
@@ -192,7 +191,6 @@ void sendResponse(unsigned char *data, int data_counter, unsigned char id){
 }
 
 void sendInvalid() {//renvoit le code de message invalide (dépend de la plateforme)
-        PDEBUGLN("Data error");
 	serial_send(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
 	serial_send(INVALID_MESSAGE);
 	serial_send(END);
@@ -204,7 +202,6 @@ void protocol_reset(){
 		long t = timeMillis();
 		while (timeMillis() - t < 500);
 	}
-	PDEBUGLN("RESET");
 }
 
 void init_protocol(){
