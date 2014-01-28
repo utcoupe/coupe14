@@ -6,7 +6,6 @@
 #ifndef COMPAARDUINO_H
 #define COMPAARDUINO_H
 
-#include "Arduino.h"
 #include "parameters.h"
 #include "serial_defines.h"
 

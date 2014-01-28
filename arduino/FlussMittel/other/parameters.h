@@ -1,6 +1,8 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
+#include <Arduino.h>
+
 #define DEBUG
 
 #define PIN_SERVO_BRAS 8

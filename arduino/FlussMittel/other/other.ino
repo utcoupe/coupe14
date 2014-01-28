@@ -1,12 +1,13 @@
+
 /****************************************
  * Author : Quentin C			*
  * Mail : quentin.chateau@gmail.com	*
  * Date : 13/10/13			*
  ****************************************/
-  
-#include "Arduino.h"
-#include "Servo.h"
-#include "AFMotor.h"
+
+//#include "AFMotor.h"
+#include <Servo.h>
+#include <Arduino.h>
 
 #include "serial_decoder_forward.h"
 #include "serial_defines.h"
@@ -14,28 +15,16 @@
 #include "parameters.h"
 
 Servo servoBras;
-AF_DCMotor motor_ascenseur(1);
+//AF_DCMotor motor_ascenseur(1);
 
 #define MAX_READ 64 
 void setup(){
 	initPins();
-	Serial2.begin(57600, SERIAL_8O1);
-	Serial1.begin(57600, SERIAL_8O1); //Forward
-#ifdef FORWARD_ADDR_CAM
-	Serial.begin(57600, SERIAL_8O1);
-#ifdef DEBUG
-	Serial3.begin(115200, SERIAL_8N1);
-#endif
-#else
-#ifdef DEBUG
-	Serial.begin(115200, SERIAL_8N1);
-#endif
-#endif
+	Serial.begin(57600);
 
 	init_protocol();
-	PDEBUGLN("INIT DONE");
 	//Moteurs :
-	motor_ascenseur.run(RELEASE);
+	//motor_ascenseur.run(RELEASE);
 	servoBras.write(0);
 	// LED qui n'en est pas une
 	pinMode(16,OUTPUT);
@@ -55,23 +44,6 @@ void loop(){
 	for(int i = 0; i < available; i++) {
 		// recuperer l'octet courant
 		executeCmd(serial_read());
-	}
-
-	//Forward des retours asserv
-	available = Serial1.available();
-	if (available > MAX_READ) {
-		available = MAX_READ;
-	}
-	for(int i = 0; i < available; i++) {
-		serial_write(Serial1.read());
-	}
-
-	available = Serial.available();
-	if (available > MAX_READ) {
-		available = MAX_READ;
-	}
-	for(int i = 0; i < available; i++) {
-		serial_write(Serial.read());
 	}
 	/* fin zone de programmation libre */
 	
