@@ -56,7 +56,9 @@ class communicationGlobale():
 		self.nbUnconfirmedPacket = [(0, -1)]*(self.nbAddress+1) # (nbUnconfimed, dateFirstUnconfirmed)
 
 		self.liaisonXbee = serial_comm.ComSerial(port, 57600)
-
+		self.emptyFifo = 1
+		self.timeOut = 1000
+		self.renvoiImmediat = []
 
 		#defines de threads
 		self.lastHighPrioTaskDate = 0
@@ -113,13 +115,15 @@ class communicationGlobale():
 				if self.renvoieOrdre == True:
 					for address in self.address:
 						if isinstance(address, (int)):
-							if (date - self.nbUnconfirmedPacket[address][1] > 75) and(self.nbUnconfirmedPacket[address][1] != -1):#si il reste un ordre non confirmé en moins de X ms
+							if (address in self.renvoiImmediat) or ((date - self.nbUnconfirmedPacket[address][1] > self.timeOut) and(self.nbUnconfirmedPacket[address][1] != -1)):#si il reste un ordre non confirmé en moins de X ms
 								self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], date)
 								indiceARenvoyer = self.getAllUnknowledgeId(address)
 								for indice in indiceARenvoyer:
 									print(("WARNING: Renvoie de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "d'idd ", indice, "au robot ", self.address[address]), "binaire :", self.ordreLog[address][indice])
 									self.liaisonXbee.send(self.ordreLog[address][indice][1])
 									self.lastSendDate[address] = date 
+								if address in self.renvoiImmediat:
+									self.renvoiImmediat.remove(address)
 
 			#tâche de faibles priorités
 			if (date - self.lastLowPrioTaskDate) > self.lowPrioSpeed:
@@ -286,6 +290,7 @@ class communicationGlobale():
 					return -1
 			elif packetId > 63:
 				print(("L'arduino", self.address[packetAddress], "nous indique avoir mal reçu un message, message d'erreur ", packetId))
+				self.renvoiImmediat.append(packetAddress)
 				return -1
 			else:
 				print("WARNING: Le paquet est mal formé, l'address ou l'id est invalide")
@@ -340,19 +345,19 @@ class communicationGlobale():
 					if returnType == 'int':
 						size = 16
 						retour = conversion.binaryToInt(argumentData[index:index+size])
-						print(("Retour int: ", retour))
+						#print(("Retour int: ", retour))
 						arguments.append(retour)
 						index += size
 					elif returnType == 'float':
 						size = 32
 						retour = conversion.binaryToFloat(argumentData[index:index+size])
-						print(("Retour float: ", retour))
+						#print(("Retour float: ", retour))
 						arguments.append(retour)
 						index += size
 					elif returnType == 'long':
 						size = 32
 						retour = conversion.binaryToInt(argumentData[index:index+size])
-						print(("Retour long: ", retour))
+						#print(("Retour long: ", retour))
 						arguments.append(retour)
 						index += size
 					else:
@@ -417,6 +422,9 @@ class communicationGlobale():
 				remainOrdersToSend.append(packet)
 
 		self.ordersToSend = remainOrdersToSend
+		if len(remainOrdersToSend) == 0 and not self.emptyFifo:
+			self.emptyFifo = 1
+			print("Fin de transmission de la file, (t = "+str(time.time()-self.timeStartProcessing)+")")
 		self.mutexOrdersToSend.release()
 
 
@@ -505,6 +513,9 @@ class communicationGlobale():
 	def sendOrderAPI(self, address, order, *arguments):
 		""""api d'envoie d'ordres avec verification des parametres, retourne -1 en cas d'erreur, sinon 0"""
 		#on verifie l'address
+		if (self.emptyFifo):
+			self.emptyFifo = 0 
+			self.timeStartProcessing = time.time()
 		address = self.checkAddress(address)
 		order = self.checkOrder(order)
 
