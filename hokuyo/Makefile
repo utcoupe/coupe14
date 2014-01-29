@@ -7,7 +7,7 @@ SRC_DIR=src/
 EXEC=hokuyo
 
 LFLAGS=-Wall `urg_c-config --libs` -lm -pthread
-CFLAGS=-Wall `urg_c-config --cflags` `sdl-config --cflags` -std=c99
+CFLAGS=-Wall `urg_c-config --cflags` -std=c99
 
 ifeq ($(DEBUG),yes)
 	CFLAGS += -D DEBUG -g

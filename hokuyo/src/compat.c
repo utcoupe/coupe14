@@ -1,4 +1,5 @@
-#include <errno.h>
+//#include <errno.h>
+#include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
 #include <string.h>
@@ -49,7 +50,7 @@ set_interface_attribs (int fd, int speed, int parity)
         tty.c_cflag &= ~(PARENB | PARODD);      // shut off parity
 	tty.c_cflag |= parity;
         tty.c_cflag &= ~CSTOPB;
-        tty.c_cflag &= ~CRTSCTS;
+        //tty.c_cflag &= ~CRTSCTS;
 
         if (tcsetattr (fd, TCSANOW, &tty) != 0)
         {
