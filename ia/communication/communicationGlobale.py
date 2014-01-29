@@ -18,8 +18,8 @@ class communicationGlobale():
 		#Constantes réglables:
 		self.maxUnconfirmedPacket = 5 # attention maximum 32
 		self.emptyFifo = True
-		self.timeOut = 1000
-		self.highPrioSpeed = 10 #fréquence d'execution en ms
+		self.timeOut = 50
+		self.highPrioSpeed = 20 #fréquence d'execution en ms
 		self.lowPrioSpeed = 1000 #fréquence d'execution en ms
 		self.keepContactTimeout = 1000
 		self.offLigneTimeout = 5000
@@ -73,11 +73,11 @@ class communicationGlobale():
 		self.lastSendDate = [-1]*(self.nbAddress+1)#date du dernier envoie(en milliseconde)
 		self.lastIdConfirm = [63]*(self.nbAddress+1)
 		self.lastIdSend = [63]*(self.nbAddress+1)
+		self.nbRenvoiImmediat = [0]*(self.nbAddress+1)
 		self.nbUnconfirmedPacket = [(0, -1)]*(self.nbAddress+1) # (nbUnconfimed, dateFirstUnconfirmed)
-
+		
 		self.liaisonXbee = serial_comm.ComSerial(port, 57600)
-		self.renvoiImmediat = []
-
+		
 		#defines de threads
 		self.lastHighPrioTaskDate = 0
 		self.lastLowPrioTaskDate = 0
@@ -123,32 +123,48 @@ class communicationGlobale():
 				if self.renvoieOrdre == True:
 					for address in self.address:
 						if isinstance(address, (int)):
-							if (address in self.renvoiImmediat) or ((date - self.nbUnconfirmedPacket[address][1] > self.timeOut) and(self.nbUnconfirmedPacket[address][1] != -1)):#si il reste un ordre non confirmé en moins de X ms
-								self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], date)
-								indiceARenvoyer = self.getAllUnknowledgeId(address)
-								for indice in indiceARenvoyer:
-									print(("WARNING: Renvoie de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "d'idd ", indice, "au robot ", self.address[address]), "binaire :", self.ordreLog[address][indice])
-									self.liaisonXbee.send(self.ordreLog[address][indice][1])
-									self.lastSendDate[address] = date 
-								if address in self.renvoiImmediat:
-									self.renvoiImmediat.remove(address)
+							indiceARenvoyer = self.getAllUnknowledgeId(address)
+							if len(indiceARenvoyer) > 0:
 
+								#procedure de renvoi immediat dans le cas où l'arduino indique une erreur
+								if self.nbRenvoiImmediat[address] != 0:
+									for i in range(self.nbRenvoiImmediat[address]):
+										if i < len(indiceARenvoyer):
+											print(("WARNING: Renvoie de l'ordre: ", self.orders[self.ordreLog[address][indiceARenvoyer[i]][0]], "d'idd ", indiceARenvoyer[i], "au robot ", self.address[address]), "binaire :", self.ordreLog[address][indiceARenvoyer[i]])
+											self.liaisonXbee.send(self.ordreLog[address][indiceARenvoyer[i]][1])
+											self.lastSendDate[address] = date 
+											self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], date)
+										else:
+											print("ERREUR CODE: cas impossible")
+											print(indiceARenvoyer)
+											print(self.nbRenvoiImmediat[address])
+									self.nbRenvoiImmediat[address] = 0
+
+								#procedure de renvoi en cas de tmeout
+								if (date - self.nbUnconfirmedPacket[address][1]) > self.timeOut and self.nbUnconfirmedPacket[address][1] != -1:
+									for indice in indiceARenvoyer:
+										print(("WARNING: Renvoie de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "d'idd ", indice, "au robot ", self.address[address]), "binaire :", self.ordreLog[address][indice])
+										self.liaisonXbee.send(self.ordreLog[address][indice][1])
+										self.lastSendDate[address] = date 
+										self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], date)
+									
 			#tâche de faibles priorités
 			if (date - self.lastLowPrioTaskDate) > self.lowPrioSpeed:
 				self.lastLowPrioTaskDate = date
 
 				#recherche d'arduino
 				if self.probingDevices == True:
-					for address in range(self.nbAddress):
-						if self.arduinoIdReady[address] == False:
-							self.askResetId(address)
+					for address in self.address:
+						if isinstance(address, (int)):
+							if self.arduinoIdReady[address] == False:
+								self.askResetId(address)
 
 				#Verification de la liaison avec les arduinos
 				if self.keepContact == True:# On envoie un PING pour verifier si le device est toujours présent
 					for address in self.address:
 						if isinstance(address, (int)):
-							if self.arduinoIdReady[address] and self.lastConfirmationDate[address] != -1:
-								if (date - self.lastConfirmationDate[address]) > self.offLigneTimeout:#le système est considere comme hors ligne
+							if self.arduinoIdReady[address] != False:
+								if (date - self.lastConfirmationDate[address]) > self.offLigneTimeout and (date - self.arduinoIdReady[address]) > self.offLigneTimeout:#le système est considere comme hors ligne
 									self.arduinoIdReady[address] = False
 								elif (date - self.lastSendDate[address]) > self.keepContactTimeout:
 									self.sendOrderAPI(address, self.orders['PINGPING_AUTO'])
@@ -210,7 +226,7 @@ class communicationGlobale():
 			if packet[0] != address:
 				remainOrdersToSend.append(packet)
 			else:
-				print(("ERREUR: drop de l'ordre", packet[1], " par l'arduino", packet[0], "suite à un reset"))
+				print("ERREUR: drop de l'ordre",self.orders[ packet[1]], " par l'arduino", self.address[ packet[0]], "suite à un reset")
 		self.ordersToSend = remainOrdersToSend
 		self.mutexOrdersToSend.release()
 
@@ -220,6 +236,7 @@ class communicationGlobale():
 		self.nbUnconfirmedPacket[address] = (0, -1)
 		self.lastSendDate[address] = -1
 		self.arduinoIdReady[address] = False
+		self.nbRenvoiImmediat[address] = 0
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
 
@@ -229,23 +246,25 @@ class communicationGlobale():
 
 	#cas où on reçoi
 	def acceptConfirmeResetId(self, address):#accepte la confirmation de reset d'un arduino
-		print(("L'arduino "+ str(address)+" a accepte le reset"))
+		print("L'arduino ", self.address[address], " a accepte le reset")
 		self.removeOrdersInFile(address)
 		self.lastConfirmationDate[address] = -1
 		self.nbUnconfirmedPacket[address] = (0, -1)
 		self.lastSendDate[address] = -1
-		self.arduinoIdReady[address] = True
+		self.arduinoIdReady[address] = int(time.time()*1000)
+		self.nbRenvoiImmediat[address] = 0
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
 		
 
 	def confirmeResetId(self, address):#renvoie une confirmation de reset
-		print(("Reponse à la demande de confirmation de reset de l'arduino "+ str(address)))
+		print("Reponse à la demande de confirmation de reset de l'arduino ", self.address[address])
 		self.removeOrdersInFile(address)
 		self.lastConfirmationDate[address] = -1
 		self.nbUnconfirmedPacket[address] = (0, -1)
 		self.lastSendDate[address] = -1
-		self.arduinoIdReady[address] = True
+		self.arduinoIdReady[address] = int(time.time()*1000)
+		self.nbRenvoiImmediat[address] = 0
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
 
@@ -301,9 +320,9 @@ class communicationGlobale():
 				else:
 					print("On essaye de lire, l'id", packetId, "en provenance de l'arduino", self.address[packetAddress], "mais il n'est existe pas de trace dans le log (un vieux paquet qui trainait sur un client avant la nouvelle init ?)")
 					return -1
-			elif packetId > 63:
+			elif packetAddress > 0 and packetAddress < (self.nbAddress+1) and packetId > 63:
 				print(("L'arduino", self.address[packetAddress], "nous indique avoir mal reçu un message, message d'erreur ", packetId))
-				self.renvoiImmediat.append(packetAddress)
+				self.nbRenvoiImmediat[packetAddress] += 1
 				return -1
 			else:
 				print("WARNING: Le paquet est mal formé, l'address ou l'id est invalide")
@@ -337,7 +356,7 @@ class communicationGlobale():
 			unconfirmedIds = self.getAllUnknowledgeId(address)
 			if idd in unconfirmedIds:
 
-				#ne pas confirmé les paquets de retour manqués qui contenant des data
+				#ne pas renvoyer  les paquets sans argument et dont on a louppé les confimations
 				returnMissed = False
 				i = 0
 				lastIdToAccept = self.lastIdConfirm[address]
@@ -347,19 +366,21 @@ class communicationGlobale():
 					if (self.returnSize[ self.ordreLog[address][unconfirmedIds[i]][0] ] == 0) and returnMissed == False:
 						lastIdToAccept = unconfirmedIds[i]
 					else:
-						print("WARNING: unused data because of a missing return paquet")
+						print("WARNING: unused data because of a missing return paquet de l'arduino", self.address[address], "drop de l'idd", idd)
 						returnMissed = True
+					if i > self.maxUnconfirmedPacket:
+						print("ERREUR CODE: ce cas ne devrait pas arriver")
 					i +=1
 
 				if lastIdToAccept != self.lastIdConfirm[address]:
 					date = int(time.time()*1000)
-					#if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:
 					if returnMissed:
 						print(("Success: l'arduino", self.address[address]," a bien recu les ordres jusque", idd, "mais il manque au moins un retour (avec argument) donc on ne confirme que", self.orders[self.ordreLog[address][lastIdToAccept][0]], " d'id: ", lastIdToAccept))
 						self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(lastIdToAccept) - 1, date)#on bidone le chiffre date, mais c'est pas grave
 						self.lastIdConfirm[address] = lastIdToAccept
 					else:
-						print(("Success: l'arduino", self.address[address]," a bien recu l'ordre ", self.orders[self.ordreLog[address][idd][0]], " d'id: ", idd))
+						if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:
+							print(("Success: l'arduino", self.address[address]," a bien recu l'ordre ", self.orders[self.ordreLog[address][idd][0]], " d'id: ", idd))
 						self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(idd) - 1, date)#on bidone le chiffre date, mais c'est pas grave
 						self.lastIdConfirm[address] = idd
 					
@@ -456,7 +477,7 @@ class communicationGlobale():
 
 		if len(remainOrdersToSend) == 0 and not self.emptyFifo:
 			self.emptyFifo = True
-			print("Fin de transmission de la file, (t = "+str(int(time.time()*1000)-self.timeStartProcessing)+")")
+			#print("Fin de transmission de la file, (t = "+str(int(time.time()*1000)-self.timeStartProcessing)+"ms)")
 		
 
 
@@ -469,7 +490,7 @@ class communicationGlobale():
 	def checkAddress(self, address):
 		"""verifie que l'address existe et la convertie en int si nécéssaire, sinon retourne -1"""
 		if address in self.address:
-			if self.arduinoIdReady[address] == True:
+			if self.arduinoIdReady[address] != False:
 				if isinstance(address, (str)):
 					address = self.address[address]
 				return address
