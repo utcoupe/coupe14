@@ -24,12 +24,13 @@ void* poll_proto () {
 }
 
 void init_protocol_thread () {
+	printf("Essai d'ouverture de %s\n", SERIAL_PATH);
 	serial = open (SERIAL_PATH, O_RDWR | O_NOCTTY | O_SYNC);
 	if (serial < 0) {
 		perror("Can't open serial\n");
 		exit (EXIT_FAILURE);
 	}
-	set_interface_attribs (serial, B57600, PARENB|PARODD);  // set speed to 115,200 bps, 8n1 (no parity)
+	set_interface_attribs (serial, B57600, PARENB|PARODD);  
 	set_blocking (serial, 1);                // set blocking
 	init_protocol();
 	printf("Protocole pret\n");
