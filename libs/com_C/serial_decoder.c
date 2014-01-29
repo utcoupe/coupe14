@@ -12,33 +12,17 @@
 extern unsigned char ordreSize[MAX_ORDRES];
 
 void executeCmd(char serial_data){
-	static char ID_attendu = 0;
 	static char ID_recu;
+	static char ID_attendu = 0;
 	static unsigned char data[MAX_DATA];
 	static int data_counter = 0;
 	static bool doublon = false;
+	static bool client_concerne = false;
 
 	static enum etape etape = wait_step;
 
 	if((serial_data & PROTOCOL_BIT) == PROTOCOL_BIT){ //Si 0b1xxxxxxx
-		if ((serial_data & 0xFF) == END) { //Fin de trame, execution de l'ordre
-			unsigned char data_8bits[MAX_DATA];
-
-                        data_counter = decode(data, data_8bits, data_counter);
-                        if(data_counter == -1){ //Si données invalides
-				sendInvalid();
-				etape = wait_step;
-			}
-			else{
-				executeOrdre(data_8bits, data_counter, ID_recu, doublon); //Execute les ordres, envoit les réponses
-				if (!doublon){
-					ID_attendu=(ID_attendu + 1) % (ID_MAX+1);//ID sur 6 bits effectifs, incrémentée si non doublon
-				}
-				etape = wait_step;
-			}
-			doublon = false;
-		}
-		else if((serial_data & 0x0F) == LOCAL_ADDR){ //Si début de paquet adressé au client
+		if((serial_data & 0x0F) == LOCAL_ADDR){ //Si début de paquet adressé au client
 			if ((serial_data & 0xF0) == RESET){ //Si demande de reset
 				ID_attendu = 0;
 				serial_send(RESET_CONF | LOCAL_ADDR);
@@ -46,7 +30,25 @@ void executeCmd(char serial_data){
 			}
 			else{
 				etape = ID_step; //Sinon le message nous est adressé
+				client_concerne = true;
 			}
+		}
+		else if (serial_data == END && client_concerne) { //Fin de trame, execution de l'ordre
+			unsigned char data_8bits[MAX_DATA];
+
+                        data_counter = decode(data, data_8bits, data_counter);
+                        if(data_counter == -1){ //Si données invalides
+				sendInvalid();
+			}
+			else{
+				executeOrdre(data_8bits, data_counter, ID_recu, doublon); //Execute les ordres, envoit les réponses
+				if (!doublon){
+					ID_attendu=(ID_attendu + 1) % (ID_MAX+1);//ID sur 6 bits effectifs, incrémentée si non doublon
+				}
+			}
+			etape = wait_step;
+			doublon = false;
+			client_concerne = false;
 		}
 		else{ //Si fin de paquet ou packet non adressé au client
 			etape = wait_step;
