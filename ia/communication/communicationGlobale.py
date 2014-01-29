@@ -282,7 +282,7 @@ class communicationGlobale():
 		
 		"""print("DEBUG")
 		for letter in rawInput:
-			print(conversion.intToBinary(letter))
+			print(conversion.intToBinary(letter)[:8])
 		print("FIN DEBUG")"""
 
 	
@@ -566,7 +566,7 @@ class communicationGlobale():
 	def sendOrderAPI(self, address, order, *arguments):
 		""""api d'envoie d'ordres avec verification des parametres, retourne -1 en cas d'erreur, sinon 0"""
 		
-		if self.emptyFifo == True:
+		if self.emptyFifo == True and order != self.orders['PINGPING_AUTO']:
 			self.emptyFifo = False 
 			self.timeStartProcessing = int(time.time()*1000)
 
