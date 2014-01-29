@@ -25,7 +25,8 @@ void* poll_proto () {
 
 void init_protocol_thread () {
 	printf("Essai d'ouverture de %s\n", SERIAL_PATH);
-	serial = open (SERIAL_PATH, O_RDWR | O_NOCTTY | O_SYNC);
+	FILE* file_serial = fopen (SERIAL_PATH, "rb+");
+	serial = fileno(file_serial);
 	if (serial < 0) {
 		perror("Can't open serial\n");
 		exit (EXIT_FAILURE);
