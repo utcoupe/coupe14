@@ -63,15 +63,16 @@ void executeCmd(char serial_data){
 			if(ID_recu == ID_attendu){//ID correct
 				etape = data_step;
 			}
-			else if(ID_recu > ID_attendu || (ID_attendu == ID_MAX && ID_recu < ID_MAX/2)){//On a raté un paquet - ID_MAX/2 représente la marge de paquets perdus
+			else if ((ID_attendu >= ID_MAX/2 && ID_recu < ID_attendu && ID_recu >= ID_attendu - ID_MAX/2) ||
+				(ID_attendu < ID_MAX/2 && (ID_recu < ID_attendu || ID_recu > ID_attendu + ID_MAX/2 + 1))) { //Doublon
+				etape = data_step;
+				doublon = true;
+			}
+			else {
 				etape = wait_step;
 				client_concerne = false;//On ignore la suite
 				PDEBUG("Data error : ID attendu "); PDEBUG((int)ID_attendu); PDEBUG(", ID recu "); PDEBUGLN((int)ID_recu);
 				sendInvalid();
-			}
-			else {//Doublon
-				etape = data_step;
-				doublon = true;
 			}
 			break;
 		case data_step:

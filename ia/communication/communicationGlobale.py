@@ -13,13 +13,14 @@ import threading
 
 
 class communicationGlobale():
-	def __init__(self, port):
+	def __init__(self, portXbee, vitesseXbee, portArduno, vitesseArduino, portAsserv, vitesseAsserv):
 
 		#Constantes réglables:
+		self.debugMode = True
 		self.maxUnconfirmedPacket = 5 # attention maximum 32
 		self.emptyFifo = True
-		self.timeOut = 50
-		self.highPrioSpeed = 20 #fréquence d'execution en ms
+		self.timeOut = 75
+		self.highPrioSpeed = 10 #fréquence d'execution en ms
 		self.lowPrioSpeed = 1000 #fréquence d'execution en ms
 		self.keepContactTimeout = 1000
 		self.offLigneTimeout = 5000
@@ -76,7 +77,11 @@ class communicationGlobale():
 		self.nbRenvoiImmediat = [0]*(self.nbAddress+1)
 		self.nbUnconfirmedPacket = [(0, -1)]*(self.nbAddress+1) # (nbUnconfimed, dateFirstUnconfirmed)
 		
-		self.liaisonXbee = serial_comm.ComSerial(port, 57600)
+		
+		self.liaisonXbee = serial_comm.ComSerial(portXbee, vitesseXbee)
+		if self.debugMode == False:
+			self.liaisonArduinoOther = serial_comm.ComSerial(portArduno, vitesseArduino)
+			self.liaisonArduinoAsserv = serial_comm.ComSerial(portAsserv, vitesseAsserv)
 		
 		#defines de threads
 		self.lastHighPrioTaskDate = 0
@@ -107,10 +112,6 @@ class communicationGlobale():
 			if (date - self.lastHighPrioTaskDate) > self.highPrioSpeed:
 				self.lastHighPrioTaskDate = date
 
-				#Ecriture des ordres
-				if self.writeOutput == True:
-					self.sendOrders()
-
 				#Lecture des entrées
 				if self.readInput == True:
 					self.mutexOrdersToRead.acquire()
@@ -130,8 +131,8 @@ class communicationGlobale():
 								if self.nbRenvoiImmediat[address] != 0:
 									for i in range(self.nbRenvoiImmediat[address]):
 										if i < len(indiceARenvoyer):
-											print(("WARNING: Renvoie de l'ordre: ", self.orders[self.ordreLog[address][indiceARenvoyer[i]][0]], "d'idd ", indiceARenvoyer[i], "au robot ", self.address[address]), "binaire :", self.ordreLog[address][indiceARenvoyer[i]])
-											self.liaisonXbee.send(self.ordreLog[address][indiceARenvoyer[i]][1])
+											print(("WARNING: Renvoie de l'ordre: ", self.orders[self.ordreLog[address][indiceARenvoyer[i]][0]], "d'idd ", indiceARenvoyer[i], "au robot ", self.address[address]))
+											self.sendMessage(address, self.ordreLog[address][indiceARenvoyer[i]][1])
 											self.lastSendDate[address] = date 
 											self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], date)
 										else:
@@ -144,9 +145,12 @@ class communicationGlobale():
 								if (date - self.nbUnconfirmedPacket[address][1]) > self.timeOut and self.nbUnconfirmedPacket[address][1] != -1:
 									for indice in indiceARenvoyer:
 										print(("WARNING: Renvoie de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "d'idd ", indice, "au robot ", self.address[address]), "binaire :", self.ordreLog[address][indice])
-										self.liaisonXbee.send(self.ordreLog[address][indice][1])
+										self.sendMessage(address, self.ordreLog[address][indice][1])
 										self.lastSendDate[address] = date 
 										self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], date)
+				#Ecriture des ordres
+				if self.writeOutput == True:
+					self.sendOrders()
 									
 			#tâche de faibles priorités
 			if (date - self.lastLowPrioTaskDate) > self.lowPrioSpeed:
@@ -165,6 +169,7 @@ class communicationGlobale():
 						if isinstance(address, (int)):
 							if self.arduinoIdReady[address] != False:
 								if (date - self.lastConfirmationDate[address]) > self.offLigneTimeout and (date - self.arduinoIdReady[address]) > self.offLigneTimeout:#le système est considere comme hors ligne
+									print("L'arduino", self.address[address], "va être reset car elle a depasser le timeout")
 									self.arduinoIdReady[address] = False
 								elif (date - self.lastSendDate[address]) > self.keepContactTimeout:
 									self.sendOrderAPI(address, self.orders['PINGPING_AUTO'])
@@ -180,6 +185,13 @@ class communicationGlobale():
 		self.threadActif = False
 
 
+	def sendMessage(self, address, data):
+		if address == self.address['ADDR_FLUSSMITTEL_OTHER'] and self.debugMode == False: 
+			self.liaisonArduinoOther.send(data)
+		elif address == self.address['ADDR_FLUSSMITTEL_ASSERV'] and self.debugMode == False:
+			self.liaisonArduinoAsserv.send(data)
+		else:
+			self.liaisonXbee.send(data)
 
 
 
@@ -241,7 +253,7 @@ class communicationGlobale():
 		self.lastIdSend[address] = 63
 
 		chaineTemp = chr(address+192)
-		self.liaisonXbee.send(chaineTemp)
+		self.sendMessage(address, chaineTemp)
 
 
 	#cas où on reçoi
@@ -269,7 +281,7 @@ class communicationGlobale():
 		self.lastIdSend[address] = 63
 
 		chaineTemp = chr(address+224)
-		self.liaisonXbee.send(chaineTemp)
+		self.sendMessage(address, chaineTemp)
 
 
 
@@ -334,6 +346,9 @@ class communicationGlobale():
 	def getXbeeOrders(self):
 		""" retourne ordersList, une liste d'élements sous la forme(adresse, id, data) où data est prêt à être interpréter"""
 		rawInputList = self.liaisonXbee.read()
+		if self.debugMode == False:
+			rawInputList += self.liaisonArduinoOther.read()
+			rawInputList += self.liaisonArduinoAsserv.read()
 
 		ordersList = deque()
 
@@ -358,29 +373,31 @@ class communicationGlobale():
 
 				#ne pas renvoyer  les paquets sans argument et dont on a louppé les confimations
 				returnMissed = False
-				i = 0
-				lastIdToAccept = self.lastIdConfirm[address]
-				if idd == unconfirmedIds[i]:
-					lastIdToAccept = unconfirmedIds[i]
-				while idd != unconfirmedIds[i]:
-					if (self.returnSize[ self.ordreLog[address][unconfirmedIds[i]][0] ] == 0) and returnMissed == False:
-						lastIdToAccept = unconfirmedIds[i]
-					else:
-						print("WARNING: unused data because of a missing return paquet de l'arduino", self.address[address], "drop de l'idd", idd)
-						returnMissed = True
-					if i > self.maxUnconfirmedPacket:
-						print("ERREUR CODE: ce cas ne devrait pas arriver")
-					i +=1
+
+				if idd == self.getNextConfirmeId(address):
+					lastIdToAccept = self.getNextConfirmeId(address)
+				else:
+					i = 0
+					lastIdToAccept = self.lastIdConfirm[address]
+					while lastIdToAccept != idd and returnMissed == False:
+						if (self.returnSize[ self.ordreLog[address][unconfirmedIds[i]][0] ] == 0 and returnMissed == False):
+							lastIdToAccept = unconfirmedIds[i]
+						else:
+							print("WARNING: unused data because of a missing return paquet de l'arduino", self.address[address], "drop de l'idd", idd)
+							returnMissed = True
+						if i > self.maxUnconfirmedPacket:
+							print("ERREUR CODE: ce cas ne devrait pas arriver")
+						i +=1
 
 				if lastIdToAccept != self.lastIdConfirm[address]:
 					date = int(time.time()*1000)
-					if returnMissed:
+					if returnMissed == True:
 						print(("Success: l'arduino", self.address[address]," a bien recu les ordres jusque", idd, "mais il manque au moins un retour (avec argument) donc on ne confirme que", self.orders[self.ordreLog[address][lastIdToAccept][0]], " d'id: ", lastIdToAccept))
 						self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(lastIdToAccept) - 1, date)#on bidone le chiffre date, mais c'est pas grave
 						self.lastIdConfirm[address] = lastIdToAccept
 					else:
-						if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:
-							print(("Success: l'arduino", self.address[address]," a bien recu l'ordre ", self.orders[self.ordreLog[address][idd][0]], " d'id: ", idd))
+						#if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:
+						print(("Success: l'arduino", self.address[address]," a bien recu l'ordre ", self.orders[self.ordreLog[address][idd][0]], " d'id: ", idd))
 						self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(idd) - 1, date)#on bidone le chiffre date, mais c'est pas grave
 						self.lastIdConfirm[address] = idd
 					
@@ -417,7 +434,7 @@ class communicationGlobale():
 					returnOrders.append((address, idd, arguments))
 
 			else:
-				print("WARNING: l'arduino", self.address[address], "a accepte le paquet", idd, "alors que les paquets a confirmer sont ", self.getAllUnknowledgeId(address), " sauf si on a louppé un réponse avec arguments")
+				print("WARNING: l'arduino", self.address[address], "a accepte le paquet", idd, "alors que les paquets a confirmer sont ", self.getAllUnknowledgeId(address), " sauf si on a louppé une réponse avec arguments")
 			
 		return returnOrders
 
@@ -468,7 +485,7 @@ class communicationGlobale():
 
 				self.ordreLog[int(address)][idd] = (order, chaineTemp)
 				self.lastSendDate[address] = int(time.time()*1000)
-				self.liaisonXbee.send(chaineTemp)
+				self.sendMessage(address, chaineTemp)
 			else:
 				remainOrdersToSend.append(packet)
 
