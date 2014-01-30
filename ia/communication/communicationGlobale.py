@@ -19,8 +19,8 @@ class communicationGlobale():
 		self.debugMode = True
 		self.maxUnconfirmedPacket = 5 # attention maximum 32
 		self.emptyFifo = True
-		self.timeOut = 50
-		self.highPrioSpeed = 5 #fréquence d'execution en ms
+		self.timeOut = 100
+		self.highPrioSpeed = 30 #fréquence d'execution en ms
 		self.lowPrioSpeed = 1000 #fréquence d'execution en ms
 		self.keepContactTimeout = 1000
 		self.offLigneTimeout = 5000
