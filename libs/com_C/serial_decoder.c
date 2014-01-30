@@ -179,12 +179,13 @@ void sendResponse(unsigned char *data, int data_counter, unsigned char id){
 	unsigned char data_7bits[MAX_DATA];
 	int i, size = 0;
 	size = encode(data, data_7bits, data_counter);
-	serial_send(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
+	serial_send(LOCAL_ADDR | PROTOCOL_BIT); //debut de rep
 	serial_send(id);
 	for(i = 0 ; i < size ; i++){
 		serial_send(data_7bits[i]); //contenu
 	}
 	serial_send(END); //fin de réponse
+	Serial.println("");
 }
 
 void sendInvalid() {//renvoit le code de message invalide (dépend de la plateforme)

@@ -5,7 +5,7 @@
  * Date : 13/10/13			*
  ****************************************/
 
-//#include "AFMotor.h"
+#include "AFMotor_due.h"
 #include <Servo.h>
 #include <Arduino.h>
 
@@ -15,7 +15,7 @@
 #include "parameters.h"
 
 Servo servoBras;
-//AF_DCMotor motor_ascenseur(1);
+AF_DCMotor motor_ascenseur(1);
 
 #define MAX_READ 64 
 void setup(){
