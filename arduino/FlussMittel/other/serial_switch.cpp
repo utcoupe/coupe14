@@ -18,8 +18,6 @@ extern Servo servoBras;
 extern AF_DCMotor motor_ascenseur;
 
 void couper_asc () {
-	detachInterrupt(PIN_INT_BAS_ASC);
-	detachInterrupt(PIN_INT_HAUT_ASC);
 	motor_ascenseur.setSpeed(0);
 }
 
@@ -46,14 +44,12 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		if (!doublon) {
 			motor_ascenseur.run(FORWARD);
 			motor_ascenseur.setSpeed(255);
-			attachInterrupt(PIN_INT_HAUT_ASC, couper_asc, RISING);
 		}
 		break;
 	case O_BAISSER_ASC:
 		if (!doublon) {
 			motor_ascenseur.run(BACKWARD);
 			motor_ascenseur.setSpeed(255);
-			attachInterrupt(PIN_INT_BAS_ASC, couper_asc, RISING);
 		}
 		break;
 	default:

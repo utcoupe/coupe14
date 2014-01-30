@@ -25,19 +25,12 @@ void setup(){
 	init_protocol();
 	//Moteurs :
 	motor_ascenseur.run(FORWARD);
-	motor_ascenseur.setSpeed(0);
-	servoBras.write(10);
+	motor_ascenseur.setSpeed(0); //Desactivr ascenseur
+	servoBras.write(170); //Fermer le bras
 	// LED qui n'en est pas une
-	pinMode(16,OUTPUT);
 }
 
 void loop(){
-
-	/* La del est allumee pendant le traitement */
-	digitalWrite(16, HIGH);
-
-
-	/* zone programmation libre */
 	int available = Serial.available();
 	if (available > MAX_READ) {
 		available = MAX_READ;
@@ -46,9 +39,4 @@ void loop(){
 		// recuperer l'octet courant
 		executeCmd(generic_serial_read());
 	}
-	/* fin zone de programmation libre */
-	
-	/* On eteint la del */
-	digitalWrite(16, LOW);
-	
 }

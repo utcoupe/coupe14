@@ -16,6 +16,8 @@ void initPins(){
 
 	pinMode(PIN_INT_HAUT_ASC, INPUT_PULLUP);
 	pinMode(PIN_INT_BAS_ASC, INPUT_PULLUP);
+	attachInterrupt(PIN_INT_HAUT_ASC, couper_asc, RISING);
+	attachInterrupt(PIN_INT_BAS_ASC, couper_asc, RISING);
 }
 
 unsigned long timeMillis(){
