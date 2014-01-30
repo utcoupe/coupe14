@@ -49,6 +49,7 @@ void executeCmd(char serial_data){
 
                         data_counter = decode(data, data_8bits, data_counter);
                         if(data_counter == -1){ //Si données invalides
+				PDEBUGLN("Data error : Données invalides");
 				sendInvalid();
 			}
 			else{
@@ -77,8 +78,10 @@ void executeCmd(char serial_data){
 			if(ID_recu == ID_attendu){//ID correct
 				etape = data_step;
 			}
-			else if(ID_recu > ID_attendu || (ID_attendu == ID_MAX && ID_recu < (ID_attendu - ID_MAX/2))){//On a raté un paquet - ID_MAX/2 représente la marge de paquets perdus
+			else if(ID_recu > ID_attendu || (ID_attendu == ID_MAX && ID_recu < ID_MAX/2)){//On a raté un paquet - ID_MAX/2 représente la marge de paquets perdus
 				etape = wait_step;
+				client_concerne = false;//On ignore la suite
+				PDEBUG("Data error : ID attendu "); PDEBUG((int)ID_attendu); PDEBUG(", ID recu "); PDEBUGLN((int)ID_recu);
 				sendInvalid();
 			}
 			else {//Doublon
@@ -123,7 +126,7 @@ int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){
         if(overflow != 0){
                 data_out[data_counter] = overflow; //Si overflow, on le met (attention aux segfault)
 		data_counter++;
-		PDEBUGLN("Pas normal\n");
+		PDEBUGLN("Pas normal");
         }
         unsigned char ordre = data_out[0];
 	if(ordre > MAX_ORDRES){//L'odre n'existe pas => corruption
@@ -191,7 +194,7 @@ void executeOrdre(unsigned char *data, int data_counter, unsigned char id, bool 
 
 void sendResponse(unsigned char *data, int data_counter, unsigned char id){
 	unsigned char data_7bits[MAX_DATA];
-	int i, size;
+	int i, size = 0;
 	size = encode(data, data_7bits, data_counter);
 	serial_send(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
 	serial_send(id);
@@ -202,7 +205,6 @@ void sendResponse(unsigned char *data, int data_counter, unsigned char id){
 }
 
 void sendInvalid() {//renvoit le code de message invalide (dépend de la plateforme)
-        PDEBUGLN("Data error");
 	serial_send(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
 	serial_send(INVALID_MESSAGE);
 	serial_send(END);
@@ -214,7 +216,7 @@ void protocol_reset(){
 		long t = timeMillis();
 		serial_send(RESET | LOCAL_ADDR);
 		while (timeMillis() - t < 1000 && !reset) {
-			char data = generic_serial_read();
+			unsigned char data = generic_serial_read();
 			if (data == (RESET_CONF | LOCAL_ADDR)) {
 				reset = 1;
 			}

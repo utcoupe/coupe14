@@ -1,4 +1,3 @@
-//#include <errno.h>
 #include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
@@ -41,7 +40,6 @@ set_interface_attribs (int fd, int speed, int parity)
         tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;     // 8-bit chars
 	tty.c_iflag &= ~(IGNBRK | INLCR | IGNCR | ICRNL);         // ignore break signal
 	tty.c_lflag = 0;                // no signaling chars, no echo, no canonical processing
-	//tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
 	tty.c_oflag = 0;                // no remapping, no delays
 	tty.c_cc[VMIN]  = 0;            // read doesn't block
 	tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
