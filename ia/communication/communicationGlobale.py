@@ -16,7 +16,7 @@ class communicationGlobale():
 	def __init__(self, portXbee, vitesseXbee, parityXbee, portOther, vitesseOther, parityOther, portAsserv, vitesseAsserv, parityAsserv):
 
 		#Constantes réglables:
-		self.useXBee = True
+		self.useXbee = True
 		self.useFMother = True
 		self.useFMasserv = True
 		self.maxUnconfirmedPacket = 5 # attention maximum 32
@@ -80,8 +80,8 @@ class communicationGlobale():
 		self.nbUnconfirmedPacket = [(0, -1)]*(self.nbAddress+1) # (nbUnconfimed, dateFirstUnconfirmed)
 		
 		
-		if self.useXBee:
-			self.liaisonXbee = serial_comm.ComSerial(portXbee, vitesseXbee, parityXBee)
+		if self.useXbee:
+			self.liaisonXbee = serial_comm.ComSerial(portXbee, vitesseXbee, parityXbee)
 		if self.useFMother:
 			self.liaisonArduinoOther = serial_comm.ComSerial(portOther, vitesseOther, parityOther)
 		if self.useFMasserv:
@@ -194,7 +194,7 @@ class communicationGlobale():
 			self.liaisonArduinoOther.send(data)
 		elif address == self.address['ADDR_FLUSSMITTEL_ASSERV'] and self.useFMasserv:
 			self.liaisonArduinoAsserv.send(data)
-		elif self.useXBee:
+		elif self.useXbee:
 			self.liaisonXbee.send(data)
 
 
@@ -350,7 +350,7 @@ class communicationGlobale():
 	def getXbeeOrders(self):
 		rawInputList = []
 		""" retourne ordersList, une liste d'élements sous la forme(adresse, id, data) où data est prêt à être interpréter"""
-		if self.useXBee:
+		if self.useXbee:
 			rawInputList += self.liaisonXbee.read()
 		if self.useFMother:
 			rawInputList += self.liaisonArduinoOther.read()
