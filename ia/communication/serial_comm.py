@@ -14,7 +14,7 @@ class ComSerial():
 	def __init__(self, name, baudrate, parity):
 		if parity == 'ODD':
 			self.liaison = serial.Serial(name, baudrate, parity=serial.PARITY_ODD, stopbits=serial.STOPBITS_ONE)
-		else if parity == 'NONE':
+		elif parity == 'NONE':
 			self.liaison = serial.Serial(name, baudrate, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE)
 		else:
 			print('Parity ', parity, ' non valide');
@@ -71,6 +71,6 @@ class ComSerial():
 		
 		for char in rawOutputString:
 			self.liaison.write(bytes(char, 'latin-1'))
-			print(conversion.intToBinary(ord(char))[:8])
+			#print(conversion.intToBinary(ord(char))[:8])
 			
 
