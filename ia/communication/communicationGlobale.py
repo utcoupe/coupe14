@@ -13,7 +13,7 @@ import threading
 
 
 class communicationGlobale():
-	def __init__(self, portXbee, vitesseXbee, portOther, vitesseOther, portAsserv, vitesseAsserv):
+	def __init__(self, portXbee, vitesseXbee, parityXbee, portOther, vitesseOther, parityOther, portAsserv, vitesseAsserv, parityAsserv):
 
 		#Constantes réglables:
 		self.useXBee = True
@@ -81,11 +81,11 @@ class communicationGlobale():
 		
 		
 		if self.useXBee:
-			self.liaisonXbee = serial_comm.ComSerial(portXbee, vitesseXbee)
+			self.liaisonXbee = serial_comm.ComSerial(portXbee, vitesseXbee, parityXBee)
 		if self.useFMother:
-			self.liaisonArduinoOther = serial_comm.ComSerial(portOther, vitesseOther)
+			self.liaisonArduinoOther = serial_comm.ComSerial(portOther, vitesseOther, parityOther)
 		if self.useFMasserv:
-			self.liaisonArduinoAsserv = serial_comm.ComSerial(portAsserv, vitesseAsserv)
+			self.liaisonArduinoAsserv = serial_comm.ComSerial(portAsserv, vitesseAsserv, parityAsserv)
 
 		#defines de threads
 		self.lastHighPrioTaskDate = 0
