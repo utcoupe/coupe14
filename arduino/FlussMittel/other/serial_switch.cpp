@@ -51,8 +51,8 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		break;
 	case O_BAISSER_ASC:
 		if (!doublon) {
-			motor_ascenseur.setSpeed(255);
 			motor_ascenseur.run(BACKWARD);
+			motor_ascenseur.setSpeed(255);
 			attachInterrupt(PIN_INT_BAS_ASC, couper_asc, RISING);
 		}
 		break;
