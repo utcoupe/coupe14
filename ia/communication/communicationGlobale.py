@@ -348,9 +348,10 @@ class communicationGlobale():
 			return -1
 
 	def getXbeeOrders(self):
+		rawInputList = []
 		""" retourne ordersList, une liste d'élements sous la forme(adresse, id, data) où data est prêt à être interpréter"""
 		if self.useXBee:
-			rawInputList = self.liaisonXbee.read()
+			rawInputList += self.liaisonXbee.read()
 		if self.useFMother:
 			rawInputList += self.liaisonArduinoOther.read()
 		if self.useFMasserv:
