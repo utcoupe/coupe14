@@ -35,11 +35,11 @@ def gui(com):
 				com.sendOrderAPI(2, 'A_GOTOA', *arguments)
 			elif order == 's':
 
-				for a in range(100):
+				for a in range(500):
 					arguments = []
 
 					com.sendOrderAPI(1, 'O_BRAS_OUVRIR', *arguments)
-					com.sendOrderAPI(2, 'PINGPING_AUTO', *arguments)
+					com.sendOrderAPI(2, 'A_GET_CODER', *arguments)
 
 			elif order in com.orders:
 				if isinstance(order, (int)):
