@@ -10,7 +10,7 @@ import sys
 from communication import communicationGlobale
 import guiCommande
 
-com = communicationGlobale.communicationGlobale("/dev/ttyUSB0")
+com = communicationGlobale.communicationGlobale("/dev/ttyUSB0", 57600, "/dev/ttyACM0", 115200, "/dev/ttymxc3", 115200)
 
 try:
 	guiCommande.gui(com)

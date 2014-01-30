@@ -37,14 +37,9 @@ def gui(com):
 
 				for a in range(100):
 					arguments = []
-					com.sendOrderAPI(2, 'PINGPING_AUTO', *arguments)
-					com.sendOrderAPI(1, 'PINGPING_AUTO', *arguments)
-					com.sendOrderAPI(2, 'PINGPING_AUTO', *arguments)
-					com.sendOrderAPI(3, 'GET_CAM', *arguments)
-					com.sendOrderAPI(3, 'PINGPING_AUTO', *arguments)
+
 					com.sendOrderAPI(1, 'O_BRAS_OUVRIR', *arguments)
-					com.sendOrderAPI(1, 'PINGPING_AUTO', *arguments)
-					com.sendOrderAPI(2, 'A_GET_CODER', *arguments)
+					com.sendOrderAPI(2, 'PINGPING_AUTO', *arguments)
 
 			elif order in com.orders:
 				if isinstance(order, (int)):
