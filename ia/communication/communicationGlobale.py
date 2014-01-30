@@ -46,7 +46,6 @@ class communicationGlobale():
 		(self.address, self.orders, self.argumentSize, self.ordersArguments, self.ordersRetour) = parser_c.parseConstante()
 		self.nbAddress = len(self.address)//2
 
-		self.ordreLog = [[(-1,"")]*64 for x in range(self.nbAddress+1)] #stock un historique des ordres envoyés, double tableau de tuple (ordre,data)
 
 		for order in self.orders:#revertion de self.argumentSize
 			if isinstance(order, (str)):
@@ -70,6 +69,7 @@ class communicationGlobale():
 		for order in self.orders:# on vérifie la cohérance entre serial_defines.c et serial_defines.h
 			self.checkParsedOrderSize(order)
 		
+		self.ordreLog = [[(-1,"")]*64 for x in range(self.nbAddress+1)] #stock un historique des ordres envoyés, double tableau de tuple (ordre,data)
 		self.arduinoIdReady = [False]*(self.nbAddress+1)
 		self.lastConfirmationDate = [-1]*(self.nbAddress+1)#date de la dernière confirmation(en milliseconde)
 		self.lastSendDate = [-1]*(self.nbAddress+1)#date du dernier envoie(en milliseconde)
@@ -149,9 +149,6 @@ class communicationGlobale():
 								#procedure de renvoi en cas de timeout
 								if (date - self.nbUnconfirmedPacket[address][1]) > self.timeOut and self.nbUnconfirmedPacket[address][1] != -1:
 									for indice in indiceARenvoyer:
-										print("address", address)
-										print("indice", indice)
-										print("orderLog", self.ordreLog[address][indice])
 										print(("WARNING: Renvoie après timeout de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "d'idd ", indice, "au robot ", self.address[address]), "binaire :", self.ordreLog[address][indice])
 										self.sendMessage(address, self.ordreLog[address][indice][1])
 										self.lastSendDate[address] = date 
