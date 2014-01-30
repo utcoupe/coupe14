@@ -16,7 +16,9 @@ class communicationGlobale():
 	def __init__(self, portXbee, vitesseXbee, portArduno, vitesseArduino, portAsserv, vitesseAsserv):
 
 		#Constantes réglables:
-		self.debugMode = True
+		self.useXBee = True
+		self.useFMother = True
+		self.useFMasserv = True
 		self.maxUnconfirmedPacket = 5 # attention maximum 32
 		self.emptyFifo = True
 		self.timeOut = 75
@@ -78,11 +80,13 @@ class communicationGlobale():
 		self.nbUnconfirmedPacket = [(0, -1)]*(self.nbAddress+1) # (nbUnconfimed, dateFirstUnconfirmed)
 		
 		
-		self.liaisonXbee = serial_comm.ComSerial(portXbee, vitesseXbee)
-		if self.debugMode == False:
+		if self.useXBee:
+			self.liaisonXbee = serial_comm.ComSerial(portXbee, vitesseXbee)
+		if self.useFMother:
 			self.liaisonArduinoOther = serial_comm.ComSerial(portArduno, vitesseArduino)
+		if self.useFMasserv:
 			self.liaisonArduinoAsserv = serial_comm.ComSerial(portAsserv, vitesseAsserv)
-		
+
 		#defines de threads
 		self.lastHighPrioTaskDate = 0
 		self.lastLowPrioTaskDate = 0
@@ -186,11 +190,11 @@ class communicationGlobale():
 
 
 	def sendMessage(self, address, data):
-		if address == self.address['ADDR_FLUSSMITTEL_OTHER'] and self.debugMode == False: 
+		if address == self.address['ADDR_FLUSSMITTEL_OTHER'] and self.useFMother: 
 			self.liaisonArduinoOther.send(data)
-		elif address == self.address['ADDR_FLUSSMITTEL_ASSERV'] and self.debugMode == False:
+		elif address == self.address['ADDR_FLUSSMITTEL_ASSERV'] and self.useFMasserv:
 			self.liaisonArduinoAsserv.send(data)
-		else:
+		elif self.useXBee:
 			self.liaisonXbee.send(data)
 
 
@@ -345,9 +349,11 @@ class communicationGlobale():
 
 	def getXbeeOrders(self):
 		""" retourne ordersList, une liste d'élements sous la forme(adresse, id, data) où data est prêt à être interpréter"""
-		rawInputList = self.liaisonXbee.read()
-		if self.debugMode == False:
+		if self.useXBee:
+			rawInputList = self.liaisonXbee.read()
+		if self.useFMother:
 			rawInputList += self.liaisonArduinoOther.read()
+		if self.useFMasserv:
 			rawInputList += self.liaisonArduinoAsserv.read()
 
 		ordersList = deque()
