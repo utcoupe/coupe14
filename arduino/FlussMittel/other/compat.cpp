@@ -5,6 +5,7 @@
  ****************************************/
 #include "compat.h"
 #include "Servo.h"
+#include "serial_switch.h"
 
 #include <Arduino.h>
 
