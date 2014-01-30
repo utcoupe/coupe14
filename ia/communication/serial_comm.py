@@ -11,8 +11,13 @@ from . import conversion
 import binascii
 
 class ComSerial():
-	def __init__(self, name, baudrate):
-		self.liaison = serial.Serial(name, baudrate, parity=serial.PARITY_ODD, stopbits=serial.STOPBITS_ONE)
+	def __init__(self, name, baudrate, parity):
+		if parity == 'ODD':
+			self.liaison = serial.Serial(name, baudrate, parity=serial.PARITY_ODD, stopbits=serial.STOPBITS_ONE)
+		elif parity == 'NONE':
+			self.liaison = serial.Serial(name, baudrate, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE)
+		else:
+			print('Parity ', parity, ' non valide');
 		self.rawInput = []
 		self.readyToRead = False
 

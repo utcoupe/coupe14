@@ -13,10 +13,12 @@ import threading
 
 
 class communicationGlobale():
-	def __init__(self, portXbee, vitesseXbee, portArduno, vitesseArduino, portAsserv, vitesseAsserv):
+	def __init__(self, portXbee, vitesseXbee, parityXbee, portOther, vitesseOther, parityOther, portAsserv, vitesseAsserv, parityAsserv):
 
 		#Constantes réglables:
-		self.debugMode = True
+		self.useXbee = True
+		self.useFMother = False
+		self.useFMasserv = False
 		self.maxUnconfirmedPacket = 5 # attention maximum 32
 		self.emptyFifo = True
 		self.timeOut = 50
@@ -80,11 +82,13 @@ class communicationGlobale():
 		self.nbUnconfirmedPacket = [(0, -1)]*(self.nbAddress+1) # (nbUnconfimed, dateFirstUnconfirmed)
 		
 		
-		self.liaisonXbee = serial_comm.ComSerial(portXbee, vitesseXbee)
-		if self.debugMode == False:
-			self.liaisonArduinoOther = serial_comm.ComSerial(portArduno, vitesseArduino)
-			self.liaisonArduinoAsserv = serial_comm.ComSerial(portAsserv, vitesseAsserv)
-		
+		if self.useXbee:
+			self.liaisonXbee = serial_comm.ComSerial(portXbee, vitesseXbee, parityXbee)
+		if self.useFMother:
+			self.liaisonArduinoOther = serial_comm.ComSerial(portOther, vitesseOther, parityOther)
+		if self.useFMasserv:
+			self.liaisonArduinoAsserv = serial_comm.ComSerial(portAsserv, vitesseAsserv, parityAsserv)
+
 		#defines de threads
 		self.lastHighPrioTaskDate = 0
 		self.lastLowPrioTaskDate = 0
@@ -192,11 +196,11 @@ class communicationGlobale():
 
 
 	def sendMessage(self, address, data):
-		if address == self.address['ADDR_FLUSSMITTEL_OTHER'] and self.debugMode == False: 
+		if address == self.address['ADDR_FLUSSMITTEL_OTHER'] and self.useFMother: 
 			self.liaisonArduinoOther.send(data)
-		elif address == self.address['ADDR_FLUSSMITTEL_ASSERV'] and self.debugMode == False:
+		elif address == self.address['ADDR_FLUSSMITTEL_ASSERV'] and self.useFMasserv:
 			self.liaisonArduinoAsserv.send(data)
-		else:
+		elif self.useXbee:
 			self.liaisonXbee.send(data)
 
 
@@ -361,10 +365,13 @@ class communicationGlobale():
 			return -1
 
 	def getXbeeOrders(self):
+		rawInputList = []
 		""" retourne ordersList, une liste d'élements sous la forme(adresse, id, data) où data est prêt à être interpréter"""
-		rawInputList = self.liaisonXbee.read()
-		if self.debugMode == False:
+		if self.useXbee:
+			rawInputList += self.liaisonXbee.read()
+		if self.useFMother:
 			rawInputList += self.liaisonArduinoOther.read()
+		if self.useFMasserv:
 			rawInputList += self.liaisonArduinoAsserv.read()
 
 		ordersList = deque()
@@ -514,7 +521,7 @@ class communicationGlobale():
 				self.ordreLog[int(address)][idd] = (order, chaineTemp)
 				self.lastSendDate[address] = date
 				self.lastIdSend[address] = idd
-				print("Envoi normal a l'arduino", self.address[address], "de l'ordre", self.orders[order], "d'id", idd)
+				#print("Envoi normal a l'arduino", self.address[address], "de l'ordre", self.orders[order], "d'id", idd)
 				self.sendMessage(address, chaineTemp)
 			else:
 				remainOrdersToSend.append(packet)
