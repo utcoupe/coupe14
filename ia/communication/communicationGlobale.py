@@ -19,8 +19,8 @@ class communicationGlobale():
 		self.debugMode = True
 		self.maxUnconfirmedPacket = 5 # attention maximum 32
 		self.emptyFifo = True
-		self.timeOut = 75
-		self.highPrioSpeed = 10 #fréquence d'execution en ms
+		self.timeOut = 50
+		self.highPrioSpeed = 5 #fréquence d'execution en ms
 		self.lowPrioSpeed = 1000 #fréquence d'execution en ms
 		self.keepContactTimeout = 1000
 		self.offLigneTimeout = 5000
@@ -30,8 +30,9 @@ class communicationGlobale():
 		self.writeOutput = True
 		self.readInput = True
 		self.probingDevices = True
-		self.renvoieOrdre = True
+		self.renvoiOrdre = True
 		self.keepContact = True
+		self.renvoiImmediat = False
 
 
 
@@ -75,6 +76,7 @@ class communicationGlobale():
 		self.lastIdConfirm = [63]*(self.nbAddress+1)
 		self.lastIdSend = [63]*(self.nbAddress+1)
 		self.nbRenvoiImmediat = [0]*(self.nbAddress+1)
+		self.nbNextRenvoiImmediat = [0]*(self.nbAddress+1)
 		self.nbUnconfirmedPacket = [(0, -1)]*(self.nbAddress+1) # (nbUnconfimed, dateFirstUnconfirmed)
 		
 		
@@ -121,33 +123,40 @@ class communicationGlobale():
 					self.mutexOrdersToRead.release()
 
 				#Renvoie des ordres non confirmés
-				if self.renvoieOrdre == True:
+				if self.renvoiOrdre == True:
 					for address in self.address:
 						if isinstance(address, (int)):
 							indiceARenvoyer = self.getAllUnknowledgeId(address)
 							if len(indiceARenvoyer) > 0:
 
 								#procedure de renvoi immediat dans le cas où l'arduino indique une erreur
-								if self.nbRenvoiImmediat[address] != 0:
-									for i in range(self.nbRenvoiImmediat[address]):
-										if i < len(indiceARenvoyer):
-											print(("WARNING: Renvoie immediat de l'ordre: ", self.orders[self.ordreLog[address][indiceARenvoyer[i]][0]], "d'idd ", indiceARenvoyer[i], "au robot ", self.address[address]))
-											self.sendMessage(address, self.ordreLog[address][indiceARenvoyer[i]][1])
-											self.lastSendDate[address] = date 
-											self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], date)
-										else:
-											print("ERREUR CODE: cas impossible")
-											print(indiceARenvoyer)
-											print(self.nbRenvoiImmediat[address])
-									self.nbRenvoiImmediat[address] = 0
+								if self.renvoiImmediat == True:
+									if self.nbRenvoiImmediat[address] != 0:
+										for i in range(self.nbRenvoiImmediat[address]):
+											if i < len(indiceARenvoyer):
+												print(("WARNING: Renvoie immediat de l'ordre: ", self.orders[self.ordreLog[address][indiceARenvoyer[i]][0]], "d'idd ", indiceARenvoyer[i], "au robot ", self.address[address]))
+												self.sendMessage(address, self.ordreLog[address][indiceARenvoyer[i]][1])
+												self.lastSendDate[address] = date 
+												self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], date)
+												self.lastIdSend[address] = i
+											else:
+												print("ERREUR CODE: cas impossible")
+												print(indiceARenvoyer)
+												print(self.nbRenvoiImmediat[address])
+										self.nbNextRenvoiImmediat[address] = len(indiceARenvoyer) - self.nbRenvoiImmediat[address]
+										self.nbRenvoiImmediat[address] = 0
 
-								#procedure de renvoi en cas de tmeout
+								#procedure de renvoi en cas de timeout
 								if (date - self.nbUnconfirmedPacket[address][1]) > self.timeOut and self.nbUnconfirmedPacket[address][1] != -1:
 									for indice in indiceARenvoyer:
+										print("address", address)
+										print("indice", indice)
+										print("orderLog", self.ordreLog[address][indice])
 										print(("WARNING: Renvoie après timeout de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "d'idd ", indice, "au robot ", self.address[address]), "binaire :", self.ordreLog[address][indice])
 										self.sendMessage(address, self.ordreLog[address][indice][1])
 										self.lastSendDate[address] = date 
 										self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], date)
+										self.lastIdSend[address] = indice
 				#Ecriture des ordres
 				if self.writeOutput == True:
 					self.sendOrders()
@@ -210,6 +219,13 @@ class communicationGlobale():
 
 		return self.lastIdSend[address]
 
+	def getNextIdOfId(self, idd):
+		"""retourne l'id d'après"""
+		if idd != 63:
+			return idd+1
+		else:
+			return 0
+
 	def getNextConfirmeId(self, address):
 		"""retourne le prochain id attendu"""
 		if self.lastIdConfirm[address] != 63:
@@ -249,6 +265,7 @@ class communicationGlobale():
 		self.lastSendDate[address] = -1
 		self.arduinoIdReady[address] = False
 		self.nbRenvoiImmediat[address] = 0
+		self.nbNextRenvoiImmediat[address] = 0
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
 
@@ -265,6 +282,7 @@ class communicationGlobale():
 		self.lastSendDate[address] = -1
 		self.arduinoIdReady[address] = int(time.time()*1000)
 		self.nbRenvoiImmediat[address] = 0
+		self.nbNextRenvoiImmediat[address] = 0
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
 		
@@ -277,6 +295,7 @@ class communicationGlobale():
 		self.lastSendDate[address] = -1
 		self.arduinoIdReady[address] = int(time.time()*1000)
 		self.nbRenvoiImmediat[address] = 0
+		self.nbNextRenvoiImmediat[address] = 0
 		self.lastIdConfirm[address] = 63
 		self.lastIdSend[address] = 63
 
@@ -334,7 +353,8 @@ class communicationGlobale():
 					return -1
 			elif packetAddress > 0 and packetAddress < (self.nbAddress+1) and packetId > 63:
 				print(("L'arduino", self.address[packetAddress], "nous indique avoir mal reçu un message, message d'erreur ", packetId))
-				self.nbRenvoiImmediat[packetAddress] += 1
+				if self.nbNextRenvoiImmediat[packetAddress] != 0:
+					self.nbRenvoiImmediat[packetAddress] += 1
 				return -1
 			else:
 				print("WARNING: Le paquet est mal formé, l'address ou l'id est invalide")
@@ -369,7 +389,6 @@ class communicationGlobale():
 			idd = int(order[1])
 			
 			unconfirmedIds = self.getAllUnknowledgeId(address)
-			print(idd)
 			if idd in unconfirmedIds:
 				#ne pas renvoyer  les paquets sans argument et dont on a louppé les confimations
 				date = int(time.time()*1000)
@@ -380,6 +399,7 @@ class communicationGlobale():
 						print(("Success: l'arduino", self.address[address]," a bien recu l'ordre ", self.orders[self.ordreLog[address][idd][0]], " d'id: ", idd))
 					self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(idd) - 1, date)#on bidone le chiffre date, mais c'est pas grave
 					self.lastIdConfirm[address] = idd
+					self.lastConfirmationDate[address] = date
 				else:
 					i = 0
 					lastIdToAccept = self.lastIdConfirm[address]
@@ -470,10 +490,22 @@ class communicationGlobale():
 		"""fonction qui gère l'envoi des ordres, sous le contrôle du thread"""
 		date = int(time.time()*1000)
 
+		#gestion du cas particulier où l'arduino a perdue un paquet, en effet il faut d'abbord lui renvoyer les autres paquets perdue avant d'en envoyer des nouveau
+		for address in self.address:
+			if isinstance(address, (int)):
+				while self.nbNextRenvoiImmediat[address] > 0 and self.nbUnconfirmedPacket[address][0] < self.maxUnconfirmedPacket:
+					print("Warning: procédure de renvoi après un renvoi immediat sur l'arduino", self.address[address], "du paquets d'id", self.getNextIdOfId(self.lastIdSend[address]))
+					self.sendMessage(address, self.ordreLog[address][self.getNextIdOfId(self.lastIdSend[address])][1])
+					self.nbNextRenvoiImmediat[address] -= 1
+					self.lastSendDate[address] = date
+					self.lastIdSend[address] = self.getNextIdOfId(self.lastIdSend[address])
+					self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], date)
+
+		#cas d'envoi normal
 		remainOrdersToSend = deque()
 		self.mutexOrdersToSend.acquire()
 		for packet in self.ordersToSend:#packet contient(address, ordre, *argument)
-			#si il n'y a pas déjà trop d'ordres en atente on envoie
+			#si il n'y a pas déjà trop d'ordres en atente on envoi
 			if self.nbUnconfirmedPacket[packet[0]][0] < self.maxUnconfirmedPacket:
 				address = packet[0]
 				order = packet[1]
@@ -483,7 +515,9 @@ class communicationGlobale():
 				chaineTemp = self.applyProtocole(address, idd, order, packet[2])
 
 				self.ordreLog[int(address)][idd] = (order, chaineTemp)
-				self.lastSendDate[address] = int(time.time()*1000)
+				self.lastSendDate[address] = date
+				self.lastIdSend[address] = idd
+				print("Envoi normal a l'arduino", self.address[address], "de l'ordre", self.orders[order], "d'id", idd)
 				self.sendMessage(address, chaineTemp)
 			else:
 				remainOrdersToSend.append(packet)
