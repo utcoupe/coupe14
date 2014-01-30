@@ -42,7 +42,6 @@ void Control::compute(){
 	}
 	else{
 		if (current_goal.isReached && fifo.getRemainingGoals() > 1){//Si le but est atteint et que ce n'est pas le dernier, on passe au suivant
-			//PDEBUGLN("Next Goal");
 			current_goal = fifo.gotoNext();
 			reset = true;
 		}
@@ -128,7 +127,6 @@ void Control::compute(){
 			}
 			default:
 			{
-				//PDEBUGLN("No Goal");
 				break;
 			}	
 		}
@@ -168,12 +166,7 @@ void Control::setMaxAngCurv(float n_max_ang){
 }
 
 void Control::setMaxAcc(float n_max_acc){
-	PDEBUGLN("");
-	PDEBUGLN(FREQ);
-	PDEBUGLN(n_max_acc);
-	PDEBUGLN(max_acc);
 	max_acc = n_max_acc / FREQ; 
-	PDEBUGLN(max_acc);
 }
 
 void Control::pushPos(pos n_pos){
