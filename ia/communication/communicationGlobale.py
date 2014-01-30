@@ -13,10 +13,12 @@ import threading
 
 
 class communicationGlobale():
-	def __init__(self, portXbee, vitesseXbee, portArduno, vitesseArduino, portAsserv, vitesseAsserv):
+	def __init__(self, portXbee, vitesseXbee, parityXbee, portOther, vitesseOther, parityOther, portAsserv, vitesseAsserv, parityAsserv):
 
 		#Constantes réglables:
-		self.debugMode = True
+		self.useXbee = True
+		self.useFMother = False
+		self.useFMasserv = False
 		self.maxUnconfirmedPacket = 5 # attention maximum 32
 		self.emptyFifo = True
 		self.timeOut = 100
@@ -80,11 +82,13 @@ class communicationGlobale():
 		self.nbUnconfirmedPacket = [(0, -1)]*(self.nbAddress+1) # (nbUnconfimed, dateFirstUnconfirmed)
 		
 		
-		self.liaisonXbee = serial_comm.ComSerial(portXbee, vitesseXbee)
-		if self.debugMode == False:
-			self.liaisonArduinoOther = serial_comm.ComSerial(portArduno, vitesseArduino)
-			self.liaisonArduinoAsserv = serial_comm.ComSerial(portAsserv, vitesseAsserv)
-		
+		if self.useXbee:
+			self.liaisonXbee = serial_comm.ComSerial(portXbee, vitesseXbee, parityXbee)
+		if self.useFMother:
+			self.liaisonArduinoOther = serial_comm.ComSerial(portOther, vitesseOther, parityOther)
+		if self.useFMasserv:
+			self.liaisonArduinoAsserv = serial_comm.ComSerial(portAsserv, vitesseAsserv, parityAsserv)
+
 		#defines de threads
 		self.lastHighPrioTaskDate = 0
 		self.lastLowPrioTaskDate = 0
@@ -192,11 +196,11 @@ class communicationGlobale():
 
 
 	def sendMessage(self, address, data):
-		if address == self.address['ADDR_FLUSSMITTEL_OTHER'] and self.debugMode == False: 
+		if address == self.address['ADDR_FLUSSMITTEL_OTHER'] and self.useFMother: 
 			self.liaisonArduinoOther.send(data)
-		elif address == self.address['ADDR_FLUSSMITTEL_ASSERV'] and self.debugMode == False:
+		elif address == self.address['ADDR_FLUSSMITTEL_ASSERV'] and self.useFMasserv:
 			self.liaisonArduinoAsserv.send(data)
-		else:
+		elif self.useXbee:
 			self.liaisonXbee.send(data)
 
 
@@ -361,10 +365,13 @@ class communicationGlobale():
 			return -1
 
 	def getXbeeOrders(self):
+		rawInputList = []
 		""" retourne ordersList, une liste d'élements sous la forme(adresse, id, data) où data est prêt à être interpréter"""
-		rawInputList = self.liaisonXbee.read()
-		if self.debugMode == False:
+		if self.useXbee:
+			rawInputList += self.liaisonXbee.read()
+		if self.useFMother:
 			rawInputList += self.liaisonArduinoOther.read()
+		if self.useFMasserv:
 			rawInputList += self.liaisonArduinoAsserv.read()
 
 		ordersList = deque()
@@ -393,7 +400,7 @@ class communicationGlobale():
 
 				if idd == self.getNextConfirmeId(address):
 					if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:
-						print(("Success: l'arduino", self.address[address]," a bien recu l'ordre ", self.orders[self.ordreLog[address][idd][0]], " d'id: ", idd))
+						print("Success: l'arduino", self.address[address]," a bien recu l'ordre ", self.orders[self.ordreLog[address][idd][0]], " d'id: ", idd)
 					self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(idd) - 1, date)#on bidone le chiffre date, mais c'est pas grave
 					self.lastIdConfirm[address] = idd
 					self.lastConfirmationDate[address] = date
@@ -412,7 +419,7 @@ class communicationGlobale():
 					if lastIdToAccept != self.lastIdConfirm[address]:
 						
 						if returnMissed == True:
-							print(("Success: l'arduino", self.address[address]," a bien recu les ordres jusque", idd, "mais il manque au moins un retour (avec argument) donc on ne confirme que", self.orders[self.ordreLog[address][lastIdToAccept][0]], " d'id: ", lastIdToAccept))
+							print("Success: l'arduino", self.address[address]," a bien recu les ordres jusque", idd, "mais il manque au moins un retour (avec argument) donc on ne confirme que", self.orders[self.ordreLog[address][lastIdToAccept][0]], " d'id: ", lastIdToAccept)
 							self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(lastIdToAccept) - 1, date)#on bidone le chiffre date, mais c'est pas grave
 							self.lastIdConfirm[address] = lastIdToAccept
 						
@@ -420,34 +427,37 @@ class communicationGlobale():
 					self.lastConfirmationDate[address] = date
 					
 
-					#python enleve les zero lors de la conversion en binaire donc on les rajoute, sauf le premier du protocole
-					argumentData = ""
-					for octet in order[2]:
-						temp = bin(octet)[2:].zfill(7)
-						argumentData += temp
+				#python enleve les zero lors de la conversion en binaire donc on les rajoute, sauf le premier du protocole
+				argumentData = ""
+				for octet in order[2]:
+					temp = bin(octet)[2:].zfill(7)
+					argumentData += temp
 
-					arguments = []
-					index = 0
-					for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
-						if returnType == 'int':
-							size = 16
-							retour = conversion.binaryToInt(argumentData[index:index+size])
-							arguments.append(retour)
-							index += size
-						elif returnType == 'float':
-							size = 32
-							retour = conversion.binaryToFloat(argumentData[index:index+size])
-							arguments.append(retour)
-							index += size
-						elif returnType == 'long':
-							size = 32
-							retour = conversion.binaryToInt(argumentData[index:index+size])
-							arguments.append(retour)
-							index += size
-						else:
-							print("ERREUR: Parseur: le parseur a trouvé un type non supporté")
+				arguments = []
+				index = 0
+				for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
+					if returnType == 'int':
+						size = 16
+						retour = conversion.binaryToInt(argumentData[index:index+size])
+						arguments.append(retour)
+						index += size
+					elif returnType == 'float':
+						size = 32
+						retour = conversion.binaryToFloat(argumentData[index:index+size])
+						arguments.append(retour)
+						index += size
+					elif returnType == 'long':
+						size = 32
+						retour = conversion.binaryToInt(argumentData[index:index+size])
+						arguments.append(retour)
+						index += size
+					else:
+						print("ERREUR: Parseur: le parseur a trouvé un type non supporté")
 
-					returnOrders.append((address, idd, arguments))
+				returnOrders.append((address, idd, arguments))
+
+				if len(arguments) > 0:
+					print("Retour :", arguments)
 
 			else:
 				print("WARNING: l'arduino", self.address[address], "a accepte le paquet", idd, "alors que les paquets a confirmer sont ", self.getAllUnknowledgeId(address), " sauf si on a louppé une réponse avec arguments")
@@ -514,7 +524,7 @@ class communicationGlobale():
 				self.ordreLog[int(address)][idd] = (order, chaineTemp)
 				self.lastSendDate[address] = date
 				self.lastIdSend[address] = idd
-				print("Envoi normal a l'arduino", self.address[address], "de l'ordre", self.orders[order], "d'id", idd)
+				#print("Envoi normal a l'arduino", self.address[address], "de l'ordre", self.orders[order], "d'id", idd)
 				self.sendMessage(address, chaineTemp)
 			else:
 				remainOrdersToSend.append(packet)
