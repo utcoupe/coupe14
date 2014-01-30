@@ -131,7 +131,7 @@ class communicationGlobale():
 								if self.nbRenvoiImmediat[address] != 0:
 									for i in range(self.nbRenvoiImmediat[address]):
 										if i < len(indiceARenvoyer):
-											print(("WARNING: Renvoie de l'ordre: ", self.orders[self.ordreLog[address][indiceARenvoyer[i]][0]], "d'idd ", indiceARenvoyer[i], "au robot ", self.address[address]))
+											print(("WARNING: Renvoie immediat de l'ordre: ", self.orders[self.ordreLog[address][indiceARenvoyer[i]][0]], "d'idd ", indiceARenvoyer[i], "au robot ", self.address[address]))
 											self.sendMessage(address, self.ordreLog[address][indiceARenvoyer[i]][1])
 											self.lastSendDate[address] = date 
 											self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], date)
@@ -144,7 +144,7 @@ class communicationGlobale():
 								#procedure de renvoi en cas de tmeout
 								if (date - self.nbUnconfirmedPacket[address][1]) > self.timeOut and self.nbUnconfirmedPacket[address][1] != -1:
 									for indice in indiceARenvoyer:
-										print(("WARNING: Renvoie de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "d'idd ", indice, "au robot ", self.address[address]), "binaire :", self.ordreLog[address][indice])
+										print(("WARNING: Renvoie après timeout de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "d'idd ", indice, "au robot ", self.address[address]), "binaire :", self.ordreLog[address][indice])
 										self.sendMessage(address, self.ordreLog[address][indice][1])
 										self.lastSendDate[address] = date 
 										self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], date)
@@ -369,13 +369,17 @@ class communicationGlobale():
 			idd = int(order[1])
 			
 			unconfirmedIds = self.getAllUnknowledgeId(address)
+			print(idd)
 			if idd in unconfirmedIds:
-
 				#ne pas renvoyer  les paquets sans argument et dont on a louppé les confimations
+				date = int(time.time()*1000)
 				returnMissed = False
 
 				if idd == self.getNextConfirmeId(address):
-					lastIdToAccept = self.getNextConfirmeId(address)
+					if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:
+						print(("Success: l'arduino", self.address[address]," a bien recu l'ordre ", self.orders[self.ordreLog[address][idd][0]], " d'id: ", idd))
+					self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(idd) - 1, date)#on bidone le chiffre date, mais c'est pas grave
+					self.lastIdConfirm[address] = idd
 				else:
 					i = 0
 					lastIdToAccept = self.lastIdConfirm[address]
@@ -383,23 +387,18 @@ class communicationGlobale():
 						if (self.returnSize[ self.ordreLog[address][unconfirmedIds[i]][0] ] == 0 and returnMissed == False):
 							lastIdToAccept = unconfirmedIds[i]
 						else:
-							print("WARNING: unused data because of a missing return paquet de l'arduino", self.address[address], "drop de l'idd", idd)
 							returnMissed = True
 						if i > self.maxUnconfirmedPacket:
 							print("ERREUR CODE: ce cas ne devrait pas arriver")
 						i +=1
 
-				if lastIdToAccept != self.lastIdConfirm[address]:
-					date = int(time.time()*1000)
-					if returnMissed == True:
-						print(("Success: l'arduino", self.address[address]," a bien recu les ordres jusque", idd, "mais il manque au moins un retour (avec argument) donc on ne confirme que", self.orders[self.ordreLog[address][lastIdToAccept][0]], " d'id: ", lastIdToAccept))
-						self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(lastIdToAccept) - 1, date)#on bidone le chiffre date, mais c'est pas grave
-						self.lastIdConfirm[address] = lastIdToAccept
-					else:
-						#if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:
-						print(("Success: l'arduino", self.address[address]," a bien recu l'ordre ", self.orders[self.ordreLog[address][idd][0]], " d'id: ", idd))
-						self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(idd) - 1, date)#on bidone le chiffre date, mais c'est pas grave
-						self.lastIdConfirm[address] = idd
+					if lastIdToAccept != self.lastIdConfirm[address]:
+						
+						if returnMissed == True:
+							print(("Success: l'arduino", self.address[address]," a bien recu les ordres jusque", idd, "mais il manque au moins un retour (avec argument) donc on ne confirme que", self.orders[self.ordreLog[address][lastIdToAccept][0]], " d'id: ", lastIdToAccept))
+							self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(lastIdToAccept) - 1, date)#on bidone le chiffre date, mais c'est pas grave
+							self.lastIdConfirm[address] = lastIdToAccept
+						
 					
 					self.lastConfirmationDate[address] = date
 					
@@ -494,7 +493,7 @@ class communicationGlobale():
 
 		if len(remainOrdersToSend) == 0 and not self.emptyFifo:
 			self.emptyFifo = True
-			#print("Fin de transmission de la file, (t = "+str(int(time.time()*1000)-self.timeStartProcessing)+"ms)")
+			print("Fin de transmission de la file, (t = "+str(int(time.time()*1000)-self.timeStartProcessing)+"ms)")
 		
 
 

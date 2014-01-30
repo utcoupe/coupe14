@@ -66,6 +66,6 @@ class ComSerial():
 		
 		for char in rawOutputString:
 			self.liaison.write(bytes(char, 'latin-1'))
-			print(conversion.intToBinary(ord(char))[:8])
+			#print(conversion.intToBinary(ord(char))[:8])
 			
 
