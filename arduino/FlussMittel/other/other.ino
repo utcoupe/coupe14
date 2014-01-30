@@ -20,12 +20,13 @@ AF_DCMotor motor_ascenseur(1);
 #define MAX_READ 64 
 void setup(){
 	initPins();
-	Serial.begin(57600);
+	Serial.begin(115200);
 
 	init_protocol();
 	//Moteurs :
-	motor_ascenseur.run(RELEASE);
-	servoBras.write(0);
+	motor_ascenseur.run(FORWARD);
+	motor_ascenseur.setSpeed(0);
+	servoBras.write(10);
 	// LED qui n'en est pas une
 	pinMode(16,OUTPUT);
 }
