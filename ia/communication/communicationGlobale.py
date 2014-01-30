@@ -400,7 +400,7 @@ class communicationGlobale():
 
 				if idd == self.getNextConfirmeId(address):
 					if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:
-						print(("Success: l'arduino", self.address[address]," a bien recu l'ordre ", self.orders[self.ordreLog[address][idd][0]], " d'id: ", idd))
+						print("Success: l'arduino", self.address[address]," a bien recu l'ordre ", self.orders[self.ordreLog[address][idd][0]], " d'id: ", idd)
 					self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(idd) - 1, date)#on bidone le chiffre date, mais c'est pas grave
 					self.lastIdConfirm[address] = idd
 					self.lastConfirmationDate[address] = date
@@ -419,7 +419,7 @@ class communicationGlobale():
 					if lastIdToAccept != self.lastIdConfirm[address]:
 						
 						if returnMissed == True:
-							print(("Success: l'arduino", self.address[address]," a bien recu les ordres jusque", idd, "mais il manque au moins un retour (avec argument) donc on ne confirme que", self.orders[self.ordreLog[address][lastIdToAccept][0]], " d'id: ", lastIdToAccept))
+							print("Success: l'arduino", self.address[address]," a bien recu les ordres jusque", idd, "mais il manque au moins un retour (avec argument) donc on ne confirme que", self.orders[self.ordreLog[address][lastIdToAccept][0]], " d'id: ", lastIdToAccept)
 							self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(lastIdToAccept) - 1, date)#on bidone le chiffre date, mais c'est pas grave
 							self.lastIdConfirm[address] = lastIdToAccept
 						
@@ -427,34 +427,37 @@ class communicationGlobale():
 					self.lastConfirmationDate[address] = date
 					
 
-					#python enleve les zero lors de la conversion en binaire donc on les rajoute, sauf le premier du protocole
-					argumentData = ""
-					for octet in order[2]:
-						temp = bin(octet)[2:].zfill(7)
-						argumentData += temp
+				#python enleve les zero lors de la conversion en binaire donc on les rajoute, sauf le premier du protocole
+				argumentData = ""
+				for octet in order[2]:
+					temp = bin(octet)[2:].zfill(7)
+					argumentData += temp
 
-					arguments = []
-					index = 0
-					for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
-						if returnType == 'int':
-							size = 16
-							retour = conversion.binaryToInt(argumentData[index:index+size])
-							arguments.append(retour)
-							index += size
-						elif returnType == 'float':
-							size = 32
-							retour = conversion.binaryToFloat(argumentData[index:index+size])
-							arguments.append(retour)
-							index += size
-						elif returnType == 'long':
-							size = 32
-							retour = conversion.binaryToInt(argumentData[index:index+size])
-							arguments.append(retour)
-							index += size
-						else:
-							print("ERREUR: Parseur: le parseur a trouvé un type non supporté")
+				arguments = []
+				index = 0
+				for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
+					if returnType == 'int':
+						size = 16
+						retour = conversion.binaryToInt(argumentData[index:index+size])
+						arguments.append(retour)
+						index += size
+					elif returnType == 'float':
+						size = 32
+						retour = conversion.binaryToFloat(argumentData[index:index+size])
+						arguments.append(retour)
+						index += size
+					elif returnType == 'long':
+						size = 32
+						retour = conversion.binaryToInt(argumentData[index:index+size])
+						arguments.append(retour)
+						index += size
+					else:
+						print("ERREUR: Parseur: le parseur a trouvé un type non supporté")
 
-					returnOrders.append((address, idd, arguments))
+				returnOrders.append((address, idd, arguments))
+
+				if len(arguments) > 0:
+					print("Retour :", arguments)
 
 			else:
 				print("WARNING: l'arduino", self.address[address], "a accepte le paquet", idd, "alors que les paquets a confirmer sont ", self.getAllUnknowledgeId(address), " sauf si on a louppé une réponse avec arguments")
