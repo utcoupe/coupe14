@@ -27,7 +27,6 @@ void setup(){
 	motor_ascenseur.run(FORWARD);
 	motor_ascenseur.setSpeed(0); //Desactivr ascenseur
 	servoBras.write(170); //Fermer le bras
-	// LED qui n'en est pas une
 }
 
 void loop(){
