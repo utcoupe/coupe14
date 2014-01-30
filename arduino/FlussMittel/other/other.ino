@@ -24,7 +24,7 @@ void setup(){
 
 	init_protocol();
 	//Moteurs :
-	//motor_ascenseur.run(RELEASE);
+	motor_ascenseur.run(RELEASE);
 	servoBras.write(0);
 	// LED qui n'en est pas une
 	pinMode(16,OUTPUT);
