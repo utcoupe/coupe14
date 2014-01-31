@@ -28,11 +28,8 @@ def binaryToFloat(string):
 
 
 def binaryToInt(string):
-	temp = ""
-	for i in range(8, 16, 1):
-		temp += string[i]
-	for i in range(0, 8, 1):
-		temp += string[i]
+	temp = string[8:16]
+	temp += string[0:8]
 
 	resultat = int(temp, 2)
 	if resultat>32767:
