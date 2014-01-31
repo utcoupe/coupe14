@@ -13,14 +13,14 @@ def gui(com):
 
 	while 1:
 		#address = str(raw_input("Entre une address:\n"))
-		address = 3
+		address = 4
 		arguments = []
 		order = str(input("Entre le nom ou le numéro d'un ordre:\n"))
 		if order:
 			if order[0] == 'A':
-				address = 2
+				address = 5
 			elif order[0] == 'O':
-				address = 1
+				address = 4
 			elif order == 'GET_HOKUYO':
 				address = 6
 

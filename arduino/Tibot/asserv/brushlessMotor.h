@@ -7,11 +7,11 @@
 
 #include "parameters.h"
 
-#define MOTOR1_DIR 50
-#define MOTOR2_DIR 40
+#define MOTOR1_DIR 26
+#define MOTOR2_DIR 22
 
-#define MOTOR1_EN 48
-#define MOTOR2_EN 38
+#define MOTOR1_EN 28
+#define MOTOR2_EN 24
 
 #define MOTOR1_SPD 5
 #define MOTOR2_SPD 4

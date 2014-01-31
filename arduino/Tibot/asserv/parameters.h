@@ -36,7 +36,7 @@
 #define DUREE_CYCLE 5 //période de calcul, en ms
 #define FREQ 1/(DUREE_CYCLE/1000.0)
 
-#define ACC_MAX 1000 //consigne*s-2
+#define ACC_MAX 250 //consigne*s-2
 
 /* CONSIGNE OFFSET
  * DEVRAIT ETRE A 0
@@ -57,12 +57,11 @@
 //CONSIGNE_REACHED est la pwm en dessous de laquelle un robot peut etre considéré comme arrêté à son goal
 #define CONSIGNE_REACHED 0
 
-#define ENC_RESOLUTION 1024 //resolution du codeur
+#define ENC_RESOLUTION 500 //resolution du codeur
 
 #define ENC_LEFT_RADIUS 34 //rayon de la roue codeuse
 #define ENC_RIGHT_RADIUS 34 //rayon de la roue codeuse
 #define ENTRAXE_ENC 130.0 // Distance entre chaque roue codeuse en mm
-#define ENTRAXE_MOTOR 70.0 // Distance entre chaque roue motrice en mm
 
 #define ERROR_ANGLE 0.00 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
 #define ERROR_POS 10 // erreur en position (mm)  maximale pour considérer l'objectif comme atteint
