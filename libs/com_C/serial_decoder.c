@@ -108,6 +108,7 @@ int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){
 
         //recalage des ordres 6bits
         unsigned char overflow = right_shift_array(data_out, data_out, data_counter, 2); //Shift tout le tableau à droite de 1 à partir de i (le premier ordre est calé)
+	//Si on vient de décaler le dernier octet de 3 ou plus à gauche, l'octet forme suite au décalage à droite de 2 sera "incomplet", c'est à dire que l'octet est en réalité des bits perdus, il faut dropper cet octet
 	if (offset > 2) { //cas ou le dernier octet est incomplet
 		data_counter--;
 	}
