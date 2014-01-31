@@ -21,8 +21,8 @@ class communicationGlobale():
 		self.useFMasserv = True
 		self.maxUnconfirmedPacket = 5 # attention maximum 32
 		self.emptyFifo = True
-		self.timeOut = 50
-		self.highPrioSpeed = 5 #fréquence d'execution en ms
+		self.timeOut = 100
+		self.highPrioSpeed = 30 #fréquence d'execution en ms
 		self.lowPrioSpeed = 1000 #fréquence d'execution en ms
 		self.keepContactTimeout = 1000
 		self.offLigneTimeout = 5000
@@ -397,6 +397,7 @@ class communicationGlobale():
 				#ne pas renvoyer  les paquets sans argument et dont on a louppé les confimations
 				date = int(time.time()*1000)
 				returnMissed = False
+				lastIdToAccept = -1
 
 				if idd == self.getNextConfirmeId(address):
 					if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:
@@ -417,7 +418,6 @@ class communicationGlobale():
 						i +=1
 
 					if lastIdToAccept != self.lastIdConfirm[address]:
-						
 						if returnMissed == True:
 							print("Success: l'arduino", self.address[address]," a bien recu les ordres jusque", idd, "mais il manque au moins un retour (avec argument) donc on ne confirme que", self.orders[self.ordreLog[address][lastIdToAccept][0]], " d'id: ", lastIdToAccept)
 							self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(lastIdToAccept) - 1, date)#on bidone le chiffre date, mais c'est pas grave
@@ -426,38 +426,38 @@ class communicationGlobale():
 					
 					self.lastConfirmationDate[address] = date
 					
+				if idd == self.getNextConfirmeId(address) or lastIdToAccept != self.lastIdConfirm[address]:
+					#python enleve les zero lors de la conversion en binaire donc on les rajoute, sauf le premier du protocole
+					argumentData = ""
+					for octet in order[2]:
+						temp = bin(octet)[2:].zfill(7)
+						argumentData += temp
 
-				#python enleve les zero lors de la conversion en binaire donc on les rajoute, sauf le premier du protocole
-				argumentData = ""
-				for octet in order[2]:
-					temp = bin(octet)[2:].zfill(7)
-					argumentData += temp
+					arguments = []
+					index = 0
+					for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
+						if returnType == 'int':
+							size = 16
+							retour = conversion.binaryToInt(argumentData[index:index+size])
+							arguments.append(retour)
+							index += size
+						elif returnType == 'float':
+							size = 32
+							retour = conversion.binaryToFloat(argumentData[index:index+size])
+							arguments.append(retour)
+							index += size
+						elif returnType == 'long':
+							size = 32
+							retour = conversion.binaryToInt(argumentData[index:index+size])
+							arguments.append(retour)
+							index += size
+						else:
+							print("ERREUR: Parseur: le parseur a trouvé un type non supporté")
 
-				arguments = []
-				index = 0
-				for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
-					if returnType == 'int':
-						size = 16
-						retour = conversion.binaryToInt(argumentData[index:index+size])
-						arguments.append(retour)
-						index += size
-					elif returnType == 'float':
-						size = 32
-						retour = conversion.binaryToFloat(argumentData[index:index+size])
-						arguments.append(retour)
-						index += size
-					elif returnType == 'long':
-						size = 32
-						retour = conversion.binaryToInt(argumentData[index:index+size])
-						arguments.append(retour)
-						index += size
-					else:
-						print("ERREUR: Parseur: le parseur a trouvé un type non supporté")
+					returnOrders.append((address, idd, arguments))
 
-				returnOrders.append((address, idd, arguments))
-
-				if len(arguments) > 0:
-					print("Retour :", arguments)
+					if len(arguments) > 0:
+						print("Retour :", arguments)
 
 			else:
 				print("WARNING: l'arduino", self.address[address], "a accepte le paquet", idd, "alors que les paquets a confirmer sont ", self.getAllUnknowledgeId(address), " sauf si on a louppé une réponse avec arguments")
