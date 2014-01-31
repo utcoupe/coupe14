@@ -17,12 +17,6 @@ extern Servo servoBras;
 int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bool doublon){ 
 	int ret_size = 0;
 	switch(ordre){
-	case PINGPING:
-		if (!doublon) {
-			//Execution des ordre
-		}
-		//Formation et envoi d'une réponse
-		break;
 	default:
 		return -1;//commande inconnue
 	}
