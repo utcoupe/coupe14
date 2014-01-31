@@ -20,7 +20,7 @@ Control control;
 #define MAX_READ 64 
 void setup(){
 	initPins();
-	Serial.begin(115200, SERIAL_8N1);
+	Serial.begin(115200, SERIAL_8O1);
 #ifdef DEBUG
 	Serial3.begin(115200, SERIAL_8N1);
 #endif

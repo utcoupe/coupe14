@@ -20,7 +20,7 @@ AF_DCMotor motor_ascenseur(1);
 #define MAX_READ 64 
 void setup(){
 	initPins();
-	Serial.begin(115200);
+	Serial.begin(115200, SERIAL_8O1);
 
 	init_protocol();
 	//Moteurs :
