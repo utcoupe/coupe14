@@ -475,7 +475,7 @@ class communicationGlobale():
 			elif typeToGet == 'long':
 				rawBinary += conversion.intToBinary(data[i])
 			elif typeToGet == 'float':
-				rawBinary += conversion.floatToBinary(data[i])
+				rawBinary += conversion.floatToBinary(str(data[i]))
 			else:
 				print("ERREUR: Parseur: le parseur serial_defines a trouvé un type non supporté")
 		

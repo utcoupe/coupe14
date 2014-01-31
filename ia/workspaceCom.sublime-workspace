@@ -11,7 +11,7 @@
 			"file": "main.py",
 			"settings":
 			{
-				"buffer_size": 330,
+				"buffer_size": 409,
 				"line_ending": "Unix"
 			}
 		},
@@ -19,7 +19,7 @@
 			"file": "guiCommande.py",
 			"settings":
 			{
-				"buffer_size": 1562,
+				"buffer_size": 1661,
 				"line_ending": "Unix"
 			}
 		},
@@ -27,7 +27,7 @@
 			"file": "communication/communicationGlobale.py",
 			"settings":
 			{
-				"buffer_size": 18117,
+				"buffer_size": 23739,
 				"line_ending": "Unix"
 			}
 		},
@@ -35,7 +35,7 @@
 			"file": "communication/conversion.py",
 			"settings":
 			{
-				"buffer_size": 2952,
+				"buffer_size": 2786,
 				"line_ending": "Unix"
 			}
 		},
@@ -43,7 +43,7 @@
 			"file": "communication/serial_comm.py",
 			"settings":
 			{
-				"buffer_size": 2643,
+				"buffer_size": 2266,
 				"line_ending": "Unix"
 			}
 		},
@@ -51,7 +51,7 @@
 			"file": "communication/parser_c.py",
 			"settings":
 			{
-				"buffer_size": 2251,
+				"buffer_size": 2285,
 				"line_ending": "Unix"
 			}
 		},
@@ -59,7 +59,7 @@
 			"file": "/home/noxy/vrac/Projets/utcoupe/coupe14/libs/com_C/serial_defines.c",
 			"settings":
 			{
-				"buffer_size": 878,
+				"buffer_size": 961,
 				"line_ending": "Unix"
 			}
 		},
@@ -67,7 +67,7 @@
 			"file": "/home/noxy/vrac/Projets/utcoupe/coupe14/libs/com_C/serial_defines.h",
 			"settings":
 			{
-				"buffer_size": 1784,
+				"buffer_size": 1874,
 				"line_ending": "Unix"
 			}
 		}
@@ -123,6 +123,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"Retour",
 			"renvoi",
 			"long",
 			"/"
@@ -143,7 +144,7 @@
 	"groups":
 	[
 		{
-			"selected": 7,
+			"selected": 1,
 			"sheets":
 			[
 				{
@@ -152,15 +153,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 330,
+						"buffer_size": 409,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								65,
+								65
 							]
 						],
 						"settings":
@@ -179,15 +180,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1562,
+						"buffer_size": 1661,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1029,
-								1029
+								806,
+								806
 							]
 						],
 						"settings":
@@ -195,7 +196,7 @@
 							"syntax": "Packages/Python/Python.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 578.0,
+						"translation.y": 17.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -206,15 +207,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 18117,
+						"buffer_size": 23739,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4531,
-								4531
+								13892,
+								13892
 							]
 						],
 						"settings":
@@ -223,7 +224,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1751.0,
+						"translation.y": 6494.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -234,7 +235,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2952,
+						"buffer_size": 2786,
 						"regions":
 						{
 						},
@@ -262,7 +263,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2643,
+						"buffer_size": 2266,
 						"regions":
 						{
 						},
@@ -290,7 +291,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2251,
+						"buffer_size": 2285,
 						"regions":
 						{
 						},
@@ -318,7 +319,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 878,
+						"buffer_size": 961,
 						"regions":
 						{
 						},
@@ -346,7 +347,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1784,
+						"buffer_size": 1874,
 						"regions":
 						{
 						},
@@ -363,7 +364,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 51.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
