@@ -11,7 +11,7 @@ def binaryToFloat(string):
 	    """
 	    See: http://en.wikipedia.org/wiki/IEEE_754-2008
 	    """
-	    return struct.unpack("f",struct.pack("I", bits2int(s)))
+	    return struct.unpack("f",struct.pack(">I", bits2int(s)))
 
 	# Where the bits2int function converts bits to an integer.  
 	def bits2int(bits):
@@ -23,21 +23,8 @@ def binaryToFloat(string):
 	    for i in range(len(bits)):
 	        x += bits[i]*2**i
 	    return x
-
-	temp = ""
-	for i in range(24, 32, 1):
-		temp += string[i]
-	for i in range(16, 24, 1):
-		temp += string[i]
-	for i in range(8, 16, 1):
-		temp += string[i]
-	for i in range(0, 8, 1):
-		temp += string[i]
-
-	resultat = as_float32(temp)[0]
-
 	#TODO gérer les float négatif et tester car taille(floatArduino) != taille(floatPC)
-	return resultat
+	return as_float32(string)[0]
 
 
 def binaryToInt(string):
@@ -111,8 +98,3 @@ def intToBinary(num):
 def orderToBinary(num):
 	"""retourne une chaine de 6 bits"""
 	return bin(num)[2:].zfill(6)
-
-b = floatToBinary(3.14)
-print(b)
-f = binaryToFloat(b)
-print(f)
