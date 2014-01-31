@@ -53,8 +53,8 @@ void RobotState::pushMmPos(pos n_pos){
 void RobotState::update(){
 	long ticksR = encoderRight.getTicks();
 	long ticksL = encoderLeft.getTicks();
-	int dl = (ticksL - last_ticksL)*(TICKS_TO_MM_LEFT * FIXED_POINT_PRECISION);
-	int dr = (ticksR - last_ticksR)*(TICKS_TO_MM_RIGHT * FIXED_POINT_PRECISION);
+	int dl = (ticksL - last_ticksL)*TICKS_TO_MM_LEFT;
+	int dr = (ticksR - last_ticksR)*TICKS_TO_MM_RIGHT;
 
 	float d_angle = atan((dr - dl)/(ENTRAXE_ENC)); //sans approximation tan
 	float last_angle = current_pos.angle; 
@@ -67,6 +67,8 @@ void RobotState::update(){
 		current_pos.angle += 2.0*M_PI;
 		current_pos.modulo_angle--;
 	}
+	dl *= FIXED_POINT_PRECISION;
+	dr *= FIXED_POINT_PRECISION;
 
 	current_pos.x += round(((dr + dl)/2.0)*cos((current_pos.angle + last_angle)/2.0));
 	current_pos.y += round(((dr + dl)/2.0)*sin((current_pos.angle + last_angle)/2.0));
