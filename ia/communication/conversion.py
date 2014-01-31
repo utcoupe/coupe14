@@ -69,20 +69,8 @@ def binaryToLong(string):
 
 def floatToBinary(num):
 	"""retourne une chaine de 32 bits"""
-	temp = ''.join(bin(ord(c)).replace('0b', '').rjust(8, '0') for c in struct.pack('!f', num))
-	
-	retour = ""
-	for i in range(24, 32, 1):
-		retour += temp[i]
-	for i in range(16, 24, 1):
-		retour += temp[i]
-	for i in range(8, 16, 1):
-		retour += temp[i]
-	for i in range(0, 8, 1):
-		retour += temp[i]
-
-	return retour
-
+	#return ''.join(bin(ord(c)).replace('0b', '').rjust(8, '0') for c in struct.pack('<f', num))
+	return ''.join(bin(c).replace('0b', '').rjust(8, '0') for c in struct.pack('<f', num))
 
 def longToBinary(num):
 	"""retourne une chaine de 32 bits"""
@@ -123,3 +111,8 @@ def intToBinary(num):
 def orderToBinary(num):
 	"""retourne une chaine de 6 bits"""
 	return bin(num)[2:].zfill(6)
+
+b = floatToBinary(3.14)
+print(b)
+f = binaryToFloat(b)
+print(f)
