@@ -37,13 +37,10 @@ def binaryToInt(string):
 	return resultat
 
 def binaryToLong(string):
-	retour = ""
-	for i in range(16, 24, 1):
-		retour += string[i]
-	for i in range(8, 16, 1):
-		retour += string[i]
-	for i in range(0, 8, 1):
-		retour += string[i]
+	retour = string[24:32]
+	retour += string[16:24]
+	retour += string[8:16]
+	retour += string[0:8]
 
 	resultat = int(retour, 2)
 	if resultat>2147483647: #si le nombre est négatif
@@ -63,16 +60,11 @@ def longToBinary(num):
 
 	temp = bin(num)[2:].zfill(32)
 
-	retour = ""
 	#On inverse les 16 bits par blocks de 8, exemple AAAAAAAABBBBBBBB devient BBBBBBBBAAAAAAAA
-	for i in range(24, 32, 1):
-		retour += temp[i]
-	for i in range(16, 24, 1):
-		retour += temp[i]
-	for i in range(8, 16, 1):
-		retour += temp[i]
-	for i in range(0, 8, 1):
-		retour += temp[i]
+	retour = temp[24:32]
+	retour += temp[16:24]
+	retour += temp[8:16]
+	retour += temp[0:8]
 	return retour
 
 
@@ -83,12 +75,9 @@ def intToBinary(num):
 
 	temp = bin(num)[2:].zfill(16)
 
-	retour = ""
 	#On inverse les 16 bits par blocks de 8, exemple AAAAAAAABBBBBBBB devient BBBBBBBBAAAAAAAA
-	for i in range(8, 16, 1):
-		retour += temp[i]
-	for i in range(0, 8, 1):
-		retour += temp[i]
+	retour = temp[8:16]
+	retour += temp[0:8]
 	return retour
 
 
