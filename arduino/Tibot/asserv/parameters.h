@@ -51,8 +51,8 @@
  * dès que le robot avance, la pwm min est trouvée */
 #define CONSIGNE_OFFSET 0
 
-#define CONSIGNE_RANGE_MAX 255
-#define CONSIGNE_RANGE_MIN 0
+#define CONSIGNE_RANGE_MAX 127
+#define CONSIGNE_RANGE_MIN -127
 
 //CONSIGNE_REACHED est la pwm en dessous de laquelle un robot peut etre considéré comme arrêté à son goal
 #define CONSIGNE_REACHED 0
