@@ -75,9 +75,9 @@ void interruptRight0{
 #endif
 
 void serial_send(char data) { //Envoi d'un octet en serial, dépend de la plateforme
-	Serial2.write(data);
+	Serial.write(data);
 }
 
 char generic_serial_read(){
-	return Serial2.read();
+	return Serial.read();
 }

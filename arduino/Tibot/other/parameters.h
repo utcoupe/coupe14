@@ -3,7 +3,7 @@
 
 #define DEBUG
 
-#define PIN_SERVO_BRAS 2
+#define PIN_SERVO_BRAS 8
 
 #ifdef DEBUG
 #define PDEBUG(x) Serial.print(x)

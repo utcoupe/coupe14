@@ -20,7 +20,9 @@ Control control;
 void setup(){
 	initPins();
 	Serial2.begin(57600, SERIAL_8O1);
+#ifdef DEBUG
 	Serial.begin(115200, SERIAL_8N1);
+#endif
 	init_protocol();
 	PDEBUGLN("INIT DONE");
 	// LED qui n'en est pas une
@@ -35,7 +37,7 @@ void loop(){
 	digitalWrite(16, HIGH);
 
 	/* zone programmation libre */
-	int available = Serial.available();
+	int available = Serial2.available();
 	if (available > MAX_READ) {
 		available = MAX_READ;
 	}

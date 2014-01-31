@@ -17,8 +17,8 @@ class communicationGlobale():
 
 		#Constantes réglables:
 		self.useXbee = True
-		self.useFMother = False
-		self.useFMasserv = False
+		self.useFMother = True
+		self.useFMasserv = True
 		self.maxUnconfirmedPacket = 5 # attention maximum 32
 		self.emptyFifo = True
 		self.timeOut = 100
