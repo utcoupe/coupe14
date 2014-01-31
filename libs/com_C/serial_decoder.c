@@ -71,7 +71,6 @@ void executeCmd(char serial_data){
 			else {
 				etape = wait_step;
 				client_concerne = false;//On ignore la suite
-				PDEBUG("Data error : ID attendu "); PDEBUG((int)ID_attendu); PDEBUG(", ID recu "); PDEBUGLN((int)ID_recu);
 				sendInvalid();
 			}
 			break;
@@ -93,20 +92,26 @@ int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){
 	int i = 0, j = 0, offset = 0;
 	//Transformation 7->8bits classique
 	for(i=0;i<data_counter;i++){
+		data_out[j] = data_in[i] << (1+offset);
+		if (i+1 < data_counter) {
+			data_out[j] |= data_in[i+1] >> (6-offset);
+		}
+		offset++;
+		j++;
 		if(offset == 7){
 			i++;
 			offset = 0;
 		}
-		data_out[j] = data_in[i] << (1+offset);
-		data_out[j] |= data_in[i+1] >> (6-offset);
-		offset++;
-		j++;
 	}
 
         data_counter = j; //nouveau compte de datas
 
         //recalage des ordres 6bits
         unsigned char overflow = right_shift_array(data_out, data_out, data_counter, 2); //Shift tout le tableau à droite de 1 à partir de i (le premier ordre est calé)
+	if (offset > 2) { //cas ou le dernier octet est incomplet
+		data_counter--;
+	}
+
         if(overflow != 0){
                 data_out[data_counter] = overflow; //Si overflow, on le met (attention aux segfault)
 		data_counter++;
