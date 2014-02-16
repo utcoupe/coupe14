@@ -61,7 +61,7 @@ void Control::compute(){
 			case TYPE_ANG :
 			{
 				//float da = current_goal.data_1 - current_pos.angle;
-				float da = moduloTwoPI(current_goal.data_1 - current_pos.angle);
+				float da = (current_goal.data_1 - current_pos.angle);
 				if(abs(da) <= ERROR_ANGLE){
 					setConsigne(0, 0);
 					fifo.pushIsReached();
@@ -76,7 +76,7 @@ void Control::compute(){
 				float dx = current_goal.data_1 - current_pos.x;
 				float dy = current_goal.data_2 - current_pos.y;
 				float goal_a = atan2(dy, dx);
-				float da = moduloTwoPI(goal_a - current_pos.angle);
+				float da = (goal_a - current_pos.angle);
 				float dd = sqrt(pow(dx, 2.0)+pow(dy, 2.0));//erreur en distance
 				float d = dd * cos(da);
 				static char aligne = 0;
