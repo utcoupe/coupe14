@@ -18,15 +18,18 @@ Control control;
 
 #define MAX_READ 64 
 void setup(){
+	TCCR3B = (TCCR3B & 0xF8) | 0x01 ; //PWM FREQUENCY
+	pinMode(16,OUTPUT);
+	digitalWrite(16, HIGH);
 	initPins();
 	Serial2.begin(57600, SERIAL_8O1);
 #ifdef DEBUG
 	Serial.begin(115200, SERIAL_8N1);
 #endif
+	PDEBUGLN("serial ok");
+	digitalWrite(16, LOW);
 	init_protocol();
 	PDEBUGLN("INIT DONE");
-	// LED qui n'en est pas une
-	pinMode(16,OUTPUT);
 }
 
 void loop(){

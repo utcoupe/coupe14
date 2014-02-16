@@ -19,6 +19,7 @@ see datasheet of DEC-MODULE-24/2
 
 Motor::Motor(int n_motor_side) {
 	motor_side = n_motor_side;
+
 	switch (motor_side) {
 		case MOTOR_LEFT:{
 		 	pinMode(MOTOR1_SPD, OUTPUT);
