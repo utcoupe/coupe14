@@ -7,9 +7,6 @@
 
 #include "parameters.h"
 
-#define MOTOR1_DIR 26
-#define MOTOR2_DIR 22
-
 #define MOTOR1_EN 28
 #define MOTOR2_EN 24
 
@@ -21,11 +18,6 @@
 
 #define MOTOR_LEFT 1
 #define MOTOR_RIGHT 2
-
-#define FORWARD 1
-#define BACKWARD 2
-#define ENABLE 3
-#define DISABLE 4
 
 //Pins codeurs liés à la shield
 #define PIN_ENC_RIGHT_A 19
@@ -47,7 +39,6 @@ class Motor
 {
 	public:
 	Motor(int n_motor_side);
-	void run(int cmd);
 	void setPwm(int pwm);
 
 	private:

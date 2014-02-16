@@ -27,8 +27,6 @@ Motor::Motor(int n_motor_side) {
 			digitalWrite(MOTOR1_EN, HIGH); //Enable motor
 
 			pinMode(MOTOR1_RDY, INPUT);
-			pinMode(MOTOR1_DIR, OUTPUT);
-			digitalWrite(MOTOR1_DIR, LOW);
 			break;
 		}
 		case MOTOR_RIGHT:{
@@ -38,45 +36,7 @@ Motor::Motor(int n_motor_side) {
 			digitalWrite(MOTOR2_EN,HIGH); //enable motor
 
 			pinMode(MOTOR2_RDY, INPUT);
-			pinMode(MOTOR2_DIR, OUTPUT);
-			digitalWrite(MOTOR2_DIR, LOW);
 		   	break;
-		}
-	}
-}
-
-void Motor::run(int cmd) {
-	int dirPin;
-	int enPin;
-	switch (motor_side) {
-		case MOTOR_LEFT:{
-			dirPin = MOTOR1_DIR;
-			enPin = MOTOR1_EN;
-			break;
-		}
-		case MOTOR_RIGHT:{
-			dirPin = MOTOR2_DIR;
-			enPin = MOTOR2_EN;
-			break;
-		}
-	}
-  
-	switch (cmd) {
-		case FORWARD:{
-			digitalWrite(dirPin, LOW);
-			break;
-		}
-		case BACKWARD:{
-			digitalWrite(dirPin, HIGH);
-   			break;
-		}
-		case DISABLE:{
-		   	digitalWrite(enPin, LOW);
-    			break;
-		}
-		case ENABLE:{
-		  	digitalWrite(enPin, HIGH);
-			break;
 		}
 	}
 }
