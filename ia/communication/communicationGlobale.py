@@ -14,7 +14,7 @@ import threading
 
 class communicationGlobale():
 	def __init__(self, portXbee, vitesseXbee, parityXbee, portOther, vitesseOther, parityOther, portAsserv, vitesseAsserv, parityAsserv):
-		self.nbLostPaquets=0
+		self.nbTimeoutPaquets=0
 		self.nbTransmitedPaquets = 0
 
 		#Constantes réglables:
@@ -155,7 +155,7 @@ class communicationGlobale():
 								#procedure de renvoi en cas de timeout
 								if (date - self.nbUnconfirmedPacket[address][1]) > self.timeOut and self.nbUnconfirmedPacket[address][1] != -1:
 									for indice in indiceARenvoyer:
-										self.nbLostPaquets += 1
+										self.nbTimeoutPaquets += 1
 										print(("WARNING: Renvoie après timeout de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "d'idd ", indice, "au robot ", self.address[address]), "binaire :", self.ordreLog[address][indice])
 										self.sendMessage(address, self.ordreLog[address][indice][1])
 										self.lastSendDate[address] = date 
@@ -539,7 +539,7 @@ class communicationGlobale():
 
 		if len(remainOrdersToSend) == 0 and not self.emptyFifo:
 			self.emptyFifo = True
-			print("Fin de transmission de la file, (t = "+str(int(time.time()*1000)-self.timeStartProcessing)+"ms),nombre de paquets reçu", self.nbTransmitedPaquets," nombre de paquets perdu", self.nbLostPaquets)
+			print("Fin de transmission de la file, (t = "+str(int(time.time()*1000)-self.timeStartProcessing)+"ms),nombre de paquets reçu", self.nbTransmitedPaquets," nombre de paquets perdu", self.nbTimeoutPaquets)
 		
 
 
