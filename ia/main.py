@@ -8,14 +8,20 @@ import sys
 
 #Nos fichiers
 from communication import communicationGlobale
+import pullData
 import guiCommande
 
-com = communicationGlobale.communicationGlobale("/dev/ttyUSB0", 57600, "ODD", "/dev/ttymxc3", 115200, "NONE", "/dev/ttyACM0", 115200, "NONE")
+
+#objetCommunication = communicationGlobale.communicationGlobale("/dev/ttyUSB0", 57600, "ODD", "/dev/ttymxc3", 115200, "NONE", "/dev/ttyACM0", 115200, "NONE")
+objetCommunication = None
+objetPullData = pullData.pullData(objetCommunication)
 
 try:
-	guiCommande.gui(com)
-
+	while True:
+		pass
 except KeyboardInterrupt:
-	com.stopGestion()
+	#objetCommunication.stopGestion()
+	pass
 finally:
-	com.stopGestion()
+	#objetCommunication.stopGestion()
+	pass
