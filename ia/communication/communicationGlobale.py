@@ -14,6 +14,8 @@ import threading
 
 class communicationGlobale():
 	def __init__(self, portXbee, vitesseXbee, parityXbee, portOther, vitesseOther, parityOther, portAsserv, vitesseAsserv, parityAsserv):
+		self.nbTimeoutPaquets=0
+		self.nbTransmitedPaquets = 0
 
 		#Constantes réglables:
 		self.useXbee = True
@@ -22,8 +24,8 @@ class communicationGlobale():
 		self.maxUnconfirmedPacket = 5 # attention maximum 32
 		self.emptyFifo = True
 		self.timeOut = 100
-		self.highPrioSpeed = 30 #fréquence d'execution en ms
-		self.lowPrioSpeed = 1000 #fréquence d'execution en ms
+		self.highPrioSpeed = 30 #période d'execution en ms
+		self.lowPrioSpeed = 1000 #période d'execution en ms
 		self.keepContactTimeout = 1000
 		self.offLigneTimeout = 5000
 
@@ -153,6 +155,7 @@ class communicationGlobale():
 								#procedure de renvoi en cas de timeout
 								if (date - self.nbUnconfirmedPacket[address][1]) > self.timeOut and self.nbUnconfirmedPacket[address][1] != -1:
 									for indice in indiceARenvoyer:
+										self.nbTimeoutPaquets += 1
 										print(("WARNING: Renvoie après timeout de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "d'idd ", indice, "au robot ", self.address[address]), "binaire :", self.ordreLog[address][indice])
 										self.sendMessage(address, self.ordreLog[address][indice][1])
 										self.lastSendDate[address] = date 
@@ -326,7 +329,7 @@ class communicationGlobale():
 				self.acceptConfirmeResetId(packetAddress-96)
 				return 0
 			else:
-				print("WARNING, corrupted address on reset confirme from arduino")
+				print("WARNING, corrupted address on reset confirme from arduino, adress", packetAddress-96)
 				return -1
 
 		elif packetAddress > 64:# l'arduino demande un reset
@@ -334,7 +337,7 @@ class communicationGlobale():
 				self.confirmeResetId(packetAddress-64)
 				return 0
 			else:
-				print("WARNING, corrupted address on reset confirme from arduino")
+				print("WARNING, corrupted address on reset request from arduino, address", packetAddress-64)
 				return -1
 
 		elif len(rawInput)>=3:#cas normal
@@ -402,6 +405,7 @@ class communicationGlobale():
 				if idd == self.getNextConfirmeId(address):
 					if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:
 						print("Success: l'arduino", self.address[address]," a bien recu l'ordre ", self.orders[self.ordreLog[address][idd][0]], " d'id: ", idd)
+					self.nbTransmitedPaquets +=1
 					self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(idd) - 1, date)#on bidone le chiffre date, mais c'est pas grave
 					self.lastIdConfirm[address] = idd
 					self.lastConfirmationDate[address] = date
@@ -420,6 +424,7 @@ class communicationGlobale():
 					if lastIdToAccept != self.lastIdConfirm[address]:
 						if returnMissed == True:
 							print("Success: l'arduino", self.address[address]," a bien recu les ordres jusque", idd, "mais il manque au moins un retour (avec argument) donc on ne confirme que", self.orders[self.ordreLog[address][lastIdToAccept][0]], " d'id: ", lastIdToAccept)
+							self.nbTransmitedPaquets += 1
 							self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(lastIdToAccept) - 1, date)#on bidone le chiffre date, mais c'est pas grave
 							self.lastIdConfirm[address] = lastIdToAccept
 						
@@ -534,7 +539,7 @@ class communicationGlobale():
 
 		if len(remainOrdersToSend) == 0 and not self.emptyFifo:
 			self.emptyFifo = True
-			print("Fin de transmission de la file, (t = "+str(int(time.time()*1000)-self.timeStartProcessing)+"ms)")
+			print("Fin de transmission de la file, (t = "+str(int(time.time()*1000)-self.timeStartProcessing)+"ms),nombre de paquets reçu", self.nbTransmitedPaquets," nombre de paquets perdu", self.nbTimeoutPaquets)
 		
 
 
