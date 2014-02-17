@@ -13,12 +13,14 @@
 
 unsigned long index = 0;
 unsigned long timeStart = 0;
+unsigned long timeLED = 0;
 
 //Creation du controleur
 Control control;
 
 #define MAX_READ 64 
 void setup(){
+	TCCR3B = (TCCR3B & 0xF8) | 0x01 ;
 	initPins();
 	Serial.begin(115200, SERIAL_8O1);
 #ifdef DEBUG
@@ -27,15 +29,17 @@ void setup(){
 	init_protocol();
 	PDEBUGLN("INIT DONE");
 	// LED qui n'en est pas une
-	pinMode(16,OUTPUT);
+	pinMode(22,OUTPUT);
+	digitalWrite(22, LOW);
 }
 
 void loop(){
 	/* on note le temps de debut */
 	timeStart = micros();
-
-	/* La del est allumee pendant le traitement */
-	digitalWrite(16, HIGH);
+	if (timeStart - timeLED > 1000000) {
+		digitalWrite(22, LOW);
+	}
+		
 
 	//Action asserv
 	control.compute();
@@ -50,15 +54,14 @@ void loop(){
 		executeCmd(generic_serial_read());
 	}
 
-	/* fin zone de programmation libre */
-	
-	/* On eteint la del */
-	digitalWrite(16, LOW);
-	
 	/* On attend le temps qu'il faut pour boucler */
 	long udelay = DUREE_CYCLE*1000-(micros()-timeStart);
-	if(udelay<0)
+	//Serial.println(udelay);
+	if(udelay<0) {
+		timeLED = timeStart;
+		digitalWrite(22, HIGH);
 		PDEBUGLN("ouch : mainloop trop longue");
+	}
 	else
 		delayMicroseconds(udelay);
 }
