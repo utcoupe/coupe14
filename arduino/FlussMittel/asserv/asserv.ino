@@ -22,9 +22,9 @@ Control control;
 void setup(){
 	TCCR3B = (TCCR3B & 0xF8) | 0x01 ;
 	initPins();
-	Serial.begin(115200, SERIAL_8O1);
+	Serial2.begin(115200);
 #ifdef DEBUG
-	Serial3.begin(115200, SERIAL_8N1);
+	Serial3.begin(115200);
 #endif
 	init_protocol();
 	PDEBUGLN("INIT DONE");
@@ -40,12 +40,11 @@ void loop(){
 		digitalWrite(22, LOW);
 	}
 		
-
 	//Action asserv
 	control.compute();
 
 	/* zone programmation libre */
-	int available = Serial.available();
+	int available = Serial2.available();
 	if (available > MAX_READ) {
 		available = MAX_READ;
 	}
