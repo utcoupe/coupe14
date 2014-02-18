@@ -14,7 +14,7 @@
 #include "compat.h"
 #include "parameters.h"
 
-Servo servoBras;
+Servo servoBras, servoRet;
 AF_DCMotor motor_ascenseur(1);
 
 #define MAX_READ 64 
@@ -31,6 +31,7 @@ void setup(){
 	motor_ascenseur.run(FORWARD);
 	motor_ascenseur.setSpeed(0); //Desactivr ascenseur
 	servoBras.write(170); //Fermer le bras
+	servoBras.write(0); //Fermer le bras
 }
 
 void loop(){
