@@ -140,7 +140,7 @@ class communicationGlobale():
 									if self.nbRenvoiImmediat[address] != 0:
 										for i in range(self.nbRenvoiImmediat[address]):
 											if i < len(indiceARenvoyer):
-												print(("WARNING: Renvoie immediat de l'ordre: ", self.orders[self.ordreLog[address][indiceARenvoyer[i]][0]], "d'idd ", indiceARenvoyer[i], "au robot ", self.address[address]))
+												print("WARNING: Renvoie immediat de l'ordre: ", self.orders[self.ordreLog[address][indiceARenvoyer[i]][0]], "d'idd ", indiceARenvoyer[i], "au robot ", self.address[address])
 												self.sendMessage(address, self.ordreLog[address][indiceARenvoyer[i]][1])
 												self.lastSendDate[address] = date 
 												self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], date)
@@ -156,7 +156,7 @@ class communicationGlobale():
 								if (date - self.nbUnconfirmedPacket[address][1]) > self.timeOut and self.nbUnconfirmedPacket[address][1] != -1:
 									for indice in indiceARenvoyer:
 										self.nbTimeoutPaquets += 1
-										print(("WARNING: Renvoie après timeout de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "d'idd ", indice, "au robot ", self.address[address]), "binaire :", self.ordreLog[address][indice])
+										print("WARNING: Renvoie après timeout de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "d'idd ", indice, "au robot ", self.address[address], "binaire :", self.ordreLog[address][indice])
 										self.sendMessage(address, self.ordreLog[address][indice][1])
 										self.lastSendDate[address] = date 
 										self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], date)
@@ -189,7 +189,7 @@ class communicationGlobale():
 
 			waitBeforeNextExec = (self.highPrioSpeed -(int(time.time()*1000) - date))
 			if waitBeforeNextExec < 1:
-				print(("Warning: La boucle de pool de communication n'est pas assez rapide ", waitBeforeNextExec))
+				print("Warning: La boucle de pool de communication n'est pas assez rapide ", waitBeforeNextExec)
 			else:
 				time.sleep(waitBeforeNextExec/1000.0)
 
@@ -356,7 +356,7 @@ class communicationGlobale():
 					print("On essaye de lire, l'id", packetId, "en provenance de l'arduino", self.address[packetAddress], "mais il n'est existe pas de trace dans le log (un vieux paquet qui trainait sur un client avant la nouvelle init ?)")
 					return -1
 			elif packetAddress > 0 and packetAddress < (self.nbAddress+1) and packetId > 63:
-				print(("L'arduino", self.address[packetAddress], "nous indique avoir mal reçu un message, message d'erreur ", packetId))
+				print("L'arduino", self.address[packetAddress], "nous indique avoir mal reçu un message, message d'erreur ", packetId)
 				if self.nbNextRenvoiImmediat[packetAddress] != 0:
 					self.nbRenvoiImmediat[packetAddress] += 1
 				return -1
@@ -557,10 +557,10 @@ class communicationGlobale():
 					address = self.address[address]
 				return address
 			else:
-				print(("ERREUR COMM: L'arduino", self.address[address], " n'est pas prête."))
+				print("ERREUR COMM: L'arduino", self.address[address], " n'est pas prête.")
 				return -1
 		else:
-			print(("ERREUR COMM: L'address: ", address, " est invalide."))
+			print("ERREUR COMM: L'address: ", address, " est invalide.")
 			return -1
 
 	def checkOrder(self, order):
@@ -570,7 +570,7 @@ class communicationGlobale():
 				order = self.orders[order]
 			return order
 		else:
-			print(("ERREUR COMM: L'ordre: ", order, " est invalide."))
+			print("ERREUR COMM: L'ordre: ", order, " est invalide.")
 			return -1
 
 	def checkParsedOrderSize(self, order):
@@ -589,9 +589,9 @@ class communicationGlobale():
 				else:
 					print("ERREUR: type parse inconnu")
 			if somme != sizeExpected:
-				print(("ERREUR: la constante de taille de l'ordre ", order, " ne correspond pas aux types indiqués attendu ", sizeExpected, " calculee ", somme))
+				print("ERREUR: la constante de taille de l'ordre ", order, " ne correspond pas aux types indiqués attendu ", sizeExpected, " calculee ", somme)
 		else:
-			print(("ERREUR l'ordre ", order, "n'a pas été trouvé dans serial_defines.c"))
+			print("ERREUR l'ordre ", order, "n'a pas été trouvé dans serial_defines.c")
 
 
 	def checkOrderArgument(self, order, *arguments):
@@ -601,22 +601,22 @@ class communicationGlobale():
 			for i, argumentType in enumerate(self.ordersArguments[order]):
 				if argumentType == 'int':
 					if not isinstance(arguments[i], (int)):
-						print(("L'argument ", i, " de l'ordre ", order, " n'est pas du bon type, attendu (int)"))
+						print("L'argument ", i, " de l'ordre ", order, " n'est pas du bon type, attendu (int)")
 						return -1
 				elif argumentType == 'long':
 					if not isinstance(arguments[i], (long)):
-						print(("L'argument ", i, " de l'ordre ", order, " n'est pas du bon type, attendu (long)"))
+						print("L'argument ", i, " de l'ordre ", order, " n'est pas du bon type, attendu (long)")
 						return -1
 				elif argumentType == 'float':
 					if not isinstance(arguments[i], (float)):
-						print(("L'argument ", i, " de l'ordre ", order, " n'est pas du bon type, attendu (float)"))
+						print("L'argument ", i, " de l'ordre ", order, " n'est pas du bon type, attendu (float)")
 						return -1
 				else:
 					print("ERREUR: l'argument parsé dans serial_define est de type inconnu")
 					return -1
 					
 		else:
-			print(("ERREUR: l'order", order, "attend", len(self.ordersArguments[order]), "arguments, mais a recu:", len(arguments), "arguemnts"))
+			print("ERREUR: l'order", order, "attend", len(self.ordersArguments[order]), "arguments, mais a recu:", len(arguments), "arguemnts")
 			return -1
 
 		return 0
