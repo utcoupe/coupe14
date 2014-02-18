@@ -35,3 +35,9 @@ void serial_send(char data) { //Envoi d'un octet en serial, dépend de la platef
 char generic_serial_read(){
 	return Serial.read();
 }
+
+void forward_serial_send(char c, char addr) {
+	if (addr == FORWARD_ADDR_ASSERV) {
+		Serial1.write(c);
+	}
+}

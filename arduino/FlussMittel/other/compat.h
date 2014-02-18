@@ -19,5 +19,6 @@ unsigned long timeMicros();
 
 void serial_send(char data);
 char generic_serial_read();
+void forward_serial_send(char c, char addr);
 
 #endif
