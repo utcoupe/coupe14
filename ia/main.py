@@ -12,10 +12,10 @@ from data import globaleData
 import constantes
 import guiCommande
 
-
-#objetCommunication = communicationGlobale.communicationGlobale("/dev/ttyUSB0", 57600, "ODD", "/dev/ttymxc3", 115200, "NONE", "/dev/ttyACM0", 115200, "NONE")
-objetCommunication = None
 constantes = constantes.constantes()
+objetCommunication = communicationGlobale.communicationGlobale(constantes)
+objetCommunication = None
+
 data = globaleData.data(objetCommunication, constantes)
 
 try:
