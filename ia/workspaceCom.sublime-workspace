@@ -8,18 +8,18 @@
 	"buffers":
 	[
 		{
-			"file": "main.py",
-			"settings":
-			{
-				"buffer_size": 552,
-				"line_ending": "Unix"
-			}
-		},
-		{
 			"file": "guiCommande.py",
 			"settings":
 			{
 				"buffer_size": 1608,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "main.py",
+			"settings":
+			{
+				"buffer_size": 633,
 				"line_ending": "Unix"
 			}
 		},
@@ -36,22 +36,6 @@
 			"settings":
 			{
 				"buffer_size": 2129,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "communication/serial_comm.py",
-			"settings":
-			{
-				"buffer_size": 2266,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "communication/parser_c.py",
-			"settings":
-			{
-				"buffer_size": 2285,
 				"line_ending": "Unix"
 			}
 		},
@@ -99,6 +83,8 @@
 	},
 	"file_history":
 	[
+		"/home/noxy/cedric.bache@gmail.com/vrac/Projets/utcoupe/coupe14/ia/communication/parser_c.py",
+		"/home/noxy/cedric.bache@gmail.com/vrac/Projets/utcoupe/coupe14/ia/communication/serial_comm.py",
 		"/home/noxy/vrac/Projets/utcoupe/coupe14/libs/com_C/serial_defines.h",
 		"/home/noxy/vrac/Projets/utcoupe/coupe14/libs/com_C/serial_defines.c",
 		"/home/noxy/vrac/Projets/utcoupe/coupe14/ia/communication/__init__.py",
@@ -155,11 +141,40 @@
 			[
 				{
 					"buffer": 0,
+					"file": "guiCommande.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1608,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								806,
+								806
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": -0.0,
+						"translation.y": 102.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
 					"file": "main.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 552,
+						"buffer_size": 633,
 						"regions":
 						{
 						},
@@ -182,35 +197,6 @@
 					"type": "text"
 				},
 				{
-					"buffer": 1,
-					"file": "guiCommande.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1608,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								806,
-								806
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
 					"buffer": 2,
 					"file": "communication/communicationGlobale.py",
 					"semi_transient": false,
@@ -223,8 +209,8 @@
 						"selection":
 						[
 							[
-								0,
-								0
+								202,
+								202
 							]
 						],
 						"settings":
@@ -233,7 +219,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 35.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -265,69 +251,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
 					"buffer": 4,
-					"file": "communication/serial_comm.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2266,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "communication/parser_c.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2285,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 7,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
 					"file": "/home/noxy/cedric.bache@gmail.com/vrac/Projets/utcoupe/coupe14/libs/com_C/serial_defines.h",
 					"semi_transient": false,
 					"settings":
@@ -352,11 +280,11 @@
 						"translation.y": 102.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
+					"buffer": 5,
 					"file": "/home/noxy/cedric.bache@gmail.com/vrac/Projets/utcoupe/coupe14/libs/com_C/serial_defines.c",
 					"semi_transient": false,
 					"settings":
@@ -381,7 +309,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 2,
 					"type": "text"
 				}
 			]

@@ -9,12 +9,14 @@ import sys
 #Nos fichiers
 from communication import communicationGlobale
 from data import globaleData
+import constantes
 import guiCommande
 
 
 #objetCommunication = communicationGlobale.communicationGlobale("/dev/ttyUSB0", 57600, "ODD", "/dev/ttymxc3", 115200, "NONE", "/dev/ttyACM0", 115200, "NONE")
 objetCommunication = None
-objetPullData = globaleData.data()
+constantes = constantes.constantes()
+data = globaleData.data(objetCommunication, constantes)
 
 try:
 	while True:

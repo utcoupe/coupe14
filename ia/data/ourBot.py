@@ -6,10 +6,11 @@ Classe pour nos robots
 from . import pullData
 
 class ourBot():
-	def __init__(self):
+	def __init__(self, communication, largeur, longueur):
 		#Constantes
-		self.largeur = 10 #en mm
-		self.longueur = 10 
+		self.communication = communication
+		self.largeur = largeur #en mm
+		self.longueur = longueur
 
 		#Valeurs récupérées (read-only)
 		self.positionX = 0
