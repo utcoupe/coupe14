@@ -11,7 +11,7 @@
 			"file": "main.py",
 			"settings":
 			{
-				"buffer_size": 409,
+				"buffer_size": 552,
 				"line_ending": "Unix"
 			}
 		},
@@ -27,7 +27,7 @@
 			"file": "communication/communicationGlobale.py",
 			"settings":
 			{
-				"buffer_size": 24042,
+				"buffer_size": 24051,
 				"line_ending": "Unix"
 			}
 		},
@@ -111,7 +111,7 @@
 	],
 	"find":
 	{
-		"height": 35.0
+		"height": 25.0
 	},
 	"find_in_files":
 	{
@@ -159,15 +159,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 409,
+						"buffer_size": 552,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								65,
-								65
+								0,
+								0
 							]
 						],
 						"settings":
@@ -200,7 +200,8 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/Python/Python.tmLanguage"
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -215,15 +216,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 24042,
+						"buffer_size": 24051,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								436,
-								436
+								0,
+								0
 							]
 						],
 						"settings":

@@ -8,13 +8,13 @@ import sys
 
 #Nos fichiers
 from communication import communicationGlobale
-import pullData
+from data import globaleData
 import guiCommande
 
 
 #objetCommunication = communicationGlobale.communicationGlobale("/dev/ttyUSB0", 57600, "ODD", "/dev/ttymxc3", 115200, "NONE", "/dev/ttyACM0", 115200, "NONE")
 objetCommunication = None
-objetPullData = pullData.pullData(objetCommunication)
+objetPullData = globaleData.data()
 
 try:
 	while True:
