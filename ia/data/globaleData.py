@@ -16,9 +16,9 @@ class data():
 		self.tiBot = ourBot.ourBot(communication, constantes.largeurTB, constantes.longueurTB)
 
 		if constantes.numberOfenemy >= 1:
-			self.smallEnemyBot = enemyBot.enemyBot()
+			self.smallEnemyBot = enemyBot.enemyBot(constantes.largeurBigEnemy, constantes.longueurBigEnemy)
 		if constantes.numberOfenemy >= 2:
-			self.bigEnemyBot = enemyBot.enemyBot()
+			self.bigEnemyBot = enemyBot.enemyBot(constantes.largeurSmallEnemy, constantes.longueurSmallEnemy)
 
 		self.tourelle = tourelle.tourelle(communication)
 		self.other = other.other(constantes.numberOfenemy)

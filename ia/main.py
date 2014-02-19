@@ -13,7 +13,7 @@ import constantes
 import guiCommande
 
 constantes = constantes.constantes()
-objetCommunication = communicationGlobale.communicationGlobale(constantes)
+#objetCommunication = communicationGlobale.communicationGlobale(constantes)
 objetCommunication = None
 
 data = globaleData.data(objetCommunication, constantes)
