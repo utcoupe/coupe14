@@ -5,6 +5,6 @@ Classe pour toutes les autres données
 
 from . import pullData
 
-class other():
+class Other():
 	def __init__(self, numberOfenemy):
 		self.numberOfenemy = numberOfenemy

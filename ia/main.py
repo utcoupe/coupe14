@@ -16,7 +16,7 @@ constantes = constantes.constantes()
 #objetCommunication = communicationGlobale.communicationGlobale(constantes)
 objetCommunication = None
 
-data = globaleData.data(objetCommunication, constantes)
+data = globaleData.Data(objetCommunication, constantes)
 
 try:
 	while True:

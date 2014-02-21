@@ -7,7 +7,7 @@ import threading
 import time
 
 
-class pullData():
+class PullData():
 	def __init__(self, objetCommunication):
 		#Constantes
 		self.nbEvent = 5 # nouvelle position FM, changement d'ordre FM, nouvelle position TB, changement d'ordre TB, nouvelles données hukuyo

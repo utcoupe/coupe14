@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"c",
+				"communication"
+			],
+			[
 				"posit",
 				"positionY"
 			]
@@ -12,10 +16,18 @@
 	"buffers":
 	[
 		{
+			"file": "constantes.py",
+			"settings":
+			{
+				"buffer_size": 1623,
+				"line_ending": "Unix"
+			}
+		},
+		{
 			"file": "main.py",
 			"settings":
 			{
-				"buffer_size": 557,
+				"buffer_size": 551,
 				"line_ending": "Unix"
 			}
 		},
@@ -28,13 +40,10 @@
 			}
 		},
 		{
-			"contents": "# -*- coding: utf-8 -*-\n\"\"\"\nClasse globale pour toutes les données, on y instancie les objets\n\"\"\"\n\nfrom . import ourBot\nfrom . import enemyBot\nfrom . import tourelle\nfrom . import other\n\nclass data():\n	def __init__(self, numberOfenemy = 0):\n		self.FM = ourBot.ourBot()\n		self.tiBot = ourBot.ourBot()\n\n		if numberOfenemy >= 1:\n			self.enn\n",
 			"file": "data/globaleData.py",
-			"file_size": 252,
-			"file_write_time": 130373092036268691,
 			"settings":
 			{
-				"buffer_size": 338,
+				"buffer_size": 801,
 				"line_ending": "Unix"
 			}
 		},
@@ -42,7 +51,7 @@
 			"file": "data/ourBot.py",
 			"settings":
 			{
-				"buffer_size": 383,
+				"buffer_size": 464,
 				"line_ending": "Unix"
 			}
 		},
@@ -50,7 +59,7 @@
 			"file": "data/enemyBot.py",
 			"settings":
 			{
-				"buffer_size": 259,
+				"buffer_size": 288,
 				"line_ending": "Unix"
 			}
 		},
@@ -58,7 +67,7 @@
 			"file": "data/tourelle.py",
 			"settings":
 			{
-				"buffer_size": 86,
+				"buffer_size": 178,
 				"line_ending": "Unix"
 			}
 		},
@@ -66,7 +75,7 @@
 			"file": "data/other.py",
 			"settings":
 			{
-				"buffer_size": 93,
+				"buffer_size": 182,
 				"line_ending": "Unix"
 			}
 		},
@@ -106,6 +115,7 @@
 	},
 	"file_history":
 	[
+		"/home/noxy/cedric.bache@gmail.com/vrac/Projets/utcoupe/coupe14/ia/communication/communicationGlobale.py",
 		"/home/noxy/cedric.bache@gmail.com/vrac/Projets/utcoupe/coupe14/ia/data/ennemyBot.py",
 		"/home/noxy/cedric.bache@gmail.com/vrac/Projets/utcoupe/coupe14/ia/data/ourBot.py",
 		"/home/noxy/cedric.bache@gmail.com/vrac/Projets/utcoupe/coupe14/ia/guiCommande.py",
@@ -149,24 +159,52 @@
 	"groups":
 	[
 		{
-			"selected": 4,
+			"selected": 3,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "main.py",
+					"file": "constantes.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 557,
+						"buffer_size": 1623,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								378,
-								378
+								554,
+								554
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 51.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "main.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 551,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								349,
+								349
 							]
 						],
 						"settings":
@@ -177,11 +215,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 1,
+					"buffer": 2,
 					"file": "data/__init__.py",
 					"semi_transient": false,
 					"settings":
@@ -205,81 +243,24 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "data/globaleData.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 338,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								142,
-								142
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "data/ourBot.py",
+					"file": "data/globaleData.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 383,
+						"buffer_size": 801,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								63,
-								63
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "data/enemyBot.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 259,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
+								801,
+								801
 							]
 						],
 						"settings":
@@ -294,48 +275,49 @@
 					"type": "text"
 				},
 				{
-					"buffer": 5,
-					"file": "data/tourelle.py",
+					"buffer": 4,
+					"file": "data/ourBot.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 86,
+						"buffer_size": 464,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								71,
-								71
+								129,
+								129
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Python/Python.tmLanguage"
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "data/other.py",
+					"buffer": 5,
+					"file": "data/enemyBot.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 93,
+						"buffer_size": 288,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								78,
-								78
+								288,
+								288
 							]
 						],
 						"settings":
@@ -350,7 +332,63 @@
 					"type": "text"
 				},
 				{
+					"buffer": 6,
+					"file": "data/tourelle.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 178,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								178,
+								178
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
 					"buffer": 7,
+					"file": "data/other.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 182,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								143,
+								143
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
 					"file": "data/pullData.py",
 					"semi_transient": false,
 					"settings":
@@ -375,7 +413,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 8,
 					"type": "text"
 				}
 			]
