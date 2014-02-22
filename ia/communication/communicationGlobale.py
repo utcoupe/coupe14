@@ -123,9 +123,7 @@ class communicationGlobale():
 				#Lecture des entrées
 				if self.readInput == True:
 					self.mutexOrdersToRead.acquire()
-					#TODO
-					#self.ordersToRead += self.readOrders()
-					self.readOrders()
+					self.ordersToRead += self.readOrders()
 					self.mutexOrdersToRead.release()
 
 				#Renvoie des ordres non confirmés
@@ -459,7 +457,7 @@ class communicationGlobale():
 						else:
 							print("ERREUR: Parseur: le parseur a trouvé un type non supporté")
 
-					returnOrders.append((address, idd, arguments))
+					returnOrders.append((address, self.ordreLog[address][idd][0], arguments))
 
 					if len(arguments) > 0:
 						print("Retour :", arguments)
@@ -646,13 +644,20 @@ class communicationGlobale():
 		
 
 
-	def readOrdersAPI(self):
+	def readOrdersAPI(self, address='all'):
 		"""Renvoi -1 si pas d'ordre en attente sinon renvoi un ordre """
+		newOrderToRead = deque()
+		find = False
+		orderToReturn = -1
 		self.mutexOrdersToRead.acquire()
-		if len(self.ordersToRead) > 0:
+		
+		while len(self.ordersToRead) > 0:
 			order = self.ordersToRead.pop()
-			self.mutexOrdersToRead.release()
-			return order
-		else:
-			self.mutexOrdersToRead.release()
-			return -1
+			if (order[0] == address or address == 'all') and find == False:
+				find = True
+				orderToReturn = order
+			else:
+				newOrderToRead.append(order)
+
+		self.mutexOrdersToRead.release()
+		return orderToReturn
