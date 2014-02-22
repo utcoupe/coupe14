@@ -6,11 +6,15 @@ Classe pour nos robots
 from . import pullData
 
 class OurBot():
-	def __init__(self, communication, largeur, longueur):
+	def __init__(self, constantes, communication, arduinoConstantes, addressOther, addressAsserv, largeur, longueur):
 		#Constantes
 		self.communication = communication
-		self.pullData = pullData.PullData(communication)
-		self.largeur = largeur #en mm
+		self.addressOther = addressOther
+		self.addressAsserv = addressAsserv
+
+		self.pullDataOther = pullData.PullData(constantes, communication, arduinoConstantes['address'][self.addressOther])
+		self.pullDataAsserv = pullData.PullData(constantes, communication, arduinoConstantes['address'][self.addressAsserv])
+		self.largeur = largeur 
 		self.longueur = longueur
 
 

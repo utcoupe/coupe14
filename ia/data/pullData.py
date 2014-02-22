@@ -6,21 +6,19 @@ Système de récupèration de données des différants systèmes
 import threading
 import time
 
-
+#Cet objet crée un thread qui va récupère en permanence les données d'un système
 class PullData():
-	def __init__(self, objetCommunication):
+	def __init__(self, constantes, objetCommunication, address):
 		#Constantes
-		self.nbEvent = 5 # nouvelle position FM, changement d'ordre FM, nouvelle position TB, changement d'ordre TB, nouvelles données hukuyo
+		self.pullPeriode = constantes.pullPeriode
+
+		self.objetCommunication = objetCommunication
 
 		#Variables
-		self.objetCommunication = objetCommunication
-		self.indexLectureEvent = 0
-		self.newEventArray = [False] * self.nbEvent
 
-		self.threadGestion = threading.Thread(target=self.gestion)
-		self.threadGestion.start()
+
+		#self.threadGestion = threading.Thread(target=self.gestion)
+		#self.threadGestion.start()
 
 	def gestion(self):
-		while True:
-			print("ok")
-			time.sleep(5)
+		time.sleep(self.pullPeriode/1000.0)
