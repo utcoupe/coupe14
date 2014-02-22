@@ -655,7 +655,7 @@ class communicationGlobale():
 			order = self.ordersToRead.pop()
 			if (order[0] == address or order[0] == self.address[address] or address == 'all') and find == False:
 				find = True
-				orderToReturn = order
+				orderToReturn = (self.address[order[0]], self.ordres[order[1]], order[2])
 			else:
 				newOrderToRead.append(order)
 
