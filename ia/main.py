@@ -16,7 +16,7 @@ constantes = constantes.constantes()
 objetCommunication = communicationGlobale.communicationGlobale(constantes)
 arduinoConstantes = objetCommunication.getConst()
 
-#data = globaleData.Data(objetCommunication, constantes, arduinoConstantes)
+data = globaleData.Data(objetCommunication, constantes, arduinoConstantes)
 
 try:
 	while True:

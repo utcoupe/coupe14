@@ -3,7 +3,6 @@
 Classe pour nos robots
 """
 
-from . import pullData
 
 class OurBot():
 	def __init__(self, constantes, communication, arduinoConstantes, addressOther, addressAsserv, largeur, longueur):
@@ -12,8 +11,6 @@ class OurBot():
 		self.addressOther = addressOther
 		self.addressAsserv = addressAsserv
 
-		self.pullDataOther = pullData.PullData(constantes, communication, arduinoConstantes['address'][self.addressOther])
-		self.pullDataAsserv = pullData.PullData(constantes, communication, arduinoConstantes['address'][self.addressAsserv])
 		self.largeur = largeur 
 		self.longueur = longueur
 
@@ -29,3 +26,8 @@ class OurBot():
 	#Getter
 	def getPositon(self):
 		return (self.positionX, self.positionY)
+
+	def majPosition(self, arguments):
+		self.positionX = arguments[0]
+		self.positionY = arguments[1]
+		self.angle = arguments[2]

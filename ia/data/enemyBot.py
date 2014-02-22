@@ -3,7 +3,7 @@
 Classe pour les robots adverses
 """
 
-from . import pullData
+
 
 class EnemyBot():
 	def __init__(self, constantes, largeur, longueur):
