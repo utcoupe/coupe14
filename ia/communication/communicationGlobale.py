@@ -653,7 +653,7 @@ class communicationGlobale():
 		
 		while len(self.ordersToRead) > 0:
 			order = self.ordersToRead.pop()
-			if (order[0] == address or address == 'all') and find == False:
+			if (order[0] == address or order[0] == self.address[address] or address == 'all') and find == False:
 				find = True
 				orderToReturn = order
 			else:
