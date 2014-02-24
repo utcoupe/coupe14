@@ -13,14 +13,13 @@ import threading
 
 
 class communicationGlobale():
-	def __init__(self, portXbee, vitesseXbee, parityXbee, portOther, vitesseOther, parityOther, portAsserv, vitesseAsserv, parityAsserv):
+	def __init__(self, portXbee, vitesseXbee, parityXbee, portFM, vitesseFM, parityFM):
 		self.nbTimeoutPaquets=0
 		self.nbTransmitedPaquets = 0
 
 		#Constantes réglables:
-		self.useXbee = True
-		self.useFMother = False
-		self.useFMasserv = False
+		self.useXbee = False
+		self.useFM = True
 		self.maxUnconfirmedPacket = 5 # attention maximum 32
 		self.emptyFifo = True
 		self.timeOut = 100
@@ -86,10 +85,8 @@ class communicationGlobale():
 		
 		if self.useXbee:
 			self.liaisonXbee = serial_comm.ComSerial(portXbee, vitesseXbee, parityXbee)
-		if self.useFMother:
-			self.liaisonArduinoOther = serial_comm.ComSerial(portOther, vitesseOther, parityOther)
-		if self.useFMasserv:
-			self.liaisonArduinoAsserv = serial_comm.ComSerial(portAsserv, vitesseAsserv, parityAsserv)
+		if self.useFM:
+			self.liaisonFM = serial_comm.ComSerial(portFM, vitesseFM, parityFM)
 
 		#defines de threads
 		self.lastHighPrioTaskDate = 0
@@ -123,7 +120,9 @@ class communicationGlobale():
 				#Lecture des entrées
 				if self.readInput == True:
 					self.mutexOrdersToRead.acquire()
-					self.ordersToRead += self.readOrders()
+					#TODO
+					#self.ordersToRead += self.readOrders()
+					self.readOrders()
 					self.mutexOrdersToRead.release()
 
 				#Renvoie des ordres non confirmés
@@ -197,10 +196,8 @@ class communicationGlobale():
 
 
 	def sendMessage(self, address, data):
-		if address == self.address['ADDR_FLUSSMITTEL_OTHER'] and self.useFMother: 
-			self.liaisonArduinoOther.send(data)
-		elif address == self.address['ADDR_FLUSSMITTEL_ASSERV'] and self.useFMasserv:
-			self.liaisonArduinoAsserv.send(data)
+		if (address == self.address['ADDR_FLUSSMITTEL_OTHER'] or address == self.address['ADDR_FLUSSMITTEL_ASSERV']) and self.useFM: 
+			self.liaisonFM.send(data)
 		elif self.useXbee:
 			self.liaisonXbee.send(data)
 
@@ -370,10 +367,8 @@ class communicationGlobale():
 		""" retourne ordersList, une liste d'élements sous la forme(adresse, id, data) où data est prêt à être interpréter"""
 		if self.useXbee:
 			rawInputList += self.liaisonXbee.read()
-		if self.useFMother:
-			rawInputList += self.liaisonArduinoOther.read()
-		if self.useFMasserv:
-			rawInputList += self.liaisonArduinoAsserv.read()
+		if self.useFM:
+			rawInputList += self.liaisonFM.read()
 
 		ordersList = deque()
 
@@ -457,7 +452,7 @@ class communicationGlobale():
 						else:
 							print("ERREUR: Parseur: le parseur a trouvé un type non supporté")
 
-					returnOrders.append((address, self.ordreLog[address][idd][0], arguments))
+					returnOrders.append((address, idd, arguments))
 
 					if len(arguments) > 0:
 						print("Retour :", arguments)
@@ -644,20 +639,13 @@ class communicationGlobale():
 		
 
 
-	def readOrdersAPI(self, address='all'):
+	def readOrdersAPI(self):
 		"""Renvoi -1 si pas d'ordre en attente sinon renvoi un ordre """
-		newOrderToRead = deque()
-		find = False
-		orderToReturn = -1
 		self.mutexOrdersToRead.acquire()
-		
-		while len(self.ordersToRead) > 0:
+		if len(self.ordersToRead) > 0:
 			order = self.ordersToRead.pop()
-			if (order[0] == address or order[0] == self.address[address] or address == 'all') and find == False:
-				find = True
-				orderToReturn = (self.address[order[0]], self.ordres[order[1]], order[2])
-			else:
-				newOrderToRead.append(order)
-
-		self.mutexOrdersToRead.release()
-		return orderToReturn
+			self.mutexOrdersToRead.release()
+			return order
+		else:
+			self.mutexOrdersToRead.release()
+			return -1

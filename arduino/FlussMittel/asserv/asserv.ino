@@ -24,7 +24,7 @@ void setup(){
 	initPins();
 	Serial2.begin(115200);
 #ifdef DEBUG
-	Serial3.begin(115200);
+	Serial.begin(115200);
 #endif
 	init_protocol();
 	PDEBUGLN("INIT DONE");

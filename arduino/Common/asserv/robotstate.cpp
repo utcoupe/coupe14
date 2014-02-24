@@ -57,16 +57,17 @@ void RobotState::update(){
 	float dr = (ticksR - last_ticksR)*TICKS_TO_MM_RIGHT;
 
 	float d_angle = atan2(dr - dl, ENTRAXE_ENC); //sans approximation tan
-	float last_angle = current_pos.angle; 
 	current_pos.angle += d_angle;
 	if (current_pos.angle > M_PI) {
 		current_pos.angle -= 2.0*M_PI;
 		current_pos.modulo_angle++;
 	}
-	else if (current_pos.angle <= M_PI) {
+	else if (current_pos.angle <= -M_PI) {
 		current_pos.angle += 2.0*M_PI;
 		current_pos.modulo_angle--;
 	}
+
+	static float last_angle = current_pos.angle; 
 	dl *= FIXED_POINT_PRECISION;
 	dr *= FIXED_POINT_PRECISION;
 
@@ -76,4 +77,5 @@ void RobotState::update(){
 	//prepare la prochaine update
 	last_ticksR = ticksR;
 	last_ticksL = ticksL;
+	last_angle = current_pos.angle;
 }

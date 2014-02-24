@@ -26,7 +26,7 @@
  * 
  * OPTIONS : '1' - '2 - '4' */
 
-#define ENCODER_EVAL 4
+#define ENCODER_EVAL 1
 
 #define FIXED_POINT_PRECISION 1000 //The robot's position is stocked with a precision of 1/FIXED_POINT_PRECISION mm 
 
@@ -108,10 +108,10 @@
 #endif
 
 #ifdef DEBUG
-#define PDEBUG(x) Serial3.print(x)
-#define PDEBUGLN(x) Serial3.println(x)
-#define WRDEBUG(x) Serial3.write(x)
-#define BINPR(x) Serial3.print(x, BIN)
+#define PDEBUG(x) Serial.print(x)
+#define PDEBUGLN(x) Serial.println(x)
+#define WRDEBUG(x) Serial.write(x)
+#define BINPR(x) Serial.print(x, BIN)
 #else
 #define PDEBUG(x)
 #define PDEBUGLN(x)
