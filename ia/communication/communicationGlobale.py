@@ -636,7 +636,7 @@ class communicationGlobale():
 		
 
 
-	def readOrdersAPI(self):
+	def readOrdersAPI(self, address = 'all'):
 		"""Renvoi -1 si pas d'ordre en attente sinon renvoi un ordre """
 		find = False
 
