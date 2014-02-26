@@ -19,7 +19,7 @@
 			"file": "main.py",
 			"settings":
 			{
-				"buffer_size": 633,
+				"buffer_size": 593,
 				"line_ending": "Unix"
 			}
 		},
@@ -27,7 +27,7 @@
 			"file": "communication/communicationGlobale.py",
 			"settings":
 			{
-				"buffer_size": 24051,
+				"buffer_size": 24294,
 				"line_ending": "Unix"
 			}
 		},
@@ -43,7 +43,7 @@
 			"file": "/home/noxy/cedric.bache@gmail.com/vrac/Projets/utcoupe/coupe14/libs/com_C/serial_defines.h",
 			"settings":
 			{
-				"buffer_size": 1702,
+				"buffer_size": 1732,
 				"line_ending": "Unix"
 			}
 		},
@@ -51,7 +51,7 @@
 			"file": "/home/noxy/cedric.bache@gmail.com/vrac/Projets/utcoupe/coupe14/libs/com_C/serial_defines.c",
 			"settings":
 			{
-				"buffer_size": 961,
+				"buffer_size": 1017,
 				"line_ending": "Unix"
 			}
 		}
@@ -97,13 +97,14 @@
 	],
 	"find":
 	{
-		"height": 25.0
+		"height": 35.0
 	},
 	"find_in_files":
 	{
-		"height": 0.0,
+		"height": 93.0,
 		"where_history":
 		[
+			""
 		]
 	},
 	"find_state":
@@ -111,6 +112,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"HEAD",
 			"transmit",
 			"perdu",
 			"nbLo",
@@ -174,7 +176,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 633,
+						"buffer_size": 593,
 						"regions":
 						{
 						},
@@ -202,15 +204,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 24051,
+						"buffer_size": 24294,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								202,
-								202
+								219,
+								219
 							]
 						],
 						"settings":
@@ -260,7 +262,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1702,
+						"buffer_size": 1732,
 						"regions":
 						{
 						},
@@ -289,15 +291,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 961,
+						"buffer_size": 1017,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								328,
-								328
+								0,
+								0
 							]
 						],
 						"settings":

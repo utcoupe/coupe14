@@ -46,6 +46,7 @@ class Data():
 		while True:
 			orderTuple = self.communication.readOrdersAPI() # (address, order, arguments)
 
+			#Si on a un ordre à lire
 			if orderTuple != -1:
 				address = orderTuple[0]
 				order = orderTuple[1]

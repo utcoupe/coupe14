@@ -632,18 +632,36 @@ class communicationGlobale():
 
 	def readOrdersAPI(self, address='all'):
 		"""Renvoi -1 si pas d'ordre en attente sinon renvoi un ordre """
-		newOrderToRead = deque()
 		find = False
-		orderToReturn = -1
-		self.mutexOrdersToRead.acquire()
-		
-		while len(self.ordersToRead) > 0:
-			order = self.ordersToRead.pop()
-			if (order[0] == address or order[0] == self.address[address] or address == 'all') and find == False:
-				find = True
-				orderToReturn = (self.address[order[0]], self.ordres[order[1]], order[2])
-			else:
-				newOrderToRead.append(order)
 
-		self.mutexOrdersToRead.release()
-		return orderToReturn
+		#Si on veut n'importe quel parquet
+		if address == 'all':
+			self.mutexOrdersToRead.acquire()
+			try:
+				orderToReturn = self.ordersToRead.pop()
+				find = True
+			except:
+				find = False
+				pass
+			self.mutexOrdersToRead.release()
+
+		#Uniquement si on veut les paquets d'un objet préci
+		else:
+			newOrderToRead = deque()
+			
+			orderToReturn = -1
+			self.mutexOrdersToRead.acquire()
+			
+			while len(self.ordersToRead) > 0:
+				order = self.ordersToRead.pop()
+				if (order[0] == address or order[0] == self.address[address] or address == 'all') and find == False:
+					find = True
+					orderToReturn = order
+				else:
+					newOrderToRead.append(order)
+			self.mutexOrdersToRead.release()
+
+		if find:
+			return (self.address[orderToReturn[0]], self.orderToReturn[order[1]], orderToReturn[2])
+		else:
+			return -1
