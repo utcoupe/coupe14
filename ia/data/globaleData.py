@@ -52,7 +52,14 @@ class Data():
 				order = orderTuple[1]
 				arguments = orderTuple[2]
 
+
 				if order == 'A_GET_POS':
 					self.system[address].majPosition(arguments)
+				elif order == 'GET_HOKUYO':
+					self.system[address].majPosition(arguments)
+				elif order == 'GET_CAM':
+					self.system[address].majCam(arguments)	
+				else:
+					print("Erreur, ce cas n'est pas implementé, address", address, "ordre", order, "arguments", arguments)
 
 			time.sleep(pullPeriode/1000.0)

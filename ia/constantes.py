@@ -48,6 +48,9 @@ class constantes():
 		#====================pullData====================
 		self.pullPeriode = 50 #période des pull en ms
 
+		#====================CAMERA====================
+		self.seuilRouge = 100 #TODO
+		self.seuilJaune = 100 #TODO
 
 		#====================FM====================
 		self.largeurFM = 100 #en mm

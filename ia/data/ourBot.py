@@ -27,6 +27,7 @@ class OurBot():
 	def getPositon(self):
 		return (self.positionX, self.positionY)
 
+	#utilise les données en provenance de nos robots pour mettre à jour les données de la classe
 	def majPosition(self, arguments):
 		self.positionX = arguments[0]
 		self.positionY = arguments[1]
