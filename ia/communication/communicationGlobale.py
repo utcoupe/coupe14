@@ -66,10 +66,8 @@ class communicationGlobale():
 
 		if self.constantes.useXbee:
 			self.liaisonXbee = serial_comm.ComSerial(self.constantes.portXbee, self.constantes.vitesseXbee, self.constantes.parityXbee)
-		if self.constantes.useFMother:
-			self.liaisonArduinoOther = serial_comm.ComSerial(self.constantes.portOther, self.constantes.vitesseOther, self.constantes.parityOther)
-		if self.constantes.useFMasserv:
-			self.liaisonArduinoAsserv = serial_comm.ComSerial(self.constantes.portAsserv, self.constantes.vitesseAsserv, self.constantes.parityAsserv)
+		if self.constantes.useArduino:
+			self.liaisonArduino = serial_comm.ComSerial(self.constantes.portOther, self.constantes.vitesseOther, self.constantes.parityOther)
 
 		#defines de threads
 		self.lastHighPrioTaskDate = 0
@@ -187,10 +185,8 @@ class communicationGlobale():
 
 
 	def sendMessage(self, address, data):
-		if address == self.address['ADDR_FLUSSMITTEL_OTHER'] and self.constantes.useFMother: 
-			self.liaisonArduinoOther.send(data)
-		elif address == self.address['ADDR_FLUSSMITTEL_ASSERV'] and self.constantes.useFMasserv:
-			self.liaisonArduinoAsserv.send(data)
+		if (address == self.address['ADDR_FLUSSMITTEL_OTHER'] or address == self.address['ADDR_FLUSSMITTEL_ASSERV']) and self.constantes.useArduino: 
+			self.liaisonArduino.send(data)
 		elif self.constantes.useXbee:
 
 			self.liaisonXbee.send(data)
@@ -362,10 +358,8 @@ class communicationGlobale():
 		if self.constantes.useXbee:
 			rawInputList += self.liaisonXbee.read()
 
-		if self.constantes.useFMother:
-			rawInputList += self.liaisonArduinoOther.read()
-		if self.constantes.useFMasserv:
-			rawInputList += self.liaisonArduinoAsserv.read()
+		if self.constantes.useArduino:
+			rawInputList += self.liaisonArduino.read()
 
 		ordersList = deque()
 

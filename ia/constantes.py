@@ -18,15 +18,11 @@ class constantes():
 		self.portOther = "/dev/ttymxc3"
 		self.vitesseOther = 115200
 		self.parityOther = "NONE"
-		self.portAsserv = "/dev/ttyACM0"
-		self.vitesseAsserv = 115200
-		self.parityAsserv = "NONE"
 
 
 		#constantes réglables:
-		self.useXbee = False
-		self.useFMother = False
-		self.useFMasserv = False
+		self.useXbee = True
+		self.useArduino = True
 		self.maxUnconfirmedPacket = 5 # attention maximum 32
 		self.emptyFifo = True
 		self.timeOut = 100

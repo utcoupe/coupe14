@@ -5,6 +5,7 @@ Fichier principale, demarre l'ia
 
 #Libs
 import sys
+import time
 
 #Nos fichiers
 from communication import communicationGlobale
@@ -21,7 +22,7 @@ data = globaleData.Data(objetCommunication, constantes, arduinoConstantes)
 
 try:
 	while True:
-		pass
+		time.sleep(1000/1000.0)
 except KeyboardInterrupt:
 	#objetCommunication.stopGestion()
 	pass
