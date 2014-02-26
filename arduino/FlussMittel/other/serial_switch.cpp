@@ -14,7 +14,7 @@
 #include "serial_defines.h"
 #include "serial_types.h"
 
-extern Servo servoBras;
+extern Servo servoBras, servoRet;
 extern AF_DCMotor motor_ascenseur;
 
 void couper_asc () {
@@ -39,6 +39,16 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 			servoBras.write(170);			
 		}
 		//Formation et envoi d'une réponse
+		break;
+	case O_RET_OUVRIR:
+		if (!doublon) {
+			servoRet.write(95);
+		}
+		break;
+	case O_RET_FERMER:
+		if (!doublon) {
+			servoRet.write(0);
+		}
 		break;
 	case O_MONTER_ASC:
 		if (!doublon) {

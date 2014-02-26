@@ -9,11 +9,13 @@
 
 #include <Arduino.h>
 
-extern Servo servoBras;
+extern Servo servoBras, servoRet;
 
 void initPins(){
 	pinMode(PIN_SERVO_BRAS, OUTPUT);
 	servoBras.attach(PIN_SERVO_BRAS);
+	pinMode(PIN_SERVO_RET, OUTPUT);
+	servoRet.attach(PIN_SERVO_RET);
 
 	pinMode(PIN_INT_HAUT_ASC, INPUT_PULLUP);
 	pinMode(PIN_INT_BAS_ASC, INPUT_PULLUP);
@@ -34,4 +36,10 @@ void serial_send(char data) { //Envoi d'un octet en serial, dépend de la platef
 
 char generic_serial_read(){
 	return Serial.read();
+}
+
+void forward_serial_send(char c, char addr) {
+	if (addr == FORWARD_ADDR_ASSERV) {
+		Serial1.write(c);
+	}
 }

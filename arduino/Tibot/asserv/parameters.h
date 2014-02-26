@@ -34,7 +34,7 @@
 
 #define MAX_GOALS 15 //nombre max de goals dans la file, évite surcharge mémoire
 #define DUREE_CYCLE 5 //période de calcul, en ms
-#define FREQ 1/(DUREE_CYCLE/1000.0)
+#define FREQ (1/(DUREE_CYCLE/1000.0))
 
 #define ACC_MAX 250 //consigne*s-2
 
