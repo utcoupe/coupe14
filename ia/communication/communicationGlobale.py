@@ -13,42 +13,13 @@ import threading
 
 
 class communicationGlobale():
-<<<<<<< HEAD
-	def __init__(self, portXbee, vitesseXbee, parityXbee, portFM, vitesseFM, parityFM):
-		self.nbTimeoutPaquets=0
-		self.nbTransmitedPaquets = 0
-
-		#Constantes réglables:
-		self.useXbee = False
-		self.useFM = True
-		self.maxUnconfirmedPacket = 5 # attention maximum 32
-		self.emptyFifo = True
-		self.timeOut = 100
-		self.highPrioSpeed = 30 #période d'execution en ms
-		self.lowPrioSpeed = 1000 #période d'execution en ms
-		self.keepContactTimeout = 1000
-		self.offLigneTimeout = 5000
-
-		#Systèmes arretable:
-		self.threadActif = True
-		self.writeOutput = True
-		self.readInput = True
-		self.probingDevices = True
-		self.renvoiOrdre = True
-		self.keepContact = True
-		self.renvoiImmediat = False
-
-
-
-		#on récupère les constantes
-=======
 	def __init__(self, constantes):
 		self.constantes = constantes
 		self.nbTimeoutPaquets=0
 		self.nbTransmitedPaquets = 0
 
 		#on récupère les self.constantes
->>>>>>> 5ee141fd0a5e07cbd4452a6c611eb39cb8da2cca
+
 		self.address = {}
 		self.orders = {}
 		self.ordersArguments = {}
@@ -92,19 +63,13 @@ class communicationGlobale():
 		self.nbUnconfirmedPacket = [(0, -1)]*(self.nbAddress+1) # (nbUnconfimed, dateFirstUnconfirmed)
 		
 		
-<<<<<<< HEAD
-		if self.useXbee:
-			self.liaisonXbee = serial_comm.ComSerial(portXbee, vitesseXbee, parityXbee)
-		if self.useFM:
-			self.liaisonFM = serial_comm.ComSerial(portFM, vitesseFM, parityFM)
-=======
+
 		if self.constantes.useXbee:
 			self.liaisonXbee = serial_comm.ComSerial(self.constantes.portXbee, self.constantes.vitesseXbee, self.constantes.parityXbee)
 		if self.constantes.useFMother:
 			self.liaisonArduinoOther = serial_comm.ComSerial(self.constantes.portOther, self.constantes.vitesseOther, self.constantes.parityOther)
 		if self.constantes.useFMasserv:
 			self.liaisonArduinoAsserv = serial_comm.ComSerial(self.constantes.portAsserv, self.constantes.vitesseAsserv, self.constantes.parityAsserv)
->>>>>>> 5ee141fd0a5e07cbd4452a6c611eb39cb8da2cca
 
 		#defines de threads
 		self.lastHighPrioTaskDate = 0
@@ -222,17 +187,12 @@ class communicationGlobale():
 
 
 	def sendMessage(self, address, data):
-<<<<<<< HEAD
-		if (address == self.address['ADDR_FLUSSMITTEL_OTHER'] or address == self.address['ADDR_FLUSSMITTEL_ASSERV']) and self.useFM: 
-			self.liaisonFM.send(data)
-		elif self.useXbee:
-=======
 		if address == self.address['ADDR_FLUSSMITTEL_OTHER'] and self.constantes.useFMother: 
 			self.liaisonArduinoOther.send(data)
 		elif address == self.address['ADDR_FLUSSMITTEL_ASSERV'] and self.constantes.useFMasserv:
 			self.liaisonArduinoAsserv.send(data)
 		elif self.constantes.useXbee:
->>>>>>> 5ee141fd0a5e07cbd4452a6c611eb39cb8da2cca
+
 			self.liaisonXbee.send(data)
 
 
@@ -401,15 +361,11 @@ class communicationGlobale():
 		""" retourne ordersList, une liste d'élements sous la forme(adresse, id, data) où data est prêt à être interpréter"""
 		if self.constantes.useXbee:
 			rawInputList += self.liaisonXbee.read()
-<<<<<<< HEAD
-		if self.useFM:
-			rawInputList += self.liaisonFM.read()
-=======
+
 		if self.constantes.useFMother:
 			rawInputList += self.liaisonArduinoOther.read()
 		if self.constantes.useFMasserv:
 			rawInputList += self.liaisonArduinoAsserv.read()
->>>>>>> 5ee141fd0a5e07cbd4452a6c611eb39cb8da2cca
 
 		ordersList = deque()
 
@@ -682,15 +638,6 @@ class communicationGlobale():
 
 	def readOrdersAPI(self):
 		"""Renvoi -1 si pas d'ordre en attente sinon renvoi un ordre """
-<<<<<<< HEAD
-		self.mutexOrdersToRead.acquire()
-		if len(self.ordersToRead) > 0:
-			order = self.ordersToRead.pop()
-			self.mutexOrdersToRead.release()
-			return order
-		else:
-			self.mutexOrdersToRead.release()
-=======
 		find = False
 
 		#Si on veut n'importe quel parquet
@@ -723,5 +670,4 @@ class communicationGlobale():
 		if find:
 			return (self.address[orderToReturn[0]], self.orderToReturn[order[1]], orderToReturn[2])
 		else:
->>>>>>> 5ee141fd0a5e07cbd4452a6c611eb39cb8da2cca
 			return -1
