@@ -32,6 +32,7 @@ class PullData():
 	def gestion(self):
 		while self.pull_data:
 			self.readData()
+			self.askData()
 			time.sleep(self.pull_periode/1000.0)
 
 	def stop(self):

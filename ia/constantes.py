@@ -16,7 +16,7 @@ class Constantes():
 
 		#constantes réglables:
 		self.useXbee = False
-		self.useArduino = False
+		self.useArduino = True
 		self.maxUnconfirmedPacket = 5 # attention maximum 32
 		self.emptyFifo = True
 		self.timeOut = 100
