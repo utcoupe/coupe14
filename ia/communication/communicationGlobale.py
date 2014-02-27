@@ -109,9 +109,7 @@ class CommunicationGlobale():
 				#Lecture des entrées
 				if self.constantes.readInput == True:
 					self.mutexOrdersToRead.acquire()
-					#TODO
-					#self.ordersToRead += self.readOrders()
-					self.readOrders()
+					self.ordersToRead += self.readOrders()
 					self.mutexOrdersToRead.release()
 
 				#Renvoie des ordres non confirmés
