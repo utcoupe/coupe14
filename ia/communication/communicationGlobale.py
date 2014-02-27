@@ -534,9 +534,9 @@ class CommunicationGlobale():
 	def checkAddress(self, address):
 		"""verifie que l'address existe et la convertie en int si nécéssaire, sinon retourne -1"""
 		if address in self.address:
+			if isinstance(address, (str)):
+				address = self.address[address]
 			if self.arduinoIdReady[address] != False:
-				if isinstance(address, (str)):
-					address = self.address[address]
 				return address
 			else:
 				print("ERREUR COMM: L'arduino", self.address[address], " n'est pas prête.")
