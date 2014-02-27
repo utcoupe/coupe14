@@ -17,6 +17,7 @@ class Data():
 		self.Tibot = None
 		self.SmallEnemyBot = None
 		self.BigEnemyBot = None
+		self.Tourelle = None
 		self.MetaData = metaData.MetaData(Constantes)
 
 
