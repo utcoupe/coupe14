@@ -82,11 +82,11 @@ class PullData():
 			if system != None:
 				if order == 'A_GET_POS':
 					print("data:", arguments)
-					self.system.majPosition(arguments)
+					system.majPosition(arguments)
 				elif order == 'GET_HOKUYO':
-					self.system.majPosition(arguments)
+					system.majPosition(arguments)
 				elif order == 'GET_CAM':
-					self.system.majCam(arguments)	
+					system.majCam(arguments)	
 				else:
 					print("Warning, ce retour n'est pas implementé, address", address, "ordre", order, "arguments", arguments)
 
