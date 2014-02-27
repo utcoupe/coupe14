@@ -12,7 +12,7 @@ from . import conversion
 import threading
 
 
-class communicationGlobale():
+class CommunicationGlobale():
 	def __init__(self, constantes):
 		self.constantes = constantes
 		self.nbTimeoutPaquets=0

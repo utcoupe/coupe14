@@ -9,16 +9,15 @@ import time
 
 #Nos fichiers
 from communication import communicationGlobale
-from data import globaleData
+from data import data
 import constantes
 import guiCommande
 
-constantes = constantes.constantes()
-objetCommunication = communicationGlobale.communicationGlobale(constantes)
-arduinoConstantes = objetCommunication.getConst()
+Constantes = constantes.Constantes()
+ObjetCommunication = communicationGlobale.CommunicationGlobale(Constantes)
+arduino_constantes = ObjetCommunication.getConst()
 
-
-data = globaleData.Data(objetCommunication, constantes, arduinoConstantes)
+data = data.Data(ObjetCommunication, Constantes, arduino_constantes)
 
 try:
 	while True:

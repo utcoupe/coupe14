@@ -1,0 +1,91 @@
+# -*- coding: utf-8 -*-
+"""
+Classe qui recupère les données de tous les objets
+"""
+
+import threading 
+import time
+
+class PullData():
+	def __init__(self, Communication, Flussmittel, Tibot, SmallEnemyBot, BigEnemyBot, Tourelle, pull_periode):
+		self.Communication = Communication
+		self.Flussmittel = Flussmittel[0]
+		self.address_flussmittel_other = Flussmittel[1]
+		self.address_flussmittel_asserv = Flussmittel[2]
+		self.Tibot = Tibot[0]
+		self.address_tibot_other = Tibot[1]
+		self.address_tibot_asserv = Tibot[2]
+		self.SmallEnemyBot = SmallEnemyBot
+		self.BigEnemyBot = BigEnemyBot
+		self.Tourelle = Tourelle[0]
+		self.address_tourelle = Flussmittel[1]
+		self.pull_periode = pull_periode
+
+		self.pull_data = True
+		self.flussmittel_asked = False
+		self.tibot_asked = False
+		self.tourelle_asked = False
+
+		self.ThreadPull = threading.Thread(target=self.gestion)
+		self.ThreadPull.start()
+
+	def gestion(self):
+		while self.pull_data:
+			self.readData()
+			time.sleep(self.pull_periode/1000.0)
+
+	def stop(self):
+		self.pull_data = False
+
+	def askData(self):
+		if self.flussmittel_asked == False:
+			if self.Flussmittel != None:
+				Communication.ssendOrderAPI(self.address_flussmittel_asserv, 'A_GET_POS', [])
+				self.flussmittel_asked = True
+
+		if self.tibot_asked == False:
+			if self.Tibot != None:
+				Communication.ssendOrderAPI(self.address_tibot_asserv, 'A_GET_POS', [])
+				self.tibot_asked = True
+
+		if self.tourelle_asked == False:
+			if self.Tourelle != None:
+				Communication.ssendOrderAPI(self.address_tourelle, 'GET_HOKUYO', [])
+				self.tourelle_asked = True
+
+
+	def readData(self):
+		orderTuple = self.Communication.readOrdersAPI() # (address, order, arguments)
+
+		#Si on a un ordre à lire
+		if orderTuple != -1:
+			address = orderTuple[0]
+			order = orderTuple[1]
+			arguments = orderTuple[2]
+
+			#Choix de l'objet
+			if address == self.address_flussmittel_other or address == self.address_flussmittel_asserv:
+				system = self.Flussmittel
+				self.flussmittel_asked = False
+			elif address == self.address_tibot_other or address == self.address_tibot_asserv:
+				system = self.Tibot
+				self.tibot_asked = False
+			elif address == self.address_tourelle:
+				system = self.Tourelle
+				self.tourelle_asked = False
+			else:
+				system = None
+				print("Erreur, un systeme non initilisé nous envoi des données")
+
+			if system != None:
+				if order == 'A_GET_POS':
+					print("data:", arguments)
+					self.system.majPosition(arguments)
+				elif order == 'GET_HOKUYO':
+					self.system.majPosition(arguments)
+				elif order == 'GET_CAM':
+					self.system.majCam(arguments)	
+				else:
+					print("Warning, ce retour n'est pas implementé, address", address, "ordre", order, "arguments", arguments)
+
+			

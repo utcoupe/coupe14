@@ -3,15 +3,9 @@
 Ce fichier regroupe toutes les constantes de l'IA
 """
 
-class constantes():
+class Constantes():
 	def __init__(self):
-		#====================Jeu====================
-		self.numberOfenemy = 0
-
-
-
-
-		#====================Communication====================
+		#========================================Communication========================================
 		self.portXbee = "/dev/ttyUSB0"
 		self.vitesseXbee = 57600
 		self.parityXbee = "ODD"
@@ -21,8 +15,8 @@ class constantes():
 
 
 		#constantes réglables:
-		self.useXbee = True
-		self.useArduino = True
+		self.useXbee = False
+		self.useArduino = False
 		self.maxUnconfirmedPacket = 5 # attention maximum 32
 		self.emptyFifo = True
 		self.timeOut = 100
@@ -41,16 +35,29 @@ class constantes():
 		self.renvoiImmediat = False # fonction non terminé, ne pas activer !
 
 
+		#=======================================IA========================================
+		
+		#====================Variables globales====================
+		self.number_of_enemy = 0
+
+
+
+
+		
+		#====================tourelle====================
+		self.enable_tourelle = True #permet de deactiver la tourelle
+
 		#====================pullData====================
-		self.pullPeriode = 50 #période des pull en ms
+		self.pull_periode = 50 #période des pull en ms
 
 		#====================CAMERA====================
-		self.seuilRouge = 100 #TODO
-		self.seuilJaune = 100 #TODO
+		self.seuil_rouge = 100 #TODO
+		self.seuil_jaune = 100 #TODO
 
 		#====================FM====================
-		self.largeurFM = 100 #en mm
-		self.longueurFM = 100
+		self.enable_flussmittel = True #permet de deactiver Flussmitel
+		self.largeur_flussmittel = 100 #en mm
+		self.longueur_flussmittel = 100
 
 
 
@@ -60,8 +67,9 @@ class constantes():
 
 
 		#====================TIBOT====================
-		self.largeurTB = 100
-		self.longueurTB = 100
+		self.enable_tibot = True #permet de deactiver un Tibot
+		self.largeur_tibot = 100
+		self.longueur_tibot = 100
 
 
 
