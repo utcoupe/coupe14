@@ -441,7 +441,7 @@ class CommunicationGlobale():
 						else:
 							print("ERREUR: Parseur: le parseur a trouvé un type non supporté")
 
-					returnOrders.append((address, self.ordreLog[address][idd], arguments))
+					returnOrders.append((address, self.ordreLog[address][idd][0], arguments))
 
 					if len(arguments) > 0:
 						print("Retour :", arguments)

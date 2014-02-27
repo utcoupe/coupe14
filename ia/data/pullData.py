@@ -80,7 +80,6 @@ class PullData():
 				print("Erreur, un systeme non initilisé nous envoi des données")
 
 			if system != None:
-				print("OrderTuple:", orderTuple)
 				if order == 'A_GET_POS':
 					print("data:", arguments)
 					self.system.majPosition(arguments)
