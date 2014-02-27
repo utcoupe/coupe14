@@ -18,7 +18,7 @@ class PullData():
 		self.SmallEnemyBot = SmallEnemyBot
 		self.BigEnemyBot = BigEnemyBot
 		self.Tourelle = Tourelle[0]
-		self.address_tourelle = Flussmittel[1]
+		self.address_tourelle = Tourelle[1]
 		self.pull_periode = pull_periode
 
 		self.pull_data = True
@@ -80,6 +80,7 @@ class PullData():
 				print("Erreur, un systeme non initilisé nous envoi des données")
 
 			if system != None:
+				print("OrderTuple:", orderTuple)
 				if order == 'A_GET_POS':
 					print("data:", arguments)
 					self.system.majPosition(arguments)

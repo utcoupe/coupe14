@@ -45,7 +45,7 @@ class Constantes():
 
 		
 		#====================tourelle====================
-		self.enable_tourelle = True #permet de deactiver la tourelle
+		self.enable_tourelle = False #permet de deactiver la tourelle
 
 		#====================pullData====================
 		self.pull_periode = 50 #période des pull en ms
@@ -54,7 +54,7 @@ class Constantes():
 		self.seuil_rouge = 100 #TODO
 		self.seuil_jaune = 100 #TODO
 
-		#====================FM====================
+		#====================Flussmittel====================
 		self.enable_flussmittel = True #permet de deactiver Flussmitel
 		self.largeur_flussmittel = 100 #en mm
 		self.longueur_flussmittel = 100
@@ -67,7 +67,7 @@ class Constantes():
 
 
 		#====================TIBOT====================
-		self.enable_tibot = True #permet de deactiver un Tibot
+		self.enable_tibot = False #permet de deactiver un Tibot
 		self.largeur_tibot = 100
 		self.longueur_tibot = 100
 
