@@ -660,6 +660,6 @@ class CommunicationGlobale():
 			self.mutexOrdersToRead.release()
 
 		if find:
-			return (self.address[orderToReturn[0]], self.orderToReturn[order[1]], orderToReturn[2])
+			return (address[orderToReturn[0]], orderToReturn[order[1]], orderToReturn[2])
 		else:
 			return -1
