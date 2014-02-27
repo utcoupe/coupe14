@@ -39,19 +39,20 @@ class PullData():
 		self.pull_data = False
 
 	def askData(self):
+		arguments = []
 		if self.flussmittel_asked == False:
 			if self.Flussmittel != None:
-				self.Communication.sendOrderAPI(self.address_flussmittel_asserv, 'A_GET_POS', [])
+				self.Communication.sendOrderAPI(self.address_flussmittel_asserv, 'A_GET_POS', *arguments)
 				self.flussmittel_asked = True
 
 		if self.tibot_asked == False:
 			if self.Tibot != None:
-				self.Communication.sendOrderAPI(self.address_tibot_asserv, 'A_GET_POS', [])
+				self.Communication.sendOrderAPI(self.address_tibot_asserv, 'A_GET_POS', *arguments)
 				self.tibot_asked = True
 
 		if self.tourelle_asked == False:
 			if self.Tourelle != None:
-				self.Communication.sendOrderAPI(self.address_tourelle, 'GET_HOKUYO', [])
+				self.Communication.sendOrderAPI(self.address_tourelle, 'GET_HOKUYO', *arguments)
 				self.tourelle_asked = True
 
 
