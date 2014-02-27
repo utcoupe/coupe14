@@ -17,6 +17,8 @@ Constantes = constantes.Constantes()
 ObjetCommunication = communicationGlobale.CommunicationGlobale(Constantes)
 arduino_constantes = ObjetCommunication.getConst()
 
+time.sleep(1000/1000.0)
+print("INFO: La communication est prête")
 data = data.Data(ObjetCommunication, Constantes, arduino_constantes)
 
 try:
