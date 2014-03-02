@@ -19,6 +19,8 @@
 Control::Control(){
 	setPID_angle(ANG_P, ANG_I, ANG_D);
 	setPID_distance(DIS_P, DIS_I, DIS_D);
+	setErrorUseI_angle(ANG_AWU);
+	setErrorUseI_distance(DIS_AWU);
 	setConsigneOffset(CONSIGNE_OFFSET);
 	max_angle = MAX_ANGLE;
 	setMaxAcc(ACC_MAX);
@@ -148,6 +150,13 @@ void Control::reset(){
 	applyPwm();
 }
 
+void Control::setErrorUseI_angle(float I){
+	PID_Angle.setErrorUseI(I);
+}
+
+void Control::setErrorUseI_distance(float I){
+	PID_Distance.setErrorUseI(I);
+}
 
 void Control::setPID_angle(float n_P, float n_I, float n_D){
 	PID_Angle.setPID(n_P, n_I / FREQ, n_D * FREQ);

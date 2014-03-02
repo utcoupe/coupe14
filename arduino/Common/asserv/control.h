@@ -27,6 +27,10 @@ class Control{
 	//set des differents PIDs
 	void setPID_angle(float n_P, float n_I, float n_D); //PID de l'asservissement angulaire
 	void setPID_distance(float n_P, float n_I, float n_D); //PID de l'asservissement en position
+
+	//set des anti-windup
+	void setErrorUseI_angle(float I);
+	void setErrorUseI_distance(float I);
 	
 	//gestion de l'offset. Attention, il faut modifier les PIDs !
 	void setConsigneOffset(int n_offset);
