@@ -109,10 +109,11 @@ void executeCmd(char serial_data){
 int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){ 
 	int i = 0, j = 0, offset = 0;
 	//Transformation 7->8bits classique
-	for(i=0;i<data_counter;i++){
+	for(i=0;i<data_counter_7;i++){
+		//Decala de l'ooctet en cours
 		data_out[j] = data_in[i] << (1+offset);
-		if (i+1 < data_counter) {
-			data_out[j] |= data_in[i+1] >> (6-offset);
+		if (i+1 < data_counter_7) { //Sauf à la dernier iteration
+			data_out[j] |= data_in[i+1] >> (6-offset); //Complément de l'octet en cours
 		}
 		offset++;
 		j++;
@@ -122,25 +123,30 @@ int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){
 		}
 	}
 
-        data_counter = j; //nouveau compte de datas
+	int data_counter = j; //nouveau compte de datas
 
-        //recalage des ordres 6bits
-        unsigned char overflow = right_shift_array(data_out, data_out, data_counter, 2); //Shift tout le tableau à droite de 1 à partir de i (le premier ordre est calé)
-	if (offset > 2) { //cas ou le dernier octet est incomplet
+	//recalage des ordres 6bits
+	unsigned char overflow = right_shift_array(data_out, data_out, data_counter, 2); //Shift tout le tableau à droite de 1 à partir de i (le premier ordre est calé)
+    unsigned char ordre = data_out[0];
+	data_counter--; //On ne compte pas l'ordre dans le nbr d'octets
+
+	//Si on vient de décaler le dernier octet de 3 ou plus à gauche, l'octet forme suite au décalage à droite de 2 sera "incomplet", c'est à dire que l'octet est en réalité des bits perdus, il faut dropper cet octet
+	if(data_counter > 0 && (offset >= 3 || (offset == 0 && data_counter%7 != 6) ||(offset == 1 && data_counter%7 != 0)||(offset == 2 && data_counter%7 != 1))){
 		data_counter--;
 	}
 
-        if(overflow != 0){
-                data_out[data_counter] = overflow; //Si overflow, on le met (attention aux segfault)
+	if(overflow != 0){
+		data_out[data_counter] = overflow; //Si overflow, on le met (attention aux segfault)
 		data_counter++;
 		PDEBUGLN("Pas normal");
-        }
-        unsigned char ordre = data_out[0];
+    }
 	if(ordre > MAX_ORDRES){//L'odre n'existe pas => corruption
+		PDEBUGLN("Ordre inconnu");
 		return -1;
 	}
 	unsigned char size = ordreSize[(int)ordre];
-	if(size != data_counter-1){//Mauvaise taille => corruption
+	if(size != data_counter){//Mauvaise taille => corruption
+		PDEBUG("Data corrompues, attendu : "); PDEBUG(size); PDEBUG("o, recu : "); PDEBUG(data_counter); PDEBUGLN("o");;
 		return -1;
 	}
 	return data_counter;
