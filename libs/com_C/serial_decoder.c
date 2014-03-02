@@ -36,8 +36,8 @@ void executeCmd(char serial_data){
 		else if (serial_data == END && client_concerne) { //Fin de trame, execution de l'ordre
 			unsigned char data_8bits[MAX_DATA];
 
-                        data_counter = decode(data, data_8bits, data_counter);
-                        if(data_counter == -1){ //Si données invalides
+			data_counter = decode(data, data_8bits, data_counter);
+			if(data_counter == -1){ //Si données invalides
 				PDEBUGLN("Data error : Données invalides");
 				sendInvalid();
 			}
@@ -72,6 +72,7 @@ void executeCmd(char serial_data){
 				etape = wait_step;
 				client_concerne = false;//On ignore la suite
 				sendInvalid();
+				PDEBUGLN("Data error : ID incorrect");
 			}
 			break;
 		case data_step:
@@ -92,9 +93,10 @@ int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){
 	int i = 0, j = 0, offset = 0;
 	//Transformation 7->8bits classique
 	for(i=0;i<data_counter;i++){
+		//Decala de l'ooctet en cours
 		data_out[j] = data_in[i] << (1+offset);
-		if (i+1 < data_counter) {
-			data_out[j] |= data_in[i+1] >> (6-offset);
+		if (i+1 < data_counter) { //Sauf à la dernier iteration
+			data_out[j] |= data_in[i+1] >> (6-offset); //Complément de l'octet en cours
 		}
 		offset++;
 		j++;
@@ -103,27 +105,31 @@ int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){
 			offset = 0;
 		}
 	}
+	PDEBUG("offset = "); PDEBUGLN(offset);
 
-        data_counter = j; //nouveau compte de datas
+	data_counter = j; //nouveau compte de datas
 
-        //recalage des ordres 6bits
-        unsigned char overflow = right_shift_array(data_out, data_out, data_counter, 2); //Shift tout le tableau à droite de 1 à partir de i (le premier ordre est calé)
+	//recalage des ordres 6bits
+	unsigned char overflow = right_shift_array(data_out, data_out, data_counter, 2); //Shift tout le tableau à droite de 1 à partir de i (le premier ordre est calé)
 	//Si on vient de décaler le dernier octet de 3 ou plus à gauche, l'octet forme suite au décalage à droite de 2 sera "incomplet", c'est à dire que l'octet est en réalité des bits perdus, il faut dropper cet octet
-	if (offset > 2) { //cas ou le dernier octet est incomplet
+	if (offset > 2 ||offset == 0){
 		data_counter--;
 	}
 
-        if(overflow != 0){
-                data_out[data_counter] = overflow; //Si overflow, on le met (attention aux segfault)
+	if(overflow != 0){
+		data_out[data_counter] = overflow; //Si overflow, on le met (attention aux segfault)
 		data_counter++;
 		PDEBUGLN("Pas normal");
-        }
-        unsigned char ordre = data_out[0];
+    }
+    unsigned char ordre = data_out[0];
+	data_counter--; //On ne compte pas l'ordre dans le nbr d'octets
 	if(ordre > MAX_ORDRES){//L'odre n'existe pas => corruption
+		PDEBUGLN("Ordre inconnu");
 		return -1;
 	}
 	unsigned char size = ordreSize[(int)ordre];
-	if(size != data_counter-1){//Mauvaise taille => corruption
+	if(size != data_counter){//Mauvaise taille => corruption
+		PDEBUG("Data corrompues, attendu : "); PDEBUG(size); PDEBUG(" bits, recu : "); PDEBUG(data_counter); PDEBUGLN(" bits");;
 		return -1;
 	}
 	return data_counter;
