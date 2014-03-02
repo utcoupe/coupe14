@@ -18,8 +18,8 @@ class communicationGlobale():
 		self.nbTransmitedPaquets = 0
 
 		#Constantes réglables:
-		self.useXbee = False
-		self.useFM = True
+		self.useXbee = True
+		self.useFM = False
 		self.maxUnconfirmedPacket = 5 # attention maximum 32
 		self.emptyFifo = True
 		self.timeOut = 100

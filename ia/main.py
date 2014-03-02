@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Fichier principale, demarre l'ia
 """
