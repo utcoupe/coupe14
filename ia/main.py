@@ -4,17 +4,28 @@ Fichier principale, demarre l'ia
 
 #Libs
 import sys
+import time
 
 #Nos fichiers
 from communication import communicationGlobale
+from data import data
+import constantes
 import guiCommande
 
-com = communicationGlobale.communicationGlobale("/dev/ttyUSB0", 57600, "ODD", "/dev/ttymxc3", 115200, "NONE")
+Constantes = constantes.Constantes()
+ObjetCommunication = communicationGlobale.CommunicationGlobale(Constantes)
+arduino_constantes = ObjetCommunication.getConst()
+
+time.sleep(1000/1000.0)
+print("INFO: La communication est prête")
+data = data.Data(ObjetCommunication, Constantes, arduino_constantes)
 
 try:
-	guiCommande.gui(com)
-
+	while True:
+		time.sleep(1000/1000.0)
 except KeyboardInterrupt:
-	com.stopGestion()
+	#objetCommunication.stopGestion()
+	pass
 finally:
-	com.stopGestion()
+	#objetCommunication.stopGestion()
+	pass
