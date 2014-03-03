@@ -1,6 +1,6 @@
 /****************************************
  * Author : Quentin C			*
- * Mail : quentin.chateau@gmail.com	*
+ * Mail : quentin.chateau@gmail.com	* 
  * Date : 22/01/13			*
  ****************************************/
 #include "compat.h"
@@ -113,8 +113,10 @@ int decode(unsigned char *data_in, unsigned char *data_out, int data_counter_7){
     unsigned char ordre = data_out[0];
 	data_counter--; //On ne compte pas l'ordre dans le nbr d'octets
 
+	PDEBUG("offset = "); PDEBUGLN(offset);
+	PDEBUG("datac = "); PDEBUGLN(data_counter);
 	//Si on vient de décaler le dernier octet de 3 ou plus à gauche, l'octet forme suite au décalage à droite de 2 sera "incomplet", c'est à dire que l'octet est en réalité des bits perdus, il faut dropper cet octet
-	if(data_counter > 0 && (offset >= 3 || (offset == 0 && data_counter%7 != 6) ||(offset == 1 && data_counter%7 != 0)||(offset == 2 && data_counter%7 != 1))){
+	if(data_counter > 0 && (offset >= 3 || (offset == 0 && data_counter%8 != 6) ||(offset == 1 && data_counter%8 != 0)||(offset == 2 && data_counter%8 != 1))){
 		data_counter--;
 	}
 
