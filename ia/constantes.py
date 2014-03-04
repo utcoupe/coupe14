@@ -38,7 +38,7 @@ renvoiImmediat = 		False # fonction non terminé, ne pas activer !
 #=======================================IA========================================
 
 #====================Variables globales====================
-NUMBER_OF_ENEMY = 		0
+NUMBER_OF_ENEMY = 		2
 
 
 

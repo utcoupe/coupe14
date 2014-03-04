@@ -1,5 +1,6 @@
 from pathfinding2012 import *
 from constantes import *
+from geometry import *
 
 class PathFinding:
 	def __init__(self, robot_list, xml_filename):
@@ -26,7 +27,7 @@ class PathFinding:
 			self.__other_bot = self.__flussmittel
 		else:
 			raise Exception("Aucun robot actif")
-		self.__update(self.__our_bot)
+		self.update(self.__our_bot)
 
 	def update(self, robot):
 		self.__update_enemy_bot()
@@ -54,9 +55,9 @@ class PathFinding:
 
 	def __update_enemy_bot(self):
 		if NUMBER_OF_ENEMY >= 1:
-			self.__enemy_bot_poly.move_to(self.__big_enemy_bot.getPosition())
+			self.__enemy_bot_poly[0].move_to(self.__big_enemy_bot.getPosition())
 		if NUMBER_OF_ENEMY >= 2:
-			self.__enemy_bot_poly.move_to(self.__small_enemy_bot.getPosition())
+			self.__enemy_bot_poly[1].move_to(self.__small_enemy_bot.getPosition())
 
 	def __init_enemy_bot(self):
 		self.__enemy_bot_poly = []
