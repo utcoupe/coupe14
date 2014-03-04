@@ -7,9 +7,9 @@ import time
 
 class MetaData():
 	def __init__(self, constantes):
-		self.numberOfenemy = constantes.number_of_enemy
-		self.seuilRouge = constantes.seuil_rouge
-		self.seuilJaune = constantes.seuil_jaune
+		self.numberOfenemy = constantes.NUMBER_OF_ENEMY
+		self.seuilRouge = constantes.SEUIL_ROUGE
+		self.seuilJaune = constantes.SEUIL_JAUNE
 
 		#Variables
 		self.triangleEnPosition = ("Rien", 0) #(Rien ou JAUNE ou ROUGE, timestanp de l'info pour savoir si on peut l'utiliser directment ou non)

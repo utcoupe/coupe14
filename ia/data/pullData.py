@@ -7,7 +7,7 @@ import threading
 import time
 
 class PullData():
-	def __init__(self, Communication, Flussmittel, Tibot, SmallEnemyBot, BigEnemyBot, Tourelle, pull_periode):
+	def __init__(self, Communication, Flussmittel, Tibot, SmallEnemyBot, BigEnemyBot, Tourelle, PULL_PERIODE):
 		self.Communication = Communication
 		self.Flussmittel = Flussmittel[0]
 		self.address_flussmittel_other = Flussmittel[1]
@@ -19,7 +19,7 @@ class PullData():
 		self.BigEnemyBot = BigEnemyBot
 		self.Tourelle = Tourelle[0]
 		self.address_tourelle = Tourelle[1]
-		self.pull_periode = pull_periode
+		self.PULL_PERIODE = PULL_PERIODE
 
 		self.pull_data = True
 		self.flussmittel_asked = False
@@ -33,7 +33,7 @@ class PullData():
 		while self.pull_data:
 			self.readData()
 			self.askData()
-			time.sleep(self.pull_periode/1000.0)
+			time.sleep(self.PULL_PERIODE/1000.0)
 
 	def stop(self):
 		self.pull_data = False
