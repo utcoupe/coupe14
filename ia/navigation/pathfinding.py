@@ -1,5 +1,4 @@
-from .pathfinding2012 import *
-sys.path.append(os.path.join(FILE_DIR,"..","..","ia"))
+from pathfinding2012 import *
 from constantes import *
 
 class PathFinding:
