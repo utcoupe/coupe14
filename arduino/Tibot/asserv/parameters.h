@@ -36,7 +36,7 @@
 #define DUREE_CYCLE 5 //période de calcul, en ms
 #define FREQ (1/(DUREE_CYCLE/1000.0))
 
-#define ACC_MAX 250 //consigne*s-2
+#define ACC_MAX 100 //consigne*s-2
 
 /* CONSIGNE OFFSET
  * DEVRAIT ETRE A 0
@@ -49,7 +49,7 @@
  * envoyer des consignes en pwm au robot
  * partant de 0 et en augmentant progressivement
  * dès que le robot avance, la pwm min est trouvée */
-#define CONSIGNE_OFFSET 0
+#define CONSIGNE_OFFSET 20
 
 #define CONSIGNE_RANGE_MAX 127
 #define CONSIGNE_RANGE_MIN -127
@@ -78,10 +78,12 @@
 #define ANG_P 30.0 //spd = P * E_ang(rad)
 #define ANG_I 0 //spd = I * I_ang(rad * s)
 #define ANG_D 0 //a regler par incrementation
+#define ANG_AWU 0 //Anti-windup, en radian
 
 #define DIS_P 0.5 //spd = P * E_dis(mm)
 #define DIS_I 0 //spd = I * I_dis(mm * s)
 #define DIS_D 0 //a regler par incrementation
+#define DIS_AWU 0 //Anti-windup, en mm
 
 /*****************************************
  *            PRIVATE                    *

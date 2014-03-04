@@ -18,14 +18,14 @@ def gui(com):
 		order = str(input("Entre le nom ou le numéro d'un ordre:\n"))
 		if order:
 			if order[0] == 'A':
-				address = 2
+				address = 5
 			elif order[0] == 'O':
-				address = 1
+				address = 4
 			elif order == 'GET_HOKUYO':
 				address = 6
 
 			if order == 'k':# arret d'urgence
-				com.sendOrderAPI(2, 'A_CLEANG', *arguments)
+				com.sendOrderAPI(5, 'A_CLEANG', *arguments)
 			elif order == 'a':# arret d'urgence
 				arguments = [1000, 500]
 				com.sendOrderAPI(2, 'A_GOTO', *arguments)
@@ -33,12 +33,18 @@ def gui(com):
 				com.sendOrderAPI(2, 'A_GOTO', *arguments)
 				arguments = [0, 0, 0]
 				com.sendOrderAPI(2, 'A_GOTOA', *arguments)
+			elif order == 'c':
+				com.sendOrderAPI(5, 'A_GET_CODER', *arguments)
+			elif order == 'p':
+				com.sendOrderAPI(5, 'A_GET_POS', *arguments)
+			elif order == 'r':
+				com.sendOrderAPI(5, 'A_RESET_POS', *arguments)
+
 			elif order == 's':
 
 				for a in range(1000):
 					arguments = []
 
-					com.sendOrderAPI(5, 'A_GET_CODER', *arguments)
 
 			elif order in com.orders:
 				if isinstance(order, (int)):

@@ -1,6 +1,6 @@
 /****************************************
  * Author : Quentin C			*
- * Mail : quentin.chateau@gmail.com	*
+ * Mail : quentin.chateau@gmail.com	* 
  * Date : 22/01/13			*
  ****************************************/
 #include "compat.h"
@@ -36,8 +36,8 @@ void executeCmd(char serial_data){
 		else if (serial_data == END && client_concerne) { //Fin de trame, execution de l'ordre
 			unsigned char data_8bits[MAX_DATA];
 
-                        data_counter = decode(data, data_8bits, data_counter);
-                        if(data_counter == -1){ //Si données invalides
+			data_counter = decode(data, data_8bits, data_counter);
+			if(data_counter == -1){ //Si données invalides
 				PDEBUGLN("Data error : Données invalides");
 				sendInvalid();
 			}
@@ -72,6 +72,7 @@ void executeCmd(char serial_data){
 				etape = wait_step;
 				client_concerne = false;//On ignore la suite
 				sendInvalid();
+				PDEBUGLN("Data error : ID incorrect");
 			}
 			break;
 		case data_step:
@@ -88,13 +89,14 @@ void executeCmd(char serial_data){
 //decode permet de décoder les données recues par la protocole, de manièe complète (plusieurs ordres par tramme. En revanche, le décodage est BEAUCOUP plus long.
 //En plus, full_decode effectue la vérification des dnnées
 //Renvoit le compte de données en cas de succès, -1 en cas de corruption de données
-int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){ 
+int decode(unsigned char *data_in, unsigned char *data_out, int data_counter_7){ 
 	int i = 0, j = 0, offset = 0;
 	//Transformation 7->8bits classique
-	for(i=0;i<data_counter;i++){
+	for(i=0;i<data_counter_7;i++){
+		//Decala de l'ooctet en cours
 		data_out[j] = data_in[i] << (1+offset);
-		if (i+1 < data_counter) {
-			data_out[j] |= data_in[i+1] >> (6-offset);
+		if (i+1 < data_counter_7) { //Sauf à la dernier iteration
+			data_out[j] |= data_in[i+1] >> (6-offset); //Complément de l'octet en cours
 		}
 		offset++;
 		j++;
@@ -104,26 +106,32 @@ int decode(unsigned char *data_in, unsigned char *data_out, int data_counter){
 		}
 	}
 
-        data_counter = j; //nouveau compte de datas
+	int data_counter = j; //nouveau compte de datas
 
-        //recalage des ordres 6bits
-        unsigned char overflow = right_shift_array(data_out, data_out, data_counter, 2); //Shift tout le tableau à droite de 1 à partir de i (le premier ordre est calé)
+	//recalage des ordres 6bits
+	unsigned char overflow = right_shift_array(data_out, data_out, data_counter, 2); //Shift tout le tableau à droite de 1 à partir de i (le premier ordre est calé)
+    unsigned char ordre = data_out[0];
+	data_counter--; //On ne compte pas l'ordre dans le nbr d'octets
+
+	PDEBUG("offset = "); PDEBUGLN(offset);
+	PDEBUG("datac = "); PDEBUGLN(data_counter);
 	//Si on vient de décaler le dernier octet de 3 ou plus à gauche, l'octet forme suite au décalage à droite de 2 sera "incomplet", c'est à dire que l'octet est en réalité des bits perdus, il faut dropper cet octet
-	if (offset > 2) { //cas ou le dernier octet est incomplet
+	if(data_counter > 0 && (offset >= 3 || (offset == 0 && data_counter%8 != 6) ||(offset == 1 && data_counter%8 != 0)||(offset == 2 && data_counter%8 != 1))){
 		data_counter--;
 	}
 
-        if(overflow != 0){
-                data_out[data_counter] = overflow; //Si overflow, on le met (attention aux segfault)
+	if(overflow != 0){
+		data_out[data_counter] = overflow; //Si overflow, on le met (attention aux segfault)
 		data_counter++;
 		PDEBUGLN("Pas normal");
-        }
-        unsigned char ordre = data_out[0];
+    }
 	if(ordre > MAX_ORDRES){//L'odre n'existe pas => corruption
+		PDEBUGLN("Ordre inconnu");
 		return -1;
 	}
 	unsigned char size = ordreSize[(int)ordre];
-	if(size != data_counter-1){//Mauvaise taille => corruption
+	if(size != data_counter){//Mauvaise taille => corruption
+		PDEBUG("Data corrompues, attendu : "); PDEBUG(size); PDEBUG("o, recu : "); PDEBUG(data_counter); PDEBUGLN("o");;
 		return -1;
 	}
 	return data_counter;
