@@ -14,3 +14,6 @@ class EnemyBot():
 		#Valeurs récupérées (read-only)
 		self.positionX = 0
 		self.positionY = 0
+
+	def getPositon(self):
+		return (self.positionX, self.positionY)
