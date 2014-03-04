@@ -15,9 +15,7 @@ from goals import goalsManager
 
 ObjetCommunication = communicationGlobale.CommunicationGlobale(constantes)
 arduino_constantes = ObjetCommunication.getConst()
-gManager = goalsManager.GoalsManager()
-gManager.getBestGoal([1,1])
-gManager.saveGoals()
+goalsManager = goalsManager.GoalsManager()
 
 time.sleep(1000/1000.0)
 print("INFO: La communication est prête")
