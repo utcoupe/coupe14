@@ -11,7 +11,6 @@ from communication import communicationGlobale
 from data import data
 import constantes
 
-print("enemynb", constantes.NUMBER_OF_ENEMY)
 ObjetCommunication = communicationGlobale.CommunicationGlobale(constantes)
 arduino_constantes = ObjetCommunication.getConst()
 
