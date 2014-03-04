@@ -2,7 +2,7 @@
 <goals>
 	<goal name='getFire1'>
 		<type>fire</type>
-		<finished>100</finished>
+		<finished>20</finished>
 		<location-x>0.0</location-x>
 		<location-y>0.0</location-y>
 		<executions>

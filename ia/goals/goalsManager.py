@@ -10,7 +10,6 @@ class GoalsManager:
 	def __init__(self):
 		self.__available_goals		= [] #List of available goals
 		self.__finished_goals		= [] #List of finished goals
-		self.__current_executions	= [] # List of next chosen executions
 		self.__blocked_goals		= [] # List of blocked goals
 		self.__goal_types			= OrderedDict()
 		self.loadGoals()
@@ -31,6 +30,7 @@ class GoalsManager:
 				execution_heap.append(goal_execution)
 				heapq.heapify(execution_heap)
 		if not len(execution_heap):
+			print 'GoalManager: no goal in available list'
 			return -1 
 		else:
 			execution = heapq.heappop(execution_heap)

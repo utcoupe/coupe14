@@ -28,10 +28,7 @@ class Goal:
 		self.__finished += int(by_value)
 
 	def isFinished(self):
-		if (self.__finished > self.FINISHED_THRESHOLD):
-			True
-		else:
-			False
+		return (self.__finished > self.FINISHED_THRESHOLD)
 
 	def toXml(self):
 		string =  "<goal name='" + self.__name + "'>\n\t<type>" + self.__type + "</type>\n"
