@@ -193,6 +193,9 @@ class NavGraph:
 
 	def add_dynamic_obstacle(self, poly):
 		self.dynamic_obstacles.append(poly)
+	
+	def pop_dynamic_obstable(self):
+		self.dynamic_obstacles.pop()
 
 	def update(self):
 		""" fonction à appeller après avoir bougé un obstacle dynamic """
