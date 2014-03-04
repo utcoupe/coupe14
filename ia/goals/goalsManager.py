@@ -1,6 +1,7 @@
-
+# -*- coding: utf-8 -*-
 import heapq
 from xml.dom.minidom import parseString
+import goal
 
 class GoalsManager():
 
@@ -32,48 +33,49 @@ class GoalsManager():
 
 	def collectEnemyFinished(self, goal):
 		for goal in __available_goals:
-			if goal.isFinished
+			if goal.isFinished():
 				print 'Goal ' + goal.getName() + ' has been calculated accomplished by the enemy'
 				goal.score = -Infinity
 				__available_goals.sort()
 				__finished_goals.push(__available_goals.pop())
 
+	# XML import and export of goals
 	def loadGoals(filename='goals.xml'):
 		print 'GoalsManager: loading goals from: ' + filename
 		fd = open(filename,'r')
 		dom = parseString(fd.read())
 		fd.close()
-		for __xml_goal in dom.getElementsByTagName('goal'):
-			__name			= __xml_goal.attributes["name"].value
-			__x 			= __xml_goal.getElementsByTagName('location-x')[0].value
-			__y				= __xml_goal.getElementsByTagName('location-y')[0].value
-			__orientation	= __xml_goal.getElementsByTagName('orientation')[0].value
-			__points		= __xml_goal.getElementsByTagName('points')[0].value
-			__priority		= __xml_goal.getElementsByTagName('priority')[0].value
-			__finished		= (bool __xml_goal.getElementsByTagName('finished')[0].value)
-			__actions		= []
+		for xml_goal in dom.getElementsByTagName('goal'):
+			name		= xml_goal.attributes["name"].value
+			x 			= xml_goal.getElementsByTagName('location-x')[0].value
+			y			= xml_goal.getElementsByTagName('location-y')[0].value
+			orientation	= xml_goal.getElementsByTagName('orientation')[0].value
+			points		= xml_goal.getElementsByTagName('points')[0].value
+			priority	= xml_goal.getElementsByTagName('priority')[0].value
+			finished	= bool(xml_goal.getElementsByTagName('finished')[0].value)
+			actions		= []
 
-			for __xml_action in __xml_goal.getElementsByTagName('action'):
-				__actions.append(__xml_action.value)
+			for xml_action in xml_goal.getElementsByTagName('action'):
+				actions.append(xml_action.value)
 
-			__goal = Goal(__name, [__x, __y], __orientation, __points, __priority, __actions)
-			__goal.incrementFinished(__finished)
+			goal = Goal(name, [x, y], orientation, points, priority, actions)
+			goal.incrementFinished(finished)
 
-			if __goal.isFinished():
-				self.__available_goals.append(__goal)
+			if goal.isFinished():
+				self.__available_goals.append(goal)
 			else:
-				self.__finished_goals.append(__goal)
+				self.__finished_goals.append(goal)
 
 		heapq.heapify(__available_goals)
 	
 	def saveGoals(filename='saved_goals.xml'):
 		print 'GoalsManager: saving goals to: ' + filename
-		__string = "<goals>\n"
+		string = "<goals>\n"
 		for goal in self.__available_goals:
-			__string += goal.toXml()
-		__string += "</goals>"
+			string += goal.toXml()
+		string += "</goals>"
 
-		doc = parseString(__string) #Check XML validity
+		doc = parseString(string) #Check XML validity
 		with open(filename, "w") as f:
-    		f.write( doc.toxml() )
-    	f.close()
+			f.write( doc.toxml() )
+    		f.close()

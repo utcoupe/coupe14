@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class Goal():
 	FINISHED_THRESHOLD = 50
 
@@ -41,11 +42,11 @@ class Goal():
 		True if (finished > FINISHED_THRESHOLD) else False
 
 	def toXml(self):
-		__string =  "<goal name='" + __name + "'>\n"
-		__string += "\t<points>" + __points + "</points>\n\t<location-x>" + __location[0] + "<location-x>\n"
-		__string += "\t<location-x>" + __location[0] +"<location-y>\n\t<orientation>" + __orientation + "<orientation>\n"
-		__string += "\t<priority>" + __priority + "</priority>\n\t<finished>" + 0 + "</finished>\n\t<actions>"
-		for __action in __actions:
-			__string += "\n\t\t<action>" + __action + "</action>"
-		__string += "\n\t</actions>\n</goal>\n"
-		return __string
+		string =  "<goal name='" + __name + "'>\n"
+		string += "\t<points>" + __points + "</points>\n\t<location-x>" + __location[0] + "<location-x>\n"
+		string += "\t<location-x>" + __location[0] +"<location-y>\n\t<orientation>" + __orientation + "<orientation>\n"
+		string += "\t<priority>" + __priority + "</priority>\n\t<finished>" + 0 + "</finished>\n\t<actions>"
+		for action in __actions:
+			string += "\n\t\t<action>" + __action + "</action>"
+		string += "\n\t</actions>\n</goal>\n"
+		return string
