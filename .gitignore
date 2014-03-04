@@ -13,3 +13,4 @@ hokuyo/hokuyo
 *.a
 *.pyc
 *.exe
+workspace*
