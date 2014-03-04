@@ -68,7 +68,7 @@ enum ordre {
 	O_BAISSER_ASC,
 
 	GET_CAM,	//#int #int
-	GET_HOKUYO,	//#int #int #int #int #int #int #int #int #int
+	GET_HOKUYO,	//#int #int #int #int #int #int #int #int #long
 	ORDRE_NON_PARSE
 	//FINPARSE
 };
