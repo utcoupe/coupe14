@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+Class used to manage goals and find best execution
+It is also a goal factory as it creates and save goals
+This should be the only interface in the goals module
+"""
+
 import heapq
 from xml.dom.minidom import parseString
 from collections import OrderedDict
@@ -8,15 +14,12 @@ from .goal import GoalExecution
 class GoalsManager:
 
 	def __init__(self):
-		self.__available_goals		= [] #List of available goals
-		self.__finished_goals		= [] #List of finished goals
-		self.__blocked_goals		= [] # List of blocked goals
-		self.__goal_types			= OrderedDict()
+		self.__available_goals	= [] #List of available goals
+		self.__finished_goals	= [] #List of finished goals
+		self.__blocked_goals	= [] # List of blocked goals
+		self.__goal_types		= OrderedDict()
 		self.loadGoals()
 		self.collectEnemyFinished()
-
-		print "Available goals: %s" % self.__available_goals
-		print "Finished goals: %s" % self.__finished_goals
 
 	def __del__(self):
 		self.saveGoals()
@@ -30,7 +33,7 @@ class GoalsManager:
 				execution_heap.append(goal_execution)
 				heapq.heapify(execution_heap)
 		if not len(execution_heap):
-			print 'GoalManager: no goal in available list'
+			print 'GoalsManager: no goal in available list'
 			return -1 
 		else:
 			execution = heapq.heappop(execution_heap)

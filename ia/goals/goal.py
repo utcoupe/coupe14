@@ -1,28 +1,27 @@
 # -*- coding: utf-8 -*-
+"""
+Class used to reprsent a goal
+A goal reprsent a task & contains a list of executions
+It is loaded from XML file
+"""
+
 from .goalExecution import GoalExecution
 
 class Goal:
 	FINISHED_THRESHOLD = 50
 
 	def __init__(self, name, type, location, executions):
-		self.__name			= str(name)
-		self.__type			= str(type)
-		self.__location 	= location
-		self.executions 	= executions
-		self.__finished		= 0 # From 0 (not finished) to 100 (finished)
+		self.__name		= str(name)
+		self.__type		= str(type)
+		self.__location = location
+		self.executions = executions
+		self.__finished	= 0 # From 0 (not finished) to 100 (finished)
 
 	def __eq__(self, other): 
 		return self.__dict__ == other.__dict__
 
 	def getName(self):
 		return self.__name
-
-	def updateScore(self):
-		if self.isFinished():
-			self.score = float("inf")
-		else:
-			self.score = float(self.__distance / (self.__priority * self.__points))
-		return self.score
 
 	def incrementFinished(self, by_value):
 		self.__finished += int(by_value)

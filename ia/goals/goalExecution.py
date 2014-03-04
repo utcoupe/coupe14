@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+Class used to reprsent an execution of a goal
+It contains an entry-point, a time and a score calculated from context
+GoalExecutions are compared on that score (lower is better choice)
+"""
+
 class GoalExecution:
 
 	def __init__(self, goal, location, orientation, points, priority, actions, time):
@@ -26,9 +32,6 @@ class GoalExecution:
 
 	def updateScore(self):
 		self.score = float(self.__distance / (self.__priority * self.__points))
-
-	def getScore(self):
-		return self.__score
 
 	def __cmp__(self, other):
 		return self.score - other.score
