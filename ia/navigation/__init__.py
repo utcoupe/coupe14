@@ -1,2 +1,1 @@
-from .pathfinding import *
-from .nav import *
+from pathfinding2012 import *
