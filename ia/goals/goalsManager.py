@@ -17,3 +17,25 @@ class GoalsManager():
 			goal.updateScore()
 		__available_goals.sort()
 		return __available_goals[0]
+
+	def setFinished(self, goal_name):
+		for goal in __available_goals
+			if goal.getName == goal_name
+				goal.score = -Infinity
+				__available_goals.sort()
+				__finished_goals.push(__available_goals.pop())
+				print 'Goal ' + goal.getName() + ' has been maked finished'
+				break
+			else
+				raise 'Goal ' + goal.getName() + ' was not found when trying to be removed from heap'
+
+	def collectEnemyFinished(self, goal):
+		for goal in __available_goals
+			if goal.finished > FINISHED_LIMIT
+				print 'Goal ' + goal.getName() + ' has been calculated accomplished by the enemy'
+				goal.score = -Infinity
+				__available_goals.sort()
+				__finished_goals.push(__available_goals.pop())
+
+	def updateFinished(self):
+		pass #TODO
