@@ -16,15 +16,18 @@ class Goal():
 
 	def updateDistance(self, current_pos):
 		__updateRouting(current_pos)
-		#TODO calculate distance from routing, this should be delegated to navigation
+		#TODO calculate distance from routing, this should be delegated to navigationn
 		pass
 
 	def updateScore(self):
-		return self.score = Infinity if finished
-		return self.score = __distance / (__priority * __points)
+		if bool(finished):
+			self.score = Infinity
+		else:
+			self.score = __distance / (__priority * __points)
+		return self.score
 
 	def incrementFinished(self, by_value):
-		self.finished += (int by_value)
+		self.finished += int(by_value)
 
 	def __cmp__(self, other):
 		return self.score - other.score
