@@ -54,8 +54,7 @@ SEUIL_JAUNE = 100 #TODO
 
 #====================Flussmittel====================
 ENABLE_FLUSSMITTEL = True #permet de deactiver Flussmitel
-LARGEUR_FLUSSMITTEL = 100 #en mm
-LONGUEUR_FLUSSMITTEL = 100
+RAYON_FLUSSMITTEL = 100 #en mm
 
 
 
@@ -66,8 +65,7 @@ LONGUEUR_FLUSSMITTEL = 100
 
 #====================TIBOT====================
 ENABLE_TIBOT = False #permet de deactiver un Tibot
-LARGEUR_TIBOT = 100
-LONGUEUR_TIBOT = 100
+RAYON_TIBOT = 100
 
 
 
@@ -75,11 +73,9 @@ LONGUEUR_TIBOT = 100
 
 #====================BIG ENEMY====================
 #Si un seul adversaire, on utilise les constantes de BIG ENEMY
-LARGEUR_BIG_ENEMY = 100
-LONGUEUR_BIG_ENEMY = 100
+RAYON_BIG_ENEMY = 100
 
 
 
 #====================SMALL ENEMY====================
-LARGEUR_SMALL_ENEMY = 100
-LONGUEUR_SMALL_ENEMY = 100
+RAYON_SMALL_ENEMY = 100
