@@ -27,6 +27,9 @@ class GoalExecution:
 	def updateScore(self):
 		self.score = float(self.__distance / (self.__priority * self.__points))
 
+	def getScore(self):
+		return self.__score
+
 	def __cmp__(self, other):
 		return self.score - other.score
 
@@ -34,8 +37,9 @@ class GoalExecution:
 		string =  "<execution>\n"
 		string += "\t<points>" + str(self.__points) + "</points>\n\t<location-x>" + str(self.__location[0]) + "</location-x>\n"
 		string += "\t<location-y>" + str(self.__location[1]) +"</location-y>\n\t<orientation>" + str(self.__orientation) + "</orientation>\n"
-		string += "\t<priority>" + str(self.__priority) + "</priority>\n\t<time>" + self.__time + "</time>\n\t<actions>"
+		string += "\t<score>" + str(self.score) + "</score>\n"
+		string += "\t<priority>" + str(self.__priority) + "</priority>\n\t<time>" + str(self.__time) + "</time>\n\t<actions>"
 		for action in self.__actions:
-			string += "\n\t\t<action>" + action + "</action>"
-		string += "\n\t</actions>\n</execution>\n"
+			string += "\n\t\t<action>" + str(action) + "</action>"
+		string += "\n\t</actions>\n\t</execution>\n"
 		return string

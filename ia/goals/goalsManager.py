@@ -34,18 +34,19 @@ class GoalsManager:
 			return -1 
 		else:
 			execution = heapq.heappop(execution_heap)
-			associated_goal = execution.getGoal
+			associated_goal = execution.getGoal()
 			self.__blockGoal(associated_goal)
 			print "GoalsManager:getBestGoal has chosen '%s'" % associated_goal.getName()
 			return execution
 
 	def cancelExecution(self, execution):
-		self.__releaseGoal(execution.getGoal)
+		self.__releaseGoal(execution.getGoal())
 
 	def finishExecution(self, execution):
-		self.__finishGoal(execution.getGoal)
+		self.__finishGoal(execution.getGoal())
 
 	def __blockGoal(self, goal):
+		print goal
 		self.__blocked_goals.append(goal)
 		self.__available_goals.remove(goal)
 		print 'Goal ' + goal.getName() + ' was blocked'
@@ -92,7 +93,7 @@ class GoalsManager:
 				actions		= []
 
 				for action	in xml_execution.getElementsByTagName('action'):
-					actions.append(action)
+					actions.append(action.firstChild.nodeValue)
 				execution = GoalExecution(goal, [x, y], orientation, points, priority, actions, time)
 				goal.executions.append(execution)
 
@@ -101,15 +102,13 @@ class GoalsManager:
 			else:
 				self.__available_goals.append(goal)
 	
-	def saveGoals(self, filename='../logs/saved_goals.xml'):
+	def saveGoals(self, filename='../log/saved_goals.xml'):
 		print 'GoalsManager: saving goals to: ' + filename
 		string = "<goals>\n"
-		for heap in [self.__available_goals, self.__blocked_goals, self.__finished_goals]:
-			for goal in heap:
-				print goal.toXml()
+		for list in [self.__available_goals, self.__blocked_goals, self.__finished_goals]:
+			for goal in list:
 				string += goal.toXml()
 		string += "</goals>"
-
 		doc = parseString(string) #Check XML validity
 		with open(filename, "w") as f:
 			f.write( doc.toxml() )
