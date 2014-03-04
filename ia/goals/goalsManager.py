@@ -101,7 +101,7 @@ class GoalsManager:
 			else:
 				self.__available_goals.append(goal)
 	
-	def saveGoals(self, filename='goals/saved_goals.xml'):
+	def saveGoals(self, filename='../logs/saved_goals.xml'):
 		print 'GoalsManager: saving goals to: ' + filename
 		string = "<goals>\n"
 		for heap in [self.__available_goals, self.__blocked_goals, self.__finished_goals]:
