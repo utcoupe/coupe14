@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 import heapq
 from xml.dom.minidom import parseString
+from collections import OrderedDict
 from .goal import Goal
+from .goal import GoalExecution
 
 class GoalsManager:
 
 	def __init__(self):
-		self.__available_goals = [] #List of available goals
-		self.__finished_goals = [] #List of finished goals
-		self.__current_executions = [] # List of next chosen executions
-		self.__blocked_goals # List of blocked goals
-		self.__goal_types = dic()
+		self.__available_goals		= [] #List of available goals
+		self.__finished_goals		= [] #List of finished goals
+		self.__current_executions	= [] # List of next chosen executions
+		self.__blocked_goals		= [] # List of blocked goals
+		self.__goal_types			= OrderedDict()
 		self.loadGoals()
 		self.collectEnemyFinished()
 
@@ -23,37 +25,40 @@ class GoalsManager:
 	def getBestGoalExecution(self, current_pos):
 		execution_heap = []
 		for goal in self.__available_goals:
-			for goal_execution in goal.executions
+			for goal_execution in goal.executions:
 				goal_execution.updateDistance(current_pos)
 				goal_execution.updateScore()
 				execution_heap.append(goal_execution)
 				heapq.heapify(execution_heap)
-		execution = execution_heap[0]
-		associated_goal = execution.getGoal
-		self.__bolckGoal(associated_goal)
-		print "GoalsManager:getBestGoal has chosen '%s'" % associated_goal.getName()
-		return execution
+		if not len(execution_heap):
+			return -1 
+		else:
+			execution = heapq.heappop(execution_heap)
+			associated_goal = execution.getGoal
+			self.__blockGoal(associated_goal)
+			print "GoalsManager:getBestGoal has chosen '%s'" % associated_goal.getName()
+			return execution
 
 	def cancelExecution(self, execution):
 		self.__releaseGoal(execution.getGoal)
 
 	def finishExecution(self, execution):
 		self.__finishGoal(execution.getGoal)
-	
+
 	def __blockGoal(self, goal):
 		self.__blocked_goals.append(goal)
 		self.__available_goals.remove(goal)
-		print 'Goal ' + goal.getName() + ' was maked blocked'
+		print 'Goal ' + goal.getName() + ' was blocked'
 
 	def __releaseGoal(self, goal):
 		self.__available_goals.append(goal)
 		self.__blocked_goals.remove(goal)
-		print 'Goal ' + goal.getName() + ' was maked released'
+		print 'Goal ' + goal.getName() + ' was released'
 
 	def __finishGoal(self, goal):
 		self.__finished_goals.append(goal)
 		self.__blocked_goals.remove(goal)
-		print 'Goal ' + goal.getName() + ' was maked finished'
+		print 'Goal ' + goal.getName() + ' was finished'
 
 	def collectEnemyFinished(self):
 		for goal in self.__available_goals:
@@ -74,10 +79,10 @@ class GoalsManager:
 			gx 			= xml_goal.getElementsByTagName('location-x')[0].firstChild.nodeValue
 			gy 			= xml_goal.getElementsByTagName('location-x')[0].firstChild.nodeValue
 
-			goal = Goal(name, type, [gx, gy])
+			goal = Goal(name, type, [gx, gy], [])
 			goal.incrementFinished(finished)
 
-			for xml_execution in xml_goal.getElementsByTagName('goal'):
+			for xml_execution in xml_goal.getElementsByTagName('execution'):
 				x 			= xml_execution.getElementsByTagName('location-x')[0].firstChild.nodeValue
 				y			= xml_execution.getElementsByTagName('location-y')[0].firstChild.nodeValue
 				orientation	= xml_execution.getElementsByTagName('orientation')[0].firstChild.nodeValue

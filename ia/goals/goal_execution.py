@@ -25,11 +25,7 @@ class GoalExecution:
 		pass
 
 	def updateScore(self):
-		if self.isFinished():
-			self.score = float("inf")
-		else:
-			self.score = float(self.__distance / (self.__priority * self.__points))
-		return self.score
+		self.score = float(self.__distance / (self.__priority * self.__points))
 
 	def __cmp__(self, other):
 		return self.score - other.score
@@ -37,7 +33,7 @@ class GoalExecution:
 	def toXml(self):
 		string =  "<execution>\n"
 		string += "\t<points>" + str(self.__points) + "</points>\n\t<location-x>" + str(self.__location[0]) + "</location-x>\n"
-		string += "\t<location-y>" + str(self.__location[0]) +"</location-y>\n\t<orientation>" + str(self.__orientation) + "</orientation>\n"
+		string += "\t<location-y>" + str(self.__location[1]) +"</location-y>\n\t<orientation>" + str(self.__orientation) + "</orientation>\n"
 		string += "\t<priority>" + str(self.__priority) + "</priority>\n\t<time>" + self.__time + "</time>\n\t<actions>"
 		for action in self.__actions:
 			string += "\n\t\t<action>" + action + "</action>"
