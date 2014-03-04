@@ -3,61 +3,59 @@
 Ce fichier regroupe toutes les constantes de l'IA
 """
 
-class Constantes():
-	def __init__(self):
-		#========================================Communication========================================
-		self.portXbee = "/dev/ttyUSB0"
-		self.vitesseXbee = 57600
-		self.parityXbee = "ODD"
-		self.portOther = "/dev/ttymxc3"
-		self.vitesseOther = 115200
-		self.parityOther = "NONE"
+#========================================Communication========================================
+portXbee = "/dev/ttyUSB0"
+vitesseXbee = 57600
+parityXbee = "ODD"
+portOther = "/dev/ttymxc3"
+vitesseOther = 115200
+parityOther = "NONE"
 
 
-		#constantes réglables:
-		self.useXbee = False
-		self.useArduino = True
-		self.maxUnconfirmedPacket = 5 # attention maximum 32
-		self.emptyFifo = True
-		self.timeOut = 100
-		self.highPrioSpeed = 30 #période d'execution en ms
-		self.lowPrioSpeed = 1000 #période d'execution en ms
-		self.keepContactTimeout = 1000
-		self.offLigneTimeout = 5000
+#constantes réglables:
+useXbee = False
+useArduino = False
+maxUnconfirmedPacket = 5 # attention maximum 32
+emptyFifo = True
+timeOut = 100
+highPrioSpeed = 30 #période d'execution en ms
+lowPrioSpeed = 1000 #période d'execution en ms
+keepContactTimeout = 1000
+offLigneTimeout = 5000
 
-		#Systèmes arretable:
-		self.threadActif = True
-		self.writeOutput = True
-		self.readInput = True
-		self.probingDevices = True
-		self.renvoiOrdre = True
-		self.keepContact = True
-		self.renvoiImmediat = False # fonction non terminé, ne pas activer !
+#Systèmes arretable:
+threadActif = True
+writeOutput = True
+readInput = True
+probingDevices = True
+renvoiOrdre = True
+keepContact = True
+renvoiImmediat = False # fonction non terminé, ne pas activer !
 
 
-		#=======================================IA========================================
-		
-		#====================Variables globales====================
-		self.number_of_enemy = 0
+#=======================================IA========================================
 
+#====================Variables globales====================
+NUMBER_OF_ENEMY = 0
 
 
 
-		
-		#====================tourelle====================
-		self.enable_tourelle = False #permet de deactiver la tourelle
 
-		#====================pullData====================
-		self.pull_periode = 50 #période des pull en ms
 
-		#====================CAMERA====================
-		self.seuil_rouge = 100 #TODO
-		self.seuil_jaune = 100 #TODO
+#====================tourelle====================
+ENABLE_TOURELLE = False #permet de deactiver la tourelle
 
-		#====================Flussmittel====================
-		self.enable_flussmittel = True #permet de deactiver Flussmitel
-		self.largeur_flussmittel = 100 #en mm
-		self.longueur_flussmittel = 100
+#====================pullData====================
+PULL_PERIODE = 50 #période des pull en ms
+
+#====================CAMERA====================
+SEUIL_ROUGE = 100 #TODO
+SEUIL_JAUNE = 100 #TODO
+
+#====================Flussmittel====================
+ENABLE_FLUSSMITTEL = True #permet de deactiver Flussmitel
+LARGEUR_FLUSSMITTEL = 100 #en mm
+LONGUEUR_FLUSSMITTEL = 100
 
 
 
@@ -66,22 +64,22 @@ class Constantes():
 
 
 
-		#====================TIBOT====================
-		self.enable_tibot = False #permet de deactiver un Tibot
-		self.largeur_tibot = 100
-		self.longueur_tibot = 100
+#====================TIBOT====================
+ENABLE_TIBOT = False #permet de deactiver un Tibot
+LARGEUR_TIBOT = 100
+LONGUEUR_TIBOT = 100
 
 
 
 
 
-		#====================BIG ENEMY====================
-		#Si un seul adversaire, on utilise les constantes de BIG ENEMY
-		self.largeurBigEnemy = 100
-		self.longueurBigEnemy = 100
+#====================BIG ENEMY====================
+#Si un seul adversaire, on utilise les constantes de BIG ENEMY
+LARGEUR_BIG_ENEMY = 100
+LONGUEUR_BIG_ENEMY = 100
 
 
 
-		#====================SMALL ENEMY====================
-		self.largeurSmallEnemy = 100
-		self.longueurSmallEnemy = 100
+#====================SMALL ENEMY====================
+LARGEUR_SMALL_ENEMY = 100
+LONGUEUR_SMALL_ENEMY = 100
