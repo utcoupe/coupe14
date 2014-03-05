@@ -36,7 +36,7 @@ renvoiImmediat = 		False # fonction non terminé, ne pas activer !
 #=======================================IA========================================
 
 #====================Variables globales====================
-NUMBER_OF_ENEMY = 		0
+NUMBER_OF_ENEMY = 		2
 
 
 
@@ -86,3 +86,6 @@ RAYON_BIG_ENEMY = 		100
 #====================SMALL ENEMY====================
 RAYON_SMALL_ENEMY = 	100
 
+#=======================================IA========================================
+POINTS_PAR_CERCLE = 8
+MARGE_PASSAGE = 10

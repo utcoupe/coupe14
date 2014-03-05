@@ -8,14 +8,16 @@ import sys
 import time
 
 #Nos fichiers
+import constantes
 from communication import communicationGlobale
 from data import data
-import constantes
+from goals import goalsManager
 import gestionTemps
 
 ObjetCommunication = communicationGlobale.CommunicationGlobale(constantes)
 arduino_constantes = ObjetCommunication.getConst()
 time.sleep(2) # on attend que les communications s'établissent
+
 
 #On teste si les systèmes demandés sont bien en lignes
 ready_list = ObjetCommunication.getSystemReady()
@@ -32,5 +34,5 @@ print("Le protocole a bien demarré.")
 
 
 Data = data.Data(ObjetCommunication, constantes, arduino_constantes)
-
+GoalsManager = goalsManager.GoalsManager()
 GestionTemps = gestionTemps.GestionTemps(Data)
