@@ -8,14 +8,14 @@ import sys
 import time
 
 #Nos fichiers
-from communication import communicationGlobale
+import communication
 import data
 import constantes
-from goals import goalsManager
+import goals
 
-ObjetCommunication = communicationGlobale.CommunicationGlobale()
+ObjetCommunication = communication.CommunicationGlobale()
 arduino_constantes = ObjetCommunication.getConst()
-goalsManager = goalsManager.GoalsManager()
+goalsManager = goals.GoalsManager()
 
 time.sleep(1000/1000.0)
 print("INFO: La communication est prête")
