@@ -3,13 +3,14 @@
 Classe pour toutes les autres données
 """
 
+from constantes import *
 import time
 
 class MetaData():
-	def __init__(self, constantes):
-		self.numberOfenemy = constantes.NUMBER_OF_ENEMY
-		self.seuilRouge = constantes.SEUIL_ROUGE
-		self.seuilJaune = constantes.SEUIL_JAUNE
+	def __init__(self):
+		self.numberOfenemy = NUMBER_OF_ENEMY
+		self.seuilRouge = SEUIL_ROUGE
+		self.seuilJaune = SEUIL_JAUNE
 
 		#Variables
 		self.triangleEnPosition = ("Rien", 0) #(Rien ou JAUNE ou ROUGE, timestanp de l'info pour savoir si on peut l'utiliser directment ou non)
