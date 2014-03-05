@@ -37,7 +37,7 @@ print("Le protocole a bien demarré.")
 
 Data = data.Data(Communication, arduino_constantes)
 GoalsManager = goals.GoalsManager()
-EventManager = event.EventManager()
+EventManager = event.EventManager(Data.MetaData)
 TimeManager = timeManager.TimeManager(Data.MetaData)
 
 #TODO if jack ready

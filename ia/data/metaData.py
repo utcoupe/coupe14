@@ -55,9 +55,17 @@ class MetaData():
 		else:
 			print("WARNING: Demande la fin de funny action alors que funny action est arreté.")
 
+
+			# GETTER
 	def getInGame(self):
 		return self.__in_game
 
+	def getInFunnyAction(self):
+		return self.__in_funny_action
+
+	def getGameClock(self):
+		return self.__game_clock
+
+			#SETTER
 	def setGameClock(self, clock):
-		print(self.__game_clock, self.__in_game, self.__in_funny_action)
 		self.__game_clock = clock
