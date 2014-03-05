@@ -18,6 +18,7 @@ class CommunicationGlobale():
 		self.nbTimeoutPaquets=0
 		self.nbTransmitedPaquets = 0
 		self.empty_fifo = True
+		self.__enable_debug = False
 
 
 		self.address = {}
@@ -101,7 +102,9 @@ class CommunicationGlobale():
 					readyList += (self.address[address])
 
 		return readyList
-			
+	
+	def enableDebug(self):
+		self.__enable_debug = True
 
 						#Thread
 
@@ -449,7 +452,7 @@ class CommunicationGlobale():
 
 					returnOrders.append((self.address[address], self.orders[self.ordreLog[address][idd][0]], arguments))
 
-					if len(arguments) > 0:
+					if len(arguments) > 0 and __enable_debug == True:
 						print("Retour :", arguments)
 
 			else:
