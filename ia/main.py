@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Fichier principale, demarre l'ia
 """
@@ -7,16 +8,18 @@ import sys
 import time
 
 #Nos fichiers
-from communication import communicationGlobale
-from data import data
+import communication
+import data
 import constantes
+import goals
 
-ObjetCommunication = communicationGlobale.CommunicationGlobale(constantes)
+ObjetCommunication = communication.CommunicationGlobale()
 arduino_constantes = ObjetCommunication.getConst()
+goalsManager = goals.GoalsManager()
 
 time.sleep(1000/1000.0)
 print("INFO: La communication est prête")
-data = data.Data(ObjetCommunication, constantes, arduino_constantes)
+data = data.Data(ObjetCommunication, arduino_constantes)
 
 try:
 	while True:

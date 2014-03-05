@@ -3,11 +3,12 @@
 Classe pour les données hokuyo
 """
 
+from constantes import *
 
 class Tourelle():
-	def __init__(self, constantes, communication, arduinoConstantes, address):
-		self.communication = communication
-		self.address = address
+	def __init__(self, communication, arduinoConstantes, address):
+		self.__communication = communication
+		self.__address = address
 
 		#Variables
 		
