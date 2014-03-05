@@ -76,10 +76,12 @@
 #define ANG_P 250 //spd = P * E_ang(rad)
 #define ANG_I 0 //spd = I * I_ang(rad * s)
 #define ANG_D 50 //a regler par incrementation
+#define ANG_AWU 0
 
 #define DIS_P 2 //spd = P * E_dis(mm)
 #define DIS_I 0 //spd = I * I_dis(mm * s)
 #define DIS_D 0.5 //a regler par incrementation
+#define DIS_AWU 0
 
 //DEFINES ARDUINO
 #define PIN_ENC_RIGHT_A 21
