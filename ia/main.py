@@ -12,6 +12,8 @@ import communication
 import data
 import constantes
 import goals
+import event
+import timeManager
 
 
 Communication = communication.CommunicationGlobale()
@@ -35,4 +37,8 @@ print("Le protocole a bien demarré.")
 
 Data = data.Data(Communication, arduino_constantes)
 GoalsManager = goals.GoalsManager()
+EventManager = event.EventManager()
+TimeManager = timeManager.TimeManager(Data.MetaData)
 
+#TODO if jack ready
+TimeManager.startMatch()

@@ -40,6 +40,7 @@ class PullData():
 
 	def askData(self):
 		arguments = []
+
 		if self.flussmittel_asked == False:
 			if self.Flussmittel != None:
 				self.Communication.sendOrderAPI(self.address_flussmittel_asserv, 'A_GET_POS', *arguments)
