@@ -34,5 +34,5 @@ print("Le protocole a bien demarré.")
 
 
 Data = data.Data(Communication, arduino_constantes)
-GoalsManager = goalsManager.GoalsManager()
-GestionTemps = gestionTemps.GestionTemps(Data)
+GoalsManager = goals.GoalsManager()
+
