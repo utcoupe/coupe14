@@ -31,7 +31,7 @@ void setup(){
 	motor_ascenseur.run(FORWARD);
 	motor_ascenseur.setSpeed(0); //Desactivr ascenseur
 	servoBras.write(170); //Fermer le bras
-	servoBras.write(0); //Fermer le bras
+	servoRet.write(0); //Fermer le bras
 }
 
 void loop(){
