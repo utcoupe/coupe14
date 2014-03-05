@@ -33,13 +33,13 @@ class GoalsManager:
 				execution_heap.append(goal_execution)
 				heapq.heapify(execution_heap)
 		if not len(execution_heap):
-			print 'GoalsManager: no goal in available list'
+			print('GoalsManager: no goal in available list')
 			return -1 
 		else:
 			execution = heapq.heappop(execution_heap)
 			associated_goal = execution.getGoal()
 			self.__blockGoal(associated_goal)
-			print "GoalsManager:getBestGoal has chosen '%s'" % associated_goal.getName()
+			print("GoalsManager:getBestGoal has chosen '%s'" % associated_goal.getName())
 			return execution
 
 	def cancelExecution(self, execution):
@@ -49,30 +49,30 @@ class GoalsManager:
 		self.__finishGoal(execution.getGoal())
 
 	def __blockGoal(self, goal):
-		print goal
+		print(goal)
 		self.__blocked_goals.append(goal)
 		self.__available_goals.remove(goal)
-		print 'Goal ' + goal.getName() + ' was blocked'
+		print('Goal ' + goal.getName() + ' was blocked')
 
 	def __releaseGoal(self, goal):
 		self.__available_goals.append(goal)
 		self.__blocked_goals.remove(goal)
-		print 'Goal ' + goal.getName() + ' was released'
+		print('Goal ' + goal.getName() + ' was released')
 
 	def __finishGoal(self, goal):
 		self.__finished_goals.append(goal)
 		self.__blocked_goals.remove(goal)
-		print 'Goal ' + goal.getName() + ' was finished'
+		print('Goal ' + goal.getName() + ' was finished')
 
 	def collectEnemyFinished(self):
 		for goal in self.__available_goals:
 			if goal.isFinished():
-				print 'Goal ' + goal.getName() + ' has been calculated accomplished by the enemy'
+				print('Goal ' + goal.getName() + ' has been calculated accomplished by the enemy')
 				self.__finishGoal(goal)
 
 	# XML import and export of goals
 	def loadGoals(self, filename="goals/goals.xml"):
-		print 'GoalsManager: loading goals from: %s' % filename
+		print('GoalsManager: loading goals from: %s' % filename)
 		fd = open(filename,'r')
 		dom = parseString(fd.read())
 		fd.close()
@@ -106,7 +106,7 @@ class GoalsManager:
 				self.__available_goals.append(goal)
 	
 	def saveGoals(self, filename='../log/saved_goals.xml'):
-		print 'GoalsManager: saving goals to: ' + filename
+		print('GoalsManager: saving goals to: ' + filename)
 		string = "<goals>\n"
 		for list in [self.__available_goals, self.__blocked_goals, self.__finished_goals]:
 			for goal in list:
@@ -115,4 +115,4 @@ class GoalsManager:
 		doc = parseString(string) #Check XML validity
 		with open(filename, "w") as f:
 			f.write( doc.toxml() )
-    		f.close()
+			f.close()
