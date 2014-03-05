@@ -10,15 +10,15 @@ from . import parser_c
 from . import serial_comm
 from . import conversion
 import threading
+from constantes import *
 
 
 class CommunicationGlobale():
-	def __init__(self, constantes):
-		self.constantes = constantes
+	def __init__(self):
 		self.nbTimeoutPaquets=0
 		self.nbTransmitedPaquets = 0
+		self.empty_fifo = True
 
-		#on récupère les self.constantes
 
 		self.address = {}
 		self.orders = {}
@@ -63,11 +63,11 @@ class CommunicationGlobale():
 		self.nbUnconfirmedPacket = [(0, -1)]*(self.nbAddress+1) # (nbUnconfimed, dateFirstUnconfirmed)
 		
 		
+		if ENABLE_TOURELLE or ENABLE_TIBOT:
+			self.liaisonXbee = serial_comm.ComSerial(PORT_XBEE, VITESSE_XBEE, PARITY_XBEE)
+		if ENABLE_FLUSSMITTEL:
+			self.liaisonArduino = serial_comm.ComSerial(PORT_OTHER, VITESSE_OTHER, PARITY_OTHER)
 
-		if (self.constantes.ENABLE_TOURELLE or self.constantes.ENABLE_TIBOT):
-			self.liaisonXbee = serial_comm.ComSerial(self.constantes.PORT_XBEE, self.constantes.VITESSE_XBEE, self.constantes.PARITY_XBEE)
-		if self.constantes.ENABLE_FLUSSMITTEL:
-			self.liaisonArduino = serial_comm.ComSerial(self.constantes.PORT_OTHER, self.constantes.VITESSE_OTHER, self.constantes.PARITY_OTHER)
 
 		#defines de threads
 		self.lastHighPrioTaskDate = 0
@@ -106,28 +106,28 @@ class CommunicationGlobale():
 						#Thread
 
 	def gestion(self):
-		while self.constantes.THREAD_ACTIF:
+		while THREAD_ACTIF:
 			date = int(time.time()*1000)
 			
 			#tâches de hautes priotités
-			if (date - self.lastHighPrioTaskDate) > self.constantes.HIGH_PRIO_SPEED:
+			if (date - self.lastHighPrioTaskDate) > HIGH_PRIO_SPEED:
 				self.lastHighPrioTaskDate = date
 
 				#Lecture des entrées
-				if self.constantes.READ_INPUT == True:
+				if READ_INPUT == True:
 					self.mutexOrdersToRead.acquire()
 					self.ordersToRead += self.readOrders()
 					self.mutexOrdersToRead.release()
 
 				#Renvoie des ordres non confirmés
-				if self.constantes.RENVOI_ORDRE == True:
+				if RENVOI_ORDRE == True:
 					for address in self.address:
 						if isinstance(address, (int)):
 							indiceARenvoyer = self.getAllUnknowledgeId(address)
 							if len(indiceARenvoyer) > 0:
 
 								#procedure de renvoi immediat dans le cas où l'arduino indique une erreur
-								if self.constantes.renvoiImmediat == True:
+								if renvoiImmediat == True:
 									if self.nbRenvoiImmediat[address] != 0:
 										for i in range(self.nbRenvoiImmediat[address]):
 											if i < len(indiceARenvoyer):
@@ -144,7 +144,7 @@ class CommunicationGlobale():
 										self.nbRenvoiImmediat[address] = 0
 
 								#procedure de renvoi en cas de TIMEOUT
-								if (date - self.nbUnconfirmedPacket[address][1]) > self.constantes.TIMEOUT and self.nbUnconfirmedPacket[address][1] != -1:
+								if (date - self.nbUnconfirmedPacket[address][1]) > TIMEOUT and self.nbUnconfirmedPacket[address][1] != -1:
 									for indice in indiceARenvoyer:
 										self.nbTimeoutPaquets += 1
 										print("WARNING: Renvoie après TIMEOUT de l'ordre: ", self.orders[self.ordreLog[address][indice][0]], "d'idd ", indice, "au robot ", self.address[address], "binaire :", self.ordreLog[address][indice])
@@ -153,32 +153,32 @@ class CommunicationGlobale():
 										self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0], date)
 										self.lastIdSend[address] = indice
 				#Ecriture des ordres
-				if self.constantes.WRITE_OUTPUT == True:
+				if WRITE_OUTPUT == True:
 					self.sendOrders()
 									
 			#tâche de faibles priorités
-			if (date - self.lastLowPrioTaskDate) > self.constantes.LOW_PRIO_SPEED:
+			if (date - self.lastLowPrioTaskDate) > LOW_PRIO_SPEED:
 				self.lastLowPrioTaskDate = date
 
 				#recherche d'arduino
-				if self.constantes.PROBING_DEVICES == True:
+				if PROBING_DEVICES == True:
 					for address in self.address:
 						if isinstance(address, (int)):
 							if self.arduinoIdReady[address] == False:
 								self.askResetId(address)
 
 				#Verification de la liaison avec les arduinos
-				if self.constantes.KEEP_CONTACT == True:# On envoie un PING pour verifier si le device est toujours présent
+				if KEEP_CONTACT == True:# On envoie un PING pour verifier si le device est toujours présent
 					for address in self.address:
 						if isinstance(address, (int)):
 							if self.arduinoIdReady[address] != False:
-								if (date - self.lastConfirmationDate[address]) > self.constantes.OFF_LIGNE_TIMEOUT and (date - self.arduinoIdReady[address]) > self.constantes.OFF_LIGNE_TIMEOUT:#le système est considere comme hors ligne
+								if (date - self.lastConfirmationDate[address]) > OFF_LIGNE_TIMEOUT and (date - self.arduinoIdReady[address]) > OFF_LIGNE_TIMEOUT:#le système est considere comme hors ligne
 									print("L'arduino", self.address[address], "va être reset car elle a depasser le TIMEOUT")
 									self.arduinoIdReady[address] = False
-								elif (date - self.lastSendDate[address]) > self.constantes.KEEP_CONTACT_TIMEOUT:
+								elif (date - self.lastSendDate[address]) > KEEP_CONTACT_TIMEOUT:
 									self.sendOrderAPI(address, self.orders['PINGPING_AUTO'])
 
-			waitBeforeNextExec = (self.constantes.HIGH_PRIO_SPEED -(int(time.time()*1000) - date))
+			waitBeforeNextExec = (HIGH_PRIO_SPEED -(int(time.time()*1000) - date))
 			if waitBeforeNextExec < 1:
 				print("Warning: La boucle de pool de communication n'est pas assez rapide ", waitBeforeNextExec)
 			else:
@@ -186,13 +186,13 @@ class CommunicationGlobale():
 
 
 	def stopGestion(self):
-		self.constantes.THREAD_ACTIF = False
+		THREAD_ACTIF = False
 
 
 	def sendMessage(self, address, data):
-		if (address == self.address['ADDR_FLUSSMITTEL_OTHER'] or address == self.address['ADDR_FLUSSMITTEL_ASSERV']) and self.constantes.ENABLE_FLUSSMITTEL: 
+		if (address == self.address['ADDR_FLUSSMITTEL_OTHER'] or address == self.address['ADDR_FLUSSMITTEL_ASSERV']) and ENABLE_FLUSSMITTEL: 
 			self.liaisonArduino.send(data)
-		elif (self.constantes.ENABLE_TOURELLE or self.constantes.ENABLE_TIBOT):
+		elif ENABLE_TOURELLE or ENABLE_TIBOT:
 			self.liaisonXbee.send(data)
 
 
@@ -359,10 +359,10 @@ class CommunicationGlobale():
 	def getXbeeOrders(self):
 		rawInputList = []
 		""" retourne ordersList, une liste d'élements sous la forme(adresse, id, data) où data est prêt à être interpréter"""
-		if (self.constantes.ENABLE_TOURELLE or self.constantes.ENABLE_TIBOT):
+		if ENABLE_TOURELLE or ENABLE_TIBOT:
 			rawInputList += self.liaisonXbee.read()
 
-		if self.constantes.ENABLE_FLUSSMITTEL:
+		if ENABLE_FLUSSMITTEL:
 			rawInputList += self.liaisonArduino.read()
 
 		ordersList = deque()
@@ -405,7 +405,7 @@ class CommunicationGlobale():
 							lastIdToAccept = unconfirmedIds[i]
 						else:
 							returnMissed = True
-						if i > self.constantes.MAX_UNCONFIRMED_PACKET:
+						if i > MAX_UNCONFIRMED_PACKET:
 							print("ERREUR CODE: ce cas ne devrait pas arriver")
 						i +=1
 
@@ -493,7 +493,7 @@ class CommunicationGlobale():
 		#gestion du cas particulier où l'arduino a perdue un paquet, en effet il faut d'abbord lui renvoyer les autres paquets perdue avant d'en envoyer des nouveau
 		for address in self.address:
 			if isinstance(address, (int)):
-				while self.nbNextRenvoiImmediat[address] > 0 and self.nbUnconfirmedPacket[address][0] < self.constantes.MAX_UNCONFIRMED_PACKET:
+				while self.nbNextRenvoiImmediat[address] > 0 and self.nbUnconfirmedPacket[address][0] < MAX_UNCONFIRMED_PACKET:
 					print("Warning: procédure de renvoi après un renvoi immediat sur l'arduino", self.address[address], "du paquets d'id", self.getNextIdOfId(self.lastIdSend[address]))
 					self.sendMessage(address, self.ordreLog[address][self.getNextIdOfId(self.lastIdSend[address])][1])
 					self.nbNextRenvoiImmediat[address] -= 1
@@ -506,7 +506,7 @@ class CommunicationGlobale():
 		self.mutexOrdersToSend.acquire()
 		for packet in self.ordersToSend:#packet contient(address, ordre, *argument)
 			#si il n'y a pas déjà trop d'ordres en atente on envoi
-			if self.nbUnconfirmedPacket[packet[0]][0] < self.constantes.MAX_UNCONFIRMED_PACKET:
+			if self.nbUnconfirmedPacket[packet[0]][0] < MAX_UNCONFIRMED_PACKET:
 				address = packet[0]
 				order = packet[1]
 				self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0]+1, date)
@@ -525,8 +525,8 @@ class CommunicationGlobale():
 		self.ordersToSend = remainOrdersToSend
 		self.mutexOrdersToSend.release()
 
-		if len(remainOrdersToSend) == 0 and not self.constantes.EMPTY_FIFO:
-			self.constantes.EMPTY_FIFO = True
+		if len(remainOrdersToSend) == 0 and not self.empty_fifo:
+			self.empty_fifo = True
 			print("Fin de transmission de la file, (t = "+str(int(time.time()*1000)-self.timeStartProcessing)+"ms),nombre de paquets reçu", self.nbTransmitedPaquets," nombre de paquets perdu", self.nbTimeoutPaquets)
 		
 
@@ -616,8 +616,8 @@ class CommunicationGlobale():
 	def sendOrderAPI(self, address, order, *arguments):
 		""""api d'envoie d'ordres avec verification des parametres, retourne -1 en cas d'erreur, sinon 0"""
 		
-		if self.constantes.EMPTY_FIFO == True and order != self.orders['PINGPING_AUTO']:
-			self.constantes.EMPTY_FIFO = False 
+		if self.empty_fifo == True and order != self.orders['PINGPING_AUTO']:
+			self.empty_fifo = False 
 			self.timeStartProcessing = int(time.time()*1000)
 
 		#on verifie l'address

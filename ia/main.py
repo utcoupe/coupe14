@@ -8,19 +8,19 @@ import sys
 import time
 
 #Nos fichiers
+import communication
+import data
 import constantes
-from communication import communicationGlobale
-from data import data
-from goals import goalsManager
-import gestionTemps
+import goals
 
-ObjetCommunication = communicationGlobale.CommunicationGlobale(constantes)
-arduino_constantes = ObjetCommunication.getConst()
+
+Communication = communication.CommunicationGlobale()
+arduino_constantes = Communication.getConst()
 time.sleep(2) # on attend que les communications s'établissent
 
 
 #On teste si les systèmes demandés sont bien en lignes
-ready_list = ObjetCommunication.getSystemReady()
+ready_list = Communication.getSystemReady()
 if constantes.ENABLE_FLUSSMITTEL and ( ('ADDR_FLUSSMITTEL_OTHER' not in ready_list) or ('ADDR_FLUSSMITTEL_ASSERV' not in ready_list) ):
 	print("ERREUR: Incohérence de communication avec le gros robot, ENABLE_FLUSSMITTEL:", constantes.ENABLE_FLUSSMITTEL, "USE_ARDUINO:",constantes.USE_ARDUINO,"ready_list:", ready_list)
 	exit()
@@ -33,6 +33,6 @@ if constantes.ENABLE_TOURELLE and 'ADDR_HOKUYO' not in ready_list:
 print("Le protocole a bien demarré.")
 
 
-Data = data.Data(ObjetCommunication, constantes, arduino_constantes)
+Data = data.Data(Communication, arduino_constantes)
 GoalsManager = goalsManager.GoalsManager()
 GestionTemps = gestionTemps.GestionTemps(Data)

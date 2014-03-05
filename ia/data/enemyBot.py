@@ -3,18 +3,21 @@
 Classe pour les robots adverses
 """
 
-
+from constantes import *
+from math import sqrt
 
 class EnemyBot():
-	def __init__(self, constantes, largeur, longueur, rayon):
+	def __init__(self, rayon):
 		#Constants
-		self.largeur = largeur
-		self.longueur = longueur
-		self.rayon = rayon
+		self.__rayon = rayon
+
 
 		#Valeurs récupérées (read-only)
-		self.positionX = 0
-		self.positionY = 0
+		self.__positionX = 0
+		self.__positionY = 0
 
-	def getPositon(self):
-		return (self.positionX, self.positionY)
+	def getPosition(self):
+		return (self.__positionX, self.__positionY)
+	def getRayon(self):
+		return self.__rayon
+
