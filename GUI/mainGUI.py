@@ -7,21 +7,20 @@ import sys
 import os
 import time
 
-lib_path = os.path.abspath('./ia')
+lib_path = os.path.abspath('../ia')
 sys.path.append(lib_path)
 
 #Nos fichiers
-from communication import communicationGlobale
-from data import data
-import constantes
+import communication
+import data
+import guiCommande
 
-Constantes = constantes.Constantes()
-ObjetCommunication = communicationGlobale.CommunicationGlobale(Constantes)
-arduino_constantes = ObjetCommunication.getConst()
+ObjetCommunication = communication.CommunicationGlobale()
+ObjetCommunication.enableDebug()
 
 time.sleep(1000/1000.0)
 print("INFO: La communication est prête")
-data = data.Data(ObjetCommunication, Constantes, arduino_constantes)
+guiCommande.gui(ObjetCommunication)
 
 try:
 	while True:
