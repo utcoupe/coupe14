@@ -64,9 +64,9 @@ class CommunicationGlobale():
 		
 		
 
-		if self.constantes.USE_XBEE:
+		if (self.constantes.ENABLE_TOURELLE or self.constantes.ENABLE_TIBOT):
 			self.liaisonXbee = serial_comm.ComSerial(self.constantes.PORT_XBEE, self.constantes.VITESSE_XBEE, self.constantes.PARITY_XBEE)
-		if self.constantes.USE_ARDUINO:
+		if self.constantes.ENABLE_FLUSSMITTEL:
 			self.liaisonArduino = serial_comm.ComSerial(self.constantes.PORT_OTHER, self.constantes.VITESSE_OTHER, self.constantes.PARITY_OTHER)
 
 		#defines de threads
@@ -93,7 +93,14 @@ class CommunicationGlobale():
 
 		return dico
 
-		
+	def getSystemReady(self):
+		readyList = ()
+		for address in self.address:
+			if isinstance(address, (int)):
+				if self.arduinoIdReady[address]:
+					readyList += (self.address[address])
+
+		return readyList
 			
 
 						#Thread
@@ -183,10 +190,9 @@ class CommunicationGlobale():
 
 
 	def sendMessage(self, address, data):
-		if (address == self.address['ADDR_FLUSSMITTEL_OTHER'] or address == self.address['ADDR_FLUSSMITTEL_ASSERV']) and self.constantes.USE_ARDUINO: 
+		if (address == self.address['ADDR_FLUSSMITTEL_OTHER'] or address == self.address['ADDR_FLUSSMITTEL_ASSERV']) and self.constantes.ENABLE_FLUSSMITTEL: 
 			self.liaisonArduino.send(data)
-		elif self.constantes.USE_XBEE:
-
+		elif (self.constantes.ENABLE_TOURELLE or self.constantes.ENABLE_TIBOT):
 			self.liaisonXbee.send(data)
 
 
@@ -353,10 +359,10 @@ class CommunicationGlobale():
 	def getXbeeOrders(self):
 		rawInputList = []
 		""" retourne ordersList, une liste d'élements sous la forme(adresse, id, data) où data est prêt à être interpréter"""
-		if self.constantes.USE_XBEE:
+		if (self.constantes.ENABLE_TOURELLE or self.constantes.ENABLE_TIBOT):
 			rawInputList += self.liaisonXbee.read()
 
-		if self.constantes.USE_ARDUINO:
+		if self.constantes.ENABLE_FLUSSMITTEL:
 			rawInputList += self.liaisonArduino.read()
 
 		ordersList = deque()

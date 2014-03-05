@@ -23,10 +23,10 @@ class Data():
 
 		#Instantation des objets
 		if self.Constantes.ENABLE_FLUSSMITTEL == True:
-			self.Flussmittel = ourBot.OurBot(Constantes, Communication, arduino_constantes, 'ADDR_FLUSSMITTEL_OTHER', 'ADDR_FLUSSMITTEL_ASSERV', Constantes.LARGEUR_FLUSSMITTEL, Constantes.LONGUEUR_FLUSSMITTEL)
+			self.Flussmittel = ourBot.OurBot(Constantes, Communication, arduino_constantes, 'ADDR_FLUSSMITTEL_OTHER', 'ADDR_FLUSSMITTEL_ASSERV', Constantes.LARGEUR_FLUSSMITTEL, Constantes.LONGUEUR_FLUSSMITTEL, Constantes.RAYON_FLUSSMITTEL)
 
 		if self.Constantes.ENABLE_TIBOT == True:
-			self.Tibot = ourBot.OurBot(Constantes, Communication, arduino_constantes, 'ADDR_TIBOT_OTHER', 'ADDR_TIBOT_ASSERV', Constantes.LARGEUR_TIBOT, Constantes.LONGUEUR_TIBOT)
+			self.Tibot = ourBot.OurBot(Constantes, Communication, arduino_constantes, 'ADDR_TIBOT_OTHER', 'ADDR_TIBOT_ASSERV', Constantes.LARGEUR_TIBOT, Constantes.LONGUEUR_TIBOT, Constantes.RAYON_TIBOT)
 
 		if self.Constantes.NUMBER_OF_ENEMY >= 1:
 			self.SmallEnemyBot = enemyBot.EnemyBot(Constantes, Constantes.LARGEUR_BIG_ENEMY, Constantes.LONGUEUR_BIG_ENEMY)

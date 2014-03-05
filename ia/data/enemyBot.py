@@ -6,10 +6,11 @@ Classe pour les robots adverses
 
 
 class EnemyBot():
-	def __init__(self, constantes, largeur, longueur):
+	def __init__(self, constantes, largeur, longueur, rayon):
 		#Constants
 		self.largeur = largeur
 		self.longueur = longueur
+		self.rayon = rayon
 
 		#Valeurs récupérées (read-only)
 		self.positionX = 0

@@ -5,7 +5,7 @@ Classe pour nos robots
 
 
 class OurBot():
-	def __init__(self, constantes, communication, arduinoConstantes, addressOther, addressAsserv, largeur, longueur):
+	def __init__(self, constantes, communication, arduinoConstantes, addressOther, addressAsserv, largeur, longueur, rayon):
 		#Constantes
 		self.communication = communication
 		self.addressOther = addressOther
@@ -13,6 +13,7 @@ class OurBot():
 
 		self.largeur = largeur 
 		self.longueur = longueur
+		self.rayon = rayon
 
 
 		#Valeurs récupérées (read-only)
