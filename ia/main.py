@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Fichier principale, demarre l'ia
 """
@@ -9,9 +10,12 @@ import time
 #Nos fichiers
 from communication import communicationGlobale
 import data
+import constantes
+from goals import goalsManager
 
 ObjetCommunication = communicationGlobale.CommunicationGlobale()
 arduino_constantes = ObjetCommunication.getConst()
+goalsManager = goalsManager.GoalsManager()
 
 time.sleep(1000/1000.0)
 print("INFO: La communication est prête")

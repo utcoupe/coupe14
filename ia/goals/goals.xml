@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<goals>
+	<goal name='getFire1'>
+		<type>fire</type>
+		<finished>20</finished>
+		<location-x>0.0</location-x>
+		<location-y>0.0</location-y>
+		<executions>
+			<execution>
+				<points>1</points>
+				<priority>1</priority>
+				<location-x>0.0</location-x>
+				<location-y>0.0</location-y>
+				<orientation>0</orientation>
+				<time>1</time>
+				<actions>
+					<action>example1</action>
+					<action>example2</action>
+				</actions>
+			</execution>
+		</executions>
+	</goal>
+</goals>
