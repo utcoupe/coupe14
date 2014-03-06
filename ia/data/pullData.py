@@ -22,12 +22,10 @@ class PullData():
 		self.PULL_PERIODE = PULL_PERIODE
 
 		self.pull_data = True
-		self.__position_flussimttel_asked = False
 		self.__id_flussmittel_other_asked = False
-		self.__id_flussmittel_asserv_asked = False
-		self.__position_tibot_asked = False
+		self.__data_flussmittel_asserv_asked = False
 		self.__id_tibot_other_asked = False
-		self.__id_tibot_asserv_asked = False
+		self.__data_tibot_asserv_asked = False
 		self.tourelle_asked = False
 
 		self.ThreadPull = threading.Thread(target=self.gestion)
@@ -46,30 +44,22 @@ class PullData():
 		arguments = []
 
 		if self.Flussmittel != None:
-			if self.__position_flussimttel_asked == False:
-				self.Communication.sendOrderAPI(self.address_flussmittel_asserv, 'A_GET_POS', *arguments)
-				self.__position_flussimttel_asked = True
-
 			if __id_flussmittel_other_asked == False:
-				self.Communication.sendOrderAPI(self.address_flussmittel_other, )
+				self.Communication.sendOrderAPI(self.address_flussmittel_other, 'GET_LAST_ID', *arguments)
 				self.__id_flussmittel_other_asked = True
 
-			if __id_flussmittel_asserv_asked == False:
-				self.Communication.sendOrderAPI(self.address_flussmittel_other, )
-				self.__id_flussmittel_asserv_asked = True
+			if __data_flussmittel_asserv_asked == False:
+				self.Communication.sendOrderAPI(self.address_flussmittel_asserv, 'A_GET_POS_ID', *arguments)
+				self.__data_flussmittel_asserv_asked = True
 
 		if self.Tibot != None:
-			if self.__position_tibot_asked == False:
-				self.Communication.sendOrderAPI(self.address_tibot_asserv, 'A_GET_POS', *arguments)
-				self.__position_tibot_asked = True
-
 			if self.__id_tibot_other_asked == False:
-				self.Communication.sendOrderAPI(self.address_tibot_other, 'A_GET_POS', *arguments)
+				self.Communication.sendOrderAPI(self.address_tibot_other, 'GET_LAST_ID', *arguments)
 				self.__id_tibot_other_asked = True
 
-			if self.__id_tibot_asserv_asked == False:
-				self.Communication.sendOrderAPI(self.address_tibot_asserv, 'A_GET_POS', *arguments)
-				self.__id_tibot_asserv_asked = True
+			if self.__data_tibot_asserv_asked == False:
+				self.Communication.sendOrderAPI(self.address_tibot_asserv, 'A_GET_POS_ID', *arguments)
+				self.__data_tibot_asserv_asked = True
 
 		if self.tourelle_asked == False:
 			self.Communication.sendOrderAPI(self.address_tourelle, 'GET_HOKUYO', *arguments)
