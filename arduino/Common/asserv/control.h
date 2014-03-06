@@ -32,8 +32,6 @@ class Control{
 	void setErrorUseI_angle(float I);
 	void setErrorUseI_distance(float I);
 	
-	//gestion de l'offset. Attention, il faut modifier les PIDs !
-	void setConsigneOffset(int n_offset);
 	void setMaxAngCurv(float n_max_ang);
 	void setMaxAcc(float n_max_acc);
 

@@ -21,7 +21,6 @@ Control::Control(){
 	setPID_distance(DIS_P, DIS_I, DIS_D);
 	setErrorUseI_angle(ANG_AWU);
 	setErrorUseI_distance(DIS_AWU);
-	setConsigneOffset(CONSIGNE_OFFSET);
 	max_angle = MAX_ANGLE;
 	setMaxAcc(ACC_MAX);
 
@@ -170,10 +169,6 @@ void Control::setPID_distance(float n_P, float n_I, float n_D){
 	PID_Distance.setPID(n_P, n_I / FREQ, n_D * FREQ);
 }
 
-void Control::setConsigneOffset(int n_offset){
-	consigne_offset = n_offset;
-}
-
 void Control::setMaxAngCurv(float n_max_ang){
 	max_angle = n_max_ang;
 }
@@ -221,18 +216,6 @@ void Control::resume(){
 /********** PRIVATE **********/
 
 void Control::setConsigne(float consigne_left, float consigne_right){
-	//Ajout des pwm minimale : "shift" des pwm
-	if(consigne_offset != 0){
-		if(consigne_right > 0)
-			consigne_right += consigne_offset;
-		else if(consigne_right < 0)
-			consigne_right -= consigne_offset;
-		if(consigne_left > 0)
-			consigne_left += consigne_offset;
-		else if(consigne_left < 0)
-			consigne_left -= consigne_offset;
-	}
-
 	//Tests d'overflow
 	check_max(&consigne_left);
 	check_max(&consigne_right);
