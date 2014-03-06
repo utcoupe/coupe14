@@ -452,7 +452,7 @@ class CommunicationGlobale():
 
 					returnOrders.append((self.address[address], self.orders[self.ordreLog[address][idd][0]], arguments))
 
-					if len(arguments) > 0 and __enable_debug == True:
+					if len(arguments) > 0 and self.__enable_debug == True:
 						print("Retour :", arguments)
 
 			else:
