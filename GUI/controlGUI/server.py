@@ -1,23 +1,25 @@
 # -*- coding: utf-8 -*-
 
 import sys
-sys.path.append('../ia/')
+sys.path.append('../../ia/')
 
-from communication import communicationGlobale
+import communication
 from socket import *
 
 myHost = ''
 myPort = 2001
 
 #init comm
-com = communicationGlobale.communicationGlobale("/dev/ttyUSB0", 57600, "ODD", "/dev/ttymxc3", 115200, "NONE")
+com = communication.CommunicationGlobale()
 sock = socket(AF_INET, SOCK_STREAM)    # create a TCP socket
 sock.bind((myHost, myPort))            # bind it to the server port
 sock.listen(5)                         # allow 5 simultaneous
 
 while 1:
 	# wait for next client to connect
+	print("Ready, waiting for socket connection")
 	connection, address = sock.accept() # connection is a new socket
+	print("Connection established")
 	while 1:
 		data_rec = connection.recv(1024) # receive up to 1K bytes
 		if data_rec:
