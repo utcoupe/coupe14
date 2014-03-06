@@ -98,7 +98,7 @@ class CommunicationGlobale():
 		for address in self.address:
 			if isinstance(address, (int)):
 				if self.arduinoIdReady[address]:
-					readyList += (self.address[address])
+					readyList += (self.address[address],)
 
 		return readyList
 			

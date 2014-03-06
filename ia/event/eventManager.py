@@ -52,22 +52,22 @@ class EventManager():
 				#TODO call collision
 
 		if self.__Flussmitel != None:
-			new_id = self.__Flussmitel.getNextIdOrder()
+			new_id = self.__Flussmitel.getLastIdOrderReceived()
 			if new_id != self.__last_flussmitel_order_finished:
 				self.__last_flussmitel_order_finished = new_id
 				if self.__last_flussmitel_order_finished == self.__id_to_reach_flussmitel:
 					self.pushOrders(self.__Flussmitel, self.__Flussmitel.getNextOrders())
 
 		if self.__Tibot != None:
-			new_id = self.__Tibot.getNextIdOrder()
+			new_id = self.__Tibot.getLastIdOrderReceived()
+			print("id", new_id)
 			if new_id != self.__last_tibot_order_finished:
 				self.__last_tibot_order_finished = new_id
 				if self.__last_tibot_order_finished == self.__id_to_reach_tibot:
 					self.pushOrders(self.__Tibot, self.__Tibot.getNextOrders())
 
-	def pushOrders(self, objet, data_objectif):
-		orders = data_objectif[1]
-		last_order = orders.pop()
+	def pushOrders(self, objet, data_objectif): #data_objectif est de type ((id_action, ordre, arguments),...)
+		last_order = data_objectif.pop()
 
 		name = objet.getName()
 		if name == 'FLUSSMITTEL':
@@ -75,15 +75,12 @@ class EventManager():
 		elif name == 'TIBOT':
 			self.__last_tibot_order_finished = last_order[0] - 1
 
-		if last_order[1][0] == 'FIN':
-			#TODO appel manager objectif
-			#manager(data_objectif[0], 'FIN', Data)
-			pass
-		elif last_order[1][0] == 'SLEEP':
+
+		if last_order[1] == 'SLEEP':
 			#TODO call time manager
 			pass
 
-		self.sendOrders(objet, orders)
+		self.sendOrders(objet, data_objectif)
 
 
 	def sendOrders(self, objet, orders):

@@ -22,9 +22,10 @@ class OurBot():
 		self.positionX = 0
 		self.positionY = 0
 		self.angle = 0.0
+		self.__last_id_order_received = None
 
 		#Variables
-		self.__objectifs = None #[(id, ((id_action, ordre, arguments), (id_action, ordre, arguments), ...)), ...]
+		self.__objectifs = None #((id, ((id_action, ordre, arguments), (id_action, ordre, arguments), ...)), ...)
 
 	#Getter
 	def getPositon(self):
@@ -32,6 +33,10 @@ class OurBot():
 
 	def getName(self):
 		return self.__name
+
+	def getLastIdOrderReceived(self):
+		return self.__last_id_order_received
+
 
 	def loadActionScript(self, filename):
 		print(self.__name,": loading actionScript from:", filename)
@@ -53,7 +58,6 @@ class OurBot():
 
 			objectif.append((idd, data_objectif))
 
-		print(objectif)
 		self.__objectifs = objectif
 
 	#utilise les données en provenance de nos robots pour mettre à jour les données de la classe
@@ -64,29 +68,29 @@ class OurBot():
 
 	def getNextIdOrder(self):
 		if self.__objectifs != None:
-			return (self.__objectifs[0][0], self.__objectifs[0][3][0]) #(id_objectif_0, id_action_0_de_objcetif_0)
+			return (self.__objectifs[0][0], self.__objectifs[0][1][0]) #(id_objectif_0, id_action_0_de_objcetif_0)
 		else:
 			return None
 
 	def getNextOrders(self):
 		if self.__objectifs != None:
 			objectif_en_cours = self.objectifs.popleft()
-			output_finale = []
-			output_finale += objectif_en_cours[0]
-			order_of_objectif = objectif_en_cours[1]
+			order_of_objectif = objectif_en_cours[1] # type ((id_action, ordre, arguments),...)
 
-			data_order = order_of_objectif.pop()
+			data_order = order_of_objectif.popleft() #type (id_action, ordre, arguments)
 			output_temp = deque()
 			output_temp.append(data_order)
-			while data_order[1][0] != 'SLEEP' or data_order[1][0] != 'THEN' or data_order[1][0] != 'FIN':
+			while data_order[1] != 'SLEEP' or data_order[1] != 'THEN' or data_order[1] != 'FIN':
 				data_order = order_of_objectif.popleft()
 				output_temp.append(data_order)
 
-			if data_order[1][0] != 'FIN':
+			if data_order[1] != 'FIN':
 				self.__objectifs.appendleft(objectif_en_cours)
+			else:
+				#TODO tell objectifManager this objectif is over
+				pass
 
-			output_finale += output_temp
-			return output_finale
+			return output_temp # type ((id_action, ordre, arguments),...)
 
 		else:
 			return None
