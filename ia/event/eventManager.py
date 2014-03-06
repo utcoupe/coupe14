@@ -9,8 +9,19 @@ import time
 from constantes import *
 
 class EventManager():
-	def __init__(self, MetaData):
-		self.__MetaData = MetaData
+	def __init__(self, Data):
+		self.__Flussmitel = Data.Flussmittel
+		self.__Tibot = Data.Tibot
+		self.__Tourelle = Data.Tourelle
+		self.__MetaData = Data.MetaData
+
+		self.__last_hokuyo_data = None
+		self.__last_flussmitel_order_finished = None	#id_action
+		self.__id_to_reach_flussmitel = None
+		self.__last_tibot_order_finished = None			#id_action
+		self.__id_to_reach_tibot = None
+
+
 		self.__managerThread = threading.Thread(target=self.managerLoop)
 		self.__managerThread .start()
 
@@ -34,4 +45,48 @@ class EventManager():
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
 	def checkEvent(self):
-		print(self.__MetaData.getGameClock(), self.__MetaData.getInGame(), self.__MetaData.getInFunnyAction())
+		if self.__Tourelle != None:
+			new_data = self.__Tourelle.getLastDataPosition()
+			if new_data != self.__last_hokuyo_data:
+				self.__last_hokuyo_data = new_data
+				#TODO call collision
+
+		if self.__Flussmitel != None:
+			new_id = self.__Flussmitel.getNextIdOrder()
+			if new_id != self.__last_flussmitel_order_finished:
+				self.__last_flussmitel_order_finished = new_id
+				if self.__last_flussmitel_order_finished == self.__id_to_reach_flussmitel:
+					self.pushOrders(self.__Flussmitel, self.__Flussmitel.getNextOrders())
+
+		if self.__Tibot != None:
+			new_id = self.__Tibot.getNextIdOrder()
+			if new_id != self.__last_tibot_order_finished:
+				self.__last_tibot_order_finished = new_id
+				if self.__last_tibot_order_finished == self.__id_to_reach_tibot:
+					self.pushOrders(self.__Tibot, self.__Tibot.getNextOrders())
+
+	def pushOrders(self, objet, data_objectif):
+		orders = data_objectif[1]
+		last_order = orders.pop()
+
+		name = objet.getName()
+		if name == 'FLUSSMITTEL':
+			self.__last_flussmitel_order_finished = last_order[0] - 1
+		elif name == 'TIBOT':
+			self.__last_tibot_order_finished = last_order[0] - 1
+
+		if last_order[1][0] == 'FIN':
+			#TODO appel manager objectif
+			#manager(data_objectif[0], 'FIN', Data)
+			pass
+		elif last_order[1][0] == 'SLEEP':
+			#TODO call time manager
+			pass
+
+		self.sendOrders(objet, orders)
+
+
+	def sendOrders(self, objet, orders):
+		print("objet", objet, "orders", orders)
+		#TODO call comm API
+		
