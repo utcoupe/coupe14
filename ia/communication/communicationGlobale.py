@@ -248,7 +248,7 @@ class CommunicationGlobale():
 		self.mutexOrdersToSend.acquire()
 		for packet in self.ordersToSend:
 			if packet[0] != address:
-				remainOrdersToSend.append(packet)
+				remainOrdersToSend.appendleft(packet)
 			else:
 				print("ERREUR: drop de l'ordre",self.orders[ packet[1]], " par l'arduino", self.address[ packet[0]], "suite à un reset")
 		self.ordersToSend = remainOrdersToSend
@@ -429,7 +429,7 @@ class CommunicationGlobale():
 						temp = bin(octet)[2:].zfill(7)
 						argumentData += temp
 
-					arguments = []
+					arguments = deque()
 					index = 0
 					for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
 						if returnType == 'int':
@@ -523,7 +523,7 @@ class CommunicationGlobale():
 				#print("Envoi normal a l'arduino", self.address[address], "de l'ordre", self.orders[order], "d'id", idd)
 				self.sendMessage(address, chaineTemp)
 			else:
-				remainOrdersToSend.append(packet)
+				remainOrdersToSend.appendleft(packet)
 
 		self.ordersToSend = remainOrdersToSend
 		self.mutexOrdersToSend.release()
@@ -645,7 +645,7 @@ class CommunicationGlobale():
 		if address == 'all':
 			self.mutexOrdersToRead.acquire()
 			try:
-				orderToReturn = self.ordersToRead.pop()
+				orderToReturn = self.ordersToRead.popleft()
 				find = True
 			except:
 				find = False
@@ -660,7 +660,7 @@ class CommunicationGlobale():
 			self.mutexOrdersToRead.acquire()
 			
 			while len(self.ordersToRead) > 0:
-				order = self.ordersToRead.pop()
+				order = self.ordersToRead.popleft()
 				if (order[0] == address or order[0] == self.address[address] or address == 'all') and find == False:
 					find = True
 					orderToReturn = order
@@ -669,6 +669,6 @@ class CommunicationGlobale():
 			self.mutexOrdersToRead.release()
 
 		if find:
-			return (orderToReturn[0], orderToReturn[1], orderToReturn[2])
+			return (orderToReturn[0], orderToReturn[1], orderToReturn[2]) #(address, order, arguments)
 		else:
 			return -1
