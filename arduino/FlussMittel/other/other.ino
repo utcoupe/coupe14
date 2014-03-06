@@ -9,7 +9,7 @@
 #include <Servo.h>
 #include <Arduino.h>
 
-#include "serial_decoder_forward.h"
+#include "serial_decoder.h"
 #include "serial_defines.h"
 #include "compat.h"
 #include "parameters.h"

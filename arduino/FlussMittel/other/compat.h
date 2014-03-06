@@ -10,8 +10,7 @@
 #include "serial_defines.h"
 
 #define LOCAL_ADDR ADDR_FLUSSMITTEL_OTHER //Ici l'adresse locale du client
-#define FORWARD_ADDR_ASSERV ADDR_FLUSSMITTEL_ASSERV
-#define FORWARD_ADDR_CAM ADDR_FLUSSMITTEL_CAM
+#define FORWARD_ADDR ADDR_FLUSSMITTEL_ASSERV
 
 void initPins();
 unsigned long timeMillis();

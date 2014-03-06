@@ -1,6 +1,6 @@
 /****************************************
  * Author : Quentin C			*
- * Mail : quentin.chateau@gmail.com	* 
+ * Mail : quentin.chateau@gmail.com	*
  * Date : 22/01/13			*
  ****************************************/
 #include "compat.h"
@@ -18,6 +18,7 @@ void executeCmd(char serial_data){
 	static int data_counter = 0;
 	static bool doublon = false;
 	static bool client_concerne = false;
+	static char forward_addr;
 
 	static enum etape etape = wait_step;
 
@@ -33,9 +34,19 @@ void executeCmd(char serial_data){
 				client_concerne = true;
 			}
 		}
+#ifdef FORWARD_ADDR
+		else if ((serial_data & 0x0F) == FORWARD_ADDR) {
+			forward_addr = serial_data & 0x0F;
+			etape = forward;
+			forward_serial_send(serial_data, forward_addr);
+		}
+		else if (serial_data == END && etape == forward) {
+			forward_serial_send(serial_data, forward_addr);
+			etape = wait_step;
+		}
+#endif
 		else if (serial_data == END && client_concerne) { //Fin de trame, execution de l'ordre
 			unsigned char data_8bits[MAX_DATA];
-
 			data_counter = decode(data, data_8bits, data_counter);
 			if(data_counter == -1){ //Si données invalides
 				PDEBUGLN("Data error : Données invalides");
@@ -48,8 +59,8 @@ void executeCmd(char serial_data){
 				}
 			}
 			etape = wait_step;
-			client_concerne = false;
 			doublon = false;
+			client_concerne = false;
 		}
 		else{ //Si fin de paquet ou packet non adressé au client
 			etape = wait_step;
@@ -71,19 +82,23 @@ void executeCmd(char serial_data){
 			else {
 				etape = wait_step;
 				client_concerne = false;//On ignore la suite
+				PDEBUG("Data error : ID attendu "); PDEBUG((int)ID_attendu); PDEBUG(", ID recu "); PDEBUGLN((int)ID_recu);
 				sendInvalid();
-				PDEBUGLN("Data error : ID incorrect");
 			}
 			break;
 		case data_step:
 			data[data_counter] = serial_data;
 			data_counter++;
 			break;
+#ifdef FORWARD_ADDR
+		case forward:
+			forward_serial_send(serial_data, forward_addr);
+			break;
+#endif
 		case wait_step:
 			break;
 		}
 	}
-
 }
 
 //decode permet de décoder les données recues par la protocole, de manièe complète (plusieurs ordres par tramme. En revanche, le décodage est BEAUCOUP plus long.
@@ -113,10 +128,8 @@ int decode(unsigned char *data_in, unsigned char *data_out, int data_counter_7){
     unsigned char ordre = data_out[0];
 	data_counter--; //On ne compte pas l'ordre dans le nbr d'octets
 
-	PDEBUG("offset = "); PDEBUGLN(offset);
-	PDEBUG("datac = "); PDEBUGLN(data_counter);
 	//Si on vient de décaler le dernier octet de 3 ou plus à gauche, l'octet forme suite au décalage à droite de 2 sera "incomplet", c'est à dire que l'octet est en réalité des bits perdus, il faut dropper cet octet
-	if(data_counter > 0 && (offset >= 3 || (offset == 0 && data_counter%8 != 6) ||(offset == 1 && data_counter%8 != 0)||(offset == 2 && data_counter%8 != 1))){
+	if(data_counter > 0 && (offset >= 3 || (offset == 0 && data_counter%7 != 6) ||(offset == 1 && data_counter%7 != 0)||(offset == 2 && data_counter%7 != 1))){
 		data_counter--;
 	}
 
@@ -194,7 +207,7 @@ void sendResponse(unsigned char *data, int data_counter, unsigned char id){
 	unsigned char data_7bits[MAX_DATA];
 	int i, size = 0;
 	size = encode(data, data_7bits, data_counter);
-	serial_send(LOCAL_ADDR | PROTOCOL_BIT); //debut de rep
+	serial_send(LOCAL_ADDR | PROTOCOL_BIT); //début de réponse
 	serial_send(id);
 	for(i = 0 ; i < size ; i++){
 		serial_send(data_7bits[i]); //contenu
@@ -224,6 +237,7 @@ void protocol_reset(){
 			}
 		}
 	}
+	PDEBUGLN("RESET");
 }
 
 void init_protocol(){
