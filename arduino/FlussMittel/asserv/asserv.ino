@@ -31,14 +31,14 @@ void setup(){
 	PDEBUGLN("INIT DONE");
 	// LED qui n'en est pas une
 	pinMode(22,OUTPUT);
-	digitalWrite(22, LOW);
+	digitalWrite(22, HIGH);
 }
 
 void loop(){
 	/* on note le temps de debut */
 	timeStart = micros();
 	if (timeStart - timeLED > 1000000) {
-		digitalWrite(22, LOW);
+		digitalWrite(22, HIGH);
 	}
 		
 	//Action asserv
@@ -56,10 +56,9 @@ void loop(){
 
 	/* On attend le temps qu'il faut pour boucler */
 	long udelay = DUREE_CYCLE*1000-(micros()-timeStart);
-	//Serial.println(udelay);
 	if(udelay<0) {
 		timeLED = timeStart;
-		digitalWrite(22, HIGH);
+		digitalWrite(22, LOW);
 		PDEBUGLN("ouch : mainloop trop longue");
 	}
 	else
