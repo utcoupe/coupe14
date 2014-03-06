@@ -27,11 +27,14 @@ while 1:
 			for data in data_rec:
 				data[0] = int(data[0])
 				#conversion data
-				if data[1] == 'A_GOTO': #deux float
+				if data[1] == 'A_GOTO': #deux int 
 					for i in range(2,len(data)):
 						data[i] = int(data[i])
-				elif data[1] == 'A_ROT':
+				elif data[1] == 'A_ROT' or data[1] == 'A_ACCMAX':
 					data[2] = float(data[2])
+				elif data[1] == 'A_PIDA' or data[1] == 'A_PIDD':
+					for i in range(2,len(data)):
+						data[i] = float(data[i])
 				
 				print('Data : ' + str(data))
 				com.sendOrderAPI(data[0], data[1], *data[2:]) 

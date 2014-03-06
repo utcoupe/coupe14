@@ -32,24 +32,62 @@ class GUI:
 
 		self.chaine = Label(self.fen)
 
+		#others
 		self.bras_ouvert = False
 		self.bras_button = Button(self.fen, text = 'Bras', command=self.bras)
 		self.ret_ouvert = False
 		self.ret_button = Button(self.fen, text = 'Retournement', command=self.ret)
 
+		#reset
 		self.reset_pos_button = Button(self.fen, text = 'Reset position', command=self.reset_pos)
 		self.reset_goals_button = Button(self.fen, text = 'Reset objectifs', command=self.reset_goals)
 
+		#fifo
 		self.fifo_switch = Scale(self.fen, from_=0, to=1, orient='horizontal')
+
+		#reglages
+		self.pida_text = Label(self.fen, text="PID angle")
+		self.pida_p = Entry(self.fen)
+		self.pida_p.insert(0,'180')
+		self.pida_i = Entry(self.fen)
+		self.pida_i.insert(0,'0')
+		self.pida_d = Entry(self.fen)
+		self.pida_d.insert(0,'40')
+
+		self.pidd_text = Label(self.fen, text="PID distance")
+		self.pidd_p = Entry(self.fen)
+		self.pidd_p.insert(0, '2')
+		self.pidd_i = Entry(self.fen)
+		self.pidd_i.insert(0, '0')
+		self.pidd_d = Entry(self.fen)
+		self.pidd_d.insert(0, '0.5')
+
+		self.acc_max_text = Label(self.fen, text="Acc max")
+		self.acc_max = Entry(self.fen)
+		self.acc_max.insert(0, '750')
+
+		self.reg_val = Button(self.fen, text = "Send", command=self.val_reg)
 
 		self.chaine.pack(side = 'bottom')
 		self.cadre.pack(side = 'right', padx = 10, pady = 10)
 		self.bras_button.pack()
 		self.ret_button.pack()
 		self.reset_goals_button.pack()
+		self.reset_pos_button.pack()
 		self.fifo_test = Label(self.fen, text='Fifo').pack()
 		self.fifo_switch.pack()
-		self.reset_pos_button.pack(side = 'bottom')
+
+		self.reg_val.pack(side='bottom')
+		self.pidd_d.pack(side = 'bottom')
+		self.pidd_i.pack(side = 'bottom')
+		self.pidd_p.pack(side = 'bottom')
+		self.pidd_text.pack(side = 'bottom')
+		self.pida_d.pack(side = 'bottom')
+		self.pida_i.pack(side = 'bottom')
+		self.pida_p.pack(side = 'bottom')
+		self.pida_text.pack(side = 'bottom')
+		self.acc_max.pack(side = 'bottom')
+		self.acc_max_text.pack(side = 'bottom')
 		self.fen.mainloop()
 
 	def bras(self):
@@ -75,6 +113,17 @@ class GUI:
 	
 	def reset_goals(self):
 		self.sock.send(bytes(self.asserv_addr+':A_CLEANG!', 'utf-8'))               # send the datas
+
+	def val_reg(self):
+		arguments = [str(self.acc_max.get())]
+		tosend = ':'.join([self.asserv_addr, 'A_ACCMAX'] + arguments) + '!'
+		self.sock.send(bytes(tosend, 'utf-8'))               # send the data
+		arguments = [str(self.pida_p.get()), str(self.pida_i.get()), str(self.pida_d.get())]
+		tosend = ':'.join([self.asserv_addr, 'A_PIDA'] + arguments) + '!'
+		self.sock.send(bytes(tosend, 'utf-8'))               # send the data
+		arguments = [str(self.pidd_p.get()), str(self.pidd_i.get()), str(self.pidd_d.get())]
+		tosend = ':'.join([self.asserv_addr, 'A_PIDD'] + arguments) + '!'
+		self.sock.send(bytes(tosend, 'utf-8'))               # send the data
 
 
 
