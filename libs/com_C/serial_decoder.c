@@ -106,12 +106,17 @@ void executeCmd(char serial_data){
 //Renvoit le compte de données en cas de succès, -1 en cas de corruption de données
 int decode(unsigned char *data_in, unsigned char *data_out, int data_counter_7){ 
 	int i = 0, j = 0, offset = 0;
+	bool last_it = false;
 	//Transformation 7->8bits classique
 	for(i=0;i<data_counter_7;i++){
 		//Decala de l'ooctet en cours
 		data_out[j] = data_in[i] << (1+offset);
 		if (i+1 < data_counter_7) { //Sauf à la dernier iteration
 			data_out[j] |= data_in[i+1] >> (6-offset); //Complément de l'octet en cours
+			last_it = false;
+		}
+		else {
+			last_it = true;
 		}
 		offset++;
 		j++;
@@ -129,14 +134,13 @@ int decode(unsigned char *data_in, unsigned char *data_out, int data_counter_7){
 	data_counter--; //On ne compte pas l'ordre dans le nbr d'octets
 
 	//Si on vient de décaler le dernier octet de 3 ou plus à gauche, l'octet forme suite au décalage à droite de 2 sera "incomplet", c'est à dire que l'octet est en réalité des bits perdus, il faut dropper cet octet
-	if(data_counter > 0 && (offset >= 3 || (offset == 0 && data_counter%7 != 6) ||(offset == 1 && data_counter%7 != 0)||(offset == 2 && data_counter%7 != 1))){
+	if (offset >= 3 || (offset == 0 && last_it)) {
 		data_counter--;
 	}
 
 	if(overflow != 0){
-		data_out[data_counter] = overflow; //Si overflow, on le met (attention aux segfault)
-		data_counter++;
-		PDEBUGLN("Pas normal");
+		PDEBUGLN("Overflow sur right shift : anormal");
+		return -1;
     }
 	if(ordre > MAX_ORDRES){//L'odre n'existe pas => corruption
 		PDEBUGLN("Ordre inconnu");
