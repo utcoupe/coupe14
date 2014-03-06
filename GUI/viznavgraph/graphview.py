@@ -6,15 +6,16 @@ import time
 
 
 class GraphView(View):
-	def __init__(self, graph, dynamic_obstacle):
+	def __init__(self, graph, dynamic_obstacle, self_bot):
 		View.__init__(self)
 
+		self.self_bot = self_bot
 		self.graph = graph
 
 		self.p_depart = (200,200)
 		self.p_arrive = (1500,1500)
 
-		self.draw_polygons(graph.get_polygons())
+		self.draw_polygons(graph.getPolygons())
 
 		self.id_raw_path = None
 		self.id_smooth_path = None
@@ -51,15 +52,15 @@ class GraphView(View):
 		print(event)
 		
 		start = time.time()
-		self.dynamic_obstacle.move_to(event)
-		self.graph.update()
+		self.dynamic_obstacle.setPosition(event)
+		self.graph.update(self.self_bot)
 		difference = (time.time() - start)
 		self.sum_update += difference
 		self.nb_update += 1
 		print("update graph time : %s (%s)" % (difference,self.sum_update / self.nb_update))
 		
 		self.remove()
-		self.draw_polygons(self.graph.get_polygons())
+		self.draw_polygons(self.graph.getPolygons())
 		self.calc_path()
 
 	def event_to_x_y(self, event):
@@ -67,21 +68,18 @@ class GraphView(View):
 
 	def calc_path(self):
 		start = time.time()
-		nodes,raw_path,smooth_path = self.graph.get_path(self.p_depart,self.p_arrive)
+		smooth_path = self.graph.getPath(self.p_depart,self.p_arrive)
 		difference = (time.time() - start)
 		self.sum_calc_times += difference
 		self.nb_calc_times += 1
 		print("pathfinding computing time : %s (moy=%s)" % (difference,self.sum_calc_times/self.nb_calc_times))
 		print("path : "+str(smooth_path))
-		#print(nodes,raw_path,smooth_path)
 
-		self.show_result_calc_path(nodes,raw_path,smooth_path)
+		self.show_result_calc_path(smooth_path)
 		
-		return nodes,raw_path,smooth_path
+		return smooth_path
 
-	def show_result_calc_path(self, nodes,raw_path,smooth_path):
-		self.remove(self.id_raw_path)
+	def show_result_calc_path(self, smooth_path):
 		self.remove(self.id_smooth_path)
 		if smooth_path:
-			self.id_raw_path = self.draw_line(raw_path, 'red')
 			self.id_smooth_path = self.draw_line(smooth_path, 'blue')

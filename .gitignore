@@ -15,3 +15,10 @@ hokuyo/hokuyo
 *.exe
 workspace*
 log/*
+libs/cgal/Makefile
+libs/cgal/cmake_install.cmake
+libs/cgal/CMakeLists.txt
+libs/cgal/CMakeFiles/*
+libs/cgal/CMakeCache.txt
+libs/cgal/partition
+libs/cgal/partition_continue

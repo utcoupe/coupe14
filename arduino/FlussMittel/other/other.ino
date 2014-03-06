@@ -9,7 +9,7 @@
 #include <Servo.h>
 #include <Arduino.h>
 
-#include "serial_decoder_forward.h"
+#include "serial_decoder.h"
 #include "serial_defines.h"
 #include "compat.h"
 #include "parameters.h"
@@ -31,7 +31,7 @@ void setup(){
 	motor_ascenseur.run(FORWARD);
 	motor_ascenseur.setSpeed(0); //Desactivr ascenseur
 	servoBras.write(170); //Fermer le bras
-	servoBras.write(0); //Fermer le bras
+	servoRet.write(0); //Fermer le bras
 }
 
 void loop(){

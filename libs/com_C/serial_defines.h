@@ -44,31 +44,32 @@ enum ordre {
 	//DEBUTPARSE
 	PINGPING_AUTO,
 	PINGPING, 	
-	A_GOTOA, 	//@int @int @float
-	A_GOTO, 	//@int @int
-	A_GOTOAR, 	//@int @int @float
-	A_GOTOR, 	//@int @int
-	A_ROT, 		//@float
-	A_ROTR, 	//@float
+	A_GOTOA, 	//@int @int @int @float
+	A_GOTO, 	//@int @int @int
+	A_GOTOAR, 	//@int @int @int @float
+	A_GOTOR, 	//@int @int @int
+	A_ROT, 		//@int @float
+	A_ROTR, 	//@int @float
 	A_KILLG, 
 	A_CLEANG,
 	A_PIDA, 	//@float @float @float
 	A_PIDD, 	//@float @float @float
 	A_GET_CODER, 	//#long #long
-	A_PWM_TEST, 	//@int @int @int
+	A_PWM, 	//@int @int @int @int
 	A_ACCMAX,	//@float
 	A_RESET_POS,
 	A_GET_POS,	//#int #int #float
 
-	O_BRAS_OUVRIR,
-	O_BRAS_FERMER,
-	O_RET_OUVRIR,
-	O_RET_FERMER,
-	O_MONTER_ASC,	
-	O_BAISSER_ASC,
+	O_BRAS_OUVRIR, //@int
+	O_BRAS_FERMER, //@int
+	O_RET_OUVRIR, //@int
+	O_RET_FERMER, //@int
+	O_MONTER_ASC, //@int	
+	O_BAISSER_ASC, //@int
 
 	GET_CAM,	//#int #int
 	GET_HOKUYO,	//#int #int #int #int #int #int #int #int #long
+	GET_LAST_ID, //#int
 	ORDRE_NON_PARSE
 	//FINPARSE
 };

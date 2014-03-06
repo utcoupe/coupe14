@@ -6,6 +6,7 @@
 #include "robotstate.h"
 #include "compat.h"
 #include "local_math.h"
+#include <math.h>
 
 /********************************************************
  * 							*
@@ -47,7 +48,8 @@ Encoder* RobotState::getLenc(){
 void RobotState::pushMmPos(pos n_pos){
 	current_pos.x = n_pos.x * FIXED_POINT_PRECISION;
 	current_pos.y = n_pos.y * FIXED_POINT_PRECISION;
-	current_pos.angle = n_pos.angle;
+	current_pos.angle = moduloTwoPI(n_pos.angle);
+	current_pos.modulo_angle = ceil(n_pos.angle/(2*M_PI));
 }
 
 void RobotState::update(){

@@ -8,6 +8,7 @@ Puis il le convertie en dictionnaires, comme ça pas besoin d'éditer plusieurs 
 import os
 import re
 import codecs
+FILE_DIR  = os.path.dirname(os.path.abspath(__file__))
 
 def parseFile(path, myRe, nbGroupParse=1, seekArguments=False, bothSideAssigment=False):
 	reBegin = re.compile("\s?//DEBUTPARSE\s?")
@@ -56,7 +57,7 @@ def parseFile(path, myRe, nbGroupParse=1, seekArguments=False, bothSideAssigment
 
 
 def parseConstante():
-	relativePath = "../libs/com_C/"
+	relativePath = os.path.join(FILE_DIR,"..","..","libs","com_C/")
 
 	reEnum = re.compile("\s*(?P<constante>\w*)(\s*=\s*(?P<value>.*))?,")
 	reArguments = re.compile("\s*(?P<constante>\w*)(\s*=\s*(?P<value>.*))?,(\s*//(?P<arg>(@\w*\s*)*))?.*\n")

@@ -41,6 +41,7 @@ float PID::compute(float error){
 	float error_D;
 
 	if(!initDone){ //Lors du premier compute, on ne tient pas compte de I et D
+		PDEBUGLN("Initialisation PID");
 		error_I = 0;
 		error_D = 0;
 		initDone = true;	
@@ -48,8 +49,7 @@ float PID::compute(float error){
 	else{
 		error_D = (error - last_error); //derivée = deltaErreur/dt - dt est la période de compute
 		if (error_use_I == 0 || abs(error) < error_use_I) {
-			error_I = error_I + error; //integrale = somme(erreur*dt) - dt est la période de compute
-			PDEBUG("I = "); PDEBUGLN(error_I);
+			error_I += error; //integrale = somme(erreur*dt) - dt est la période de compute
 		}
 	}
 	
