@@ -13,30 +13,31 @@ void initSize()
 	//DEBUTPARSE
 	ordreSize[PINGPING_AUTO]=0;
 	ordreSize[PINGPING]=0;
-	ordreSize[A_GOTOA]=8;
-	ordreSize[A_GOTO]=4;
-	ordreSize[A_GOTOAR]=8;
-	ordreSize[A_GOTOR]=4;
-	ordreSize[A_ROT]=4;
-	ordreSize[A_ROTR]=4;
+	ordreSize[A_GOTOA]=10;
+	ordreSize[A_GOTO]=6;
+	ordreSize[A_GOTOAR]=10;
+	ordreSize[A_GOTOR]=6;
+	ordreSize[A_ROT]=6;
+	ordreSize[A_ROTR]=6;
 	ordreSize[A_KILLG]=0;
 	ordreSize[A_CLEANG]=0;
 	ordreSize[A_PIDA]=12;
 	ordreSize[A_PIDD]=12;
-	ordreSize[A_PWM_TEST]=6;
+	ordreSize[A_PWM]=8;
 	ordreSize[A_GET_CODER]=0;
 	ordreSize[A_ACCMAX]=4;
 	ordreSize[A_RESET_POS]=0;
 	ordreSize[A_GET_POS]=0;
 
-	ordreSize[O_BRAS_OUVRIR]=0;
-	ordreSize[O_BRAS_FERMER]=0;
-	ordreSize[O_RET_OUVRIR]=0;
-	ordreSize[O_RET_FERMER]=0;
-	ordreSize[O_MONTER_ASC]=0;
-	ordreSize[O_BAISSER_ASC]=0;
+	ordreSize[O_BRAS_OUVRIR]=2;
+	ordreSize[O_BRAS_FERMER]=2;
+	ordreSize[O_RET_OUVRIR]=2;
+	ordreSize[O_RET_FERMER]=2;
+	ordreSize[O_MONTER_ASC]=2;
+	ordreSize[O_BAISSER_ASC]=2;
 
 	ordreSize[GET_CAM]=0;
 	ordreSize[GET_HOKUYO]=0;
+	ordreSize[GET_LAST_ID]=0;
 	//FINPARSE
 }

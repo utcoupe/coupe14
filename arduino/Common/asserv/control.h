@@ -54,6 +54,9 @@ class Control{
 	void pause();
 	void resume();
 
+	//Get ID
+	int getLastFinishedId();
+
 	private:
 	RobotState robot;
 	Fifo fifo;
@@ -75,5 +78,7 @@ class Control{
 
 	//Les pwm à appliquer
 	int value_consigne_right, value_consigne_left;
+
+	int last_finished_id;
 };
 #endif

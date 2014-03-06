@@ -27,6 +27,7 @@ Control::Control(){
 
 	value_consigne_right = 0;
 	value_consigne_left = 0;
+	last_finished_id = -1;
 }
 
 void Control::compute(){
@@ -43,11 +44,14 @@ void Control::compute(){
 		value_consigne_left = 0;
 	}
 	else{
-		if (current_goal.isReached && fifo.getRemainingGoals() > 1){//Si le but est atteint et que ce n'est pas le dernier, on passe au suivant
-			current_goal = fifo.gotoNext();
-			reset = true;
+		if (current_goal.isReached) {
+			last_finished_id = current_goal.ID;
+			if (fifo.getRemainingGoals() > 1){//Si le but est atteint et que ce n'est pas le dernier, on passe au suivant
+				current_goal = fifo.gotoNext();
+				reset = true;
+			}
 		}
-		else if (last_goal.data_1 != current_goal.data_1 || last_goal.data_2 != current_goal.data_2 || last_goal.data_3 != current_goal.data_3) { //On a cancel un goal
+		else if (last_goal.type != current_goal.type || last_goal.data_1 != current_goal.data_1 || last_goal.data_2 != current_goal.data_2 || last_goal.data_3 != current_goal.data_3) { //On a cancel un goal
 			reset = true;
 		}
 		if (reset) {//permet de reset des variables entre les goals
@@ -302,4 +306,8 @@ void Control::controlPos(float da, float dd)
 void Control::applyPwm(){
 	set_pwm_left(value_consigne_left);
 	set_pwm_right(value_consigne_right);
+}
+
+int Control::getLastFinishedId() {
+	return last_finished_id;
 }

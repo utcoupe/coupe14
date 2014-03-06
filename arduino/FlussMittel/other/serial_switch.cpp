@@ -24,9 +24,12 @@ void couper_asc () {
 
 //La fonction renvoit le nombre d'octet dans ret, chaine de caractère de réponse. Si doublon, ne pas executer d'ordre mais renvoyer les données à renvoyer
 int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bool doublon){ 
+	static int last_id = -1;
 	int ret_size = 0;
 	switch(ordre){
 	case O_BRAS_OUVRIR:
+		last_id = btoi(argv);
+		argv+=2;
 		if (!doublon) {
 			//Execution des ordre
 			servoBras.write(10);			
@@ -34,6 +37,8 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		//Formation et envoi d'une réponse
 		break;
 	case O_BRAS_FERMER:
+		last_id = btoi(argv);
+		argv+=2;
 		if (!doublon) {
 			//Execution des ordre
 			servoBras.write(170);			
@@ -41,26 +46,38 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		//Formation et envoi d'une réponse
 		break;
 	case O_RET_OUVRIR:
+		last_id = btoi(argv);
+		argv+=2;
 		if (!doublon) {
 			servoRet.write(95);
 		}
 		break;
 	case O_RET_FERMER:
+		last_id = btoi(argv);
+		argv+=2;
 		if (!doublon) {
 			servoRet.write(0);
 		}
 		break;
 	case O_MONTER_ASC:
+		last_id = btoi(argv);
+		argv+=2;
 		if (!doublon) {
 			motor_ascenseur.run(FORWARD);
 			motor_ascenseur.setSpeed(255);
 		}
 		break;
 	case O_BAISSER_ASC:
+		last_id = btoi(argv);
+		argv+=2;
 		if (!doublon) {
 			motor_ascenseur.run(BACKWARD);
 			motor_ascenseur.setSpeed(255);
 		}
+		break;
+	case GET_LAST_ID:
+		ret_size = 2;
+		itob(last_id, ret);
 		break;
 	default:
 		return -1;//commande inconnue
