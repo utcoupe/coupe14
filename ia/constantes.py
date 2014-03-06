@@ -15,6 +15,7 @@ PARITY_OTHER = 			"NONE"
 
 
 #constantes réglables:
+ENABLE_COM_DEBUG =		False
 MAX_UNCONFIRMED_PACKET =5 # maximum 32
 EMPTY_FIFO = 			True
 TIMEOUT = 				100
