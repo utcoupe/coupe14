@@ -43,7 +43,17 @@ class GUI:
 		self.reset_goals_button = Button(self.fen, text = 'Reset objectifs', command=self.reset_goals)
 
 		#fifo
-		self.fifo_switch = Scale(self.fen, from_=0, to=1, orient='horizontal')
+		self.fifo_switch = Scale(self.fen, from_=0, to=1,label='Fifo', orient='horizontal')
+
+		#goto manue
+		self.goto_text = Label(self.fen, text = "Goto")
+		self.gotox = Entry(self.fen)
+		self.gotoy = Entry(self.fen)
+		self.gotoang = Entry(self.fen)
+		self.goto_frame = Frame()
+		self.send_goto = Button(self.goto_frame, text = "Goto", command=self.goto_handler).pack(side='left')
+		self.send_gotoa = Button(self.goto_frame, text = "Gotoa", command=self.gotoa_handler).pack(side='right')
+
 
 		#reglages
 		self.pida_text = Label(self.fen, text="PID angle")
@@ -66,18 +76,23 @@ class GUI:
 		self.acc_max = Entry(self.fen)
 		self.acc_max.insert(0, '750')
 
-		self.reg_val = Button(self.fen, text = "Send", command=self.val_reg)
+		self.send_reg = Button(self.fen, text = "Send", command=self.val_reg)
 
 		self.chaine.pack(side = 'bottom')
 		self.cadre.pack(side = 'right', padx = 10, pady = 10)
 		self.bras_button.pack()
 		self.ret_button.pack()
-		self.reset_goals_button.pack()
-		self.reset_pos_button.pack()
-		self.fifo_test = Label(self.fen, text='Fifo').pack()
 		self.fifo_switch.pack()
+		self.reset_goals_button.pack(pady = 10)
+		self.reset_pos_button.pack(pady = 10)
 
-		self.reg_val.pack(side='bottom')
+		self.goto_text.pack()
+		self.gotox.pack()
+		self.gotoy.pack()
+		self.gotoang.pack()
+		self.goto_frame.pack()
+
+		self.send_reg.pack(side='bottom')
 		self.pidd_d.pack(side = 'bottom')
 		self.pidd_i.pack(side = 'bottom')
 		self.pidd_p.pack(side = 'bottom')
@@ -125,11 +140,7 @@ class GUI:
 		tosend = ':'.join([self.asserv_addr, 'A_PIDD'] + arguments) + '!'
 		self.sock.send(bytes(tosend, 'utf-8'))               # send the data
 
-
-
-	def clic_goto(self, event):
-		gotox = int((event.x/self.widthfen)*self.areax)
-		gotoy = int(self.areay - (event.y/self.heightfen)*self.areay)
+	def goto(self, gotox, gotoy):
 		self.chaine.configure(text = "Goto : "+str(gotox)+" ; "+str(gotoy))
 		#ENVOYER DATA PROTOCOLE
 		if self.fifo_switch.get() == 0:#on clean la file a chaque nouvel ordre
@@ -138,6 +149,27 @@ class GUI:
 		arguments = [str(gotox), str(gotoy)]
 		tosend = ':'.join([self.asserv_addr, 'A_GOTO'] + arguments) + '!'
 		self.sock.send(bytes(tosend, 'utf-8'))               # send the data
+	
+	def gotoa(self, gotox, gotoy, gotoa):
+		self.chaine.configure(text = "Gotoa : "+str(gotox)+" ; "+str(gotoy)+" ; "+str(gotoa))
+		#ENVOYER DATA PROTOCOLE
+		if self.fifo_switch.get() == 0:#on clean la file a chaque nouvel ordre
+			self.sock.send(bytes(self.asserv_addr +':A_CLEANG!', 'utf-8'))
+
+		arguments = [str(gotox), str(gotoy), str(gotoa)]
+		tosend = ':'.join([self.asserv_addr, 'A_GOTOA'] + arguments) + '!'
+		self.sock.send(bytes(tosend, 'utf-8'))               # send the data
+
+	def goto_handler(self):
+		self.goto(self.gotox.get(), self.gotoy.get())
+
+	def gotoa_handler(self):
+		self.gotoa(self.gotox.get(), self.gotoy.get(), self.gotoa.get())
+
+	def clic_goto(self, event):
+		gotox = int((event.x/self.widthfen)*self.areax)
+		gotoy = int(self.areay - (event.y/self.heightfen)*self.areay)
+		self.goto(gotox, gotoy)
 
 if __name__ == '__main__':
 	gui = GUI()
