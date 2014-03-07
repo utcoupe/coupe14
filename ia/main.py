@@ -9,7 +9,7 @@ import time
 import logging
 
 #logfile_name = "log/" + time.strftime("%d %b %Y %H:%M:%S", time.gmtime()) + ".log"
-logging.basicConfig(filename="log/last.log", filemode='w', level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+logging.basicConfig(filename="log/last.log", filemode='w', level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__.split('.')[0])
 
 
@@ -22,7 +22,7 @@ import goals
 
 Communication = communication.CommunicationGlobale()
 arduino_constantes = Communication.getConst()
-time.sleep(2) # on attend que les communications s'établissent
+time.sleep(1) # on attend que les communications s'établissent
 
 
 #On teste si les systèmes demandés sont bien en lignes

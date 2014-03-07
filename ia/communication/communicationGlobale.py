@@ -452,8 +452,8 @@ class CommunicationGlobale():
 							index += size
 						else:
 							self.__logger.error("Parseur: le parseur a trouvé un type non supporté")
-
-					returnOrders.append((self.address[address], self.orders[self.ordreLog[address][idd][0]], arguments))
+					if self.orders[self.ordreLog[address][idd][0]] != 'PINGPING_AUTO':
+						returnOrders.append((self.address[address], self.orders[self.ordreLog[address][idd][0]], arguments))
 
 					#utilisé pour afficher les retours directement dans la console quand on bypass l'ia
 					if len(arguments) > 0 and self.__enable_return_display == True:
@@ -524,7 +524,7 @@ class CommunicationGlobale():
 				self.ordreLog[int(address)][idd] = (order, chaineTemp)
 				self.lastSendDate[address] = date
 				self.lastIdSend[address] = idd
-				self.__logger.info("Envoi normal a l'arduino %sde l'ordre %s d'id %s", self.address[address], self.orders[order], idd)
+				self.__logger.info("Envoi normal a l'arduino %s de l'ordre %s d'id %s", self.address[address], self.orders[order], idd)
 				self.sendMessage(address, chaineTemp)
 			else:
 				remainOrdersToSend.appendleft(packet)
