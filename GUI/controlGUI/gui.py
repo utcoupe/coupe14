@@ -14,7 +14,7 @@ class GUI:
 		self.others_addr = '1'
 		self.asserv_addr = '2'
 
-		self.serverHost = '10.42.0.52'
+		self.serverHost = '192.168.2.2'
 		self.serverPort = 2001
 
 		#init comm
@@ -124,7 +124,10 @@ class GUI:
 	def pos_update(self):
 		while 1:
 			ret = str(self.sock.recv(1024), 'utf-8')
-			self.robot_pos = list(map(float, ret.split(":")))
+			try:
+				self.robot_pos = list(map(float, ret.split(":")))
+			except:
+				pass
 
 	def pos_loop(self):
 		self.move_robot(*self.robot_pos)
