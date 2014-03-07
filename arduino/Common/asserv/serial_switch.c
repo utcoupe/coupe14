@@ -97,6 +97,17 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		ret_size = 8;
 		break;
 		}
+	case A_GET_POS_ID:{
+		pos pos = control.getPos();
+		int x = pos.x, y = pos.y;
+		float a = pos.angle;
+		itob(x, ret);
+		itob(y, ret+2);
+		ftob(a, ret+4);
+		itob(control.getLastFinishedId(), ret+8);
+		ret_size = 10;
+		break;
+		}
 	case A_ACCMAX:
 		if(!doublon) {
 			control.setMaxAcc(btof(argv));

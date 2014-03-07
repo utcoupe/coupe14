@@ -28,6 +28,7 @@ void initSize()
 	ordreSize[A_ACCMAX]=4;
 	ordreSize[A_RESET_POS]=0;
 	ordreSize[A_GET_POS]=0;
+	ordreSize[A_GET_POS_ID]=0;
 
 	ordreSize[O_BRAS_OUVRIR]=2;
 	ordreSize[O_BRAS_FERMER]=2;
