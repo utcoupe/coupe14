@@ -39,7 +39,6 @@ class CommunicationGlobale():
 				self.argumentSize[self.orders[order]] = size
 
 		#on crée un dico de taille de retour
-		self.__logger.error("Test")
 		for order in self.orders:
 			size = 0
 			for i,typeToGet in enumerate(self.ordersRetour[order]):
@@ -308,10 +307,13 @@ class CommunicationGlobale():
 	def extractData(self, rawInput):
 		""" prend rawInput une chaine de caractère qui correspond  qui correspond à un ordre, retourne les autres packerData est prêt à être interpréter"""
 		
-		"""print("DEBUG")
+		#Affiche les retours arduino après le découpage en paquet et avec le traitement 
+		"""
+		print("DEBUG")
 		for letter in rawInput:
 			print(conversion.intToBinary(letter)[:8])
-		print("FIN DEBUG")"""
+		print("FIN DEBUG")
+		"""
 
 	
 
@@ -453,6 +455,7 @@ class CommunicationGlobale():
 
 					returnOrders.append((self.address[address], self.orders[self.ordreLog[address][idd][0]], arguments))
 
+					#utilisé pour afficher les retours directement dans la console quand on bypass l'ia
 					if len(arguments) > 0 and self.__enable_return_display == True:
 						print("Retour :", arguments)
 
