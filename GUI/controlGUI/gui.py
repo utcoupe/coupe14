@@ -2,7 +2,6 @@ from socket import *
 from tkinter import *
 import threading
 
-
 class GUI:
 	def __init__(self):
 		#defines
@@ -15,13 +14,13 @@ class GUI:
 		self.others_addr = '1'
 		self.asserv_addr = '2'
 
-		self.serverHost = '192.168.2.2'
+		self.serverHost = '10.42.0.52'
 		self.serverPort = 2001
 
 		#init comm
 		try:
 			self.sock = socket(AF_INET, SOCK_STREAM)    # create a TCP socket
-			self.sock.settimeout(1)
+			self.sock.settimeout(5)
 			self.sock.connect((self.serverHost, self.serverPort))  # connect to server on the port
 		except:
 			print("WARNING : Socket non ouvert, mode visualisation")
@@ -111,19 +110,21 @@ class GUI:
 		self.acc_max.pack(side='bottom')
 		self.acc_max_text.pack(side='bottom')
 
-		threading.Thread(target=self.pos_update)
+		threading.Thread(target=self.pos_update).start()
 		self.fen.after(100, self.pos_loop)
 		self.fen.mainloop()
 
 	def move_robot(self, x, y, a):
+		x = int(x)
+		y = int(y)
 		self.cadre.coords(self.robot_rect, ((x / self.areax) * self.widthfen) - self.robotsize / 2, self.heightfen - ((y / self.areay) * self.heightfen) - self.robotsize / 2, ((x / self.areax) * self.widthfen) + self.robotsize / 2, self.heightfen - ((y / self.areay) * self.heightfen) + self.robotsize / 2)
 		self.cadre.coords(self.robot_txt, ((x / self.areax) * self.widthfen), self.heightfen - ((y / self.areay) * self.heightfen) + self.robotsize / 1.5)
-		self.cadre.itemconfig(self.robot_txt, text=str(x) + ";" + str(y) + ";" + str(a))
+		self.cadre.itemconfig(self.robot_txt, text=str(x) + ";" + str(y) + ";" + "{:.2f}".format(a))
 
 	def pos_update(self):
 		while 1:
-			ret = self.sock.recv(1024)
-			self.robot_pos = ret[2]
+			ret = str(self.sock.recv(1024), 'utf-8')
+			self.robot_pos = list(map(float, ret.split(":")))
 
 	def pos_loop(self):
 		self.move_robot(*self.robot_pos)
