@@ -421,7 +421,7 @@ class CommunicationGlobale():
 						temp = bin(octet)[2:].zfill(7)
 						argumentData += temp
 
-					arguments = deque()
+					arguments = []
 					index = 0
 					for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
 						if returnType == 'int':

@@ -110,7 +110,7 @@ class PullData():
 				if order == 'A_GET_POS_ID':
 					system.majPositionId(arguments)
 				elif order == 'GET_LAST_ID':
-					system.majId(arguments)
+					system.majId(arguments[0])
 				elif order == 'GET_HOKUYO':
 					system.majPosition(arguments)
 				elif order == 'GET_CAM':

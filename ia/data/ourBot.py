@@ -22,7 +22,7 @@ class OurBot():
 		self.__positionX = 0
 		self.__positionY = 0
 		self.__angle = 0.0
-		self.__last_id_order_received = None
+		self.__last_id_order_received = -1
 
 		#Variables
 		self.__objectifs = None #((id, ((id_action, ordre, arguments), (id_action, ordre, arguments), ...)), ...)

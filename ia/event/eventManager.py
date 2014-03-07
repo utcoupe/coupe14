@@ -16,9 +16,9 @@ class EventManager():
 		self.__MetaData = Data.MetaData
 
 		self.__last_hokuyo_data = None
-		self.__last_flussmitel_order_finished = None	#id_action
+		self.__last_flussmitel_order_finished = -1	#id_action
 		self.__id_to_reach_flussmitel = None
-		self.__last_tibot_order_finished = None			#id_action
+		self.__last_tibot_order_finished = -1			#id_action
 		self.__id_to_reach_tibot = None
 
 
@@ -56,16 +56,17 @@ class EventManager():
 			#si un nouvel ordre s'est terminé
 			if new_id != self.__last_flussmitel_order_finished:
 				self.__last_flussmitel_order_finished = new_id
-				#si on a atteint 
+				#si on a atteint l'action bloquante
 				if self.__last_flussmitel_order_finished == self.__id_to_reach_flussmitel:
 					self.pushOrders(self.__Flussmitel, self.__Flussmitel.getNextOrders())
 
 		if self.__Tibot != None:
 			new_id = self.__Tibot.getLastIdOrderReceived()
-			print("id", new_id)
 			#si un nouvel ordre s'est terminé
 			if new_id != self.__last_tibot_order_finished:
+				print("id", new_id)
 				self.__last_tibot_order_finished = new_id
+				#si on a atteint l'action bloquante
 				if self.__last_tibot_order_finished == self.__id_to_reach_tibot:
 					self.pushOrders(self.__Tibot, self.__Tibot.getNextOrders())
 
