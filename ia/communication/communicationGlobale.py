@@ -168,7 +168,10 @@ class CommunicationGlobale():
 
 			waitBeforeNextExec = (HIGH_PRIO_SPEED -(int(time.time()*1000) - date))
 			if waitBeforeNextExec < 1:
-				self.__logger.warning("La boucle de pool de communication n'est pas assez rapide %s", waitBeforeNextExec)
+				faible_prio = False
+				if self.lastLowPrioTaskDate == date:
+					faible_prio = True
+				self.__logger.warning("La boucle de pool de communication n'est pas assez rapide %s, faible priorité en cours: %s", waitBeforeNextExec, faible_prio)
 			else:
 				time.sleep(waitBeforeNextExec/1000.0)
 
@@ -382,8 +385,7 @@ class CommunicationGlobale():
 				lastIdToAccept = -1
 
 				if idd == self.getNextConfirmeId(address):
-					if self.ordreLog[address][idd][0] != self.orders['PINGPING_AUTO']:
-						self.__logger.info("Success: l'arduino %s a bien recu l'ordre %s d'id: %s", self.address[address], self.orders[self.ordreLog[address][idd][0]], idd)
+					self.__logger.info("Success: l'arduino %s a bien recu l'ordre %s d'id: %s", self.address[address], self.orders[self.ordreLog[address][idd][0]], idd)
 					self.nbTransmitedPaquets +=1
 					self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(idd) - 1, date)#on bidone le chiffre date, mais c'est pas grave
 					self.lastIdConfirm[address] = idd

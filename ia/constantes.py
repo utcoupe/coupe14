@@ -17,10 +17,10 @@ PARITY_OTHER = 			"NONE"
 #constantes réglables:
 MAX_UNCONFIRMED_PACKET =5 # maximum 32
 EMPTY_FIFO = 			True
-TIMEOUT = 				75
-HIGH_PRIO_SPEED = 		7 #période d'execution en ms
+TIMEOUT = 				100
+HIGH_PRIO_SPEED = 		20 #période d'execution en ms
 LOW_PRIO_SPEED = 		1000 #période d'execution en ms
-KEEP_CONTACT_TIMEOUT = 	1000
+KEEP_CONTACT_TIMEOUT = 	2000
 OFF_LIGNE_TIMEOUT = 	5000
 
 #Systèmes arretable:

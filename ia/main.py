@@ -19,10 +19,10 @@ import data
 from constantes import *
 import goals
 
-
+logger.info("Demarrage de l'ia")
 Communication = communication.CommunicationGlobale()
 arduino_constantes = Communication.getConst()
-time.sleep(1) # on attend que les communications s'établissent
+time.sleep(0.5) # on attend que les communications s'établissent
 
 
 #On teste si les systèmes demandés sont bien en lignes
