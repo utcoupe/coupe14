@@ -37,7 +37,6 @@ class ComSerial():
 			self.__logger.critical('comSerial,fct read: La liaison demandé n\'a pas été initializé')
 		else:	
 			if self.liaison.inWaiting():
-				#self.rawInput += self.liaison.read(self.liaison.inWaiting())
 				self.rawInput += self.liaison.read(self.liaison.inWaiting())
 
 				i = 0
