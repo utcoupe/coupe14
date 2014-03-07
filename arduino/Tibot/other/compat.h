@@ -11,7 +11,7 @@
 #include "serial_defines.h"
 
 #define LOCAL_ADDR ADDR_TIBOT_OTHER //Ici l'adresse locale du client
-#define FORWARD_ADDR_ASSERV ADDR_TIBOT_ASSERV
+#define FORWARD_ADDR ADDR_TIBOT_ASSERV
 
 void initPins();
 unsigned long timeMillis();

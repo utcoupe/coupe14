@@ -29,7 +29,7 @@ char generic_serial_read(){
 }
 
 void forward_serial_send(char c, char addr) {
-	if (addr == FORWARD_ADDR_ASSERV) {
+	if (addr == FORWARD_ADDR) {
 		Serial1.write(c);
 	}
 }
