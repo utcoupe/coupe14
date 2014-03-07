@@ -62,10 +62,11 @@ class PullData():
 			if self.__data_tibot_asserv_asked == False:
 				self.Communication.sendOrderAPI(self.address_tibot_asserv, 'A_GET_POS_ID', *arguments)
 				self.__data_tibot_asserv_asked = True
-
-		if self.tourelle_asked == False:
-			self.Communication.sendOrderAPI(self.address_tourelle, 'GET_HOKUYO', *arguments)
-			self.tourelle_asked = True
+				
+		if self.Tourelle != None:
+			if self.tourelle_asked == False:
+				self.Communication.sendOrderAPI(self.address_tourelle, 'GET_HOKUYO', *arguments)
+				self.tourelle_asked = True
 
 
 	def readData(self):
@@ -78,12 +79,26 @@ class PullData():
 			arguments = orderTuple[2]
 
 			#Choix de l'objet
-			if address == self.address_flussmittel_other or address == self.address_flussmittel_asserv:
+			if address == self.address_flussmittel_other:
 				system = self.Flussmittel
-				self.flussmittel_asked = False
-			elif address == self.address_tibot_other or address == self.address_tibot_asserv:
+				if order == 'GET_LAST_ID':
+					self.__id_flussmittel_other_asked = False
+
+			elif address == self.address_flussmittel_asserv:
+				system = self.Flussmittel
+				if order == 'A_GET_POS_ID':
+					self.__data_flussmittel_asserv_asked = False
+
+			elif address == self.address_tibot_other:
 				system = self.Tibot
-				self.tibot_asked = False
+				if order == 'GET_LAST_ID':
+					self.__id_tibot_other_asked = False
+
+			elif address == self.address_tibot_asserv:
+				system = self.Tibot
+				if order == 'A_GET_POS_ID':
+					self.__data_tibot_asserv_asked = False
+					
 			elif address == self.address_tourelle:
 				system = self.Tourelle
 				self.tourelle_asked = False
@@ -92,8 +107,10 @@ class PullData():
 				self.__logger.error("un systeme non initilisé nous envoi des données")
 
 			if system != None:
-				if order == 'A_GET_POS':
-					system.majPosition(arguments)
+				if order == 'A_GET_POS_ID':
+					system.majPositionId(arguments)
+				elif order == 'GET_LAST_ID':
+					system.majId(arguments)
 				elif order == 'GET_HOKUYO':
 					system.majPosition(arguments)
 				elif order == 'GET_CAM':

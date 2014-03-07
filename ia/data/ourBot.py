@@ -19,9 +19,9 @@ class OurBot():
 
 
 		#Valeurs récupérées (read-only)
-		self.positionX = 0
-		self.positionY = 0
-		self.angle = 0.0
+		self.__positionX = 0
+		self.__positionY = 0
+		self.__angle = 0.0
 		self.__last_id_order_received = None
 
 		#Variables
@@ -61,10 +61,15 @@ class OurBot():
 		self.__objectifs = objectif
 
 	#utilise les données en provenance de nos robots pour mettre à jour les données de la classe
-	def majPosition(self, arguments):
+	def majPositionId(self, arguments):
 		self.positionX = arguments[0]
 		self.positionY = arguments[1]
 		self.angle = arguments[2]
+		self.majId(arguments[3])
+
+	def majId(self, idd):
+		#TODO gèrer la boucle d'id
+		self.__last_id_order_received = idd
 
 	def getNextIdOrder(self):
 		if self.__objectifs != None:
