@@ -5,9 +5,11 @@ Classe qui recupère les données de tous les objets
 
 import threading 
 import time
+import logging
 
 class PullData():
 	def __init__(self, Communication, Flussmittel, Tibot, SmallEnemyBot, BigEnemyBot, Tourelle, PULL_PERIODE):
+		self.__logger = logging.getLogger(__name__.split('.')[0])
 		self.Communication = Communication
 		self.Flussmittel = Flussmittel[0]
 		self.address_flussmittel_other = Flussmittel[1]
@@ -77,17 +79,16 @@ class PullData():
 				self.tourelle_asked = False
 			else:
 				system = None
-				print("Erreur, un systeme non initilisé nous envoi des données")
+				self.__logger.error("un systeme non initilisé nous envoi des données")
 
 			if system != None:
 				if order == 'A_GET_POS':
-					print("data:", arguments)
 					system.majPosition(arguments)
 				elif order == 'GET_HOKUYO':
 					system.majPosition(arguments)
 				elif order == 'GET_CAM':
 					system.majCam(arguments)	
 				else:
-					print("Warning, ce retour n'est pas implementé, address", address, "ordre", order, "arguments", arguments)
+					self.__logger.warning("ce retour n'est pas implementé, address " + str(address) + " ordre " + str(order) + " arguments " + str(arguments))
 
 			
