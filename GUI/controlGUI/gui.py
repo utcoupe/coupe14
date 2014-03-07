@@ -1,5 +1,6 @@
 from socket import *
 from tkinter import *
+import threading
 
 
 class GUI:
@@ -9,17 +10,19 @@ class GUI:
 		self.heightfen = 600
 		self.areax = 3000
 		self.areay = 2000
+		self.robotsize = 50
+		self.robot_pos = [0, 0, 0]
 		self.others_addr = '1'
 		self.asserv_addr = '2'
 
-		self.serverHost = '192.168.2.2'
+		self.serverHost = 'localhost'
 		self.serverPort = 2001
 
 		#init comm
 		try:
 			self.sock = socket(AF_INET, SOCK_STREAM)    # create a TCP socket
 			self.sock.settimeout(1)
-			self.sock.connect((self.serverHost, self.serverPort)) # connect to server on the port
+			self.sock.connect((self.serverHost, self.serverPort))  # connect to server on the port
 		except:
 			print("WARNING : Socket non ouvert, mode visualisation")
 
@@ -27,42 +30,45 @@ class GUI:
 		self.fen = Tk()
 		self.fen.title("Clique moi")
 
-		self.cadre = Frame(self.fen, width = self.widthfen, height = self.heightfen, bg="light yellow", relief=SUNKEN)
+		self.cadre = Canvas(self.fen, width=self.widthfen, height =self.heightfen, bg="light yellow")
 		self.cadre.bind("<Button-1>", self.clic_goto)
+		self.robot_rect = self.cadre.create_oval(0, 0, self.robotsize, self.robotsize, offset='center', fill='red')
+		self.robot_txt = self.cadre.create_text(0, 0, text='Pos')
+		self.move_robot(*self.robot_pos)
 
 		self.chaine = Label(self.fen)
 
 		#others
 		self.bras_ouvert = False
-		self.bras_button = Button(self.fen, text = 'Bras', command=self.bras)
+		self.bras_button = Button(self.fen, text='Bras', command=self.bras)
 		self.ret_ouvert = False
-		self.ret_button = Button(self.fen, text = 'Retournement', command=self.ret)
+		self.ret_button = Button(self.fen, text='Retournement', command=self.ret)
 
 		#reset
-		self.reset_pos_button = Button(self.fen, text = 'Reset position', command=self.reset_pos)
-		self.reset_goals_button = Button(self.fen, text = 'Reset objectifs', command=self.reset_goals)
+		self.reset_pos_button = Button(self.fen, text='Reset position', command=self.reset_pos)
+		self.reset_goals_button = Button(self.fen, text='Reset objectifs', command=self.reset_goals)
 
 		#fifo
-		self.fifo_switch = Scale(self.fen, from_=0, to=1,label='Fifo', orient='horizontal')
+		self.fifo_switch = Scale(self.fen, from_=0, to=1, label='Fifo', orient='horizontal')
 
 		#goto manue
-		self.goto_text = Label(self.fen, text = "Goto")
+		self.goto_text = Label(self.fen, text= "Goto")
 		self.gotox = Entry(self.fen)
 		self.gotoy = Entry(self.fen)
 		self.gotoang = Entry(self.fen)
 		self.goto_frame = Frame()
-		self.send_goto = Button(self.goto_frame, text = "Goto", command=self.goto_handler).pack(side='left')
-		self.send_gotoa = Button(self.goto_frame, text = "Gotoa", command=self.gotoa_handler).pack(side='right')
+		self.send_goto = Button(self.goto_frame, text="Goto", command=self.goto_handler).pack(side='left')
+		self.send_gotoa = Button(self.goto_frame, text="Gotoa", command=self.gotoa_handler).pack(side='right')
 
 
 		#reglages
 		self.pida_text = Label(self.fen, text="PID angle")
 		self.pida_p = Entry(self.fen)
-		self.pida_p.insert(0,'180')
+		self.pida_p.insert(0, '180')
 		self.pida_i = Entry(self.fen)
-		self.pida_i.insert(0,'0')
+		self.pida_i.insert(0, '0')
 		self.pida_d = Entry(self.fen)
-		self.pida_d.insert(0,'40')
+		self.pida_d.insert(0, '40')
 
 		self.pidd_text = Label(self.fen, text="PID distance")
 		self.pidd_p = Entry(self.fen)
@@ -76,15 +82,16 @@ class GUI:
 		self.acc_max = Entry(self.fen)
 		self.acc_max.insert(0, '750')
 
-		self.send_reg = Button(self.fen, text = "Send", command=self.val_reg)
+		self.send_reg = Button(self.fen, text="Send", command=self.val_reg)
 
-		self.chaine.pack(side = 'bottom')
-		self.cadre.pack(side = 'right', padx = 10, pady = 10)
+
+		self.chaine.pack(side='bottom')
+		self.cadre.pack(side='right', padx=10, pady=10)
 		self.bras_button.pack()
 		self.ret_button.pack()
 		self.fifo_switch.pack()
-		self.reset_goals_button.pack(pady = 10)
-		self.reset_pos_button.pack(pady = 10)
+		self.reset_goals_button.pack(pady=10)
+		self.reset_pos_button.pack(pady=10)
 
 		self.goto_text.pack()
 		self.gotox.pack()
@@ -93,17 +100,34 @@ class GUI:
 		self.goto_frame.pack()
 
 		self.send_reg.pack(side='bottom')
-		self.pidd_d.pack(side = 'bottom')
-		self.pidd_i.pack(side = 'bottom')
-		self.pidd_p.pack(side = 'bottom')
-		self.pidd_text.pack(side = 'bottom')
-		self.pida_d.pack(side = 'bottom')
-		self.pida_i.pack(side = 'bottom')
-		self.pida_p.pack(side = 'bottom')
-		self.pida_text.pack(side = 'bottom')
-		self.acc_max.pack(side = 'bottom')
-		self.acc_max_text.pack(side = 'bottom')
+		self.pidd_d.pack(side='bottom')
+		self.pidd_i.pack(side='bottom')
+		self.pidd_p.pack(side='bottom')
+		self.pidd_text.pack(side='bottom')
+		self.pida_d.pack(side='bottom')
+		self.pida_i.pack(side='bottom')
+		self.pida_p.pack(side='bottom')
+		self.pida_text.pack(side='bottom')
+		self.acc_max.pack(side='bottom')
+		self.acc_max_text.pack(side='bottom')
+
+		threading.Thread(target=self.pos_update)
+		self.fen.after(100, self.pos_loop)
 		self.fen.mainloop()
+
+	def move_robot(self, x, y, a):
+		self.cadre.coords(self.robot_rect, ((x / self.areax) * self.widthfen) - self.robotsize / 2, self.heightfen - ((y / self.areay) * self.heightfen) - self.robotsize / 2, ((x / self.areax) * self.widthfen) + self.robotsize / 2, self.heightfen - ((y / self.areay) * self.heightfen) + self.robotsize / 2)
+		self.cadre.coords(self.robot_txt, ((x / self.areax) * self.widthfen), self.heightfen - ((y / self.areay) * self.heightfen) + self.robotsize / 1.5)
+		self.cadre.itemconfig(self.robot_txt, text=str(x) + ";" + str(y) + ";" + str(a))
+
+	def pos_update(self):
+		while 1:
+			ret = self.sock.recv(1024)
+			self.robot_pos = ret[2]
+
+	def pos_loop(self):
+		self.move_robot(*self.robot_pos)
+		self.fen.after(100, self.pos_loop)
 
 	def bras(self):
 		if self.bras_ouvert:
