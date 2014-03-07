@@ -60,9 +60,11 @@ while 1:
 				elif data[1] == 'A_GOTO': #all int
 					for i in range(2,len(data)):
 						data[i] = int(data[i])
+				if data[1] == 'A_GOTO' or data[1] == 'A_GOTOA' or data[1] == 'A_ROT':
+					data.insert(2, 0) #ajout id
 				
 				print('Data : ' + str(data))
-				com.sendOrderAPI(data[0], data[1], 0, *data[2:]) 
+				com.sendOrderAPI(data[0], data[1], *data[2:]) 
 		else:
 			break
 	connection.close()              # close socket
