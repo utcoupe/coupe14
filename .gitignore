@@ -14,7 +14,6 @@ hokuyo/hokuyo
 *.pyc
 *.exe
 workspace*
-log/*
 libs/cgal/Makefile
 libs/cgal/cmake_install.cmake
 libs/cgal/CMakeLists.txt

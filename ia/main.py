@@ -17,13 +17,11 @@ logger = logging.getLogger(__name__.split('.')[0])
 import communication
 import data
 from constantes import *
-import goals
 
 logger.info("Demarrage de l'ia")
 Communication = communication.CommunicationGlobale()
 arduino_constantes = Communication.getConst()
 time.sleep(0.5) # on attend que les communications s'établissent
-
 
 #On teste si les systèmes demandés sont bien en lignes
 ready_list = Communication.getSystemReady()
