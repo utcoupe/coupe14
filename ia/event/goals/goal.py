@@ -5,7 +5,6 @@ A goal reprsent a task & contains a list of executions
 It is loaded from XML file
 """
 
-import goalExecution
 
 class Goal:
 	FINISHED_THRESHOLD = 50

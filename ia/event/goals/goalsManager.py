@@ -9,8 +9,9 @@ import heapq
 import logging
 from xml.dom.minidom import parseString
 from collections import OrderedDict
-import goal
-import goalExecution
+
+from .goal import *
+from .goalExecution import *
 
 class GoalsManager:
 
@@ -73,7 +74,7 @@ class GoalsManager:
 				self.__finishGoal(goal)
 
 	# XML import and export of goals
-	def loadGoals(self, filename="goals/goals.xml"):
+	def loadGoals(self, filename="event/goals/goals.xml"):
 		self.__logger.info('GoalsManager: loading goals from: %s' % filename)
 		fd = open(filename,'r')
 		dom = parseString(fd.read())

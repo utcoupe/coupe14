@@ -5,6 +5,7 @@ Ce code gère l'envoi d'actions élémentaires aux robots et traite les collisio
 
 import threading
 import time
+import os
 
 from constantes import *
 import goals
@@ -22,8 +23,8 @@ class EventManager():
 		self.__last_tibot_order_finished = -1			#id_action
 		self.__id_to_reach_tibot = None
 
-		GoalsManager = goals.GoalsManager()
-		
+		self.__GoalsManager = goals.GoalsManager()
+
 		self.__managerThread = threading.Thread(target=self.managerLoop)
 		self.__managerThread .start()
 
