@@ -5,12 +5,12 @@ Classe pour toutes les autres données
 
 from constantes import *
 import time
+import logging
 
 class MetaData():
 	def __init__(self):
-		self.__number_of_enemy = NUMBER_OF_ENEMY
-		self.__seuil_rouge = SEUIL_ROUGE
-		self.__seuil_jaune = SEUIL_JAUNE
+		self.__logger = logging.getLogger(__name__.split('.')[0])
+		self.numberOfenemy = NUMBER_OF_ENEMY
 
 		#Variables
 		self.__triangle_en_position = ("Rien", 0) #(Rien ou JAUNE ou ROUGE, timestanp de l'info pour savoir si on peut l'utiliser directment ou non)
@@ -21,11 +21,11 @@ class MetaData():
 
 	#utilise les données en provenance des caméras pour mettre à jour les données de la classe
 	def majCam(self, arguments):
-		if arguments[0] > self.__seuil_rouge and arguments[1] > self.__seuil_jaune:
-			print("Probleme, les deux seuils sont dépassés")
-		elif arguments[0] > self.__seuil_rouge:
+		if arguments[0] > SEUIL_ROUGE and arguments[1] > SEUIL_JAUNE:
+			self.__logger.warning("Probleme, les deux seuils sont dépassés")
+		elif arguments[0] > SEUIL_ROUGE:
 			self.__triangle_en_position = ("Rouge", int(time.time()*1000))
-		elif arguments[1] > self.__seuil_jaune:
+		elif arguments[1] > SEUIL_JAUNE:
 			self.__triangle_en_position = ("Jaune", int(time.time()*1000))
 		else:
 			self.__triangle_en_position = ("Rien", int(time.time()*1000))

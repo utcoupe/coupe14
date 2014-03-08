@@ -7,6 +7,7 @@ import threading
 import time
 
 from constantes import *
+import goals
 
 class EventManager():
 	def __init__(self, Data):
@@ -21,9 +22,12 @@ class EventManager():
 		self.__last_tibot_order_finished = -1			#id_action
 		self.__id_to_reach_tibot = None
 
-
+		GoalsManager = goals.GoalsManager()
+		
 		self.__managerThread = threading.Thread(target=self.managerLoop)
 		self.__managerThread .start()
+
+
 
 	def managerLoop(self):
 		#On attend le debut du match

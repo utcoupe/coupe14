@@ -3,16 +3,21 @@
 Classe pour nos robots
 """
 
+
 from collections import deque
 from xml.dom.minidom import parseString
+from constantes import *
+from math import sqrt
+import logging
 
 class OurBot():
 	def __init__(self, name, communication, arduinoConstantes, addressOther, addressAsserv, largeur, longueur):
 		#Constantes
-		self.communication = communication
-		self.addressOther = addressOther
-		self.addressAsserv = addressAsserv
 		self.__name = name
+		self.__logger = logging.getLogger(__name__.split('.')[0])
+		self.__communication = communication
+		self.__addressOther = addressOther
+		self.__addressAsserv = addressAsserv
 
 		self.largeur = largeur 
 		self.longueur = longueur
