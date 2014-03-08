@@ -108,13 +108,15 @@ class PullData():
 
 			if system != None:
 				if order == 'A_GET_POS_ID':
-					system.majPositionId(arguments)
+					system.majPositionId(address, arguments)
 				elif order == 'GET_LAST_ID':
-					system.majId(arguments[0])
+					system.majLastId(address, arguments[0])
 				elif order == 'GET_HOKUYO':
 					system.majPosition(arguments)
 				elif order == 'GET_CAM':
-					system.majCam(arguments)	
+					system.majCam(arguments)
+				elif order == 'A_GOTO':
+					pass	
 				else:
 					self.__logger.warning("ce retour n'est pas implementé, address " + str(address) + " ordre " + str(order) + " arguments " + str(arguments))
 

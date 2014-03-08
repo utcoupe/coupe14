@@ -9,9 +9,12 @@ import os
 
 from constantes import *
 import goals
+import logging
 
 class EventManager():
-	def __init__(self, Data):
+	def __init__(self, Communication, Data):
+		self.__logger = logging.getLogger(__name__.split('.')[0])
+		self.__Communication = Communication
 		self.__Flussmitel = Data.Flussmittel
 		self.__Tibot = Data.Tibot
 		self.__Tourelle = Data.Tourelle
@@ -19,9 +22,9 @@ class EventManager():
 
 		self.__last_hokuyo_data = None
 		self.__last_flussmitel_order_finished = -1	#id_action
-		self.__id_to_reach_flussmitel = None
+		self.__id_to_reach_flussmitel = 0
 		self.__last_tibot_order_finished = -1			#id_action
-		self.__id_to_reach_tibot = None
+		self.__id_to_reach_tibot = 0
 
 		self.__GoalsManager = goals.GoalsManager()
 
@@ -57,7 +60,7 @@ class EventManager():
 				#TODO call collision
 
 		if self.__Flussmitel != None:
-			new_id = self.__Flussmitel.getLastIdOrderReceived()
+			new_id = self.__Flussmitel.getLastIdGlobale()
 			#si un nouvel ordre s'est terminé
 			if new_id != self.__last_flussmitel_order_finished:
 				self.__last_flussmitel_order_finished = new_id
@@ -66,7 +69,7 @@ class EventManager():
 					self.pushOrders(self.__Flussmitel, self.__Flussmitel.getNextOrders())
 
 		if self.__Tibot != None:
-			new_id = self.__Tibot.getLastIdOrderReceived()
+			new_id = self.__Tibot.getLastIdGlobale()
 			#si un nouvel ordre s'est terminé
 			if new_id != self.__last_tibot_order_finished:
 				print("id", new_id)
@@ -75,24 +78,40 @@ class EventManager():
 				if self.__last_tibot_order_finished == self.__id_to_reach_tibot:
 					self.pushOrders(self.__Tibot, self.__Tibot.getNextOrders())
 
-	def pushOrders(self, objet, data_objectif): #data_objectif est de type ((id_action, ordre, arguments),...)
-		last_order = data_objectif.pop()
+	def pushOrders(self, objet, data): 
+		id_objectif = data[0]
+		data_action = data[1]#data_action est de type ((id_action, ordre, arguments),...)
 
-		name = objet.getName()
-		if name == 'FLUSSMITTEL':
-			self.__last_flussmitel_order_finished = last_order[0] - 1
-		elif name == 'TIBOT':
-			self.__last_tibot_order_finished = last_order[0] - 1
+		last_order = data_action.pop()
+		if len(data_action) > 0:
+			prev_last_order = data_action[-1]
+			name = objet.getName()
+			if name == 'FLUSSMITTEL':
+				self.__id_to_reach_flussmitel = prev_last_order[0]
+			elif name == 'TIBOT':
+				self.__id_to_reach_tibot = prev_last_order[0]
 
 
 		if last_order[1] == 'SLEEP':
 			#TODO call time manager
 			pass
+		elif last_order[1] == 'END':
+			#TODO call objectifManager
+			pass
 
-		self.sendOrders(objet, data_objectif)
+		self.sendOrders((objet.getAddressOther(), objet.getAddressAsserv()), data_action)
 
 
-	def sendOrders(self, objet, orders):
-		print("objet", objet, "orders", orders)
-		#TODO call comm API
+	def sendOrders(self, address, data_action):#data_action est de type ((id_action, ordre, arguments),...)
+		for action in data_action:
+			arg = list(map(int, list(action[0]) + action[2].split(',')))
+			print(arg)
+			if action[1][0] == 'O':
+				self.__Communication.sendOrderAPI(address[0], action[1], *arg)
+			elif action[1][0] == 'A':
+				self.__Communication.sendOrderAPI(address[1], action[1], *arg)
+			else:
+				self.__logger.critical("L'ordre " + action[1] + " ne suit pas la convention, il ne commence ni par A, ni par O")
+			print("envoie de action:" + str(action))
+
 		

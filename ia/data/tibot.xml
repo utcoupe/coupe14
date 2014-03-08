@@ -5,8 +5,18 @@
 		<actions>
 			<action>
 				<id_action>0</id_action>
-				<ordre>GOTO</ordre>
-				<arguments>(10,10)</arguments>
+				<ordre>A_GOTO</ordre>
+				<arguments>0,0</arguments>
+			</action>
+			<action>
+				<id_action>1</id_action>
+				<ordre>A_GOTO</ordre>
+				<arguments>0,0</arguments>
+			</action>
+			<action>
+				<id_action>2</id_action>
+				<ordre>END</ordre>
+				<arguments>0</arguments>
 			</action>
 		</actions>
 	</objectif>
