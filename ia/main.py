@@ -38,5 +38,6 @@ logger.info("Les systèmes attendu ont bien été détéctés. Flussmittel: %s  
 
 
 Data = data.Data(Communication, arduino_constantes)
-GoalsManager = goals.GoalsManager()
+#On l'instanciera depuis eventManager
+#GoalsManager = goals.GoalsManager()
 
