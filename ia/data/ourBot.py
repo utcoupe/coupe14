@@ -5,10 +5,12 @@ Classe pour nos robots
 
 from constantes import *
 from math import sqrt
+import logging
 
 class OurBot():
 	def __init__(self, communication, arduino_constantes, addressOther, addressAsserv, largeur, longueur):
 		#Constantes
+		self.__logger = logging.getLogger(__name__.split('.')[0])
 		self.__communication = communication
 		self.__addressOther = addressOther
 		self.__addressAsserv = addressAsserv
