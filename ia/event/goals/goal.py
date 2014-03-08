@@ -5,14 +5,14 @@ A goal reprsent a task & contains a list of executions
 It is loaded from XML file
 """
 
-from .goalExecution import GoalExecution
+import goalExecution
 
 class Goal:
 	FINISHED_THRESHOLD = 50
 
 	def __init__(self, name, type, location, executions):
-		self.__name		= str(name)
-		self.__type		= str(type)
+		self.__name			= str(name)
+		self.__type			= str(type)
 		self.__location = location
 		self.executions = executions
 		self.__finished	= 0 # From 0 (not finished) to 100 (finished)
