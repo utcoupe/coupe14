@@ -11,6 +11,7 @@ from xml.dom.minidom import parseString
 from collections import OrderedDict
 import goal
 import goalExecution
+import os
 
 class GoalsManager:
 

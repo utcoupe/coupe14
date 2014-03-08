@@ -5,6 +5,7 @@ Fichier principale, demarre l'ia
 
 #Libs
 import sys
+import os
 import time
 import logging
 
