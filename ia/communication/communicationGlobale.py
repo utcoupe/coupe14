@@ -32,11 +32,14 @@ class CommunicationGlobale():
 		(self.address, self.orders, self.argumentSize, self.ordersArguments, self.ordersRetour) = parser_c.parseConstante()
 		self.nbAddress = len(self.address)//2
 
-
+			
 		for order in self.orders:#revertion de self.argumentSize
 			if isinstance(order, (str)):
 				size = self.argumentSize[order]
 				self.argumentSize[self.orders[order]] = size
+
+		for order in self.orders:# on vérifie la cohérance entre serial_defines.c et serial_defines.h
+			self.checkParsedOrderSize(order)
 
 		#on crée un dico de taille de retour
 		for order in self.orders:
@@ -52,8 +55,7 @@ class CommunicationGlobale():
 					self.__logger.error("Parseur: le parseur a trouvé un type non supporté")
 			self.returnSize[order] = size
 
-		for order in self.orders:# on vérifie la cohérance entre serial_defines.c et serial_defines.h
-			self.checkParsedOrderSize(order)
+		
 		
 		self.ordreLog = [[(-1,"")]*64 for x in range(self.nbAddress+1)] #stock un historique des ordres envoyés, double tableau de tuple (ordre,data)
 		self.arduinoIdReady = [False]*(self.nbAddress+1)
@@ -419,7 +421,7 @@ class CommunicationGlobale():
 						temp = bin(octet)[2:].zfill(7)
 						argumentData += temp
 
-					arguments = deque()
+					arguments = []
 					index = 0
 					for returnType in self.ordersRetour[self.ordreLog[address][idd][0]]:
 						if returnType == 'int':
@@ -564,7 +566,7 @@ class CommunicationGlobale():
 			if somme != sizeExpected:
 				self.__logger.error("la constante de taille de l'ordre " + str(order) + " ne correspond pas aux types indiqués attendu " + str(sizeExpected) + " calculee " + str(somme))
 		else:
-			self.__logger.error("ERREUR l'ordre " + str(order) + "n'a pas été trouvé dans serial_defines.c")
+			self.__logger.error("L'ordre " + str(order) + " n'a pas été trouvé dans serial_defines.c")
 
 
 	def checkOrderArgument(self, order, *arguments):

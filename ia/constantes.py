@@ -38,9 +38,14 @@ renvoiImmediat = 		False # fonction non terminé, ne pas activer !
 #====================Variables globales====================
 NUMBER_OF_ENEMY = 		2
 
+#====================eventManager====================
+PERIODE_EVENT_MANAGER =	10
 
-
-
+#====================timeManager====================
+PERIODE_TIME_MANAGER =	100
+END_OF_MATCH = 			89500
+BEGIN_FUNNY_ACTION =	90000
+END_OF_FUNNY_ACTION = 	94000
 
 #====================tourelle====================
 ENABLE_TOURELLE = 		False #permet de deactiver la tourelle

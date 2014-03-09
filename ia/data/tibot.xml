@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<objectifs>
+	<objectif objectif_name='Sortir de la zone de depart'>
+		<idd>0</idd>
+		<actions>
+			<action>
+				<id_action>0</id_action>
+				<ordre>A_GOTO</ordre>
+				<arguments>0,0</arguments>
+			</action>
+			<action>
+				<id_action>1</id_action>
+				<ordre>A_GOTO</ordre>
+				<arguments>0,0</arguments>
+			</action>
+			<action>
+				<id_action>2</id_action>
+				<ordre>END</ordre>
+				<arguments>0</arguments>
+			</action>
+		</actions>
+	</objectif>
+</objectifs>

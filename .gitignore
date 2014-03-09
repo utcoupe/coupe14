@@ -22,3 +22,4 @@ libs/cgal/CMakeCache.txt
 libs/cgal/partition
 libs/cgal/partition_continue
 ia/log/*
+.idea/*
