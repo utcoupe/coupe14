@@ -26,7 +26,7 @@ Control::Control(){
 
 	value_consigne_right = 0;
 	value_consigne_left = 0;
-	last_finished_id = -1;
+	last_finished_id = 0;
 }
 
 void Control::compute(){
