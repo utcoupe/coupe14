@@ -125,9 +125,14 @@ class GUI:
 		while 1:
 			ret = str(self.sock.recv(1024), 'utf-8')
 			try:
+				backup = self.robot_pos
 				self.robot_pos = list(map(float, ret.split(":")))
+				if len(self.robot_pos) != 3:
+					print("taille de la pos : " + str(len(self.robot_pos)))
+					raise Exception("Robot_pos corompu")
 			except:
-				pass
+				print("Exception : robot_pos from backup")
+				self.robot_pos = backup
 
 	def pos_loop(self):
 		self.move_robot(*self.robot_pos)
