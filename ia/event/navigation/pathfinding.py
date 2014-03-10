@@ -16,7 +16,6 @@ class PathFinding:
 		self.__flussmittel, self.__tibot, self.__big_enemy_bot, self.__small_enemy_bot = robot_list
 		#on cree le navgraph
 		self.__ng = nav.NavGraph(MARGE_PASSAGE, xml_filename)
-		self.__init_enemy_bot()
 		#on compte nos robots
 		self.__our_bot_count = 0
 		if self.__flussmittel is not None:
@@ -36,15 +35,17 @@ class PathFinding:
 
 		self.__log.info(str(self.__our_bot_count) + " robots amis actifs")
 
+		#compte des ennemis
 		self.__number_of_enemy = 0
 		if self.__big_enemy_bot is not None:
 			self.__number_of_enemy += 1
 		if self.__small_enemy_bot is not None:
 			self.__number_of_enemy += 1
 		self.__log.info(str(self.__number_of_enemy) + " robots ennemis actifs")
-		#on met a jour tout les robots
 
-		self.__other_bot_poly = Poly().initFromCircle(self.__other_bot.getPosition(), self.__other_bot.getRayon(), POINTS_PAR_CERCLE)
+		#initialisation
+		self.__init_enemy_bot()
+		self.__init_allied_bot()
 		self.update(self.__our_bot)
 
 	def update(self, robot):
@@ -92,3 +93,7 @@ class PathFinding:
 			self.__small_enemy_poly = Poly().initFromCircle((-1000,-1000), self.__small_enemy_bot.getRayon(), POINTS_PAR_CERCLE)
 			self.__ng.add_dynamic_obstacle(self.__small_enemy_poly)
 		self.__update_enemy_bot()
+
+	def __init_allied_bot(self):
+		self.__other_bot_poly = Poly().initFromCircle(self.__other_bot.getPosition(), self.__other_bot.getRayon(), POINTS_PAR_CERCLE)
+		self.__ng.add_dynamic_obstacle(self.__other_bot_poly)
