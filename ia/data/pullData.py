@@ -24,8 +24,10 @@ class PullData():
 		self.PULL_PERIODE = PULL_PERIODE
 
 		self.pull_data = True
-		self.flussmittel_asked = False
-		self.tibot_asked = False
+		self.__id_flussmittel_other_asked = False
+		self.__data_flussmittel_asserv_asked = False
+		self.__id_tibot_other_asked = False
+		self.__data_tibot_asserv_asked = False
 		self.tourelle_asked = False
 
 		self.ThreadPull = threading.Thread(target=self.gestion)
@@ -42,18 +44,27 @@ class PullData():
 
 	def askData(self):
 		arguments = []
-		if self.flussmittel_asked == False:
-			if self.Flussmittel != None:
-				self.Communication.sendOrderAPI(self.address_flussmittel_asserv, 'A_GET_POS', *arguments)
-				self.flussmittel_asked = True
 
-		if self.tibot_asked == False:
-			if self.Tibot != None:
-				self.Communication.sendOrderAPI(self.address_tibot_asserv, 'A_GET_POS', *arguments)
-				self.tibot_asked = True
+		if self.Flussmittel != None:
+			if __id_flussmittel_other_asked == False:
+				self.Communication.sendOrderAPI(self.address_flussmittel_other, 'GET_LAST_ID', *arguments)
+				self.__id_flussmittel_other_asked = True
 
-		if self.tourelle_asked == False:
-			if self.Tourelle != None:
+			if __data_flussmittel_asserv_asked == False:
+				self.Communication.sendOrderAPI(self.address_flussmittel_asserv, 'A_GET_POS_ID', *arguments)
+				self.__data_flussmittel_asserv_asked = True
+
+		if self.Tibot != None:
+			if self.__id_tibot_other_asked == False:
+				self.Communication.sendOrderAPI(self.address_tibot_other, 'GET_LAST_ID', *arguments)
+				self.__id_tibot_other_asked = True
+
+			if self.__data_tibot_asserv_asked == False:
+				self.Communication.sendOrderAPI(self.address_tibot_asserv, 'A_GET_POS_ID', *arguments)
+				self.__data_tibot_asserv_asked = True
+				
+		if self.Tourelle != None:
+			if self.tourelle_asked == False:
 				self.Communication.sendOrderAPI(self.address_tourelle, 'GET_HOKUYO', *arguments)
 				self.tourelle_asked = True
 
@@ -68,12 +79,26 @@ class PullData():
 			arguments = orderTuple[2]
 
 			#Choix de l'objet
-			if address == self.address_flussmittel_other or address == self.address_flussmittel_asserv:
+			if address == self.address_flussmittel_other:
 				system = self.Flussmittel
-				self.flussmittel_asked = False
-			elif address == self.address_tibot_other or address == self.address_tibot_asserv:
+				if order == 'GET_LAST_ID':
+					self.__id_flussmittel_other_asked = False
+
+			elif address == self.address_flussmittel_asserv:
+				system = self.Flussmittel
+				if order == 'A_GET_POS_ID':
+					self.__data_flussmittel_asserv_asked = False
+
+			elif address == self.address_tibot_other:
 				system = self.Tibot
-				self.tibot_asked = False
+				if order == 'GET_LAST_ID':
+					self.__id_tibot_other_asked = False
+
+			elif address == self.address_tibot_asserv:
+				system = self.Tibot
+				if order == 'A_GET_POS_ID':
+					self.__data_tibot_asserv_asked = False
+					
 			elif address == self.address_tourelle:
 				system = self.Tourelle
 				self.tourelle_asked = False
@@ -82,12 +107,16 @@ class PullData():
 				self.__logger.error("un systeme non initilisé nous envoi des données")
 
 			if system != None:
-				if order == 'A_GET_POS':
-					system.majPosition(arguments)
+				if order == 'A_GET_POS_ID':
+					system.majPositionId(address, arguments)
+				elif order == 'GET_LAST_ID':
+					system.majLastId(address, arguments[0])
 				elif order == 'GET_HOKUYO':
 					system.majPosition(arguments)
 				elif order == 'GET_CAM':
-					system.majCam(arguments)	
+					system.majCam(arguments)
+				elif order == 'A_GOTO':
+					pass	
 				else:
 					self.__logger.warning("ce retour n'est pas implementé, address " + str(address) + " ordre " + str(order) + " arguments " + str(arguments))
 

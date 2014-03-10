@@ -9,9 +9,11 @@ import heapq
 import logging
 from xml.dom.minidom import parseString
 from collections import OrderedDict
-import goal
-import goalExecution
+
+from .goal import *
+from .goalExecution import *
 import os
+
 
 class GoalsManager:
 
@@ -74,7 +76,7 @@ class GoalsManager:
 				self.__finishGoal(goal)
 
 	# XML import and export of goals
-	def loadGoals(self, filename=os.path.join(os.path.dirname(os.path.abspath(__file__)), "goals/goals.xml")):
+	def loadGoals(self, filename=os.path.join(os.path.dirname(os.path.abspath(__file__)), "goals.xml")):
 		self.__logger.info('GoalsManager: loading goals from: %s' % filename)
 		fd = open(filename,'r')
 		dom = parseString(fd.read())
@@ -108,7 +110,7 @@ class GoalsManager:
 			else:
 				self.__available_goals.append(goal)
 	
-	def saveGoals(self, filename=os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../log/saved_goals.xml"):
+	def saveGoals(self, filename=os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../log/saved_goals.xml")):
 		self.__logger.info('GoalsManager: saving goals to: ' + filename)
 		string = "<goals>\n"
 		for list in [self.__available_goals, self.__blocked_goals, self.__finished_goals]:
