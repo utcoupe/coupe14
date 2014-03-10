@@ -18,9 +18,9 @@ PARITY_OTHER = 			"NONE"
 MAX_UNCONFIRMED_PACKET =5 # maximum 32
 EMPTY_FIFO = 			True
 TIMEOUT = 				100
-HIGH_PRIO_SPEED = 		30 #période d'execution en ms
+HIGH_PRIO_SPEED = 		20 #période d'execution en ms
 LOW_PRIO_SPEED = 		1000 #période d'execution en ms
-KEEP_CONTACT_TIMEOUT = 	1000
+KEEP_CONTACT_TIMEOUT = 	2000
 OFF_LIGNE_TIMEOUT = 	5000
 
 #Systèmes arretable:
@@ -38,15 +38,20 @@ renvoiImmediat = 		False # fonction non terminé, ne pas activer !
 #====================Variables globales====================
 NUMBER_OF_ENEMY = 		2
 
+#====================eventManager====================
+PERIODE_EVENT_MANAGER =	10
 
-
-
+#====================timeManager====================
+PERIODE_TIME_MANAGER =	100
+END_OF_MATCH = 			89500
+BEGIN_FUNNY_ACTION =	90000
+END_OF_FUNNY_ACTION = 	94000
 
 #====================tourelle====================
 ENABLE_TOURELLE = 		False #permet de deactiver la tourelle
 
 #====================pullData====================
-PULL_PERIODE = 			50 #période des pull en ms
+PULL_PERIODE = 			100 #période des pull en ms
 
 #====================CAMERA====================
 SEUIL_ROUGE = 			100 #TODO

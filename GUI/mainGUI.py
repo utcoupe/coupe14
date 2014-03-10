@@ -16,7 +16,7 @@ import data
 import guiCommande
 
 ObjetCommunication = communication.CommunicationGlobale()
-ObjetCommunication.enableDebug()
+ObjetCommunication.enableReturnDisplay()
 
 time.sleep(1000/1000.0)
 print("INFO: La communication est prête")

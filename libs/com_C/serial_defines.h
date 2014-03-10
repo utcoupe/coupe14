@@ -59,6 +59,7 @@ enum ordre {
 	A_ACCMAX,	//@float
 	A_RESET_POS,
 	A_GET_POS,	//#int #int #float
+	A_GET_POS_ID,	//#int #int #float #int
 
 	O_BRAS_OUVRIR, //@int
 	O_BRAS_FERMER, //@int
