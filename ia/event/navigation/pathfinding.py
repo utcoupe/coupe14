@@ -86,9 +86,9 @@ class PathFinding:
 
 	def __init_enemy_bot(self):
 		if self.__big_enemy_bot is not None:
-			self.__big_enemy_poly = Poly().initFromCircle((-1000,-1000), RAYON_BIG_ENEMY, POINTS_PAR_CERCLE)
+			self.__big_enemy_poly = Poly().initFromCircle((-1000,-1000), self.__big_enemy_bot.getRayon(), POINTS_PAR_CERCLE)
 			self.__ng.add_dynamic_obstacle(self.__big_enemy_poly)
 		if self.__small_enemy_bot is not None:
-			self.__small_enemy_poly = Poly().initFromCircle((-1000,-1000), RAYON_SMALL_ENEMY, POINTS_PAR_CERCLE)
+			self.__small_enemy_poly = Poly().initFromCircle((-1000,-1000), self.__small_enemy_bot.getRayon(), POINTS_PAR_CERCLE)
 			self.__ng.add_dynamic_obstacle(self.__small_enemy_poly)
 		self.__update_enemy_bot()
