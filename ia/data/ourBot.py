@@ -32,7 +32,7 @@ class OurBot():
 		self.__last_id_executed_other = 29999
 		self.__last_id_executed_asserv = 29999
 
-		self.__last_id_stacked_action = IdRot()
+		self.__last_id_action_stacked = IdRot()
 
 		#Variables
 		self.__objectifs = None #((id, ((id_action, ordre, arguments), (id_action, ordre, arguments), ...)), ...)
@@ -52,6 +52,9 @@ class OurBot():
 
 	def getAddressAsserv(self):
 		return self.__addressAsserv
+
+	def __getNextIdToStack(self):
+		return self.__last_id_action_stacked.idIncrementation()
 
 
 	def majLastId(self, address, idd):
@@ -106,23 +109,36 @@ class OurBot():
 		objectif = deque()
 		for xml_goal in dom.getElementsByTagName('objectif'):
 			objectif_name	= xml_goal.attributes["objectif_name"].value #seulement pour information
-			idd				= xml_goal.getElementsByTagName('idd')[0].firstChild.nodeValue
+			id_action				= xml_goal.getElementsByTagName('idd')[0].firstChild.nodeValue
 
 			data_objectif = deque()
 			for xml_execution in xml_goal.getElementsByTagName('action'):
-				action 		= (xml_execution.getElementsByTagName('id_action')[0].firstChild.nodeValue,)
+				action 		= (self.__getNextIdToStack(),)
 				action 		+= (xml_execution.getElementsByTagName('ordre')[0].firstChild.nodeValue,)
-				action 		+= (xml_execution.getElementsByTagName('arguments')[0].firstChild.nodeValue,)
+
+				arguments = xml_execution.getElementsByTagName('arguments')[0].firstChild
+				if arguments:
+					action 		+= (list(map(int, arguments.nodeValue.split(','))),)
+				else:
+					action += (None,)
+
 				data_objectif.append(action)
 
-			objectif.append((idd, data_objectif))
+			objectif.append((id_action, data_objectif))
 
 		self.__objectifs = objectif
+		print(self.__objectifs)
 	
 
 	def getMaxRot(self, id1, id2):
-		"""Retourne le plus id de manière rotationnelle"""
-		if id1 > id2 and (id1 - id2) < 255/2:
-			return id1
+		"""Retourne le plus grand id rotationnelle"""
+		if id1 > id2:
+			if (id1 - id2) < 29999/2:
+				return id1
+			else:
+				return id2
 		else:
-			return id2
+			if (id2 - id1) < 29999/2:
+				return id2
+			else:
+				return id1

@@ -20,9 +20,9 @@ class EventManager():
 		self.__MetaData = Data.MetaData
 
 		self.__last_hokuyo_data = None
-		self.__last_flussmitel_order_finished = -1	#id_action
+		self.__last_flussmitel_order_finished = 29999	#id_action
 		self.__id_to_reach_flussmitel = 0
-		self.__last_tibot_order_finished = -1			#id_action
+		self.__last_tibot_order_finished = 29999			#id_action
 		self.__id_to_reach_tibot = 0
 
 		self.__GoalsManager = goals.GoalsManager()
@@ -71,7 +71,7 @@ class EventManager():
 			new_id = self.__Tibot.getLastIdGlobale()
 			#si un nouvel ordre s'est terminé
 			if new_id != self.__last_tibot_order_finished:
-				print("id", new_id)
+				print("Debug: Tibot vient de finir la commande d'id: " + str(new_id))
 				self.__last_tibot_order_finished = new_id
 				#si on a atteint l'action bloquante
 				if self.__last_tibot_order_finished == self.__id_to_reach_tibot:
@@ -82,13 +82,14 @@ class EventManager():
 		data_action = data[1]#data_action est de type ((id_action, ordre, arguments),...)
 
 		last_order = data_action.pop()
-		if len(data_action) > 0:
+		if data_action:
 			prev_last_order = data_action[-1]
-			name = objet.getName()
-			if name == 'FLUSSMITTEL':
+			if objet is self.__Flussmitel:
 				self.__id_to_reach_flussmitel = prev_last_order[0]
-			elif name == 'TIBOT':
+			elif objet is self.__Tibot:
 				self.__id_to_reach_tibot = prev_last_order[0]
+			else:
+				self.__logger.error("objet inconnu")
 
 
 		if last_order[1] == 'SLEEP':
@@ -103,7 +104,9 @@ class EventManager():
 
 	def sendOrders(self, address, data_action):#data_action est de type ((id_action, ordre, arguments),...)
 		for action in data_action:
-			arg = list(map(int, list(action[0]) + action[2].split(',')))
+			arg = [action[0]]
+			if action[2] is not None:
+				arg += action[2]
 			print(arg)
 			if action[1][0] == 'O':
 				self.__Communication.sendOrderAPI(address[0], action[1], *arg)
@@ -111,6 +114,6 @@ class EventManager():
 				self.__Communication.sendOrderAPI(address[1], action[1], *arg)
 			else:
 				self.__logger.critical("L'ordre " + action[1] + " ne suit pas la convention, il ne commence ni par A, ni par O")
-			print("envoie de action:" + str(action))
+			print("Debug: envoie de action:" + str(action))
 
 		
