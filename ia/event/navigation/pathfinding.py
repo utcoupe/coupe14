@@ -4,11 +4,8 @@ from geometry import *
 
 class PathFinding:
 	def __init__(self, robot_list, xml_filename, MARGE_PASSAGE=MARGE_PASSAGE):
-		flussmittel, tibot, big_enemy, small_enemy = robot_list
-		self.__flussmittel = flussmittel
-		self.__tibot = tibot
-		self.__big_enemy_bot = big_enemy
-		self.__small_enemy_bot = small_enemy
+		self.__log = logging.getLogger(__name__)
+		self.__flussmittel, self.__tibot, self.__big_enemy, self.__small_enemy = robot_list
 		#on cree le navgraph
 		self.__ng = nav.NavGraph(MARGE_PASSAGE, xml_filename)
 		self.__init_enemy_bot()
