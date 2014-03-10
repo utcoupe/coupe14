@@ -13,7 +13,7 @@ class IdRot:
 		return self.__id
 
 	def idIncremntation(self):
-		self.__id = self.__id + 1
+		self.__id += 1
 		if self.__id > self.__max:
 			self.__id = self.__min
 

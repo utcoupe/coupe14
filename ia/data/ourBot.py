@@ -72,14 +72,13 @@ class OurBot():
 		self.majLastId(address, arguments[3])
 
 	def getNextIdOrder(self):
-		if self.__objectifs != None:
+		if self.__objectifs is not None:
 			return (self.__objectifs[0][0], self.__objectifs[0][1][0]) #(id_objectif_0, id_action_0_de_objcetif_0)
 		else:
 			return None
 
 	def getNextOrders(self):
-		print(self.__objectifs)
-		if len(self.__objectifs) > 0:
+		if self.__objectifs is not None:
 			objectif_en_cours = self.__objectifs.popleft()
 			order_of_objectif = objectif_en_cours[1] # type ((id_action, ordre, arguments),...)
 

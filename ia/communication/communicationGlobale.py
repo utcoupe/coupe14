@@ -329,7 +329,7 @@ class CommunicationGlobale():
 			packetId = rawInput[1]
 
 			# si la longeur des données reçu est bonne
-			if packetAddress > 0 and packetAddress < (self.nbAddress+1) and packetId >= 0 and packetId < 64:
+			if 0 < packetAddress < (self.nbAddress+1) and 0 <= packetId < 64:
 				order = self.ordreLog[packetAddress][packetId][0]
 				if order != -1:
 					if len(rawInput[2:-1])*7//8 == self.returnSize[ order ]:
@@ -340,7 +340,7 @@ class CommunicationGlobale():
 				else:
 					self.__logger.error("On essaye de lire, l'id %s en provenance de l'arduino %s mais il n'est existe pas de trace dans le log (un vieux paquet qui trainait sur un client avant la nouvelle init ?)", packetId, self.address[packetAddress])
 					return -1
-			elif packetAddress > 0 and packetAddress < (self.nbAddress+1) and packetId > 63:
+			elif 0 < packetAddress < (self.nbAddress+1) and packetId > 63:
 				self.__logger.warning("L'arduino %s nous indique avoir mal reçu un message, message d'erreur %s", self.address[packetAddress], packetId)
 				if self.nbNextRenvoiImmediat[packetAddress] != 0:
 					self.nbRenvoiImmediat[packetAddress] += 1
@@ -365,7 +365,7 @@ class CommunicationGlobale():
 
 		for rawInput in rawInputList:
 			ret = self.extractData(rawInput)
-			if ret != -1 and ret != 0 and ret != None:# cas où les données sont de la bonne taille et que ça n'a rien à voir avec le système de reset
+			if ret != -1 and ret != 0 and ret is not None:# cas où les données sont de la bonne taille et que ça n'a rien à voir avec le système de reset
 				ordersList.append(ret)
 
 		return ordersList
@@ -623,19 +623,18 @@ class CommunicationGlobale():
 
 	def readOrdersAPI(self, address = 'all'):
 		"""Renvoi -1 si pas d'ordre en attente sinon renvoi un ordre """
-		find = False
 
+		orderToReturn = None
 		#Si on veut n'importe quel parquet
 		if address == 'all':
 			self.mutexOrdersToRead.acquire()
 			try:
 				orderToReturn = self.ordersToRead.popleft()
-				find = True
 			except:
-				find = False
 				pass
 			self.mutexOrdersToRead.release()
 
+		"""
 		#Uniquement si on veut les paquets d'un objet préci
 		else:
 			newOrderToRead = deque()
@@ -651,8 +650,8 @@ class CommunicationGlobale():
 				else:
 					newOrderToRead.append(order)
 			self.mutexOrdersToRead.release()
-
-		if find:
+		"""
+		if orderToReturn is not None:
 			return (orderToReturn[0], orderToReturn[1], orderToReturn[2]) #(address, order, arguments)
 		else:
 			return -1

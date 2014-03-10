@@ -53,13 +53,13 @@ class EventManager():
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
 	def checkEvent(self):
-		if self.__Tourelle != None:
+		if self.__Tourelle is not None:
 			new_data = self.__Tourelle.getLastDataPosition()
 			if new_data != self.__last_hokuyo_data:
 				self.__last_hokuyo_data = new_data
 				#TODO call collision
 
-		if self.__Flussmitel != None:
+		if self.__Flussmitel is not None:
 			new_id = self.__Flussmitel.getLastIdGlobale()
 			#si un nouvel ordre s'est terminé
 			if new_id != self.__last_flussmitel_order_finished:
@@ -68,7 +68,7 @@ class EventManager():
 				if self.__last_flussmitel_order_finished == self.__id_to_reach_flussmitel:
 					self.pushOrders(self.__Flussmitel, self.__Flussmitel.getNextOrders())
 
-		if self.__Tibot != None:
+		if self.__Tibot is not None:
 			new_id = self.__Tibot.getLastIdGlobale()
 			#si un nouvel ordre s'est terminé
 			if new_id != self.__last_tibot_order_finished:

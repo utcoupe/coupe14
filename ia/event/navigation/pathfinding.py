@@ -18,23 +18,23 @@ class PathFinding:
 		self.__init_enemy_bot()
 		#on compte nos robots
 		self.__our_bot_count = 0
-		if flussmittel != None:
+		if flussmittel is not None:
 			self.__our_bot_count += 1
-		if tibot != None:
+		if tibot is not None:
 			self.__our_bot_count += 1
 		self.__log.info(str(self.__our_bot_count) + " robots amis actifs")
 		self.__number_of_enemy = 0
-		if big_enemy != None:
+		if big_enemy is not None:
 			self.__number_of_enemy += 1
-		if small_enemy != None:
+		if small_enemy is not None:
 			self.__number_of_enemy += 1
 		self.__log.info(str(self.__number_of_enemy) + " robots ennemis actifs")
 		#on met a jour tout les robots
 
-		if flussmittel != None:
+		if flussmittel is not None:
 			self.__our_bot = self.__flussmittel
 			self.__other_bot = self.__tibot
-		elif tibot != None:
+		elif tibot is not None:
 			self.__our_bot = self.__tibot
 			self.__other_bot = self.__flussmittel
 		else:
@@ -75,16 +75,16 @@ class PathFinding:
 			self.__ng.add_dynamic_obstacle(self.__our_bot_poly)
 
 	def __update_enemy_bot(self):
-		if self.__small_enemy_bot != None:
+		if self.__small_enemy_bot is not None:
 			self.__big_enemy_poly.move_to(self.__big_enemy_bot.getPosition())
-		if self.__big_enemy_bot != None:
+		if self.__big_enemy_bot is not None:
 			self.__small_enemy_poly.move_to(self.__small_enemy_bot.getPosition())
 
 	def __init_enemy_bot(self):
-		if self.__big_enemy_bot != None:
+		if self.__big_enemy_bot is not None:
 			self.__big_enemy_poly =Poly().initFromCircle((0,0), RAYON_BIG_ENEMY, POINTS_PAR_CERCLE)
 			self.__ng.add_dynamic_obstacle(self.__big_enemy_poly)
-		if self.__small_enemy_bot != None:
+		if self.__small_enemy_bot is not None:
 			self.__small_enemy_poly = Poly().initFromCircle((0,0), RAYON_SMALL_ENEMY, POINTS_PAR_CERCLE)
 			self.__ng.add_dynamic_obstacle(self.__small_enemy_poly)
 		self.__update_enemy_bot()

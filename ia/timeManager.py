@@ -19,30 +19,30 @@ class TimeManager():
 		self.__date_match_begin = int(time.time()*1000.0)
 
 		#Pendant le match
-		dateActuel = int(time.time()*1000.0)
-		while ( dateActuel - self.__date_match_begin ) < END_OF_MATCH:	
-			self.__MetaData.setGameClock(dateActuel - self.__date_match_begin)
+		date_actuel = int(time.time()*1000.0)
+		while( date_actuel - self.__date_match_begin ) < END_OF_MATCH:
+			self.__MetaData.setGameClock(date_actuel - self.__date_match_begin)
 			#TODO gèrer les simulation d'event
 			time.sleep(PERIODE_TIME_MANAGER/1000.0)
-			dateActuel = int(time.time()*1000.0)
+			date_actuel = int(time.time()*1000.0)
 
 		self.__MetaData.stopMatch()
 		#TODO broadcast stop
 
 		#Temps mort
-		while ( dateActuel - self.__date_match_begin ) < BEGIN_FUNNY_ACTION:	
-			self.__MetaData.setGameClock(dateActuel - self.__date_match_begin)
+		while ( date_actuel - self.__date_match_begin ) < BEGIN_FUNNY_ACTION:
+			self.__MetaData.setGameClock(date_actuel - self.__date_match_begin)
 			#TODO gèrer les simulation d'event
 			time.sleep(PERIODE_TIME_MANAGER/1000.0)
-			dateActuel = int(time.time()*1000.0)
+			date_actuel = int(time.time()*1000.0)
 
 		#Pendant la funnyAction
 		self.__MetaData.startFunny()
-		dateActuel = int(time.time()*1000.0)
-		while ( dateActuel - self.__date_match_begin ) < END_OF_FUNNY_ACTION:	
-			self.__MetaData.setGameClock(dateActuel - self.__date_match_begin)
+		date_actuel = int(time.time()*1000.0)
+		while ( date_actuel - self.__date_match_begin ) < END_OF_FUNNY_ACTION:
+			self.__MetaData.setGameClock(date_actuel - self.__date_match_begin)
 			#TODO gèrer les simulation d'event
 			time.sleep(PERIODE_TIME_MANAGER/1000.0)
-			dateActuel = int(time.time()*1000.0)
+			date_actuel = int(time.time()*1000.0)
 		self.__MetaData.stopFunny()
 		#TODO broadcast stop

@@ -61,7 +61,7 @@ class Segment:
 			@return p
 		"""
 		m = self.m
-		if m == None: # eq x=c
+		if m is None: # eq x=c
 			return self.a.x
 		return self.a.y - m*self.a.x
 	
@@ -70,7 +70,7 @@ class Segment:
 			calcul la distance à un point
 		"""
 		m = self.m
-		if m == None: # eq x=c
+		if m is None: # eq x=c
 			return abs(self.a.x - p[0])
 		return abs(m*p[0] - p[1] + self.p) / math.sqrt(1+m**2)
 	
@@ -79,7 +79,7 @@ class Segment:
 			Calcul la projection orthogonale d'un point
 		"""
 		m = self.m
-		if m == None: # eq x=c
+		if m is None: # eq x=c
 			x = self.p
 			y = p[1]
 		elif m == 0: #eq y=c
