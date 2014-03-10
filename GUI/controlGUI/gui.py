@@ -20,7 +20,7 @@ class GUI:
 		#init comm
 		try:
 			self.sock = socket(AF_INET, SOCK_STREAM)    # create a TCP socket
-			self.sock.settimeout(5)
+			self.sock.settimeout(60)
 			self.sock.connect((self.serverHost, self.serverPort))  # connect to server on the port
 		except:
 			print("WARNING : Socket non ouvert, mode visualisation")
@@ -52,8 +52,8 @@ class GUI:
 
 		#goto manue
 		self.goto_text = Label(self.fen, text= "Goto")
-		self.gotox = Entry(self.fen)
-		self.gotoy = Entry(self.fen)
+		self.gotox_e = Entry(self.fen)
+		self.gotoy_e = Entry(self.fen)
 		self.gotoang = Entry(self.fen)
 		self.goto_frame = Frame()
 		self.send_goto = Button(self.goto_frame, text="Goto", command=self.goto_handler).pack(side='left')
@@ -93,8 +93,8 @@ class GUI:
 		self.reset_pos_button.pack(pady=10)
 
 		self.goto_text.pack()
-		self.gotox.pack()
-		self.gotoy.pack()
+		self.gotox_e.pack()
+		self.gotoy_e.pack()
 		self.gotoang.pack()
 		self.goto_frame.pack()
 
@@ -194,10 +194,10 @@ class GUI:
 		self.sock.send(bytes(tosend, 'utf-8'))               # send the data
 
 	def goto_handler(self):
-		self.goto(self.gotox.get(), self.gotoy.get())
+		self.goto(self.gotox_e.get(), self.gotoy_e.get())
 
 	def gotoa_handler(self):
-		self.gotoa(self.gotox.get(), self.gotoy.get(), self.gotoa.get())
+		self.gotoa(self.gotox_e.get(), self.gotoy_e.get(), self.gotoang.get())
 
 	def clic_goto(self, event):
 		gotox = int((event.x/self.widthfen)*self.areax)
