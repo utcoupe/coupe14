@@ -387,7 +387,7 @@ class CommunicationGlobale():
 				lastIdToAccept = -1
 
 				if idd == self.getNextConfirmeId(address):
-					self.__logger.info("Success: l'arduino %s a bien recu l'ordre %s d'id: %s", self.address[address], self.orders[self.ordreLog[address][idd][0]], idd)
+					self.__logger.debug("Success: l'arduino %s a bien recu l'ordre %s d'id: %s", self.address[address], self.orders[self.ordreLog[address][idd][0]], idd)
 					self.nbTransmitedPaquets +=1
 					self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(idd) - 1, date)#on bidone le chiffre date, mais c'est pas grave
 					self.lastIdConfirm[address] = idd
@@ -406,7 +406,7 @@ class CommunicationGlobale():
 
 					if lastIdToAccept != self.lastIdConfirm[address]:
 						if returnMissed == True:
-							self.__logger.info("Success: l'arduino %s a bien recu les ordres jusque %s mais il manque au moins un retour (avec argument) donc on ne confirme que %s d'id: %s", self.address[address], idd, self.orders[self.ordreLog[address][lastIdToAccept][0]], lastIdToAccept)
+							self.__logger.warning("Success: l'arduino %s a bien recu les ordres jusque %s mais il manque au moins un retour (avec argument) donc on ne confirme que %s d'id: %s", self.address[address], idd, self.orders[self.ordreLog[address][lastIdToAccept][0]], lastIdToAccept)
 							self.nbTransmitedPaquets += 1
 							self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(lastIdToAccept) - 1, date)#on bidone le chiffre date, mais c'est pas grave
 							self.lastIdConfirm[address] = lastIdToAccept
@@ -483,11 +483,10 @@ class CommunicationGlobale():
 		return (chaineRetour)
 
 	def sendOrders(self):
-		"""fonction qui gère l'envoi des ordres, sous le contrôle du thread"""
+		"""fonction qui gère l'envoi des ordres, sous le contrôle du thread de gestion"""
 		
 		#cas d'envoi normal
-		if len(self.ordersToSend)>0:
-
+		if self.ordersToSend:
 			date = int(time.time()*1000)
 			remainOrdersToSend = deque()
 			self.mutexOrdersToSend.acquire()
@@ -504,7 +503,7 @@ class CommunicationGlobale():
 					self.ordreLog[int(address)][idd] = (order, chaineTemp)
 					self.lastSendDate[address] = date
 					self.lastIdSend[address] = idd
-					self.__logger.info("Envoi normal a l'arduino %s de l'ordre %s d'id %s", self.address[address], self.orders[order], idd)
+					self.__logger.debug("Envoi normal a l'arduino %s de l'ordre %s d'id %s", self.address[address], self.orders[order], idd)
 					self.sendMessage(address, chaineTemp)
 				else:
 					remainOrdersToSend.appendleft(packet)
@@ -514,7 +513,7 @@ class CommunicationGlobale():
 
 			if len(remainOrdersToSend) == 0 and not self.empty_fifo:
 				self.empty_fifo = True
-				self.__logger.info("Fin de transmission de la file, (t = "+str(int(time.time()*1000)-self.timeStartProcessing)+"ms),nombre de paquets reçu " + str(self.nbTransmitedPaquets) + " nombre de paquets perdu " + str(self.nbTimeoutPaquets))
+				self.__logger.debug("Fin de transmission de la file, (t = "+str(int(time.time()*1000)-self.timeStartProcessing)+"ms),nombre de paquets reçu " + str(self.nbTransmitedPaquets) + " nombre de paquets perdu " + str(self.nbTimeoutPaquets))
 		
 
 
@@ -642,7 +641,7 @@ class CommunicationGlobale():
 			orderToReturn = -1
 			self.mutexOrdersToRead.acquire()
 			
-			while len(self.ordersToRead) > 0:
+			while self.ordersToRead:
 				order = self.ordersToRead.popleft()
 				if (order[0] == address or order[0] == self.address[address] or address == 'all') and find == False:
 					find = True
