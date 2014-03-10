@@ -10,6 +10,7 @@ class GraphView(View):
 		View.__init__(self)
 
 		self.self_bot = self_bot
+		self.dynamic_obstacle = dynamic_obstacle
 		self.graph = graph
 
 		self.p_depart = (200,200)
@@ -19,15 +20,13 @@ class GraphView(View):
 
 		self.id_raw_path = None
 		self.id_smooth_path = None
-
-		self.dynamic_obstacle = dynamic_obstacle
 		
 		## bindings
 		self.canvas.bind('<Button-1>',self.onLeft)
 		self.canvas.bind('<B1-Motion>',self.onLeft)
 		self.canvas.bind('<Button-3>',self.onRight)
 		self.canvas.bind('<B3-Motion>',self.onRight)
-		self.canvas.bind('<Button-2>',self.onWheel)
+		self.canvas.bind('<Button-1>',self.onWheel)
 		self.canvas.bind('<B2-Motion>',self.onWheel)
 
 		self.sum_calc_times = 0
