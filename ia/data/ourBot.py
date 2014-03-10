@@ -29,8 +29,8 @@ class OurBot():
 		self.__positionX = 0
 		self.__positionY = 0
 		self.__angle = 0.0
-		self.__last_id_executed_other = 29999
-		self.__last_id_executed_asserv = 29999
+		self.__last_id_executed_other = ID_ACTION_MAX
+		self.__last_id_executed_asserv = ID_ACTION_MAX
 
 		self.__last_id_action_stacked = IdRot()
 
@@ -61,11 +61,11 @@ class OurBot():
 		if address == 'ADDR_FLUSSMITTEL_OTHER' or address == 'ADDR_TIBOT_OTHER':
 			if idd != self.__last_id_executed_other and idd:
 				self.__last_id_executed_other = idd
-				print("changement d'id other " + str(idd))
+				self.__logger.debug("changement d'id other " + str(idd))
 		else:
 			if idd != self.__last_id_executed_asserv:
 				self.__last_id_executed_asserv = idd
-				print("changement d'id asserv " + str(idd))
+				self.__logger.debug("changement d'id asserv " + str(idd))
 
 	#utilise les données en provenance de de l'asserv uniquement !
 	def majPositionId(self, address, arguments):
@@ -101,7 +101,7 @@ class OurBot():
 			return None
 
 	def loadActionScript(self, filename):
-		print(self.__name,": loading actionScript from:", filename)
+		self.__logger.info(str(self.__name) + ": loading actionScript from: " + str(filename))
 		fd = open(filename,'r')
 		dom = parseString(fd.read())
 		fd.close()
@@ -127,20 +127,20 @@ class OurBot():
 			objectif.append((id_action, data_objectif))
 
 		self.__objectifs = objectif
-		print(self.__objectifs)
+		self.__logger.debug("Script de " + str(self.__name) + "chargé: " + str(self.__objectifs))
 	
 
 	def getMaxRot(self, id1, id2):
 		"""Retourne le plus grand id rotationnelle"""
 		if id1 > id2:
-			if (id1 - id2) < 29999/2:
+			if (id1 - id2) < ID_ACTION_MAX/2:
 				return id1
 			else:
 				return id2
 		else:
-			if (id2 - id1) < 29999/2:
+			if (id2 - id1) < ID_ACTION_MAX/2:
 				return id2
 			else:
 				return id1
 
-	
+

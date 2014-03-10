@@ -40,6 +40,7 @@ NUMBER_OF_ENEMY = 		2
 
 #====================eventManager====================
 PERIODE_EVENT_MANAGER =	10
+ID_ACTION_MAX =			3
 
 #====================timeManager====================
 PERIODE_TIME_MANAGER =	100

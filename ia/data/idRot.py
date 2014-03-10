@@ -3,9 +3,11 @@
 Gere des id rotationnelle de 0 à 255, on les utilisent pour les id d'actions
 """
 
+from constantes import *
+
 class IdRot:
 	def __init__(self):
-		self.__max = 29999 #ne peut être modifié indépendament du eventManager
+		self.__max = ID_ACTION_MAX #ne peut être modifié indépendament du eventManager
 		self.__id = self.__max
 
 	def getId(self):

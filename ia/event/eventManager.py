@@ -21,12 +21,12 @@ class EventManager():
 		self.__MetaData = Data.MetaData
 
 		self.__last_hokuyo_data = None
-		self.__last_flussmitel_order_finished = 29999	#id_action
+		self.__last_flussmitel_order_finished = ID_ACTION_MAX	#id_action
 		self.__id_to_reach_flussmitel = 0
 		self.__sleep_time_flussmitel = 0
 		self.__resume_date_flussmittel = 0
 
-		self.__last_tibot_order_finished = 29999			#id_action
+		self.__last_tibot_order_finished = ID_ACTION_MAX			#id_action
 		self.__id_to_reach_tibot = 0
 		self.__sleep_time_tibot = 0
 		self.__resume_date_tibot = 0
@@ -86,7 +86,6 @@ class EventManager():
 			new_id = self.__Tibot.getLastIdGlobale()
 			#si un nouvel ordre s'est terminé
 			if new_id != self.__last_tibot_order_finished:
-				print("Debug: Tibot vient de finir la commande d'id: " + str(new_id))
 				self.__last_tibot_order_finished = new_id
 
 			#si on est sur l'action bloquante
@@ -101,7 +100,6 @@ class EventManager():
 						self.pushOrders(self.__Tibot, self.__Tibot.getNextOrders())
 
 	def pushOrders(self, objet, data): 
-		print("data: " + str(data))
 		id_objectif = data[0]
 		data_action = data[1]#data_action est de type ((id_action, ordre, arguments),...)
 
@@ -117,22 +115,18 @@ class EventManager():
 
 
 		if last_order[1] == 'SLEEP':
-			print("debug ttstb:" + str(last_order[2][0]))
 			if objet is self.__Flussmitel:
 				self.__sleep_time_flussmitel = last_order[2][0]
 			elif objet is self.__Tibot:
 				self.__sleep_time_tibot = last_order[2][0]
 			else:
 				self.__logger.error("objet inconnu")
-
 		elif last_order[1] == 'END':
 			#TODO call objectifManager
 			pass
-
 		elif last_order[1] == 'THEN':
 			#Rien à faire
 			pass
-
 		else:
 			self.__logger.error("ordre de stop impossible")
 
@@ -144,11 +138,12 @@ class EventManager():
 			arg = [action[0]]
 			if action[2] is not None:
 				arg += action[2]
-			print(arg)
+
 			if action[1][0] == 'O':
 				self.__Communication.sendOrderAPI(address[0], action[1], *arg)
 			elif action[1][0] == 'A':
 				self.__Communication.sendOrderAPI(address[1], action[1], *arg)
 			else:
-				self.__logger.critical("L'ordre " + action[1] + " ne suit pas la convention, il ne commence ni par A, ni par O")
-			print("Debug: envoie de action:" + str(action))
+				self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
+
+			self.__logger.debug("Envoie des actions: " + str(action))
