@@ -75,6 +75,7 @@ class GraphView(View):
 		print("path : "+str(smooth_path))
 
 		self.show_result_calc_path(smooth_path)
+		print("Longueur : " + str(smooth_path.dist))
 		
 		return smooth_path
 
