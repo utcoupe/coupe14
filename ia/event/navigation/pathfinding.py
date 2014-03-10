@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from .pathfinding2012 import *
-from constantes import *
+from .constantes import *
 from geometry import *
 import logging
 import time
