@@ -4,8 +4,8 @@
 		<idd>0</idd>
 		<actions>
 			<action>
-				<ordre>A_GOTO</ordre>
-				<arguments>0,0</arguments>
+				<ordre>SLEEP</ordre>
+				<arguments>5000</arguments>
 			</action>
 			<action>
 				<ordre>A_GOTO</ordre>
@@ -13,15 +13,15 @@
 			</action>
 			<action>
 				<ordre>A_GOTO</ordre>
-				<arguments>0,0</arguments>
+				<arguments>1,0</arguments>
 			</action>
 			<action>
-				<ordre>THEN</ordre>
-				<arguments></arguments>
+				<ordre>SLEEP</ordre>
+				<arguments>10000</arguments>
 			</action>
 			<action>
 				<ordre>A_GOTO</ordre>
-				<arguments>0,0</arguments>
+				<arguments>1,2</arguments>
 			</action>
 			<action>
 				<ordre>END</ordre>

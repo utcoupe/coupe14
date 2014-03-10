@@ -59,11 +59,11 @@ class OurBot():
 
 	def majLastId(self, address, idd):
 		if address == 'ADDR_FLUSSMITTEL_OTHER' or address == 'ADDR_TIBOT_OTHER':
-			if self.__last_id_executed_other != idd:
+			if idd != self.__last_id_executed_other and idd:
 				self.__last_id_executed_other = idd
 				print("changement d'id other " + str(idd))
 		else:
-			if self.__last_id_executed_asserv != idd:
+			if idd != self.__last_id_executed_asserv:
 				self.__last_id_executed_asserv = idd
 				print("changement d'id asserv " + str(idd))
 
@@ -142,3 +142,5 @@ class OurBot():
 				return id2
 			else:
 				return id1
+
+	

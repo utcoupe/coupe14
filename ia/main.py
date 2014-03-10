@@ -41,8 +41,8 @@ logger.info("Les systèmes attendu ont bien été détéctés. Flussmittel: %s  
 
 
 Data = data.Data(Communication, arduino_constantes)
-EventManager = event.EventManager(Communication, Data)
 TimeManager = timeManager.TimeManager(Data.MetaData)
+EventManager = event.EventManager(Communication, TimeManager, Data)
 
 
 

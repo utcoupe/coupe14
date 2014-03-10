@@ -12,6 +12,8 @@ class TimeManager():
 		self.__MetaData = MetaData
 
 		self.__date_match_begin = None
+		self.__wait_dico = {}
+
 
 
 	def startMatch(self):
@@ -46,3 +48,4 @@ class TimeManager():
 			date_actuel = int(time.time()*1000.0)
 		self.__MetaData.stopFunny()
 		#TODO broadcast stop
+
