@@ -97,7 +97,7 @@ void Control::compute(){
 					}
 					order_started = true;
 				}
-				if(!aligne && abs(da) <= ERROR_ANGLE && value_consigne_right < CONSIGNE_REACHED && value_consigne_left < CONSIGNE_REACHED) {
+				if(!aligne && abs(da) <= ERROR_ANGLE) {// && value_consigne_right < CONSIGNE_REACHED && value_consigne_left < CONSIGNE_REACHED) {
 					aligne = 1;
 				}
 
@@ -108,7 +108,7 @@ void Control::compute(){
 					controlPos(da, d + current_goal.data_3);//erreur en dist = dist au point + dist additionelle
 				}
 
-				if(abs(dd) <= ERROR_POS && value_consigne_right < CONSIGNE_REACHED && value_consigne_left < CONSIGNE_REACHED) {
+				if(abs(dd) <= ERROR_POS) {// && value_consigne_right < CONSIGNE_REACHED && value_consigne_left < CONSIGNE_REACHED) {
 					setConsigne(0, 0);
 					fifo.pushIsReached();
 				}
@@ -224,11 +224,11 @@ void Control::setConsigne(float consigne_left, float consigne_right){
 	value_consigne_left = (int)consigne_left;
 }
 
-void Control::check_max(float *consigne) {
-	if(*consigne > CONSIGNE_RANGE_MAX)
-		*consigne = CONSIGNE_RANGE_MAX;
-	else if(*consigne < CONSIGNE_RANGE_MIN)
-		*consigne = CONSIGNE_RANGE_MIN;
+void Control::check_max(float *consigne, float max) {
+	if(*consigne > max)
+		*consigne = max;
+	else if(*consigne < -max)
+		*consigne = -max;
 }
 
 void Control::check_acc(float *consigne, float last)
@@ -272,7 +272,7 @@ void Control::controlPos(float da, float dd)
 	consigneDistance = PID_Distance.compute(dd); //erreur = distance au goal
 
 	check_max(&consigneAngle);
-	check_max(&consigneDistance);
+	check_max(&consigneDistance, CONSIGNE_MAX - abs(consigneAngle));
 
 	consigneR = consigneDistance + consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
 	consigneL = consigneDistance - consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne

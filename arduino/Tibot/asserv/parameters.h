@@ -52,10 +52,8 @@
 #define PWM_MIN 20
 
 #define CONSIGNE_MAX 127
-#define CONSIGNE_MIN -127
 
 #define CONSIGNE_RANGE_MAX CONSIGNE_MAX - PWM_MIN
-#define CONSIGNE_RANGE_MIN CONSIGNE_MIN + PWM_MIN
 
 //CONSIGNE_REACHED est la pwm en dessous de laquelle un robot peut etre considéré comme arrêté à son goal
 #define CONSIGNE_REACHED 0

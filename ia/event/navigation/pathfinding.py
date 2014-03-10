@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 from .pathfinding2012 import *
-from constantes import *
+from .constantes import *
 from geometry import *
 import logging
 import time
+
+class Path(list):
+	def __init__(self, list):
+		super().__init__(list)
+		self.dist = sum( vec.norm() for vec in list )
 
 class PathFinding:
 	def __init__(self, robot_list, xml_filename, MARGE_PASSAGE=MARGE_PASSAGE):
@@ -55,7 +60,7 @@ class PathFinding:
 		start_time = time.time()
 		foo, bar, path = self.__ng.get_path(start, end)
 		self.__log.info("Calcul de trajectoire en " + str((time.time() - start_time) * 1000) + "ms : " + str(path))
-		return path
+		return Path(path)
 
 	def getPolygons(self):
 		return self.__ng.get_polygons()

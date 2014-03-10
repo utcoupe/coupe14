@@ -4,12 +4,11 @@ Ce code gère l'envoi d'actions élémentaires aux robots et traite les collisio
 """
 
 import threading
-import time
-import os
-
-from constantes import *
-import goals
 import logging
+import time
+
+from . import goals
+from .constantes import *
 
 class EventManager():
 	def __init__(self, Communication, Data):
