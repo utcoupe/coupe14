@@ -69,7 +69,7 @@ class PathFinding:
 
 	def __update_our_bot(self, robot):
 		"""Update le navgraph pour calculer une trajectoire pour le robot en paramètre"""
-		if robot == self.__our_bot: #on met juste la position a jour
+		if robot is self.__our_bot: #on met juste la position a jour
 			self.__other_bot_poly.move_to(self.__other_bot.getPosition())
 		else: #il faut recreer un nouveau poly a la bonne taille
 			#swap des robots
