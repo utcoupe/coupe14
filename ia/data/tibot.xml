@@ -30,7 +30,7 @@
 			</action>
 			<action>
 				<ordre>A_GOTO</ordre>
-				<arguments>1,0</arguments>
+				<arguments>0,0</arguments>
 			</action>
 			<action>
 				<ordre>SLEEP</ordre>
@@ -38,7 +38,7 @@
 			</action>
 			<action>
 				<ordre>A_GOTO</ordre>
-				<arguments>1,2</arguments>
+				<arguments>0,0</arguments>
 			</action>
 			<action>
 				<ordre>END</ordre>

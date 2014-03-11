@@ -46,11 +46,11 @@ class PullData():
 		arguments = []
 
 		if self.Flussmittel is not None:
-			if __id_flussmittel_other_asked == False:
+			if self.__id_flussmittel_other_asked == False:
 				self.Communication.sendOrderAPI(self.address_flussmittel_other, 'GET_LAST_ID', *arguments)
 				self.__id_flussmittel_other_asked = True
 
-			if __data_flussmittel_asserv_asked == False:
+			if self.__data_flussmittel_asserv_asked == False:
 				self.Communication.sendOrderAPI(self.address_flussmittel_asserv, 'A_GET_POS_ID', *arguments)
 				self.__data_flussmittel_asserv_asked = True
 

@@ -40,7 +40,7 @@ NUMBER_OF_ENEMY = 		2
 
 #====================eventManager====================
 PERIODE_EVENT_MANAGER =	10
-ID_ACTION_MAX =			3
+ID_ACTION_MAX =			29999
 
 #====================timeManager====================
 PERIODE_TIME_MANAGER =	100
@@ -59,7 +59,7 @@ SEUIL_ROUGE = 			100 #TODO
 SEUIL_JAUNE = 			100 #TODO
 
 #====================Flussmittel====================
-ENABLE_FLUSSMITTEL = 	False #permet de deactiver Flussmitel
+ENABLE_FLUSSMITTEL = 	True #permet de deactiver Flussmitel
 LARGEUR_FLUSSMITTEL = 	100
 LONGUEUR_FLUSSMITTEL = 	100
 RAYON_FLUSSMITTEL = 	math.sqrt(LARGEUR_FLUSSMITTEL * LARGEUR_FLUSSMITTEL + LONGUEUR_FLUSSMITTEL * LONGUEUR_FLUSSMITTEL) #en mm

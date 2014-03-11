@@ -81,7 +81,7 @@ class OurBot():
 			return None
 
 	def getNextOrders(self):
-		if self.__objectifs is not None:
+		if self.__objectifs:
 			objectif_en_cours = self.__objectifs.popleft()
 			order_of_objectif = objectif_en_cours[1] # type ((id_action, ordre, arguments),...)
 
@@ -114,13 +114,21 @@ class OurBot():
 			data_objectif = deque()
 			for xml_execution in xml_goal.getElementsByTagName('action'):
 				action 		= (self.__getNextIdToStack(),)
-				action 		+= (xml_execution.getElementsByTagName('ordre')[0].firstChild.nodeValue,)
+				ordre 		= (xml_execution.getElementsByTagName('ordre')[0].firstChild.nodeValue,)
+				action += ordre
 
-				arguments = xml_execution.getElementsByTagName('arguments')[0].firstChild
-				if arguments:
-					action 		+= (list(map(int, arguments.nodeValue.split(','))),)
+				if ordre[0] == 'A_ROT':
+					arguments = xml_execution.getElementsByTagName('arguments')[0].firstChild
+					if arguments:
+						action 		+= (list(map(float, arguments.nodeValue.split(','))),)
+					else:
+						action += (None,)
 				else:
-					action += (None,)
+					arguments = xml_execution.getElementsByTagName('arguments')[0].firstChild
+					if arguments:
+						action 		+= (list(map(int, arguments.nodeValue.split(','))),)
+					else:
+						action += (None,)
 
 				data_objectif.append(action)
 
