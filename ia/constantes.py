@@ -59,7 +59,7 @@ SEUIL_ROUGE = 			100 #TODO
 SEUIL_JAUNE = 			100 #TODO
 
 #====================Flussmittel====================
-ENABLE_FLUSSMITTEL = 	True #permet de deactiver Flussmitel
+ENABLE_FLUSSMITTEL = 	False #permet de deactiver Flussmitel
 LARGEUR_FLUSSMITTEL = 	100
 LONGUEUR_FLUSSMITTEL = 	100
 RAYON_FLUSSMITTEL = 	math.sqrt(LARGEUR_FLUSSMITTEL * LARGEUR_FLUSSMITTEL + LONGUEUR_FLUSSMITTEL * LONGUEUR_FLUSSMITTEL) #en mm

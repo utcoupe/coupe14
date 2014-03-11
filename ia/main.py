@@ -41,10 +41,10 @@ logger.info("Les systèmes attendu ont bien été détéctés. Flussmittel: %s  
 
 
 Data = data.Data(Communication, arduino_constantes)
-TimeManager = timeManager.TimeManager(Data.MetaData)
-EventManager = event.EventManager(Communication, TimeManager, Data)
+TimeManager = timeManager.TimeManager(Communication, Data)
+EventManager = event.EventManager(Communication, Data)
 
-
-
+#on veut être sur de récupèrer le dernier id pour que event se lance
+time.sleep(1)
 #TODO if jack ready
 TimeManager.startMatch()

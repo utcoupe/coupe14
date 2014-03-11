@@ -11,10 +11,9 @@ from . import goals
 from .constantes import *
 
 class EventManager():
-	def __init__(self, Communication, TimeManager, Data):
+	def __init__(self, Communication, Data):
 		self.__logger = logging.getLogger(__name__.split('.')[0])
 		self.__Communication = Communication
-		self.__TimeManager = TimeManager
 		self.__Flussmittel = Data.Flussmittel
 		self.__Tibot = Data.Tibot
 		self.__Tourelle = Data.Tourelle
@@ -22,7 +21,7 @@ class EventManager():
 
 		self.__last_hokuyo_data = None
 		self.__last_flussmittel_order_finished = ID_ACTION_MAX	#id_action
-		self.__id_to_reach_flussmittel = self.__Flussmittel.getLastIdGlobale()
+		self.__id_to_reach_flussmittel = 0
 		self.__sleep_time_flussmittel = 0
 		self.__resume_date_flussmittel = 0
 
@@ -41,11 +40,21 @@ class EventManager():
 	def managerLoop(self):
 		#On attend le debut du match
 		while self.__MetaData.getInGame() == False:
+			#On defini l'id actuel de l'arduino comme point de debut, ça évite de devoir la reset
+			if self.__Flussmittel is not None:
+				self.__id_to_reach_flussmittel = self.__Flussmittel.getLastIdGlobale()
+			else:
+				self.__id_to_reach_flussmittel = 0
+			
+			if self.__Tibot is not None:
+				self.__id_to_reach_tibot = self.__Tibot.getLastIdGlobale()
+			else:
+				self.__id_to_reach_tibot = 0
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
 		#Pendant le match
 		while self.__MetaData.getInGame() == True:
-			self.checkEvent()
+			self.__checkEvent()
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
 		#On attend le debut de la funny action
@@ -54,10 +63,10 @@ class EventManager():
 
 		#Pendant la funny action
 		while self.__MetaData.getInFunnyAction() == True:
-			self.checkEvent()
+			#self.__checkEvent() ou fonction dédiée
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
-	def checkEvent(self):
+	def __checkEvent(self):
 		if self.__Tourelle is not None:
 			new_data = self.__Tourelle.getLastDataPosition()
 			if new_data != self.__last_hokuyo_data:
@@ -79,7 +88,7 @@ class EventManager():
 				else:
 					#Si tu as attendu le SLEEP assez longtemps
 					if int(time.time()*1000) > self.__resume_date_flussmittel:
-						self.pushOrders(self.__Flussmittel, self.__Flussmittel.getNextOrders())
+						self.__pushOrders(self.__Flussmittel, self.__Flussmittel.getNextOrders())
 
 
 		if self.__Tibot is not None:
@@ -97,9 +106,9 @@ class EventManager():
 				else:
 					#Si tu as attendu le SLEEP assez longtemps
 					if int(time.time()*1000) > self.__resume_date_tibot:
-						self.pushOrders(self.__Tibot, self.__Tibot.getNextOrders())
+						self.__pushOrders(self.__Tibot, self.__Tibot.getNextOrders())
 
-	def pushOrders(self, objet, data): 
+	def __pushOrders(self, objet, data): 
 		print("data" + str(data))
 		id_objectif = data[0]
 		data_action = data[1]#data_action est de type ((id_action, ordre, arguments),...)
@@ -137,18 +146,22 @@ class EventManager():
 
 
 	def __sendOrders(self, address, data_action):#data_action est de type ((id_action, ordre, arguments),...)
-		for action in data_action:
-			arg = [action[0]]
-			if action[2] is not None:
-				arg += action[2]
-			if action[1] == 'A_RESET_POS':
-				arg = []
-				self.__Communication.sendOrderAPI(address[1], action[1], *arg)
-			elif action[1][0] == 'O':
-				self.__Communication.sendOrderAPI(address[0], action[1], *arg)
-			elif action[1][0] == 'A':
-				self.__Communication.sendOrderAPI(address[1], action[1], *arg)
-			else:
-				self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
+		#Si on est en jeuS
+		if self.__MetaData.getInGame():
+			for action in data_action:
+				arg = [action[0]]
+				#Si l'ordre a des arguments
+				if action[2] is not None:
+					arg += action[2]
 
-			self.__logger.debug("Envoie des actions: " + str(action))
+				if action[1] == 'A_RESET_POS':#TODO enlever ce cas particulier, cet ordre doit avoir un id
+					arg = []
+					self.__Communication.sendOrderAPI(address[1], action[1], *arg)
+				elif action[1][0] == 'O':
+					self.__Communication.sendOrderAPI(address[0], action[1], *arg)
+				elif action[1][0] == 'A':
+					self.__Communication.sendOrderAPI(address[1], action[1], *arg)
+				else:
+					self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
+
+				self.__logger.debug("Envoie des actions: " + str(action))
