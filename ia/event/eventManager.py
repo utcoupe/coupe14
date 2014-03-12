@@ -94,7 +94,11 @@ class EventManager():
 				else:
 					#Si tu as attendu le SLEEP assez longtemps
 					if int(time.time()*1000) > self.__resume_date_flussmittel:
-						self.__pushOrders(self.__Flussmittel, self.__Flussmittel.getNextOrders())
+						next_actions = self.__Flussmittel.getNextOrders()
+						if next_actions is not None:
+							self.__pushOrders(self.__Flussmittel, self.__Flussmittel.getNextOrders())
+						else:
+							self.__Flussmittel.setObjectifEnCours(None)
 
 
 		if self.__Tibot is not None:
@@ -112,33 +116,38 @@ class EventManager():
 				else:
 					#Si tu as attendu le SLEEP assez longtemps
 					if int(time.time()*1000) > self.__resume_date_tibot:
-						self.__pushOrders(self.__Tibot, self.__Tibot.getNextOrders())
+						next_actions = self.__Tibot.getNextOrders()
+						if next_actions is not None:
+							self.__pushOrders(self.__Tibot, self.__Tibot.getNextOrders())
+						else:
+							self.__Tibot.setObjectifEnCours(None)
 
-	def __pushOrders(self, objet, data): 
+	def __pushOrders(self, Objet, data): 
 		print("data" + str(data))
 		id_objectif = data[0]
+		Objet.setObjectifEnCours(id_objectif)
 		data_action = data[1]#data_action est de type ((id_action, ordre, arguments),...)
 
 		last_order = data_action.pop()
 		if data_action:
 			prev_last_order = data_action[-1]
-			if objet is self.__Flussmittel:
+			if Objet is self.__Flussmittel:
 				print(self.__id_to_reach_flussmittel)
 				self.__id_to_reach_flussmittel = prev_last_order[0]
 				print(self.__id_to_reach_flussmittel)
-			elif objet is self.__Tibot:
+			elif Objet is self.__Tibot:
 				self.__id_to_reach_tibot = prev_last_order[0]
 			else:
-				self.__logger.error("objet inconnu")
+				self.__logger.error("Objet inconnu")
 
 
 		if last_order[1] == 'SLEEP':
-			if objet is self.__Flussmittel:
+			if Objet is self.__Flussmittel:
 				self.__sleep_time_flussmittel = last_order[2][0]
-			elif objet is self.__Tibot:
+			elif Objet is self.__Tibot:
 				self.__sleep_time_tibot = last_order[2][0]
 			else:
-				self.__logger.error("objet inconnu")
+				self.__logger.error("Objet inconnu")
 		elif last_order[1] == 'END':
 			#TODO call objectifManager
 			pass
@@ -148,7 +157,7 @@ class EventManager():
 		else:
 			self.__logger.error("ordre de stop impossible")
 
-		self.__sendOrders((objet.getAddressOther(), objet.getAddressAsserv()), data_action)
+		self.__sendOrders((Objet.getAddressOther(), Objet.getAddressAsserv()), data_action)
 
 
 	def __sendOrders(self, address, data_action):#data_action est de type ((id_action, ordre, arguments),...)
