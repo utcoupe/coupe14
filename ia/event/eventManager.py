@@ -41,16 +41,6 @@ class EventManager():
 	def managerLoop(self):
 		#On attend le debut du match
 		while self.__MetaData.getInGame() == False:
-			#On defini l'id actuel de l'arduino comme point de debut, ça évite de devoir la reset
-			if self.__Flussmittel is not None:
-				self.__id_to_reach_flussmittel = self.__Flussmittel.getLastIdGlobale()
-			else:
-				self.__id_to_reach_flussmittel = 0
-			
-			if self.__Tibot is not None:
-				self.__id_to_reach_tibot = self.__Tibot.getLastIdGlobale()
-			else:
-				self.__id_to_reach_tibot = 0
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
 		#Pendant le match
