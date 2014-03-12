@@ -40,12 +40,12 @@ class PathFinding:
 		self.__log.info(str(self.__our_bot_count) + " robots amis actifs")
 
 		#compte des ennemis
-		self.__number_of_enemy = 0
+		self.__enemy_bot_count = 0
 		if self.__big_enemy_bot is not None:
-			self.__number_of_enemy += 1
+			self.__enemy_bot_count += 1
 		if self.__small_enemy_bot is not None:
-			self.__number_of_enemy += 1
-		self.__log.info(str(self.__number_of_enemy) + " robots ennemis actifs")
+			self.__enemy_bot_count += 1
+		self.__log.info(str(self.__enemy_bot_count) + " robots ennemis actifs")
 
 		#initialisation
 		self.__init_enemy_bot()
@@ -69,11 +69,11 @@ class PathFinding:
 	def getPolygons(self):
 		return self.__ng.get_polygons()
 
-	def __update_our_bot(self, robot):
+	def __update_our_bot(self, robot):  # fonciton appelée uniquement quand on a deux robots
 		"""Update le navgraph pour calculer une trajectoire pour le robot en paramètre"""
-		if robot is self.__our_bot: #on met juste la position a jour
+		if robot is self.__our_bot:  # on met juste la position a jour
 			self.__other_bot_poly.move_to(self.__other_bot.getPosition())
-		else: #il faut recreer un nouveau poly a la bonne taille
+		else:  # il faut recreer un nouveau poly a la bonne taille
 			#swap des robots
 			self.__other_bot = self.__our_bot
 			self.__our_bot = robot
@@ -84,9 +84,9 @@ class PathFinding:
 			self.__ng.add_dynamic_obstacle(self.__other_bot_poly)
 
 	def __update_enemy_bot(self):
-		if self.__small_enemy_bot is not None:
-			self.__big_enemy_poly.move_to(self.__big_enemy_bot.getPosition())
 		if self.__big_enemy_bot is not None:
+			self.__big_enemy_poly.move_to(self.__big_enemy_bot.getPosition())
+		if self.__small_enemy_bot is not None:
 			self.__small_enemy_poly.move_to(self.__small_enemy_bot.getPosition())
 
 	def __init_enemy_bot(self):
@@ -99,5 +99,6 @@ class PathFinding:
 		self.__update_enemy_bot()
 
 	def __init_allied_bot(self):
-		self.__other_bot_poly = Poly().initFromCircle(self.__other_bot.getPosition(), self.__other_bot.getRayon(), POINTS_PAR_CERCLE)
-		self.__ng.add_dynamic_obstacle(self.__other_bot_poly)
+		if self.__our_bot_count == 2:
+			self.__other_bot_poly = Poly().initFromCircle(self.__other_bot.getPosition(), self.__other_bot.getRayon(), POINTS_PAR_CERCLE)
+			self.__ng.add_dynamic_obstacle(self.__other_bot_poly)
