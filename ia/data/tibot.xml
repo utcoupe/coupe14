@@ -4,19 +4,45 @@
 		<idd>0</idd>
 		<actions>
 			<action>
-				<id_action>0</id_action>
-				<ordre>A_GOTO</ordre>
-				<arguments>0,0</arguments>
+				<ordre>SLEEP</ordre>
+				<arguments>5000</arguments>
 			</action>
 			<action>
-				<id_action>1</id_action>
-				<ordre>A_GOTO</ordre>
-				<arguments>0,0</arguments>
+				<ordre>SLEEP</ordre>
+				<arguments>1000</arguments>
 			</action>
 			<action>
-				<id_action>2</id_action>
 				<ordre>END</ordre>
-				<arguments>0</arguments>
+				<arguments></arguments>
+			</action>
+		</actions>
+	</objectif>
+	<objectif objectif_name='Prendre position'>
+		<idd>1</idd>
+		<actions>
+			<action>
+				<ordre>SLEEP</ordre>
+				<arguments>5000</arguments>
+			</action>
+			<action>
+				<ordre>A_GOTO</ordre>
+				<arguments>0,0</arguments>
+			</action>
+			<action>
+				<ordre>A_GOTO</ordre>
+				<arguments>0,0</arguments>
+			</action>
+			<action>
+				<ordre>SLEEP</ordre>
+				<arguments>10000</arguments>
+			</action>
+			<action>
+				<ordre>A_GOTO</ordre>
+				<arguments>0,0</arguments>
+			</action>
+			<action>
+				<ordre>END</ordre>
+				<arguments></arguments>
 			</action>
 		</actions>
 	</objectif>

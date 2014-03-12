@@ -45,16 +45,16 @@ class PullData():
 	def askData(self):
 		arguments = []
 
-		if self.Flussmittel != None:
-			if __id_flussmittel_other_asked == False:
+		if self.Flussmittel is not None:
+			if self.__id_flussmittel_other_asked == False:
 				self.Communication.sendOrderAPI(self.address_flussmittel_other, 'GET_LAST_ID', *arguments)
 				self.__id_flussmittel_other_asked = True
 
-			if __data_flussmittel_asserv_asked == False:
+			if self.__data_flussmittel_asserv_asked == False:
 				self.Communication.sendOrderAPI(self.address_flussmittel_asserv, 'A_GET_POS_ID', *arguments)
 				self.__data_flussmittel_asserv_asked = True
 
-		if self.Tibot != None:
+		if self.Tibot is not None:
 			if self.__id_tibot_other_asked == False:
 				self.Communication.sendOrderAPI(self.address_tibot_other, 'GET_LAST_ID', *arguments)
 				self.__id_tibot_other_asked = True
@@ -63,7 +63,7 @@ class PullData():
 				self.Communication.sendOrderAPI(self.address_tibot_asserv, 'A_GET_POS_ID', *arguments)
 				self.__data_tibot_asserv_asked = True
 				
-		if self.Tourelle != None:
+		if self.Tourelle is not None:
 			if self.tourelle_asked == False:
 				self.Communication.sendOrderAPI(self.address_tourelle, 'GET_HOKUYO', *arguments)
 				self.tourelle_asked = True
@@ -106,7 +106,7 @@ class PullData():
 				system = None
 				self.__logger.error("un systeme non initilisé nous envoi des données")
 
-			if system != None:
+			if system is not None:
 				if order == 'A_GET_POS_ID':
 					system.majPositionId(address, arguments)
 				elif order == 'GET_LAST_ID':

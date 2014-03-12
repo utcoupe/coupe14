@@ -32,7 +32,7 @@ def parseFile(path, myRe, nbGroupParse=1, seekArguments=False, bothSideAssigment
 
 				if seekArguments:
 					argList = result.group('arg')
-					if argList == None:
+					if argList is None:
 						argList = ""
 					argTuple = ()
 					for arg in argList.split():

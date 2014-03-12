@@ -29,10 +29,10 @@ class OurBot():
 		self.__positionX = 0
 		self.__positionY = 0
 		self.__angle = 0.0
-		self.__last_id_executed_other = 29999
-		self.__last_id_executed_asserv = 29999
+		self.__last_id_executed_other = ID_ACTION_MAX
+		self.__last_id_executed_asserv = ID_ACTION_MAX
 
-		self.__last_id_stacked_action = IdRot()
+		self.__last_id_action_stacked = IdRot()
 
 		#Variables
 		self.__objectifs = None #((id, ((id_action, ordre, arguments), (id_action, ordre, arguments), ...)), ...)
@@ -53,16 +53,19 @@ class OurBot():
 	def getAddressAsserv(self):
 		return self.__addressAsserv
 
+	def __getNextIdToStack(self):
+		return self.__last_id_action_stacked.idIncrementation()
+
 
 	def majLastId(self, address, idd):
 		if address == 'ADDR_FLUSSMITTEL_OTHER' or address == 'ADDR_TIBOT_OTHER':
-			if self.__last_id_executed_other != idd:
+			if idd != self.__last_id_executed_other and idd:
 				self.__last_id_executed_other = idd
-				print("changement d'id other " + str(idd))
+				self.__logger.debug("changement d'id other " + str(idd))
 		else:
-			if self.__last_id_executed_asserv != idd:
+			if idd != self.__last_id_executed_asserv:
 				self.__last_id_executed_asserv = idd
-				print("changement d'id asserv " + str(idd))
+				self.__logger.debug("changement d'id asserv " + str(idd))
 
 	#utilise les données en provenance de de l'asserv uniquement !
 	def majPositionId(self, address, arguments):
@@ -72,14 +75,13 @@ class OurBot():
 		self.majLastId(address, arguments[3])
 
 	def getNextIdOrder(self):
-		if self.__objectifs != None:
+		if self.__objectifs is not None:
 			return (self.__objectifs[0][0], self.__objectifs[0][1][0]) #(id_objectif_0, id_action_0_de_objcetif_0)
 		else:
 			return None
 
 	def getNextOrders(self):
-		print(self.__objectifs)
-		if len(self.__objectifs) > 0:
+		if self.__objectifs:
 			objectif_en_cours = self.__objectifs.popleft()
 			order_of_objectif = objectif_en_cours[1] # type ((id_action, ordre, arguments),...)
 
@@ -99,7 +101,7 @@ class OurBot():
 			return None
 
 	def loadActionScript(self, filename):
-		print(self.__name,": loading actionScript from:", filename)
+		self.__logger.info(str(self.__name) + ": loading actionScript from: " + str(filename))
 		fd = open(filename,'r')
 		dom = parseString(fd.read())
 		fd.close()
@@ -107,23 +109,46 @@ class OurBot():
 		objectif = deque()
 		for xml_goal in dom.getElementsByTagName('objectif'):
 			objectif_name	= xml_goal.attributes["objectif_name"].value #seulement pour information
-			idd				= xml_goal.getElementsByTagName('idd')[0].firstChild.nodeValue
+			id_action				= xml_goal.getElementsByTagName('idd')[0].firstChild.nodeValue
 
 			data_objectif = deque()
 			for xml_execution in xml_goal.getElementsByTagName('action'):
-				action 		= (xml_execution.getElementsByTagName('id_action')[0].firstChild.nodeValue,)
-				action 		+= (xml_execution.getElementsByTagName('ordre')[0].firstChild.nodeValue,)
-				action 		+= (xml_execution.getElementsByTagName('arguments')[0].firstChild.nodeValue,)
+				action 		= (self.__getNextIdToStack(),)
+				ordre 		= (xml_execution.getElementsByTagName('ordre')[0].firstChild.nodeValue,)
+				action += ordre
+
+				if ordre[0] == 'A_ROT':
+					arguments = xml_execution.getElementsByTagName('arguments')[0].firstChild
+					if arguments:
+						action 		+= (list(map(float, arguments.nodeValue.split(','))),)
+					else:
+						action += (None,)
+				else:
+					arguments = xml_execution.getElementsByTagName('arguments')[0].firstChild
+					if arguments:
+						action 		+= (list(map(int, arguments.nodeValue.split(','))),)
+					else:
+						action += (None,)
+
 				data_objectif.append(action)
 
-			objectif.append((idd, data_objectif))
+			objectif.append((id_action, data_objectif))
 
 		self.__objectifs = objectif
+		self.__logger.debug("Script de " + str(self.__name) + "chargé: " + str(self.__objectifs))
 	
 
 	def getMaxRot(self, id1, id2):
-		"""Retourne le plus id de manière rotationnelle"""
-		if id1 > id2 and (id1 - id2) < 255/2:
-			return id1
+		"""Retourne le plus grand id rotationnelle"""
+		if id1 > id2:
+			if (id1 - id2) < ID_ACTION_MAX/2:
+				return id1
+			else:
+				return id2
 		else:
-			return id2
+			if (id2 - id1) < ID_ACTION_MAX/2:
+				return id2
+			else:
+				return id1
+
+

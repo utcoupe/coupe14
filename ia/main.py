@@ -10,7 +10,7 @@ import time
 import logging
 
 #logfile_name = "log/" + time.strftime("%d %b %Y %H:%M:%S", time.gmtime()) + ".log"
-logging.basicConfig(filename=os.path.join(os.path.dirname(os.path.abspath(__file__)), "log/last.log"), filemode='w', level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename=os.path.join(os.path.dirname(os.path.abspath(__file__)), "log/last.log"), filemode='w', level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__.split('.')[0])
 
 
@@ -24,7 +24,7 @@ import timeManager
 logger.info("Demarrage de l'ia")
 Communication = communication.CommunicationGlobale()
 arduino_constantes = Communication.getConst()
-time.sleep(0.5) # on attend que les communications s'établissent
+time.sleep(2) # on attend que les communications s'établissent
 
 #On teste si les systèmes demandés sont bien en lignes
 ready_list = Communication.getSystemReady()
@@ -41,10 +41,10 @@ logger.info("Les systèmes attendu ont bien été détéctés. Flussmittel: %s  
 
 
 Data = data.Data(Communication, arduino_constantes)
+TimeManager = timeManager.TimeManager(Communication, Data)
 EventManager = event.EventManager(Communication, Data)
-TimeManager = timeManager.TimeManager(Data.MetaData)
 
-
-
+#on veut être sur de récupèrer le dernier id pour que event se lance
+time.sleep(1)
 #TODO if jack ready
 TimeManager.startMatch()

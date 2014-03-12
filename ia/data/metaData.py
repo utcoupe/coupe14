@@ -35,25 +35,25 @@ class MetaData():
 			self.__in_game = True
 			self.__game_clock = 0
 		else:
-			print("WARNING: Demande de debut de match alors que le match est déjà en cours.")
+			self.__logger.warning("Demande de debut de match alors que le match est déjà en cours.")
 
 	def stopMatch(self):
 		if self.__in_game == True:
 			self.__in_game = False
 		else:
-			print("WARNING: Demande de fin de match alors que le match est déjà en arreté.")
+			self.__logger.warning("Demande de fin de match alors que le match est déjà en arreté.")
 	
 	def startFunny(self):
 		if self.__in_funny_action == False:
 			self.__in_funny_action = True
 		else:
-			print("WARNING: Demande de debut funny action alors que funny action est déjà en cours.")
+			self.__logger.warning("Demande de debut funny action alors que funny action est déjà en cours.")
 
 	def stopFunny(self):
 		if self.__in_funny_action == True:
 			self.__in_funny_action = False
 		else:
-			print("WARNING: Demande la fin de funny action alors que funny action est arreté.")
+			self.__logger.warning("Demande la fin de funny action alors que funny action est arreté.")
 
 
 			# GETTER

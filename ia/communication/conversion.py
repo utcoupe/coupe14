@@ -8,21 +8,21 @@ import struct
 def binaryToFloat(string):
 	#convertion d'un chaine de binaire en float
 	def as_float32(s):
-	    """
-	    See: http://en.wikipedia.org/wiki/IEEE_754-2008
-	    """
-	    return struct.unpack("f",struct.pack(">I", bits2int(s)))
+		"""
+		See: http://en.wikipedia.org/wiki/IEEE_754-2008
+		"""
+		return struct.unpack("f",struct.pack(">I", bits2int(s)))
 
 	# Where the bits2int function converts bits to an integer.  
 	def bits2int(bits):
-	    # You may want to change ::-1 if depending on which bit is assumed
-	    # to be most significant. 
-	    bits = [int(x) for x in bits[::-1]]
+		# You may want to change ::-1 if depending on which bit is assumed
+		# to be most significant.
+		bits = [int(x) for x in bits[::-1]]
 
-	    x = 0
-	    for i in range(len(bits)):
-	        x += bits[i]*2**i
-	    return x
+		x = 0
+		for i in range(len(bits)):
+			x += bits[i]*2**i
+		return x
 	#TODO gérer les float négatif et tester car taille(floatArduino) != taille(floatPC)
 	return as_float32(string)[0]
 
