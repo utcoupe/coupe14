@@ -22,6 +22,9 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		ret_size = 2;
 		itob(last_id, ret);
 		break;
+	case RESET_ID:
+		last_id = 0;
+		break;
 	default:
 		return -1;//commande inconnue
 	}
