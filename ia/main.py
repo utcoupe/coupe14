@@ -45,6 +45,7 @@ TimeManager = timeManager.TimeManager(Communication, Data)
 EventManager = event.EventManager(Communication, Data)
 
 #on veut être sur de récupèrer le dernier id pour que event se lance
+#TODO le faire lors du reset arduino
 time.sleep(1)
 #TODO if jack ready
 TimeManager.startMatch()

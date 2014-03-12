@@ -53,6 +53,19 @@ class OurBot():
 	def getAddressAsserv(self):
 		return self.__addressAsserv
 
+	def getTrajectoires(self):
+		data_trajectoires = ()
+		for objectif in self.__objectifs:
+			idd = objectif[0]
+			trajectoire = ((self.__positionX, self.__positionY),)
+			for order in objectif[1]:
+				if order[1] == 'A_GOTO':
+					trajectoire += ((order[2][0]), order[2][1])
+			data_objectif += (idd, trajectoire)
+
+		return data_trajectoires
+
+
 	def __getNextIdToStack(self):
 		return self.__last_id_action_stacked.idIncrementation()
 
