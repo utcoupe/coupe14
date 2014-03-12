@@ -8,9 +8,11 @@ import time
 class Path(list):
 	def __init__(self, list):
 		super().__init__(list)
-		self.dist = 0
-		for i in range(len(list) - 1):
-			self.dist += (list[i+1] - list[i]).norm()
+	def getDist(self):
+		dist = 0
+		for i in range(len(self) - 1):
+			dist += (self[i+1] - self[i]).norm()
+		return dist
 
 class PathFinding:
 	def __init__(self, robot_list, xml_filename, MARGE_PASSAGE=MARGE_PASSAGE):
