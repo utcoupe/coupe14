@@ -15,11 +15,11 @@ class Path(list):
 		return dist
 
 class PathFinding:
-	def __init__(self, robot_list, xml_filename, MARGE_PASSAGE=MARGE_PASSAGE):
+	def __init__(self, robot_list, xml_filename, MARGE_PASSAGE_PATH=MARGE_PASSAGE_PATH):
 		self.__log = logging.getLogger(__name__)
 		self.__flussmittel, self.__tibot, self.__big_enemy_bot, self.__small_enemy_bot = robot_list
 		#on cree le navgraph
-		self.__ng = nav.NavGraph(MARGE_PASSAGE, xml_filename)
+		self.__ng = nav.NavGraph(MARGE_PASSAGE_PATH, xml_filename)
 		#on compte nos robots
 		self.__our_bot_count = 0
 		if self.__flussmittel is not None:
