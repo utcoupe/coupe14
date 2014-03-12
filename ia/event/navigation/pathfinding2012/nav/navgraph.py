@@ -35,6 +35,14 @@ class NavGraph:
 		self.pathfinding_area = AStar(self.areas.values(), NAVGRAPH)
 		self.pathfinding_vertices = AStar(self.vertices.values(), NAVGRAPH)
 
+	def setOffset(self, offset):
+		self.offset = offset
+		self.partition = Partition(
+			offset,
+			self.container.points,
+			self.obstacles
+			)
+
 	def calc_areas(self):
 		for k in tuple(self.areas.keys()):
 			self.areas.pop(k)
