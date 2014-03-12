@@ -26,7 +26,7 @@ class GraphView(View):
 		self.canvas.bind('<B1-Motion>',self.onLeft)
 		self.canvas.bind('<Button-3>',self.onRight)
 		self.canvas.bind('<B3-Motion>',self.onRight)
-		self.canvas.bind('<Button-1>',self.onWheel)
+		self.canvas.bind('<Button-2>',self.onWheel)
 		self.canvas.bind('<B2-Motion>',self.onWheel)
 
 		self.sum_calc_times = 0
