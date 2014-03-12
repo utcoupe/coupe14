@@ -40,5 +40,7 @@ void initSize()
 	ordreSize[GET_CAM]=0;
 	ordreSize[GET_HOKUYO]=0;
 	ordreSize[GET_LAST_ID]=0;
+
+	ordreSize[RESET_ID]=0;
 	//FINPARSE
 }

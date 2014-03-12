@@ -54,6 +54,7 @@ class Control{
 
 	//Get ID
 	int getLastFinishedId();
+	void resetLastFinishedId();
 
 	private:
 	RobotState robot;

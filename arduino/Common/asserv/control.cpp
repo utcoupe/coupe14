@@ -294,3 +294,7 @@ void Control::applyPwm(){
 int Control::getLastFinishedId() {
 	return last_finished_id;
 }
+
+void Control::resetLastFinishedId() {
+	last_finished_id = 0;
+}
