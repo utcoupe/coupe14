@@ -71,6 +71,8 @@ enum ordre {
 	GET_CAM,	//#int #int
 	GET_HOKUYO,	//#int #int #int #int #int #int #int #int #long
 	GET_LAST_ID, //#int
+
+	RESET_ID,
 	ORDRE_NON_PARSE
 	//FINPARSE
 };

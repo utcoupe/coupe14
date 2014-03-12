@@ -78,6 +78,9 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 			control.clearGoals();
 		}
 		break;
+	case RESET_ID:
+		control.resetLastFinishedId();
+		break;
 	case A_RESET_POS:
 		if (!doublon) {
 			pos pos;
