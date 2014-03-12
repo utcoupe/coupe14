@@ -12,14 +12,16 @@
 
 static struct coord robots[MAX_ROBOTS];
 static int number_robots;
+static long data_time = 0;
 extern pthread_mutex_t mutex;
 
-void pushCoords(struct coord *n_robots, int n) {
+void pushCoords(struct coord *n_robots, int n, long timestamp) {
 	pthread_mutex_lock(&mutex); int i;
 	for (i=0; i<n; i++){
 		robots[i] = n_robots[i];
 	}
 	number_robots = n;
+	data_time = timestamp;
 	pthread_mutex_unlock(&mutex);
 }
 
@@ -39,7 +41,7 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 			itob(-1, ret+4*i);
 			itob(-1, ret+4*i+2);
 		}
-		itob(timeMillis(), ret+16);
+		itob(data_time, ret+16);
 		ret_size = 18;
 		break;
 		}

@@ -9,7 +9,7 @@
 #include "fast_math.h"
 #include "compat.h"
 
-void pushCoords(struct coord *n_robots, int n);
+void pushCoords(struct coord *n_robots, int n, long timestamp);
 int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bool doublon);//Si doublon, ne pas executer d'ordre mais renvoyer les données à renvoyer 
 
 #endif
