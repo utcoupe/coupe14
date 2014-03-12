@@ -11,7 +11,7 @@ class Collison:
 		self.__log = logging.getLogger(__name__)
 		self.__flussmittel, self.__tibot, self.__big_enemy_bot, self.__small_enemy_bot = robot_list
 
-	def getCollision(self, robot, path):  # path est-il dans robot ?
+	def getCollision(self, robot):
 		#on etablit la liste des robots autres que celui pour lequel on calcule la trajectoire
 		robot_list = [self.__big_enemy_bot, self.__small_enemy_bot]
 		if robot is self.__flussmittel:
