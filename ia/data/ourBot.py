@@ -63,7 +63,7 @@ class OurBot():
 					trajectoire += ((order[2][0]), order[2][1])
 			data_objectif += (idd, trajectoire)
 
-		return data_trajectoires
+		return data_trajectoires #type: ((id_objectif, ((x,y),(x,y),...)), (id_objectif, ((x,y),(x,y),...)), ...)
 
 
 	def __getNextIdToStack(self):

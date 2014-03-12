@@ -20,6 +20,7 @@ class EventManager():
 		self.__MetaData = Data.MetaData
 
 		self.__last_hokuyo_data = None
+
 		self.__last_flussmittel_order_finished = ID_ACTION_MAX	#id_action
 		self.__id_to_reach_flussmittel = 0
 		self.__sleep_time_flussmittel = 0
@@ -68,7 +69,12 @@ class EventManager():
 
 	def __checkEvent(self):
 		if self.__Tourelle is not None:
-			new_data = self.__Tourelle.getLastDataPosition()
+			new_data = ()
+			if self.__Flussmittel is not None:
+				new_data += (self.__Flussmittel.getPositon(),)
+			if self.__Tibot is not None:
+				new_data += (self.Tibot.getPositon(),)
+			
 			if new_data != self.__last_hokuyo_data:
 				self.__last_hokuyo_data = new_data
 				#TODO call collision
