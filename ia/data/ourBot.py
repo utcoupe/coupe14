@@ -36,7 +36,7 @@ class OurBot():
 
 		#Variables
 		self.__objectifs = None #((id, ((id_action, ordre, arguments), (id_action, ordre, arguments), ...)), ...)
-		self.__objectifs_en_cours = None #entier qui correspond à l'id de l'objectif en cours, si aucun: None
+		self.__id_objectif_en_cours = None #entier qui correspond à l'id de l'objectif en cours, si aucun: None
 
 	#Getter
 	def getPositon(self):
@@ -70,8 +70,8 @@ class OurBot():
 	def __getNextIdToStack(self):
 		return self.__last_id_action_stacked.idIncrementation()
 
-	def setObjectifEnCours(self, idd):
-		self.__objectifs_en_cours = idd
+	def setIdObjectifEnCours(self, idd):
+		self.__id_objectif_en_cours = idd
 
 
 	def majLastId(self, address, idd):
@@ -112,6 +112,7 @@ class OurBot():
 			if data_order[1] != 'END':
 				self.__objectifs.appendleft(objectif_en_cours)
 
+			self.setIdObjectifEnCours(objectif_en_cours[0])
 			return (objectif_en_cours[0], output_temp) # type ((id_action, ordre, arguments),...)
 
 		else:

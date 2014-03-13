@@ -67,7 +67,7 @@ class EventManager():
 			
 			if new_data != self.__last_hokuyo_data:
 				self.__last_hokuyo_data = new_data
-				#TODO call collision
+				self.__testCollision()
 
 		if self.__Flussmittel is not None:
 			new_id = self.__Flussmittel.getLastIdGlobale()
@@ -88,7 +88,7 @@ class EventManager():
 						if next_actions is not None:
 							self.__pushOrders(self.__Flussmittel, self.__Flussmittel.getNextOrders())
 						else:
-							self.__Flussmittel.setObjectifEnCours(None)
+							self.__Flussmittel.setIdObjectifEnCours(None)
 
 
 		if self.__Tibot is not None:
@@ -110,12 +110,11 @@ class EventManager():
 						if next_actions is not None:
 							self.__pushOrders(self.__Tibot, self.__Tibot.getNextOrders())
 						else:
-							self.__Tibot.setObjectifEnCours(None)
+							self.__Tibot.setIdObjectifEnCours(None)
 
 	def __pushOrders(self, Objet, data): 
 		print("data" + str(data))
 		id_objectif = data[0]
-		Objet.setObjectifEnCours(id_objectif)
 		data_action = data[1]#data_action est de type ((id_action, ordre, arguments),...)
 
 		last_order = data_action.pop()
@@ -139,7 +138,7 @@ class EventManager():
 			else:
 				self.__logger.error("Objet inconnu")
 		elif last_order[1] == 'END':
-			#TODO call objectifManager
+			self.__objectifOver(id_objectif)
 			pass
 		elif last_order[1] == 'THEN':
 			#Rien à faire
@@ -170,3 +169,15 @@ class EventManager():
 					self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
 
 				self.__logger.debug("Envoie des actions: " + str(action))
+
+
+	def __objectifOver(self, id_objectif):
+		#warn objectif manager than id_objectif is over
+		pass
+
+	def __testCollision(self):
+		pass
+
+	def __cancelObjectif(self, id_objectif):
+		#warn objectif manager than id_objectif is over because of collision
+		pass
