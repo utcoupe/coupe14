@@ -14,6 +14,7 @@ class EventManager():
 	def __init__(self, Communication, Data):
 		self.__logger = logging.getLogger(__name__.split('.')[0])
 		self.__Communication = Communication
+		self.__Data = Data
 		self.__Flussmittel = Data.Flussmittel
 		self.__Tibot = Data.Tibot
 		self.__Tourelle = Data.Tourelle
@@ -158,17 +159,14 @@ class EventManager():
 				if action[2] is not None:
 					arg += action[2]
 
-				if action[1] == 'A_RESET_POS':#TODO enlever ce cas particulier, cet ordre doit avoir un id
-					arg = []
-					self.__Communication.sendOrderAPI(address[1], action[1], *arg)
-				elif action[1][0] == 'O':
+				if action[1][0] == 'O':
 					self.__Communication.sendOrderAPI(address[0], action[1], *arg)
 				elif action[1][0] == 'A':
 					self.__Communication.sendOrderAPI(address[1], action[1], *arg)
 				else:
 					self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
 
-				self.__logger.debug("Envoie des actions: " + str(action))
+				self.__logger.debug("Envoi des actions: " + str(action))
 
 
 	def __objectifOver(self, id_objectif):
