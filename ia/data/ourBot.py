@@ -36,6 +36,7 @@ class OurBot():
 
 		#Variables
 		self.__objectifs = None #((id, ((id_action, ordre, arguments), (id_action, ordre, arguments), ...)), ...)
+		self.__objectifs_en_cours = None #entier qui correspond à l'id de l'objectif en cours, si aucun: None
 
 	#Getter
 	def getPositon(self):
@@ -53,8 +54,24 @@ class OurBot():
 	def getAddressAsserv(self):
 		return self.__addressAsserv
 
+	def getTrajectoires(self):
+		data_trajectoires = ()
+		for objectif in self.__objectifs:
+			idd = objectif[0]
+			trajectoire = ((self.__positionX, self.__positionY),)
+			for order in objectif[1]:
+				if order[1] == 'A_GOTO':
+					trajectoire += ((order[2][0]), order[2][1])
+			data_objectif += (idd, trajectoire)
+
+		return data_trajectoires #type: ((id_objectif, ((x,y),(x,y),...)), (id_objectif, ((x,y),(x,y),...)), ...)
+
+
 	def __getNextIdToStack(self):
 		return self.__last_id_action_stacked.idIncrementation()
+
+	def setObjectifEnCours(self, idd):
+		self.__objectifs_en_cours = idd
 
 
 	def majLastId(self, address, idd):

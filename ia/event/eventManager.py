@@ -20,6 +20,7 @@ class EventManager():
 		self.__MetaData = Data.MetaData
 
 		self.__last_hokuyo_data = None
+
 		self.__last_flussmittel_order_finished = ID_ACTION_MAX	#id_action
 		self.__id_to_reach_flussmittel = 0
 		self.__sleep_time_flussmittel = 0
@@ -40,16 +41,6 @@ class EventManager():
 	def managerLoop(self):
 		#On attend le debut du match
 		while self.__MetaData.getInGame() == False:
-			#On defini l'id actuel de l'arduino comme point de debut, ça évite de devoir la reset
-			if self.__Flussmittel is not None:
-				self.__id_to_reach_flussmittel = self.__Flussmittel.getLastIdGlobale()
-			else:
-				self.__id_to_reach_flussmittel = 0
-			
-			if self.__Tibot is not None:
-				self.__id_to_reach_tibot = self.__Tibot.getLastIdGlobale()
-			else:
-				self.__id_to_reach_tibot = 0
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
 		#Pendant le match
@@ -68,7 +59,12 @@ class EventManager():
 
 	def __checkEvent(self):
 		if self.__Tourelle is not None:
-			new_data = self.__Tourelle.getLastDataPosition()
+			new_data = ()
+			if self.__Flussmittel is not None:
+				new_data += (self.__Flussmittel.getPositon(),)
+			if self.__Tibot is not None:
+				new_data += (self.Tibot.getPositon(),)
+			
 			if new_data != self.__last_hokuyo_data:
 				self.__last_hokuyo_data = new_data
 				#TODO call collision
@@ -88,7 +84,11 @@ class EventManager():
 				else:
 					#Si tu as attendu le SLEEP assez longtemps
 					if int(time.time()*1000) > self.__resume_date_flussmittel:
-						self.__pushOrders(self.__Flussmittel, self.__Flussmittel.getNextOrders())
+						next_actions = self.__Flussmittel.getNextOrders()
+						if next_actions is not None:
+							self.__pushOrders(self.__Flussmittel, self.__Flussmittel.getNextOrders())
+						else:
+							self.__Flussmittel.setObjectifEnCours(None)
 
 
 		if self.__Tibot is not None:
@@ -106,33 +106,38 @@ class EventManager():
 				else:
 					#Si tu as attendu le SLEEP assez longtemps
 					if int(time.time()*1000) > self.__resume_date_tibot:
-						self.__pushOrders(self.__Tibot, self.__Tibot.getNextOrders())
+						next_actions = self.__Tibot.getNextOrders()
+						if next_actions is not None:
+							self.__pushOrders(self.__Tibot, self.__Tibot.getNextOrders())
+						else:
+							self.__Tibot.setObjectifEnCours(None)
 
-	def __pushOrders(self, objet, data): 
+	def __pushOrders(self, Objet, data): 
 		print("data" + str(data))
 		id_objectif = data[0]
+		Objet.setObjectifEnCours(id_objectif)
 		data_action = data[1]#data_action est de type ((id_action, ordre, arguments),...)
 
 		last_order = data_action.pop()
 		if data_action:
 			prev_last_order = data_action[-1]
-			if objet is self.__Flussmittel:
+			if Objet is self.__Flussmittel:
 				print(self.__id_to_reach_flussmittel)
 				self.__id_to_reach_flussmittel = prev_last_order[0]
 				print(self.__id_to_reach_flussmittel)
-			elif objet is self.__Tibot:
+			elif Objet is self.__Tibot:
 				self.__id_to_reach_tibot = prev_last_order[0]
 			else:
-				self.__logger.error("objet inconnu")
+				self.__logger.error("Objet inconnu")
 
 
 		if last_order[1] == 'SLEEP':
-			if objet is self.__Flussmittel:
+			if Objet is self.__Flussmittel:
 				self.__sleep_time_flussmittel = last_order[2][0]
-			elif objet is self.__Tibot:
+			elif Objet is self.__Tibot:
 				self.__sleep_time_tibot = last_order[2][0]
 			else:
-				self.__logger.error("objet inconnu")
+				self.__logger.error("Objet inconnu")
 		elif last_order[1] == 'END':
 			#TODO call objectifManager
 			pass
@@ -142,7 +147,7 @@ class EventManager():
 		else:
 			self.__logger.error("ordre de stop impossible")
 
-		self.__sendOrders((objet.getAddressOther(), objet.getAddressAsserv()), data_action)
+		self.__sendOrders((Objet.getAddressOther(), Objet.getAddressAsserv()), data_action)
 
 
 	def __sendOrders(self, address, data_action):#data_action est de type ((id_action, ordre, arguments),...)

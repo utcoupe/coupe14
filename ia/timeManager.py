@@ -17,6 +17,9 @@ class TimeManager():
 		self.__date_match_begin = None
 		self.__wait_dico = {}
 
+		self.__broadcastStopOrder()
+		self.__sendResetId()
+
 
 
 	def startMatch(self):
@@ -55,10 +58,18 @@ class TimeManager():
 
 		for i in range(1):#TODO augmenter le nombre de stop ?
 			if self.__Flussmittel is not None:
-				self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_CLEANG', *arg)#TODO quelle commande est utile et dans quelle ordre ?
-				self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_KILLG', *arg)
+				self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_CLEANG', *arg)
 			if self.__Tibot is not None:
 				self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_CLEANG', *arg)
-				self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_KILLG', *arg)
 			time.sleep(100)
+
+	def __sendResetId(self):
+		arg = []
+
+		if self.__Flussmittel is not None:
+			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'RESET_ID', *arg)
+			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressOther() , 'RESET_ID', *arg)
+		if self.__Tibot is not None:
+			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'RESET_ID', *arg)
+			self.__Communication.sendOrderAPI(self.__Tibot.getAddressOther() , 'RESET_ID', *arg)
 
