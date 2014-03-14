@@ -41,11 +41,13 @@ logger.info("Les systèmes attendu ont bien été détéctés. Flussmittel: %s  
 
 
 Data = data.Data(Communication, arduino_constantes)
+data.parametrerHokuyo()
+data.parametrerIa()
+
 TimeManager = timeManager.TimeManager(Communication, Data)
 EventManager = event.EventManager(Communication, Data)
 
-#on veut être sur de récupèrer le dernier id pour que event se lance
-#TODO le faire lors du reset arduino
-time.sleep(1)
+
+
 #TODO if jack ready
 TimeManager.startMatch()

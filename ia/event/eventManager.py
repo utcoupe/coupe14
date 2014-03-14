@@ -14,6 +14,7 @@ class EventManager():
 	def __init__(self, Communication, Data):
 		self.__logger = logging.getLogger(__name__.split('.')[0])
 		self.__Communication = Communication
+		self.__Data = Data
 		self.__Flussmittel = Data.Flussmittel
 		self.__Tibot = Data.Tibot
 		self.__Tourelle = Data.Tourelle
@@ -67,7 +68,7 @@ class EventManager():
 			
 			if new_data != self.__last_hokuyo_data:
 				self.__last_hokuyo_data = new_data
-				#TODO call collision
+				self.__testCollision()
 
 		if self.__Flussmittel is not None:
 			new_id = self.__Flussmittel.getLastIdGlobale()
@@ -88,7 +89,7 @@ class EventManager():
 						if next_actions is not None:
 							self.__pushOrders(self.__Flussmittel, self.__Flussmittel.getNextOrders())
 						else:
-							self.__Flussmittel.setObjectifEnCours(None)
+							self.__Flussmittel.setIdObjectifEnCours(None)
 
 
 		if self.__Tibot is not None:
@@ -110,21 +111,18 @@ class EventManager():
 						if next_actions is not None:
 							self.__pushOrders(self.__Tibot, self.__Tibot.getNextOrders())
 						else:
-							self.__Tibot.setObjectifEnCours(None)
+							self.__Tibot.setIdObjectifEnCours(None)
 
 	def __pushOrders(self, Objet, data): 
-		print("data" + str(data))
+		print("On charge les actions: " + str(data))
 		id_objectif = data[0]
-		Objet.setObjectifEnCours(id_objectif)
 		data_action = data[1]#data_action est de type ((id_action, ordre, arguments),...)
 
 		last_order = data_action.pop()
 		if data_action:
 			prev_last_order = data_action[-1]
 			if Objet is self.__Flussmittel:
-				print(self.__id_to_reach_flussmittel)
 				self.__id_to_reach_flussmittel = prev_last_order[0]
-				print(self.__id_to_reach_flussmittel)
 			elif Objet is self.__Tibot:
 				self.__id_to_reach_tibot = prev_last_order[0]
 			else:
@@ -139,7 +137,7 @@ class EventManager():
 			else:
 				self.__logger.error("Objet inconnu")
 		elif last_order[1] == 'END':
-			#TODO call objectifManager
+			self.__objectifOver(id_objectif)
 			pass
 		elif last_order[1] == 'THEN':
 			#Rien à faire
@@ -159,14 +157,23 @@ class EventManager():
 				if action[2] is not None:
 					arg += action[2]
 
-				if action[1] == 'A_RESET_POS':#TODO enlever ce cas particulier, cet ordre doit avoir un id
-					arg = []
-					self.__Communication.sendOrderAPI(address[1], action[1], *arg)
-				elif action[1][0] == 'O':
+				if action[1][0] == 'O':
 					self.__Communication.sendOrderAPI(address[0], action[1], *arg)
 				elif action[1][0] == 'A':
 					self.__Communication.sendOrderAPI(address[1], action[1], *arg)
 				else:
 					self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
 
-				self.__logger.debug("Envoie des actions: " + str(action))
+				self.__logger.debug("Envoi de l'ordre: " + str(action))
+
+
+	def __objectifOver(self, id_objectif):
+		#warn objectif manager than id_objectif is over
+		pass
+
+	def __testCollision(self):
+		pass
+
+	def __cancelObjectif(self, id_objectif):
+		#warn objectif manager than id_objectif is over because of collision
+		pass
