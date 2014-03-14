@@ -61,7 +61,7 @@ class TimeManager():
 				self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_CLEANG', *arg)
 			if self.__Tibot is not None:
 				self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_CLEANG', *arg)
-			time.sleep(100)
+			time.sleep(0.05)
 
 	def __sendResetBot(self):
 		arg = []

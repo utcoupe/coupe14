@@ -114,7 +114,7 @@ class EventManager():
 							self.__Tibot.setIdObjectifEnCours(None)
 
 	def __pushOrders(self, Objet, data): 
-		print("data" + str(data))
+		print("On charge les actions: " + str(data))
 		id_objectif = data[0]
 		data_action = data[1]#data_action est de type ((id_action, ordre, arguments),...)
 
@@ -122,9 +122,7 @@ class EventManager():
 		if data_action:
 			prev_last_order = data_action[-1]
 			if Objet is self.__Flussmittel:
-				print(self.__id_to_reach_flussmittel)
 				self.__id_to_reach_flussmittel = prev_last_order[0]
-				print(self.__id_to_reach_flussmittel)
 			elif Objet is self.__Tibot:
 				self.__id_to_reach_tibot = prev_last_order[0]
 			else:
@@ -166,7 +164,7 @@ class EventManager():
 				else:
 					self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
 
-				self.__logger.debug("Envoi des actions: " + str(action))
+				self.__logger.debug("Envoi de l'ordre: " + str(action))
 
 
 	def __objectifOver(self, id_objectif):
