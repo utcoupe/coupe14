@@ -6,7 +6,6 @@
 #include "serial_switch.h"
 #include "serial_defines.h"
 #include "serial_types.h"
-#include "traitement.h"
 
 #include <pthread.h>
 
@@ -26,7 +25,7 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 	case GET_CAM: {
 		pthread_mutex_lock(&mutex);
 		pthread_mutex_unlock(&mutex);
-		ret_size = x;
+		ret_size = 0;
 		break;
 	}
 	default:
