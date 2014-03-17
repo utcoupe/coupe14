@@ -6,6 +6,11 @@ set(EXECUTABLE_OUTPUT_PATH bin/)
 set(EXEC_NAME visio)
 find_package( OpenCV REQUIRED )
 
+option(VISUAL "visual" OFF)
+if (VISUAL)
+	add_definitions(-DVISUAL)
+endif()
+
 #Configurationdel'exécutable
 
 file(
