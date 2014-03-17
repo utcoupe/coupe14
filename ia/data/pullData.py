@@ -34,7 +34,7 @@ class PullData():
 		self.ThreadPull.start()
 
 	def stop(self):
-	"""méthode public pour arreter le système de pull data"""
+		"""méthode public pour arreter le système de pull data"""
 		self.pull_data = False
 
 	def __gestion(self):

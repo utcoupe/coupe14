@@ -28,7 +28,7 @@ class EventManager():
 		self.__resume_date_flussmittel = 0
 
 		self.__last_tibot_order_finished = ID_ACTION_MAX			#id_action
-		self.__id_to_reach_tibot = 0
+		self.__id_to_reach_tibot = ID_ACTION_MAX
 		self.__sleep_time_tibot = 0
 		self.__resume_date_tibot = 0
 
@@ -75,6 +75,7 @@ class EventManager():
 			#si un nouvel ordre s'est terminé
 			if new_id != self.__last_flussmittel_order_finished:
 				self.__last_flussmittel_order_finished = new_id
+				self.Flussmittel.removeActionBellow(new_id)
 
 			#si on est sur l'action bloquante
 			if self.__last_flussmittel_order_finished == self.__id_to_reach_flussmittel:
@@ -88,8 +89,7 @@ class EventManager():
 						next_actions = self.__Flussmittel.getNextOrders()
 						if next_actions is not None:
 							self.__pushOrders(self.__Flussmittel, self.__Flussmittel.getNextOrders())
-						else:
-							self.__Flussmittel.setIdObjectifEnCours(None)
+
 
 
 		if self.__Tibot is not None:
@@ -97,6 +97,7 @@ class EventManager():
 			#si un nouvel ordre s'est terminé
 			if new_id != self.__last_tibot_order_finished:
 				self.__last_tibot_order_finished = new_id
+				self.__Tibot.removeActionBellow(new_id)
 
 			#si on est sur l'action bloquante
 			if self.__last_tibot_order_finished == self.__id_to_reach_tibot:
@@ -110,8 +111,6 @@ class EventManager():
 						next_actions = self.__Tibot.getNextOrders()
 						if next_actions is not None:
 							self.__pushOrders(self.__Tibot, self.__Tibot.getNextOrders())
-						else:
-							self.__Tibot.setIdObjectifEnCours(None)
 
 	def __pushOrders(self, Objet, data): 
 		print("On charge les actions: " + str(data))

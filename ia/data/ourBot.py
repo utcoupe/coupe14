@@ -36,7 +36,7 @@ class OurBot():
 
 		#Variables
 		self.__objectifs = None #((id, ((id_action, ordre, arguments), (id_action, ordre, arguments), ...)), ...)
-		self.__id_objectif_en_cours = None #entier qui correspond à l'id de l'objectif en cours, si aucun: None
+		self.__actions_en_cours = None
 
 	#Getter
 	def getPositon(self):
@@ -56,7 +56,9 @@ class OurBot():
 
 	def getTrajectoires(self):
 		data_trajectoires = ()
-		for objectif in self.__objectifs:
+
+		#Pour les actions en cours d'execution
+		if self.__actions_en_cours is not None:
 			idd = objectif[0]
 			trajectoire = ((self.__positionX, self.__positionY),)
 			for order in objectif[1]:
@@ -64,15 +66,45 @@ class OurBot():
 					trajectoire += ((order[2][0]), order[2][1])
 			data_objectif += (idd, trajectoire)
 
+		#Pour les objectifs prévu par la suite
+		elif self.__objectifs is not None:
+			
+			idd = self.__objectifs[0][0]
+			trajectoire = ((self.__positionX, self.__positionY),)
+
+			for objectif in self.__objectifs:
+				for order in objectif[1]:
+					if order[1] == 'A_GOTO':
+						trajectoire += ((order[2][0]), order[2][1])
+				data_objectif += (idd, trajectoire)
+
 		return data_trajectoires #type: ((id_objectif, ((x,y),(x,y),...)), (id_objectif, ((x,y),(x,y),...)), ...)
 
+	def getNextOrders(self):
+		"""retourne une liste d'action qui s'arrete sur le premier ordre bloquant trouvé (END,THEN ou SLEEP) """
+		if self.__objectifs:
+			objectif_en_cours = self.__objectifs.popleft()
+			order_of_objectif = objectif_en_cours[1] # type ((id_action, ordre, arguments),...)
+
+			data_order = order_of_objectif.popleft() #type (id_action, ordre, arguments)
+			output_temp = deque()
+			output_temp.append(data_order)
+			while data_order[1] != 'SLEEP' and data_order[1] != 'THEN' and data_order[1] != 'END':
+				data_order = order_of_objectif.popleft()
+				output_temp.append(data_order)
+
+			if data_order[1] != 'END':
+				self.__objectifs.appendleft(objectif_en_cours)
+
+			self.__actions_en_cours = (objectif_en_cours[0], output_temp)# type (id_objectif, (data_order1, data_order2, ...)
+			return  self.__actions_en_cours
+
+		else:
+			self.__actions_en_cours = None
+			return None
 
 	def __getNextIdToStack(self):
 		return self.__last_id_action_stacked.idIncrementation()
-
-	def setIdObjectifEnCours(self, idd):
-		self.__id_objectif_en_cours = idd
-
 
 	def setLastId(self, address, idd):
 		if address == 'ADDR_FLUSSMITTEL_OTHER' or address == 'ADDR_TIBOT_OTHER':
@@ -91,27 +123,16 @@ class OurBot():
 		self.angle = arguments[2]
 		self.setLastId(address, arguments[3])
 
-	def getNextOrders(self):
-	"""retourne une liste d'action qui s'arrete sur le premier ordre bloquant trouvé (END,THEN ou SLEEP) """
-		if self.__objectifs:
-			objectif_en_cours = self.__objectifs.popleft()
+	def removeActionBellow(self, lastIddExecuted):
+		"""enleve les actions terminé de la liste des actions en cours """
+		if self.__actions_en_cours is not None:
+			objectif_en_cours = self.__actions_en_cours[0] # il ne peut y avoir qu'un objectif à la fois
 			order_of_objectif = objectif_en_cours[1] # type ((id_action, ordre, arguments),...)
 
-			data_order = order_of_objectif.popleft() #type (id_action, ordre, arguments)
-			output_temp = deque()
-			output_temp.append(data_order)
-			while data_order[1] != 'SLEEP' and data_order[1] != 'THEN' and data_order[1] != 'END':
+			data_order = order_of_objectif[0] #type (id_action, ordre, arguments)
+			while maxRot(data_order[0], lastIddExecuted) == lastIddExecuted:
 				data_order = order_of_objectif.popleft()
-				output_temp.append(data_order)
 
-			if data_order[1] != 'END':
-				self.__objectifs.appendleft(objectif_en_cours)
-
-			self.setIdObjectifEnCours(objectif_en_cours[0])
-			return (objectif_en_cours[0], output_temp) # type ((id_action, ordre, arguments),...)
-
-		else:
-			return None
 
 	def loadActionScript(self, filename):
 		self.__logger.info(str(self.__name) + ": loading actionScript from: " + str(filename))
@@ -152,7 +173,7 @@ class OurBot():
 	
 
 	def maxRot(self, id1, id2):
-	"""Retourne le plus grand id rotationnelle"""
+		"""Retourne le plus grand id rotationnelle"""
 		if id1 > id2:
 			if (id1 - id2) < ID_ACTION_MAX/2:
 				return id1
