@@ -34,12 +34,12 @@ class EventManager():
 
 		self.__GoalsManager = goals.GoalsManager()
 
-		self.__managerThread = threading.Thread(target=self.managerLoop)
+		self.__managerThread = threading.Thread(target=self.__managerLoop)
 		self.__managerThread .start()
 
 
 
-	def managerLoop(self):
+	def __managerLoop(self):
 		#On attend le debut du match
 		while self.__MetaData.getInGame() == False:
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)

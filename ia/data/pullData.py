@@ -30,19 +30,20 @@ class PullData():
 		self.__data_tibot_asserv_asked = False
 		self.tourelle_asked = False
 
-		self.ThreadPull = threading.Thread(target=self.gestion)
+		self.ThreadPull = threading.Thread(target=self.__gestion)
 		self.ThreadPull.start()
 
-	def gestion(self):
-		while self.pull_data:
-			self.readData()
-			self.askData()
-			time.sleep(self.PULL_PERIODE/1000.0)
-
 	def stop(self):
+	"""méthode public pour arreter le système de pull data"""
 		self.pull_data = False
 
-	def askData(self):
+	def __gestion(self):
+		while self.pull_data:
+			self.__readData()
+			self.__askData()
+			time.sleep(self.PULL_PERIODE/1000.0)
+
+	def __askData(self):
 		arguments = []
 
 		if self.Flussmittel is not None:
@@ -69,7 +70,7 @@ class PullData():
 				self.tourelle_asked = True
 
 
-	def readData(self):
+	def __readData(self):
 		orderTuple = self.Communication.readOrdersAPI() # (address, order, arguments)
 
 		#Si on a un ordre à lire
@@ -108,9 +109,9 @@ class PullData():
 
 			if system is not None:
 				if order == 'A_GET_POS_ID':
-					system.majPositionId(address, arguments)
+					system.setPositionAndId(address, arguments)
 				elif order == 'GET_LAST_ID':
-					system.majLastId(address, arguments[0])
+					system.setLastId(address, arguments[0])
 				elif order == 'GET_HOKUYO':
 					system.majPosition(arguments)
 				elif order == 'GET_CAM':

@@ -46,7 +46,7 @@ class OurBot():
 		return self.__name
 
 	def getLastIdGlobale(self):
-		return self.getMaxRot(self.__last_id_executed_other, self.__last_id_executed_asserv)
+		return self.maxRot(self.__last_id_executed_other, self.__last_id_executed_asserv)
 
 	def getAddressOther(self):
 		return self.__addressOther
@@ -74,9 +74,9 @@ class OurBot():
 		self.__id_objectif_en_cours = idd
 
 
-	def majLastId(self, address, idd):
+	def setLastId(self, address, idd):
 		if address == 'ADDR_FLUSSMITTEL_OTHER' or address == 'ADDR_TIBOT_OTHER':
-			if idd != self.__last_id_executed_other and idd:
+			if idd != self.__last_id_executed_other:
 				self.__last_id_executed_other = idd
 				self.__logger.debug("changement d'id other " + str(idd))
 		else:
@@ -85,19 +85,14 @@ class OurBot():
 				self.__logger.debug("changement d'id asserv " + str(idd))
 
 	#utilise les données en provenance de de l'asserv uniquement !
-	def majPositionId(self, address, arguments):
+	def setPositionAndId(self, address, arguments):
 		self.positionX = arguments[0]
 		self.positionY = arguments[1]
 		self.angle = arguments[2]
-		self.majLastId(address, arguments[3])
-
-	def getNextIdOrder(self):
-		if self.__objectifs is not None:
-			return (self.__objectifs[0][0], self.__objectifs[0][1][0]) #(id_objectif_0, id_action_0_de_objcetif_0)
-		else:
-			return None
+		self.setLastId(address, arguments[3])
 
 	def getNextOrders(self):
+	"""retourne une liste d'action qui s'arrete sur le premier ordre bloquant trouvé (END,THEN ou SLEEP) """
 		if self.__objectifs:
 			objectif_en_cours = self.__objectifs.popleft()
 			order_of_objectif = objectif_en_cours[1] # type ((id_action, ordre, arguments),...)
@@ -127,7 +122,7 @@ class OurBot():
 		objectif = deque()
 		for xml_goal in dom.getElementsByTagName('objectif'):
 			objectif_name	= xml_goal.attributes["objectif_name"].value #seulement pour information
-			id_action				= xml_goal.getElementsByTagName('idd')[0].firstChild.nodeValue
+			id_objectif		= xml_goal.getElementsByTagName('idd')[0].firstChild.nodeValue
 
 			data_objectif = deque()
 			for xml_execution in xml_goal.getElementsByTagName('action'):
@@ -150,14 +145,14 @@ class OurBot():
 
 				data_objectif.append(action)
 
-			objectif.append((id_action, data_objectif))
+			objectif.append((id_objectif, data_objectif))
 
 		self.__objectifs = objectif
 		self.__logger.debug("Script de " + str(self.__name) + "chargé: " + str(self.__objectifs))
 	
 
-	def getMaxRot(self, id1, id2):
-		"""Retourne le plus grand id rotationnelle"""
+	def maxRot(self, id1, id2):
+	"""Retourne le plus grand id rotationnelle"""
 		if id1 > id2:
 			if (id1 - id2) < ID_ACTION_MAX/2:
 				return id1
