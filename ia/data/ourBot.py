@@ -126,13 +126,10 @@ class OurBot():
 	def removeActionBellow(self, lastIddExecuted):
 		"""enleve les actions terminé de la liste des actions en cours """
 		if self.__actions_en_cours is not None:
-			print("__actions_en_cours " + str(self.__actions_en_cours))
 			order_of_objectif = self.__actions_en_cours[1] # il ne peut y avoir qu'un objectif à la fois
 			if order_of_objectif:
 				data_order = order_of_objectif.popleft() #type (id_action, ordre, arguments)
 				
-				print("data_order[0]" + str(data_order[0]) + " lastIddExecuted " + str(lastIddExecuted))
-				print("order_of_objectif " + str(order_of_objectif))
 				while (self.maxRot(data_order[0], lastIddExecuted) == lastIddExecuted) and order_of_objectif:
 					data_order = order_of_objectif.popleft()
 
