@@ -1,5 +1,7 @@
 *__pycache__*
-CMake*
+CMakeCache*
+CMakeFiles
+cmake_install*
 
 hokuyo/hokuyo_sdl
 hokuyo/hokuyo
