@@ -2,7 +2,7 @@
 #define COMPAT_H
 
 #include <stdio.h>
-#include "global.h"
+#include "../global.h"
 
 #define LOCAL_ADDR ADDR_FLUSSMITTEL_CAM
 #define SERIAL_PATH "/dev/ttyACM0"

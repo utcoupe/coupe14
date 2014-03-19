@@ -99,4 +99,3 @@ vector<Point2f> orderPoints(const vector<Point2f> &pts) {
 	ordered.push_back(pts[max]);
 	return ordered;
 }
-
