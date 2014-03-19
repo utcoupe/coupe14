@@ -8,7 +8,7 @@ import time
 import logging
 
 class PullData():
-	def __init__(self, Communication, Flussmittel, Tibot, SmallEnemyBot, BigEnemyBot, Tourelle, PULL_PERIODE):
+	def __init__(self, Communication, Flussmittel, Tibot, SmallEnemyBot, BigEnemyBot, ComputeHokuyoData, Tourelle, PULL_PERIODE):
 		self.__logger = logging.getLogger(__name__.split('.')[0])
 		self.Communication = Communication
 		self.Flussmittel = Flussmittel[0]
@@ -19,6 +19,7 @@ class PullData():
 		self.address_tibot_asserv = Tibot[2]
 		self.SmallEnemyBot = SmallEnemyBot
 		self.BigEnemyBot = BigEnemyBot
+		self.ComputeHokuyoData = ComputeHokuyoData
 		self.Tourelle = Tourelle[0]
 		self.address_tourelle = Tourelle[1]
 		self.PULL_PERIODE = PULL_PERIODE

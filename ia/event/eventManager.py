@@ -72,7 +72,7 @@ class EventManager():
 			if self.__Flussmittel is not None:
 				new_data += (self.__Flussmittel.getPositon(),)
 			if self.__Tibot is not None:
-				new_data += (self.Tibot.getPositon(),)
+				new_data += (self.__Tibot.getPositon(),)
 			
 			if new_data != self.__last_hokuyo_data:
 				self.__last_hokuyo_data = new_data

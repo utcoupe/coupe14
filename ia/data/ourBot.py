@@ -40,7 +40,7 @@ class OurBot():
 
 	#Getter
 	def getPositon(self):
-		return (self.positionX, self.positionY)
+		return (self.__positionX, self.__positionY)
 
 	def getName(self):
 		return self.__name
