@@ -7,8 +7,8 @@ import threading
 import logging
 import time
 
-from . import goals
 from .constantes import *
+from .subProcessCommunicate import *
 
 class EventManager():
 	def __init__(self, Communication, Data):
@@ -28,11 +28,11 @@ class EventManager():
 		self.__resume_date_flussmittel = 0
 
 		self.__last_tibot_order_finished = ID_ACTION_MAX			#id_action
-		self.__id_to_reach_tibot = ID_ACTION_MAX
+		self.__id_to_reach_tibot = 0
 		self.__sleep_time_tibot = 0
 		self.__resume_date_tibot = 0
 
-		self.__GoalsManager = goals.GoalsManager()
+		self.__SubProcessCommunicate = SubProcessCommunicate()
 
 		self.__managerThread = threading.Thread(target=self.__managerLoop)
 		self.__managerThread .start()
@@ -42,21 +42,29 @@ class EventManager():
 	def __managerLoop(self):
 		#On attend le debut du match
 		while self.__MetaData.getInGame() == False:
+			self.__majObjectif()
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
 		#Pendant le match
 		while self.__MetaData.getInGame() == True:
+			self.__majObjectif()
 			self.__checkEvent()
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
 		#On attend le debut de la funny action
 		while self.__MetaData.getInFunnyAction() == False:
+			self.__majObjectif()
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
 		#Pendant la funny action
 		while self.__MetaData.getInFunnyAction() == True:
-			#self.__checkEvent() ou fonction dédiée
+			self.__majObjectif() #TODO faire une fonction dédiée ?
+			self.__checkEvent()
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
+
+	def __majObjectif(self):
+		#TODO
+		self.__SubProcessCommunicate.read()
 
 	def __checkEvent(self):
 		if self.__Tourelle is not None:
@@ -136,7 +144,7 @@ class EventManager():
 			else:
 				self.__logger.error("Objet inconnu")
 		elif last_order[1] == 'END':
-			self.__objectifOver(id_objectif)
+			self.__SubProcessCommunicate.sendObjectifOver(id_objectif)
 			pass
 		elif last_order[1] == 'THEN':
 			#Rien à faire
@@ -166,13 +174,8 @@ class EventManager():
 				self.__logger.debug("Envoi de l'ordre: " + str(action))
 
 
-	def __objectifOver(self, id_objectif):
-		#warn objectif manager than id_objectif is over
-		pass
-
 	def __testCollision(self):
-		pass
-
-	def __cancelObjectif(self, id_objectif):
-		#warn objectif manager than id_objectif is over because of collision
-		pass
+		#TODO
+		id_objectifs_canceled = ()
+		if False:
+			self.__SubProcessCommunicate.sendObjectifCanceled(id_objectifs_canceled)
