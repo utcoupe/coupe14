@@ -135,7 +135,6 @@ class OurBot():
 
 	def addNewObjectif(self, id_objectif, action_data):
 		new_objectif = (id_objectif,)
-
 		data_objectif = deque()
 		for elm_action in action_data:
 			action = (self.__getNextIdToStack(),)
@@ -170,7 +169,7 @@ class OurBot():
 			data_objectif.append(action)
 
 		self.__objectifs.append((id_objectif, data_objectif))
-
+		self.__logger.debug("New goals queued: " + str((id_objectif, data_objectif)))
 
 	def removeActionBellow(self, lastIddExecuted):
 		"""enleve les actions terminé de la liste des actions en cours """
