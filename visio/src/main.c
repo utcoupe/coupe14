@@ -4,10 +4,12 @@
 #include <stdio.h>
 #include <cv.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #include "traitement.h"
 #include "global.h"
-#include "pipe.h"
+#include "serial_switch.h"
+#include "protocole_serial.h"
 
 #ifdef VISUAL
 #include <highgui.h>
@@ -21,11 +23,17 @@ int main(int argc, char **argv){
 	int h_yellow = H_YEL, h_yellow_tol = H_YEL_TOL, s_yellow_tol = S_YEL_TOL, v_yellow_tol = V_YEL_TOL;
 	int h_red = H_RED, h_red_tol = H_RED_TOL, s_red_tol = S_RED_TOL, v_red_tol = V_RED_TOL;
 	int weight_yellow, weight_red;
+	int use_protocol = 0;
 
 	// Capture vidéo
 	CvCapture *capture=NULL;
 	IplImage *image=NULL, *mask_red=NULL, *mask_yellow=NULL, *color_red_mask=NULL, *color_yellow_mask=NULL;
 	IplImage *zone_mask = cvLoadImage(mask_name, 0);
+
+	if (argc == 2 && strcmp(argv[1], "protocol") == 0) {
+		printf("Utilisation du protcole\n");
+		use_protocol = 1;
+	}
 
 	// Ouvrir le flux vidéo
 	capture = cvCreateCameraCapture(CV_CAP_ANY);
@@ -47,15 +55,13 @@ int main(int argc, char **argv){
 	color_red_mask = cvCreateImage(cvGetSize(image), image->depth, 1);
 	mask_red = cvCreateImage(cvGetSize(image), image->depth, 1);
 
-	//Init pipe
-	initPipe();
 
 	//Lancement communication
-	pid_t pid = fork();
-	if (pid == 0) {
-		system("./com");
-		return 0;
+	if (use_protocol) {
+		printf("Lancement du thread protocole\n");
+		init_protocol_thread();
 	}
+	printf("Lancement visio\n");
 
 	// Boucle tant que l'utilisateur n'appuie pas sur la touche q (ou Q)
 #ifdef VISUAL
@@ -122,7 +128,8 @@ int main(int argc, char **argv){
 		weight_red = get_weight(mask_red);
 
 		//Affichage resultat
-		writePipe(weight_red, weight_yellow);
+		pushData(weight_red, weight_yellow);
+
 #ifdef VISUAL
 		// On affiche l'image dans une fenêtre
 		cvShowImage("Mask_yellow", mask_yellow);

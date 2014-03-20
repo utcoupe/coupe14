@@ -8,14 +8,18 @@
 #include "serial_types.h"
 
 #include <pthread.h>
+#include <time.h>
 
-static int red, yellow;
+static struct coord robots[MAX_ROBOTS];
+static int number_robots;
 extern pthread_mutex_t mutex;
 
-void pushData(int p_red, int p_yellow) {
-	pthread_mutex_lock(&mutex);
-	red = p_red;
-	yellow = p_yellow;
+void pushCoords(struct coord *n_robots, int n) {
+	pthread_mutex_lock(&mutex); int i;
+	for (i=0; i<n; i++){
+		robots[i] = n_robots[i];
+	}
+	number_robots = n;
 	pthread_mutex_unlock(&mutex);
 }
 
@@ -23,14 +27,22 @@ void pushData(int p_red, int p_yellow) {
 int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bool doublon){ 
 	int ret_size = 0;
 	switch(ordre){
-	case GET_CAM: {
+	case GET_HOKUYO: {
+		int i;
 		pthread_mutex_lock(&mutex);
-		itob(red, ret);
-		itob(yellow, ret+2);
+		for (i=0; i< number_robots ; i++) {
+			itob(robots[i].x, ret+4*i);
+			itob(robots[i].y, ret+4*i+2);
+		}
 		pthread_mutex_unlock(&mutex);
-		ret_size = 4;
+		for (; i < 4; i++) {
+			itob(-1, ret+4*i);
+			itob(-1, ret+4*i+2);
+		}
+		itob(timeMillis(), ret+16);
+		ret_size = 18;
 		break;
-	}
+		}
 	default:
 		return -1;//commande inconnue
 	}

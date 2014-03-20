@@ -19,7 +19,7 @@ unsigned long timeMillis();
 unsigned long timeMicros();
 
 void serial_write(char data);
-char serial_read();
+char generic_serial_read();
 void forward_serial_write(char c, char addr);
 
 #endif

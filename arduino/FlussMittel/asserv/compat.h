@@ -29,6 +29,6 @@ void initPins();
 unsigned long timeMillis();
 unsigned long timeMicros();
 void serial_send(char data);
-char serial_read();
+char generic_serial_read();
 
 #endif

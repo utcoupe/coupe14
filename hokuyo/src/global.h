@@ -26,10 +26,4 @@
 
 #define MAX_ROBOTS 4
 
-
-
-
-
-
-
 #endif
