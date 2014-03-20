@@ -91,7 +91,7 @@ class Robot(EngineObjectPoly):
 		self.current_team	= BLUE
 		self.stop			= False
 
-		if asserv_obj != None:
+		if asserv_obj is not None:
 			self.asserv = asserv_obj
 		else:
 			self.asserv = Asserv(self)
@@ -99,7 +99,7 @@ class Robot(EngineObjectPoly):
 		self.others = others_obj
 		print(self.asserv, self.others)
 		self.others_service = services.create(others, self.others)
-		if visio != None and visio_obj != None:
+		if visio is not None and visio_obj is not None:
 			self.visio = Visio(self)
 			self.visio_service = services.create(visio, self.visio)
 

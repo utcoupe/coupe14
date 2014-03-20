@@ -7,12 +7,12 @@ Puis il le convertie en dictionnaires, comme ça pas besoin d'éditer plusieurs 
 
 import os
 import re
-
+import codecs
 
 def parseFile(path, myRe, nbGroupParse=1, seekArguments=False, bothSideAssigment=False):
 	reBegin = re.compile("\s?//DEBUTPARSE\s?")
 	reFin = re.compile("\s?//FINPARSE\s?")
-	definesFile = open(path)
+	definesFile = codecs.open(path, 'r', 'utf-8')
 	compteur = 0
 	parse = False
 	nbGroup = 0
@@ -32,7 +32,7 @@ def parseFile(path, myRe, nbGroupParse=1, seekArguments=False, bothSideAssigment
 
 				if seekArguments:
 					argList = result.group('arg')
-					if argList == None:
+					if argList is None:
 						argList = ""
 					argTuple = ()
 					for arg in argList.split():
@@ -56,7 +56,7 @@ def parseFile(path, myRe, nbGroupParse=1, seekArguments=False, bothSideAssigment
 
 
 def parseConstante():
-	relativePath = "../libs/com_C/"
+	relativePath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../libs/com_C/")
 
 	reEnum = re.compile("\s*(?P<constante>\w*)(\s*=\s*(?P<value>.*))?,")
 	reArguments = re.compile("\s*(?P<constante>\w*)(\s*=\s*(?P<value>.*))?,(\s*//(?P<arg>(@\w*\s*)*))?.*\n")

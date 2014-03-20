@@ -8,44 +8,28 @@ import struct
 def binaryToFloat(string):
 	#convertion d'un chaine de binaire en float
 	def as_float32(s):
-	    """
-	    See: http://en.wikipedia.org/wiki/IEEE_754-2008
-	    """
-	    return struct.unpack("f",struct.pack("I", bits2int(s)))
+		"""
+		See: http://en.wikipedia.org/wiki/IEEE_754-2008
+		"""
+		return struct.unpack("f",struct.pack(">I", bits2int(s)))
 
 	# Where the bits2int function converts bits to an integer.  
 	def bits2int(bits):
-	    # You may want to change ::-1 if depending on which bit is assumed
-	    # to be most significant. 
-	    bits = [int(x) for x in bits[::-1]]
+		# You may want to change ::-1 if depending on which bit is assumed
+		# to be most significant.
+		bits = [int(x) for x in bits[::-1]]
 
-	    x = 0
-	    for i in range(len(bits)):
-	        x += bits[i]*2**i
-	    return x
-
-	temp = ""
-	for i in range(24, 32, 1):
-		temp += string[i]
-	for i in range(16, 24, 1):
-		temp += string[i]
-	for i in range(8, 16, 1):
-		temp += string[i]
-	for i in range(0, 8, 1):
-		temp += string[i]
-
-	resultat = as_float32(temp)[0]
-
+		x = 0
+		for i in range(len(bits)):
+			x += bits[i]*2**i
+		return x
 	#TODO gérer les float négatif et tester car taille(floatArduino) != taille(floatPC)
-	return resultat
+	return as_float32(string)[0]
 
 
 def binaryToInt(string):
-	temp = ""
-	for i in range(8, 16, 1):
-		temp += string[i]
-	for i in range(0, 8, 1):
-		temp += string[i]
+	temp = string[8:16]
+	temp += string[0:8]
 
 	resultat = int(temp, 2)
 	if resultat>32767:
@@ -53,13 +37,10 @@ def binaryToInt(string):
 	return resultat
 
 def binaryToLong(string):
-	retour = ""
-	for i in range(16, 24, 1):
-		retour += string[i]
-	for i in range(8, 16, 1):
-		retour += string[i]
-	for i in range(0, 8, 1):
-		retour += string[i]
+	retour = string[24:32]
+	retour += string[16:24]
+	retour += string[8:16]
+	retour += string[0:8]
 
 	resultat = int(retour, 2)
 	if resultat>2147483647: #si le nombre est négatif
@@ -69,20 +50,8 @@ def binaryToLong(string):
 
 def floatToBinary(num):
 	"""retourne une chaine de 32 bits"""
-	temp = ''.join(bin(ord(c)).replace('0b', '').rjust(8, '0') for c in struct.pack('!f', num))
-	
-	retour = ""
-	for i in range(24, 32, 1):
-		retour += temp[i]
-	for i in range(16, 24, 1):
-		retour += temp[i]
-	for i in range(8, 16, 1):
-		retour += temp[i]
-	for i in range(0, 8, 1):
-		retour += temp[i]
-
-	return retour
-
+	#return ''.join(bin(ord(c)).replace('0b', '').rjust(8, '0') for c in struct.pack('<f', num))
+	return ''.join(bin(c).replace('0b', '').rjust(8, '0') for c in struct.pack('<f', num))
 
 def longToBinary(num):
 	"""retourne une chaine de 32 bits"""
@@ -91,16 +60,11 @@ def longToBinary(num):
 
 	temp = bin(num)[2:].zfill(32)
 
-	retour = ""
 	#On inverse les 16 bits par blocks de 8, exemple AAAAAAAABBBBBBBB devient BBBBBBBBAAAAAAAA
-	for i in range(24, 32, 1):
-		retour += temp[i]
-	for i in range(16, 24, 1):
-		retour += temp[i]
-	for i in range(8, 16, 1):
-		retour += temp[i]
-	for i in range(0, 8, 1):
-		retour += temp[i]
+	retour = temp[24:32]
+	retour += temp[16:24]
+	retour += temp[8:16]
+	retour += temp[0:8]
 	return retour
 
 
@@ -111,12 +75,9 @@ def intToBinary(num):
 
 	temp = bin(num)[2:].zfill(16)
 
-	retour = ""
 	#On inverse les 16 bits par blocks de 8, exemple AAAAAAAABBBBBBBB devient BBBBBBBBAAAAAAAA
-	for i in range(8, 16, 1):
-		retour += temp[i]
-	for i in range(0, 8, 1):
-		retour += temp[i]
+	retour = temp[8:16]
+	retour += temp[0:8]
 	return retour
 
 

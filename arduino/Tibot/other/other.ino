@@ -7,7 +7,7 @@
 #include "Arduino.h"
 #include "Servo.h"
 
-#include "serial_decoder_forward.h"
+#include "serial_decoder.h"
 #include "serial_defines.h"
 #include "compat.h"
 #include "parameters.h"
@@ -16,16 +16,19 @@ Servo servoBras;
 
 #define MAX_READ 64 
 void setup(){
+	pinMode(16,OUTPUT);
+	digitalWrite(16, HIGH);
 	initPins();
 	Serial2.begin(57600, SERIAL_8O1);
 	Serial1.begin(57600, SERIAL_8O1); //Forward
 #ifdef DEBUG
 	Serial.begin(115200, SERIAL_8N1);
 #endif
+	PDEBUGLN("serial ok");
+	digitalWrite(16, LOW); //LED eteinte pendant attente protocole
 	init_protocol();
 	PDEBUGLN("INIT DONE");
 	// LED qui n'en est pas une
-	pinMode(16,OUTPUT);
 }
 
 void loop(){
@@ -50,7 +53,7 @@ void loop(){
 		available = MAX_READ;
 	}
 	for(int i = 0; i < available; i++) {
-		serial_write(Serial1.read());
+		serial_send(Serial1.read());
 	}
 
 	/* fin zone de programmation libre */

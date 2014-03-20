@@ -14,9 +14,10 @@ extern Control control;
 //La fonction renvoit le nombre d'octet dans ret, chaine de caractère de réponse. Si doublon, ne pas executer d'ordre mais renvoyer les données à renvoyer
 int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bool doublon){ 
 	int ret_size = 0;
+	int id;
 	switch(ordre){
 	case PINGPING:
-                if (!doublon) {
+		if (!doublon) {
 			PDEBUGLN("PONG (nouveau)");
 		}
 		else{
@@ -24,34 +25,37 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		}
 		break;
 	case A_GET_CODER:
-                if (!doublon) {
-			PDEBUG("Codeur L : ");PDEBUGLN(control.getLenc()->getTicks());
-			PDEBUG("Codeur R : ");PDEBUGLN(control.getRenc()->getTicks());
-			PDEBUG("Angle pos : ");PDEBUGLN(control.getPos().angle);
-                }
 		ltob(control.getLenc()->getTicks(), ret);
 		ltob(control.getRenc()->getTicks(), ret + 4);
 		ret_size = 8;
 		break;
 	case A_GOTO:
+		id = btoi(argv);
+		argv += 2;
 		if (!doublon) {
-			control.pushGoal(0, TYPE_POS, btoi(argv), btoi(argv+2), 0);
+			control.pushGoal(id, TYPE_POS, btoi(argv), btoi(argv+2), 0);
 		}
 		break;
 	case A_GOTOA:
+		id = btoi(argv);
+		argv += 2;
 		if (!doublon) {
-			control.pushGoal(0, TYPE_POS, btoi(argv), btoi(argv+2), 0);
-			control.pushGoal(0, TYPE_ANG, btof(argv+4), 0, 0);
+			control.pushGoal(id, TYPE_POS, btoi(argv), btoi(argv+2), 0);
+			control.pushGoal(id, TYPE_ANG, btof(argv+4), 0, 0);
 		}
 		break;
 	case A_ROT:
+		id = btoi(argv);
+		argv += 2;
 		if (!doublon) {
-			control.pushGoal(0, TYPE_ANG, btof(argv), 0, 0);
+			control.pushGoal(id, TYPE_ANG, btof(argv), 0, 0);
 		}
 		break;
-	case A_PWM_TEST:
+	case A_PWM:
+		id = btoi(argv);
+		argv += 2;
 		if (!doublon) {
-			control.pushGoal(0, TYPE_PWM, btoi(argv), btoi(argv+2), btoi(argv+4));
+			control.pushGoal(id, TYPE_PWM, btoi(argv), btoi(argv+2), btoi(argv+4));
 		}
 		break;
 	case A_PIDA:
@@ -74,6 +78,9 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 			control.clearGoals();
 		}
 		break;
+	case RESET_ID:
+		control.resetLastFinishedId();
+		break;
 	case A_RESET_POS:
 		if (!doublon) {
 			pos pos;
@@ -93,11 +100,28 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		ret_size = 8;
 		break;
 		}
+	case A_GET_POS_ID:{
+		pos pos = control.getPos();
+		int x = pos.x, y = pos.y;
+		float a = pos.angle;
+		itob(x, ret);
+		itob(y, ret+2);
+		ftob(a, ret+4);
+		itob(control.getLastFinishedId(), ret+8);
+		ret_size = 2;
+		ret_size = 10;
+		break;
+		}
 	case A_ACCMAX:
 		if(!doublon) {
 			control.setMaxAcc(btof(argv));
 		}
 		break;
+	case GET_LAST_ID: {
+		itob(control.getLastFinishedId(), ret);
+		ret_size = 2;
+		break;
+		}
 
 /*	case ORDRE_001:
 		if (!doublon) {
@@ -112,7 +136,10 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		//Coder ici la formation des données de retour
 
 		break;*/
+	case PINGPING_AUTO:
+		break;
 	default:
+		PDEBUGLN("ORDRE INCONNU");
 		return -1;//commande inconnue
 	}
 	return ret_size;

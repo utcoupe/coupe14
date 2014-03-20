@@ -5,7 +5,7 @@
 #include "global.h"
 
 #define LOCAL_ADDR ADDR_HOKUYO
-#define SERIAL_PATH "/dev/ttyUSB0"
+#define SERIAL_PATH "/dev/ttyUSB1"
 
 typedef enum bool 
 { 

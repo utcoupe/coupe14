@@ -14,7 +14,13 @@ Motor motor_right(MOTOR_RIGHT);
 
 void set_pwm_left(int pwm){
 	pwm = -pwm;//les moteurs sont faces à face, pour avancer il faut qu'il tournent dans un sens différent
+	if (pwm > 0)
+		pwm += PWM_MIN;
+	else if (pwm < 0)
+		pwm -= PWM_MIN;
+
 	pwm += 127;
+
 	if(pwm > 255)
 		pwm = 255;
 	else if(pwm < 0)
@@ -24,7 +30,13 @@ void set_pwm_left(int pwm){
 }
 
 void set_pwm_right(int pwm){
+	if (pwm > 0)
+		pwm += PWM_MIN;
+	else if (pwm < 0)
+		pwm -= PWM_MIN;
+
 	pwm += 127;
+
 	if(pwm > 255)
 		pwm = 255;
 	else if(pwm < 0)

@@ -5,7 +5,7 @@
 #include "global.h"
 
 #define LOCAL_ADDR ADDR_FLUSSMITTEL_CAM
-#define SERIAL_PATH "/dev/ttyUSB0"
+#define SERIAL_PATH "/dev/ttyACM0"
 
 typedef enum bool 
 { 

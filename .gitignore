@@ -1,5 +1,7 @@
 *__pycache__*
-CMake*
+CMakeCache*
+CMakeFiles
+cmake_install*
 
 hokuyo/hokuyo_sdl
 hokuyo/hokuyo
@@ -13,3 +15,15 @@ hokuyo/hokuyo
 *.a
 *.pyc
 *.exe
+*.save
+workspace*
+libs/cgal/Makefile
+libs/cgal/cmake_install.cmake
+libs/cgal/CMakeLists.txt
+libs/cgal/CMakeFiles/*
+libs/cgal/CMakeCache.txt
+libs/cgal/partition
+libs/cgal/partition_continue
+ia/log/*.log
+ia/log/*.xml
+.idea/*

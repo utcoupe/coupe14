@@ -1,15 +1,19 @@
-#include <errno.h>
+#include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
+#include <sys/time.h>
+#include <fcntl.h>
 
 #include "compat.h"
 
 int serial;
 
 long timeMillis() {
-	return 1000*((float)clock())/CLOCKS_PER_SEC;
+	struct timeval tv;       
+    if(gettimeofday(&tv, NULL) != 0) return 0;
+	return (unsigned long)((tv.tv_sec * 1000ul) + (tv.tv_usec / 1000ul));        
 }
 
 void serial_send(char c){
@@ -18,8 +22,9 @@ void serial_send(char c){
 
 unsigned char generic_serial_read() {
 	char data;
-	read (serial, &data, 1); 
-	return data & 0xFF;
+	read (serial, &data, 1);
+	data &= 0xFF;
+	return data;
 }
 
 int
@@ -36,7 +41,7 @@ set_interface_attribs (int fd, int speed, int parity)
 	cfsetispeed (&tty, speed);
 
         tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;     // 8-bit chars
-	tty.c_iflag &= ~IGNBRK;         // ignore break signal
+	tty.c_iflag &= ~(IGNBRK | INLCR | IGNCR | ICRNL);         // ignore break signal
 	tty.c_lflag = 0;                // no signaling chars, no echo, no canonical processing
 	tty.c_oflag = 0;                // no remapping, no delays
 	tty.c_cc[VMIN]  = 0;            // read doesn't block
@@ -48,7 +53,6 @@ set_interface_attribs (int fd, int speed, int parity)
         tty.c_cflag &= ~(PARENB | PARODD);      // shut off parity
 	tty.c_cflag |= parity;
         tty.c_cflag &= ~CSTOPB;
-        tty.c_cflag &= ~CRTSCTS;
 
         if (tcsetattr (fd, TCSANOW, &tty) != 0)
         {
@@ -93,4 +97,3 @@ int n = read (fd, buf, sizeof buf);
 
 The values for speed are B115200, B230400, B9600, B19200, B38400, B57600, B1200, B2400, B4800, etc. The values for parity are 0 (meaning no parity), PARENB|PARODD (enable parity and use odd), PARENB (enable parity and use even), PARENB|PARODD|CMSPAR (mark parity), and PARENB|CMSPAR (space parity).
 */
-

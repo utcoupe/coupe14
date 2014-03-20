@@ -11,10 +11,12 @@ void initPins(){
 	//set mode des pins pour arduino
 	pinMode(PIN_ENC_LEFT_A,INPUT_PULLUP);
 	pinMode(PIN_ENC_LEFT_B,INPUT_PULLUP);
-	pinMode(PIN_ENC_LEFT_0,INPUT_PULLUP);
-	pinMode(PIN_ENC_RIGHT_0,INPUT_PULLUP);
 	pinMode(PIN_ENC_RIGHT_A,INPUT_PULLUP);
 	pinMode(PIN_ENC_RIGHT_B,INPUT_PULLUP);
+	if (GESTION_3EME_FIL) {
+		pinMode(PIN_ENC_LEFT_0,INPUT_PULLUP);
+		pinMode(PIN_ENC_RIGHT_0,INPUT_PULLUP);
+	}
 
 	//Definition des interruptions arduino en fonction du type d'évaluation
 #if ENCODER_EVAL == 4

@@ -27,9 +27,11 @@ class Control{
 	//set des differents PIDs
 	void setPID_angle(float n_P, float n_I, float n_D); //PID de l'asservissement angulaire
 	void setPID_distance(float n_P, float n_I, float n_D); //PID de l'asservissement en position
+
+	//set des anti-windup
+	void setErrorUseI_angle(float I);
+	void setErrorUseI_distance(float I);
 	
-	//gestion de l'offset. Attention, il faut modifier les PIDs !
-	void setConsigneOffset(int n_offset);
 	void setMaxAngCurv(float n_max_ang);
 	void setMaxAcc(float n_max_acc);
 
@@ -50,6 +52,10 @@ class Control{
 	void pause();
 	void resume();
 
+	//Get ID
+	int getLastFinishedId();
+	void resetLastFinishedId();
+
 	private:
 	RobotState robot;
 	Fifo fifo;
@@ -58,7 +64,7 @@ class Control{
 	//interface avec les PIDs
 	void setConsigne(float consigne_left, float consigne_right); //controles puis modification (renvoie l'overflow)
 	void check_acc(float *consigne, float last);
-	void check_max(float *consigne);
+	void check_max(float *consigne, float max = CONSIGNE_RANGE_MAX);
 	void controlAngle(float goal_angle); //goal en radians
 	void controlPos(float e_angle, float e_dist); //goal en mm
 
@@ -71,5 +77,7 @@ class Control{
 
 	//Les pwm à appliquer
 	int value_consigne_right, value_consigne_left;
+
+	int last_finished_id;
 };
 #endif
