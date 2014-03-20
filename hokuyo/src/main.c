@@ -2,7 +2,7 @@
 #include "global.h"
 #include "robot.h"
 #include "compat.h"
-#include "protocole.h"
+#include "protocole_serial.h"
 #include "serial_switch.h"
 
 #include <stdio.h>

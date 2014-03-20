@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include "global.h"
 
+#define LOCAL_ADDR ADDR_FLUSSMITTEL_CAM
+#define SERIAL_PATH "/dev/ttyUSB0"
+
 typedef enum bool 
 { 
 	true = 1, false = 0 
@@ -14,8 +17,6 @@ unsigned char generic_serial_read();
 void serial_send(char c);
 int set_interface_attribs (int fd, int speed, int parity);
 void set_blocking (int fd, int should_block);
-
-#define LOCAL_ADDR ADDR_FLUSSMITTEL_CAM
 
 #ifdef DEBUG
 #define PDEBUGLN(x) printf(x);printf("\n");

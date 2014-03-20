@@ -6,7 +6,7 @@
 
 #include "compat.h"
 
-extern int serial;
+int serial;
 
 long timeMillis() {
 	return 1000*((float)clock())/CLOCKS_PER_SEC;
@@ -14,13 +14,11 @@ long timeMillis() {
 
 void serial_send(char c){
 	write (serial, &c, 1);           // send 7 character greeting
-	printf("send %x\n", c);
 }
 
 unsigned char generic_serial_read() {
 	char data;
 	read (serial, &data, 1); 
-	printf("read %x\n", data);
 	return data & 0xFF;
 }
 
