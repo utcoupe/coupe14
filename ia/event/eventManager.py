@@ -63,8 +63,35 @@ class EventManager():
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
 	def __majObjectif(self):
-		#TODO
-		self.__SubProcessCommunicate.read()
+		"""Get new goals from objectifManager and add it to robot's goals queue"""
+		new_data_list = self.__SubProcessCommunicate.read()
+		for new_data in new_data_list:
+			nom_robot, id_prev_objectif, id_objectif, action_data = new_data
+
+			if self.__Flussmittel is not None and nom_robot == self.__Flussmittel.getName():
+				robot = self.__Flussmittel
+			elif self.__Tibot is not None:
+				robot = self.__Tibot
+			else:
+				robot = None
+
+			if robot is not None:
+				action_en_cours, objectif = robot.getQueuedObjectif()
+
+				if objectif:
+					last_objectif = objectif[-1]
+				elif action_en_cours:
+					last_objectif = action_en_cours
+				else:
+					last_objectif = robot.getLastIdObjectifExecuted()
+				
+				if last_objectif is not None:
+					if last_objectif[0] == id_prev_objectif:
+						robot.addNewObjectif(id_objectif, action_data)
+					else:
+						self.__logger.warning("On drop un nouvel ordre car il n'est pas à jour, id_prev_objectif: " + str(id_prev_objectif) + " last_objectif[0]: " + str(last_objectif[0]) + " action_data " + str(action_data))
+				else:
+					robot.addNewObjectif(id_objectif, action_data)
 
 	def __checkEvent(self):
 		if self.__Tourelle is not None:
@@ -83,7 +110,7 @@ class EventManager():
 			#si un nouvel ordre s'est terminé
 			if new_id != self.__last_flussmittel_order_finished:
 				self.__last_flussmittel_order_finished = new_id
-				self.Flussmittel.removeActionBellow(new_id)
+				self.__Flussmittel.removeActionBellow(new_id)
 
 			#si on est sur l'action bloquante
 			if self.__last_flussmittel_order_finished == self.__id_to_reach_flussmittel:
@@ -96,7 +123,7 @@ class EventManager():
 					if int(time.time()*1000) > self.__resume_date_flussmittel:
 						next_actions = self.__Flussmittel.getNextOrders()
 						if next_actions is not None:
-							self.__pushOrders(self.__Flussmittel, self.__Flussmittel.getNextOrders())
+							self.__pushOrders(self.__Flussmittel, next_actions)
 
 
 
@@ -118,7 +145,7 @@ class EventManager():
 					if int(time.time()*1000) > self.__resume_date_tibot:
 						next_actions = self.__Tibot.getNextOrders()
 						if next_actions is not None:
-							self.__pushOrders(self.__Tibot, self.__Tibot.getNextOrders())
+							self.__pushOrders(self.__Tibot, next_actions)
 
 	def __pushOrders(self, Objet, data): 
 		print("On charge les actions: " + str(data))
@@ -144,6 +171,7 @@ class EventManager():
 			else:
 				self.__logger.error("Objet inconnu")
 		elif last_order[1] == 'END':
+			Objet.setLastIdObjectifExecuted(id_objectif)
 			self.__SubProcessCommunicate.sendObjectifOver(id_objectif)
 			pass
 		elif last_order[1] == 'THEN':
