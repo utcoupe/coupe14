@@ -128,6 +128,7 @@ int main(int argc, char **argv){
 		weight_red = get_weight(mask_red);
 
 		//Affichage resultat
+		printf("Red : %d\t\tYellow : %d\n", weight_red, weight_yellow);
 		pushData(weight_red, weight_yellow);
 
 #ifdef VISUAL

@@ -15,7 +15,7 @@ reader = open(filename, 'r')
 print("Fifo connected !")
 
 line = reader.readline()
-while line != None :
+while line is not None:
 	print(line, end="")
 	line = reader.readline()
 

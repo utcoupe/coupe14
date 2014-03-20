@@ -34,7 +34,7 @@ static struct coord robots[MAX_ROBOTS];
 int main(int argc, char **argv){
 	
 	if(argc <= 1 || ( strcmp(argv[1], "red") != 0 && strcmp(argv[1], "blue") ) ){
-		fprintf(stderr, "usage: hokuyo {red|blue} [pipe]\n");
+		fprintf(stderr, "usage: hokuyo {red|blue} [protocol]\n");
 		return EXIT_FAILURE;
 	}
 
@@ -55,6 +55,7 @@ int main(int argc, char **argv){
 	l1 = initLidarAndCalibrate( hokuyo_urg, "/dev/ttyACM0", pos1, PI/2, 0, PI/2);
 	//l1 = initLidar( hokuyo_urg, "/dev/ttyACM0", pos1, 0, 0, PI/2);
 
+
 	#ifdef SDL
 	l1Color = newColor(255, 0, 0);
 	initSDL();
@@ -73,7 +74,9 @@ int main(int argc, char **argv){
 }
 
 void frame(){
+	long timestamp;
 	getPoints(&l1);
+	timestamp = timeMillis();
 	//printf("nPoints:%i\n", l1.fm.n);
 	int nRobots = getRobots(l1.points, l1.fm.n, robots);
 	#ifdef SDL
@@ -84,10 +87,10 @@ void frame(){
 	waitScreen();
 	#endif
 	if (use_protocol){
-		pushCoords(robots, nRobots);
+		pushCoords(robots, nRobots, timestamp);
 	}
 	else{
-		printf("%s%i", PREFIX, nRobots);
+		printf("%s%ld;%i", PREFIX, timestamp, nRobots);
 		for(int i=0; i<nRobots; i++){
 			printf(";%i:%i", robots[i].x, robots[i].y);
 		}
