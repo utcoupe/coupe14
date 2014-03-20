@@ -3,12 +3,10 @@
 Classe pour nos robots
 """
 
-
-from collections import deque
-from xml.dom.minidom import parseString
 from constantes import *
 from math import sqrt
 import logging
+from collections import deque
 
 from .idRot import *
 
@@ -17,6 +15,7 @@ class OurBot():
 		#Constantes
 		self.__name = name
 		self.__logger = logging.getLogger(__name__.split('.')[0])
+		self.__arduino_constantes = arduinoConstantes
 		self.__communication = communication
 		self.__addressOther = addressOther
 		self.__addressAsserv = addressAsserv
@@ -35,8 +34,9 @@ class OurBot():
 		self.__last_id_action_stacked = IdRot()
 
 		#Variables
-		self.__objectifs = None #((id, ((id_action, ordre, arguments), (id_action, ordre, arguments), ...)), ...)
+		self.__objectifs = deque() #((id, ((id_action, ordre, arguments), (id_action, ordre, arguments), ...)), ...)
 		self.__actions_en_cours = None
+		self.__last_id_objectif_executed = None
 
 	#Getter
 	def getPositon(self):
@@ -54,6 +54,12 @@ class OurBot():
 	def getAddressAsserv(self):
 		return self.__addressAsserv
 
+	def getQueuedObjectif(self):
+		return (self.__actions_en_cours, self.__objectifs)
+
+	def getLastIdObjectifExecuted(self):
+		return self.__last_id_objectif_executed
+
 	def getTrajectoires(self):
 		data_trajectoires = ()
 
@@ -67,7 +73,7 @@ class OurBot():
 			data_objectif += (idd, trajectoire)
 
 		#Pour les objectifs prévu par la suite
-		elif self.__objectifs is not None:
+		elif self.__objectifs:
 			
 			idd = self.__objectifs[0][0]
 			trajectoire = ((self.__positionX, self.__positionY),)
@@ -96,15 +102,19 @@ class OurBot():
 			if data_order[1] != 'END':
 				self.__objectifs.appendleft(objectif_en_cours)
 
+
 			self.__actions_en_cours = (objectif_en_cours[0], output_temp)# type (id_objectif, (data_order1, data_order2, ...)
-			return  self.__actions_en_cours
 
 		else:
 			self.__actions_en_cours = None
-			return None
+		
+		return self.__actions_en_cours
 
 	def __getNextIdToStack(self):
 		return self.__last_id_action_stacked.idIncrementation()
+
+	def setLastIdObjectifExecuted(self, idd):
+		self.__last_id_objectif_executed = idd
 
 	def setLastId(self, address, idd):
 		if address == 'ADDR_FLUSSMITTEL_OTHER' or address == 'ADDR_TIBOT_OTHER':
@@ -123,6 +133,45 @@ class OurBot():
 		self.angle = arguments[2]
 		self.setLastId(address, arguments[3])
 
+	def addNewObjectif(self, id_objectif, action_data):
+		new_objectif = (id_objectif,)
+
+		data_objectif = deque()
+		for elm_action in action_data:
+			action = (self.__getNextIdToStack(),)
+			order = elm_action[0]
+			action += (order,)
+
+			if order not in ("SLEEP", "THEN", "END"):
+				argument_type_list = self.__arduino_constantes['ordersArguments'][order]
+				arguments_temp = ()
+				for i, argument_type in enumerate(argument_type_list):
+					#le premier argument est l'id d'action
+					if i != 0:
+						if argument_type == "int":
+							arguments_temp += (int(elm_action[1][i-1]),)
+						elif argument_type == "float":
+							arguments_temp += (float(elm_action[1][i-1]),)
+						elif argument_type == "long":
+							arguments_temp += (long(elm_action[1][i-1]),)
+
+				if arguments_temp != ():
+					action += (arguments_temp,)
+				else:
+					action += (None,)
+
+			elif order == "SLEEP":
+				arguments_temp = (int(elm_action[1][0]),)
+				action += (arguments_temp,)
+
+			else:
+				action += (None,)
+
+			data_objectif.append(action)
+
+		self.__objectifs.append((id_objectif, data_objectif))
+
+
 	def removeActionBellow(self, lastIddExecuted):
 		"""enleve les actions terminé de la liste des actions en cours """
 		if self.__actions_en_cours is not None:
@@ -135,44 +184,6 @@ class OurBot():
 
 				if not order_of_objectif:
 					self.__actions_en_cours = None
-
-
-	def loadActionScript(self, filename):
-		self.__logger.info(str(self.__name) + ": loading actionScript from: " + str(filename))
-		fd = open(filename,'r')
-		dom = parseString(fd.read())
-		fd.close()
-
-		objectif = deque()
-		for xml_goal in dom.getElementsByTagName('objectif'):
-			objectif_name	= xml_goal.attributes["objectif_name"].value #seulement pour information
-			id_objectif		= xml_goal.getElementsByTagName('idd')[0].firstChild.nodeValue
-
-			data_objectif = deque()
-			for xml_execution in xml_goal.getElementsByTagName('action'):
-				action 		= (self.__getNextIdToStack(),)
-				ordre 		= (xml_execution.getElementsByTagName('ordre')[0].firstChild.nodeValue,)
-				action += ordre
-
-				if ordre[0] == 'A_ROT':
-					arguments = xml_execution.getElementsByTagName('arguments')[0].firstChild
-					if arguments:
-						action 		+= (list(map(float, arguments.nodeValue.split(','))),)
-					else:
-						action += (None,)
-				else:
-					arguments = xml_execution.getElementsByTagName('arguments')[0].firstChild
-					if arguments:
-						action 		+= (list(map(int, arguments.nodeValue.split(','))),)
-					else:
-						action += (None,)
-
-				data_objectif.append(action)
-
-			objectif.append((id_objectif, data_objectif))
-
-		self.__objectifs = objectif
-		self.__logger.debug("Script de " + str(self.__name) + "chargé: " + str(self.__objectifs))
 	
 
 	def maxRot(self, id1, id2):
