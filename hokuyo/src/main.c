@@ -14,36 +14,10 @@
 #ifdef SDL
 #include "gui.h"
 #endif
-/*
-       +-------------------------------------------------------------------------------------+-> X
-       |                    x                                                                |
-       |                    x                                                                |
-       |                   x                                                                 |
-       |                  x                                                                  |
-       |                 x                                                                   |
-       |                x                                                                    |
-       |   x         xxx                                                                     |
-       |  x     xxxxx                                                                        |
-       | xxxxxxx             |                                                               |
-       |  x                --+--                                                             |
-       |   x                 |                                                               |
-       |                                                                                     |
-       |                                                                                     |
-       |                                                                                     |
-       |                                                                                     |
-       |   x                                                                                 |
-       |  x                                                                                  |
-       | xxxxx                                                                               |
-       |  x   xx                                                                             |
-       |   x    x                                                                            |
-       |         x                                                                           |
-  /||\ |         x                                                                           |
-   ||  +-------------------------------------------------------------------------------------+
-  +--+ |
-  |l1| v
-  +--+ Y
 
- */
+
+
+
 
 void frame();
 
@@ -71,15 +45,15 @@ int main(int argc, char **argv){
 		pos1.x = TAILLE_TABLE_X+25;
 	}
 
-	pos1.y = TAILLE_TABLE_Y+25;
+	pos1.y = -25;
 
 	if (argc == 3 && strcmp(argv[2], "protocol") == 0) {
 		printf("Utilisation du protcole\n");
 		use_protocol = 1;
 	}
 
-	//l1 = initLidarAndCalibrate( hokuyo_urg, "/dev/ttyACM0", pos1, -PI/2, -PI/2, 0);
-	l1 = initLidarAndCalibrate( hokuyo_urg, "/dev/ttyACM0", pos1, -PI/2, -PI/2, 0);
+	l1 = initLidarAndCalibrate( hokuyo_urg, "/dev/ttyACM0", pos1, PI/2, 0, PI/2);
+	//l1 = initLidar( hokuyo_urg, "/dev/ttyACM0", pos1, 0, 0, PI/2);
 
 	#ifdef SDL
 	l1Color = newColor(255, 0, 0);
@@ -115,7 +89,7 @@ void frame(){
 	else{
 		printf("%s%i", PREFIX, nRobots);
 		for(int i=0; i<nRobots; i++){
-			printf(";%i:%i", robots[i].x, TAILLE_TABLE_Y-robots[i].y);
+			printf(";%i:%i", robots[i].x, robots[i].y);
 		}
 		printf("\n");
 	}
