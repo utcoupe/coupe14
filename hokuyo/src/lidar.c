@@ -19,7 +19,7 @@ theta(struct coord lidar, struct coord marker){
 	delta.y = lidar.y - marker.y;
 
 	//printf("dx=%i\tdy=%i\n", delta.x, delta.y);
-	if(delta.x == 0) return -PI/2;
+	if(delta.x == 0) return PI/2;
 
 	return atan((double)delta.y / (double)delta.x); // -(-) -> +
 }
@@ -75,10 +75,15 @@ initLidarAndCalibrate(enum lidarModel model, char* device, struct coord position
 	double *angles = malloc(sizeof(double)*nAngles);
 	if(angles == NULL) exit(EXIT_FAILURE);
 	for(int i=0; i<nAngles; i++){
-		angles[i] = getAngleFromIndexHokuyoUrg(l.lidarObject, nAngles-i-1) + l.orientation;
+		angles[i] = getAngleFromIndexHokuyoUrg(l.lidarObject, i) + l.orientation;
+		printf("angleFromhokuyo:%f\tangle[%i]:%f\n", getAngleFromIndexHokuyoUrg(l.lidarObject, i)*180/PI, i, angles[i]*180/PI);
 	}
 	freeFastmath(l.fm);
 	l.fm = initFastmath( nAngles, angles );
+
+	free(l.points);
+	l.points = malloc(sizeof(struct coord)*l.fm.n);
+	if(l.points == NULL) exit(EXIT_FAILURE);
 
 	free(angles);
 
@@ -104,8 +109,8 @@ initLidar(enum lidarModel model, char* device, struct coord position, double ori
 		double *angles = malloc(sizeof(double)*nAngles);
 		if(angles == NULL) exit(EXIT_FAILURE);
 		for(int i=0; i<nAngles; i++){
-			angles[i] = getAngleFromIndexHokuyoUrg(l.lidarObject, nAngles-i-1) + orientation;
-			//printf("angleFromhokuyo:%f\tangle[%i]:%f\n", getAngleFromIndexHokuyoUrg(l.lidarObject, nAngles-i-1)*180/PI, i, angles[i]*180/PI);
+			angles[i] = getAngleFromIndexHokuyoUrg(l.lidarObject, i) + orientation;
+			//printf("angleFromhokuyo:%f\tangle[%i]:%f\n", getAngleFromIndexHokuyoUrg(l.lidarObject, i)*180/PI, i, angles[i]*180/PI);
 		}
 
 		l.fm = initFastmath( nAngles, angles );
@@ -152,20 +157,22 @@ invalidPointCalibration(struct coord lidar, struct coord p){
 struct coord*
 getPointsCalibrate(struct lidar* l, char calibration){
 	long* buffer = malloc(sizeof(long)*l->fm.n);
+
+
 	getDistancesHokuyoUrg(l->lidarObject, buffer);
-	for(int i=0; i<l->fm.n; i++){
-		//hokuyo scans in indirect direction, buffer is reversed
+	for(int i=0; i<(l->fm.n); i++){
 
 		#ifndef DEBUG_DO_NOT_REMOVE_POINTS
-		if(invalidDistance(buffer[l->fm.n-i])){
+		if(invalidDistance(buffer[i])){
+			//printf("invalidDistance[%i]\t%li\n", i, buffer[i]);
 			l->points[i].x = 0;
 			l->points[i].y = 0;
 			continue;
 		}
 		#endif 
 
-		l->points[i].x = fastCos(l->fm, i)*buffer[l->fm.n-i-1] + l->pos.x;
-		l->points[i].y = fastSin(l->fm, i)*buffer[l->fm.n-i-1] + l->pos.y;
+		l->points[i].x = fastCos(l->fm, i)*buffer[i] + l->pos.x;
+		l->points[i].y = fastSin(l->fm, i)*buffer[i] + l->pos.y;
 
 		if(calibration){
 			if(invalidPointCalibration(l->pos, l->points[i])){
@@ -176,17 +183,20 @@ getPointsCalibrate(struct lidar* l, char calibration){
 		}else{
 			#ifndef DEBUG_DO_NOT_REMOVE_POINTS
 			if(invalidPoint(l->points[i])){
+				//printf("invalidPoint[%i]\t%li\t(%i,%i)\n", i, buffer[i], l->points[i].x, l->points[i].y);
 				l->points[i].x = 0;
 				l->points[i].y = 0;
 				continue;
 			}
+			//printf("validPoint[%i]\t%li\t(%i,%i)\n", i, buffer[i], l->points[i].x, l->points[i].y);
 			#endif
 		}
 	}
+	
 	/*
 	for(int i=0; i<l->fm.n; i++){
-		printf("%i\t%ld\t%i\t%i\n", i, buffer[l->fm.n-i], l->points[i].x, l->points[i].y);
-	}*/
+		printf("%i\t%ld\t%i\t%i\n", i, buffer[i], l->points[i].x, l->points[i].y);
+	}//*/
 	free(buffer);
 	return l->points;
 }

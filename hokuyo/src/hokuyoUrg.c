@@ -23,8 +23,8 @@ initHokuyoUrg(char* device, double angleMin, double angleMax){
 	
 	printf("%sConnection établie à %s\n", PREFIX, device);
 
-	//printf("Hokuyo init from %f to %f\n", -angleMax*180/PI, -angleMin*180/PI);
-    urg_set_scanning_parameter(urg, urg_rad2step(urg, -angleMax), urg_rad2step(urg, -angleMin), 0);//scan en continu, on ne garde que les point entre angleMin et angleMax
+	printf("Hokuyo init from %f to %f\n", angleMin*180/PI, angleMax*180/PI);
+    urg_set_scanning_parameter(urg, urg_rad2step(urg, angleMin), urg_rad2step(urg, angleMax), 0);//scan en continu, on ne garde que les point entre angleMin et angleMax
 	
 	printf("%sParameters set #1\n", PREFIX);
 
@@ -42,8 +42,8 @@ initHokuyoUrg(char* device, double angleMin, double angleMax){
 void
 resetHokuyoUrg(void* urg, double angleMin, double angleMax){
 	urg_stop_measurement((urg_t*)urg);
-	printf("%sHokuyo reinit from %f to %f\n", PREFIX, -angleMax*180/PI, -angleMin*180/PI);
-	urg_set_scanning_parameter((urg_t*)urg, urg_rad2step(urg, -angleMax), urg_rad2step(urg, -angleMin), 0);
+	printf("%sHokuyo reinit from %f to %f\n", PREFIX, angleMin*180/PI, angleMax*180/PI);
+	urg_set_scanning_parameter((urg_t*)urg, urg_rad2step(urg, angleMin), urg_rad2step(urg, angleMax), 0);
 	printf("%sParameters set #2\n", PREFIX);
 
 	int error = urg_start_measurement((urg_t*)urg, URG_DISTANCE, URG_SCAN_INFINITY, 0);
@@ -61,7 +61,7 @@ getnPointsHokuyoUrg(void* urg){
 
 double
 getAngleFromIndexHokuyoUrg(void* urg, int index){
-	return -urg_index2rad((urg_t*)urg, index);
+	return urg_index2rad((urg_t*)urg, index);
 }
 
 void
