@@ -1,11 +1,12 @@
 #include "stereo.h"
 #include <opencv2/opencv.hpp>
+#include <opencv2/calib3d/calib3d_c.h>
 
 using namespace std;
 
 Stereo::Stereo(int index_left, int index_right):
 	cam_left(), cam_right(), calibrated(false) {
-	setAlphaROI(1);
+	setAlphaROI(0.5);
 	cam_left.open(index_left);
 	cam_right.open(index_right);
 	if (!cam_right.isOpened() || !cam_left.isOpened()) {
@@ -38,13 +39,14 @@ bool Stereo::calibrate(int nbr_of_views, Size size_chessboard) {
 		bool pattern_found[2];
 
 		//A-t-on appuyé sur 'c' pour capturer cette frame ?
-		if (key = 'c') {
+		if (key == 'c') {
 			capture= true;
 		}
-		if (key = 'q') {
-			return false;
+		if (key == 'q') {
+			cerr << "WARNING : Calibration failed" << endl;
 			destroyWindow("ViewRight");
 			destroyWindow("ViewLeft");
+			return false;
 		}
 		//Capture d'image
 		cam_left >> img[0];
@@ -81,7 +83,7 @@ bool Stereo::calibrate(int nbr_of_views, Size size_chessboard) {
 	destroyWindow("ViewRight");
 	destroyWindow("ViewLeft");
 
-	cout << "Views captures, computing data ..." << endl;
+	cout << "Views captured, computing data ..." << endl;
 
 	//Un tas de matrices necessaires
 	//Matrice de parametres intrinseques
@@ -138,7 +140,7 @@ void Stereo::displayCalibration() {
 		img_right.copyTo(right_roi);
 
 		//Dessin de lignes horizontales
-		int step = 10;
+		int step = 40;
 		for(int i=0; i < cameras_image_size.height; i+=step) {
 			Point l(0, i), r(combine.size().width-1, i);
 			line(combine, l, r, red);

@@ -8,8 +8,9 @@ using namespace cv;
 
 class Stereo {
 	public:
+	Stereo();
 	Stereo(int index_left=0, int index_right=1);
-	bool calibrate(int nbr_of_views=8, Size size_chessboard=Size(7,7));
+	bool calibrate(int nbr_of_views=8, Size size_chessboard=Size(7,6));
 	void displayCalibration();
 	bool loadCalibration();
 	bool saveCalibration();

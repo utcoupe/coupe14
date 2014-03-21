@@ -95,4 +95,4 @@ RAYON_SMALL_ENEMY = 	100
 #=======================================IA========================================
 #====================NAVIGATION================
 POINTS_PAR_CERCLE = 8
-MARGE_PASSAGE_PATH = 10
+MARGE_PASSAGE_PATH = 50

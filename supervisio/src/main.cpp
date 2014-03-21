@@ -16,6 +16,7 @@ int main(int argc, char **argv){
 	if (argc > 1){
 		index = argv[1][0] - '0';
 	}
-	perspectiveOnlyLoop(index);
+	//perspectiveOnlyLoop(index);
+	testStereo();
 	return 0;
 }

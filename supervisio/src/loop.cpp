@@ -1,5 +1,6 @@
 #include "perspective/traitement.h"
 #include "perspective/gui.h"
+#include "stereo/stereo.h"
 #include "loop.h"
 
 void perspectiveOnlyLoop(int index){
@@ -63,4 +64,10 @@ void perspectiveOnlyLoop(int index){
 		imshow("origin", frame);
 		key = waitKey(1);
 	}
+}
+
+void testStereo() {
+	Stereo stereo(0,1);
+	stereo.calibrate(15);
+	stereo.displayCalibration();
 }
