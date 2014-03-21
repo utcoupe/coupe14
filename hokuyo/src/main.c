@@ -76,7 +76,7 @@ int main(int argc, char **argv){
 }
 
 void frame(){
-	int timestamp;
+	long timestamp;
 	getPoints(&l1);
 	timestamp = timeMillis() - startTime;
 	//printf("nPoints:%i\n", l1.fm.n);
