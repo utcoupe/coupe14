@@ -6,20 +6,21 @@ import time
 
 
 class GraphView(View):
-	def __init__(self, graph, dynamic_obstacle, self_bot):
+	def __init__(self, graph, col, dynamic_obstacle, self_bot):
 		View.__init__(self)
 
 		self.self_bot = self_bot
 		self.dynamic_obstacle = dynamic_obstacle
 		self.graph = graph
+		self.graph.update(self.self_bot)
+		self.col = col
 
 		self.p_depart = (200,200)
 		self.p_arrive = (1500,1500)
 
 		self.draw_polygons(graph.getPolygons())
 
-		self.id_raw_path = None
-		self.id_path = None
+		self.id_smooth_path = None
 		
 		## bindings
 		self.canvas.bind('<Button-1>',self.onLeft)
@@ -29,19 +30,10 @@ class GraphView(View):
 		self.canvas.bind('<Button-2>',self.onWheel)
 		self.canvas.bind('<B2-Motion>',self.onWheel)
 
-		self.bind_all('m', self.switchPathType)
-
 		self.sum_calc_times = 0
 		self.nb_calc_times = 0
 		self.sum_update = 0
 		self.nb_update = 0
-
-		self.path_type = True  # True = smooth
-
-	def switchPathType(self, args):
-		self.path_type = not self.path_type
-		print('Smooth_path status : ' + str(self.path_type))
-		self.calc_path()
 	
 	def onLeft(self, event):
 		event = self.event_to_x_y(event)
@@ -59,40 +51,38 @@ class GraphView(View):
 		event = self.event_to_x_y(event)
 		print(event)
 		
-		start = time.time()
 		self.dynamic_obstacle.setPosition(event)
 		self.graph.update(self.self_bot)
-		difference = (time.time() - start)
-		self.sum_update += difference
-		self.nb_update += 1
-		print("update graph time : %s (%s)" % (difference,self.sum_update / self.nb_update))
-		
 		self.remove()
+
 		self.draw_polygons(self.graph.getPolygons())
-		self.calc_path()
+		self.show_result_calc_path(self.smooth_path)
+		start = time.time()
+		couple = self.col.getCollision(self.self_bot)
+		print("Duree de calcul de collision : %s ms" % ((time.time() - start)*1000))
+		if couple is not None:
+			print("Collision id=%s, dist=%s" % (couple[0], couple[1]))
 
 	def event_to_x_y(self, event):
 		return (round(event.x / self.w_to_px), round((HEIGHT - event.y) / self.h_to_px))
 
 	def calc_path(self):
 		start = time.time()
-		path = self.graph.getPath(self.p_depart,self.p_arrive, self.path_type)
+		smooth_path = self.graph.getPath(self.p_depart,self.p_arrive)
+		self.smooth_path = smooth_path
 		difference = (time.time() - start)
 		self.sum_calc_times += difference
 		self.nb_calc_times += 1
 		print("pathfinding computing time : %s (moy=%s)" % (difference,self.sum_calc_times/self.nb_calc_times))
-		print("path : "+str(path))
+		print("path : "+str(smooth_path))
+		self.self_bot.traj = [[42, smooth_path]]
 
-		self.show_result_calc_path(path)
-		print("Longueur : " + str(path.getDist()))
+		self.show_result_calc_path(smooth_path)
+		print("Longueur : " + str(smooth_path.getDist()))
 		
-		return path
+		return smooth_path
 
-	def show_result_calc_path(self, path):
-		self.remove(self.id_path)
-		if self.path_type:  #smooth
-			color = 'red'
-		else:
-			color = 'blue'
-		if path:
-			self.id_path = self.draw_line(path, color)
+	def show_result_calc_path(self, smooth_path):
+		self.remove(self.id_smooth_path)
+		if smooth_path:
+			self.id_smooth_path = self.draw_line(smooth_path, 'blue')
