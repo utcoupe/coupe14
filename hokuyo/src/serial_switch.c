@@ -12,10 +12,10 @@
 
 static struct coord robots[MAX_ROBOTS];
 static int number_robots;
-static long data_time = 0;
+static int data_time = 0;
 extern pthread_mutex_t mutex;
 
-void pushCoords(struct coord *n_robots, int n, long timestamp) {
+void pushCoords(struct coord *n_robots, int n, int timestamp) {
 	pthread_mutex_lock(&mutex); int i;
 	for (i=0; i<n; i++){
 		robots[i] = n_robots[i];

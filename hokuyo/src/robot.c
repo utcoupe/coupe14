@@ -81,11 +81,30 @@ struct coord robotCenter(int * sizeSquarred, struct coord *points, int n, int *c
 	return pos;
 }
 
+void
+sortRobots(int n, int * sizes, struct coord * positions, struct coord *robots){
+	//tri très optimisé ^^
+	for(int i=0; i<n; i++){
+		int maxSize = 0, maxId = 0;
+		for(int j=0; j<n; j++){
+			if(sizes[j] > maxSize){
+				maxSize = sizes[j];
+				maxId = j;
+			}
+		}
+		sizes[maxId] = 0;
+		robots[i] = positions[maxId];
+		//printf("%sbiggest cluster:(%i, %i) size=%i\n", PREFIX, robots[i].x, robots[i].y, maxSize);
+	}
+}
+
 int
 getRobots(struct coord *points, int n, struct coord *robots){
 	int clustersNbPoints[MAX_CLUSTERS];
 	int *clusters = malloc(sizeof(int)*n);
 	if(clusters == NULL) exit(EXIT_FAILURE);
+
+	//printf("%s---------\n", PREFIX);
 
 
 	int nbClusters = clusterize(points, n, clusters, clustersNbPoints);
@@ -104,10 +123,14 @@ getRobots(struct coord *points, int n, struct coord *robots){
 
 	//calcul du centre du robot et de sa taille
 	int size[MAX_ROBOTS];
+	struct coord positions[MAX_ROBOTS];
+
 	for(int i=0; i<nbClusters; i++){
-		robots[i] = robotCenter(&(size[i]), points, n, clusters, bestClustersId[i]);
-		printf("%sCluster[%i] (%i,%i) size:%i\n", PREFIX, i, robots[i].x, robots[i].y, size[i]);
-	}	
+		positions[i] = robotCenter(&(size[i]), points, n, clusters, bestClustersId[i]);
+		//printf("%sCluster[%i] (%i,%i) size:%i\n", PREFIX, i, positions[i].x, positions[i].y, size[i]);
+	}
+	//printf("%sSort... nbClusters=%i\n", PREFIX, nbClusters);
+	sortRobots(nbClusters, size, positions, robots);
 
 
 	free(clusters);

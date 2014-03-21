@@ -28,6 +28,7 @@ static struct lidar l1;
 static struct color l1Color;
 #endif
 
+long startTime;
 static struct coord robots[MAX_ROBOTS];
 
 
@@ -66,6 +67,7 @@ int main(int argc, char **argv){
 		init_protocol_thread();
 	}
 
+	startTime = timeMillis();
 	printf("%sRunning ! ...\n", PREFIX);
 	while(1){
 		frame();
@@ -74,9 +76,9 @@ int main(int argc, char **argv){
 }
 
 void frame(){
-	long timestamp;
+	int timestamp;
 	getPoints(&l1);
-	timestamp = timeMillis();
+	timestamp = timeMillis() - startTime;
 	//printf("nPoints:%i\n", l1.fm.n);
 	int nRobots = getRobots(l1.points, l1.fm.n, robots);
 	#ifdef SDL
@@ -90,7 +92,7 @@ void frame(){
 		pushCoords(robots, nRobots, timestamp);
 	}
 	else{
-		printf("%s%ld;%i", PREFIX, timestamp, nRobots);
+		printf("%s%li;%i", PREFIX, timestamp, nRobots);
 		for(int i=0; i<nRobots; i++){
 			printf(";%i:%i", robots[i].x, robots[i].y);
 		}
