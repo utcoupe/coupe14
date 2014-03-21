@@ -1,5 +1,5 @@
-#include "traitement.h"
-#include "gui.h"
+#include "perspective/traitement.h"
+#include "perspective/gui.h"
 #include "loop.h"
 
 void perspectiveOnlyLoop(int index){

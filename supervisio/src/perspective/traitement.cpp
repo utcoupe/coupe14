@@ -1,6 +1,5 @@
 #include "traitement.h"
 #include "gui.h"
-#include "global.h"
 
 #include <iostream>
 #include <opencv2/opencv.hpp>

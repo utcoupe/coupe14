@@ -4,8 +4,8 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
-#include "traitement.h"
-#include "gui.h"
+#include "perspective/traitement.h"
+#include "perspective/gui.h"
 #include "loop.h"
 
 using namespace cv;
