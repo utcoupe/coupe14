@@ -32,7 +32,7 @@ class EventManager():
 		self.__sleep_time_tibot = 0
 		self.__resume_date_tibot = 0
 
-		self.__SubProcessCommunicate = SubProcessCommunicate()
+		self.__SubProcessCommunicate = SubProcessCommunicate(Data)
 
 		self.__managerThread = threading.Thread(target=self.__managerLoop)
 		self.__managerThread.start()
