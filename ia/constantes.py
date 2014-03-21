@@ -39,7 +39,7 @@ renvoiImmediat = 		False # fonction non terminé, ne pas activer !
 NUMBER_OF_ENEMY = 		2
 
 #====================eventManager====================
-PERIODE_EVENT_MANAGER =	10
+PERIODE_EVENT_MANAGER =	40
 ID_ACTION_MAX =			29999
 
 #====================timeManager====================
@@ -73,7 +73,7 @@ RAYON_FLUSSMITTEL = 	math.sqrt(LARGEUR_FLUSSMITTEL * LARGEUR_FLUSSMITTEL + LONGU
 
 
 #====================TIBOT====================
-ENABLE_TIBOT = 			True #permet de deactiver un Tibot
+ENABLE_TIBOT = 			False #permet de deactiver un Tibot
 LARGEUR_TIBOT = 		100
 LONGUEUR_TIBOT = 		100
 RAYON_TIBOT = 			math.sqrt(LARGEUR_TIBOT * LARGEUR_TIBOT + LONGUEUR_TIBOT * LONGUEUR_TIBOT) 

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 
 #include "fast_math.h"
@@ -54,6 +55,7 @@ freeFastmath(struct fastmathTrigo s)
 double
 fastCos(struct fastmathTrigo f, int index)
 {
+	//printf("asked fastCos(%i)=%lf\n", index, f.cos[index]);
 	return f.cos[index];
 }
 

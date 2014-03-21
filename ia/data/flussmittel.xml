@@ -4,10 +4,6 @@
 		<idd>0</idd>
 		<actions>
 			<action>
-				<ordre>A_RESET_POS</ordre>
-				<arguments></arguments>
-			</action>
-			<action>
 				<ordre>O_BRAS_FERMER</ordre>
 				<arguments></arguments>
 			</action>

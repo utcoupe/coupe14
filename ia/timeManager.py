@@ -18,7 +18,7 @@ class TimeManager():
 		self.__wait_dico = {}
 
 		self.__broadcastStopOrder()
-		self.__sendResetId()
+		self.__sendResetBot()
 
 
 
@@ -61,15 +61,17 @@ class TimeManager():
 				self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_CLEANG', *arg)
 			if self.__Tibot is not None:
 				self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_CLEANG', *arg)
-			time.sleep(100)
+			time.sleep(0.05)
 
-	def __sendResetId(self):
+	def __sendResetBot(self):
 		arg = []
 
 		if self.__Flussmittel is not None:
+			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_RESET_POS', *arg)
 			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'RESET_ID', *arg)
 			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressOther() , 'RESET_ID', *arg)
 		if self.__Tibot is not None:
+			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_RESET_POS', *arg)
 			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'RESET_ID', *arg)
 			self.__Communication.sendOrderAPI(self.__Tibot.getAddressOther() , 'RESET_ID', *arg)
 
