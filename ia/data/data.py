@@ -17,17 +17,16 @@ class Data():
 		self.SmallEnemyBot = None
 		self.BigEnemyBot = None
 		self.Tourelle = None
+		self.ComputeHokuyoData = None
 		self.MetaData = MetaData()
 
 
 		#Instantation des objets
 		if ENABLE_FLUSSMITTEL == True:
 			self.Flussmittel = OurBot('FLUSSMITTEL', Communication, arduino_constantes, 'ADDR_FLUSSMITTEL_OTHER', 'ADDR_FLUSSMITTEL_ASSERV', LARGEUR_FLUSSMITTEL, LONGUEUR_FLUSSMITTEL)
-			self.Flussmittel.loadActionScript("data/flussmittel.xml")
 
 		if ENABLE_TIBOT == True:
 			self.Tibot = OurBot('TIBOT', Communication, arduino_constantes, 'ADDR_TIBOT_OTHER', 'ADDR_TIBOT_ASSERV', LARGEUR_TIBOT, LONGUEUR_TIBOT)
-			self.Tibot.loadActionScript("data/tibot.xml")
 
 		if NUMBER_OF_ENEMY >= 1:
 			self.SmallEnemyBot = EnemyBot(RAYON_BIG_ENEMY)
@@ -35,8 +34,8 @@ class Data():
 			self.BigEnemyBot = EnemyBot(RAYON_SMALL_ENEMY)
 
 		if ENABLE_TOURELLE == True:
-			self.Tourelle = Tourelle(Communication, arduino_constantes, 'ADDR_HOKUYO')
+			self.Tourelle = Tourelle(self.Flussmittel, self.Tibot,self.BigEnemyBot, self.SmallEnemyBot, Communication, arduino_constantes, 'ADDR_HOKUYO')
 
-		self.PullData = PullData(Communication, (self.Flussmittel, 'ADDR_FLUSSMITTEL_OTHER', 'ADDR_FLUSSMITTEL_ASSERV'), (self.Tibot, 'ADDR_TIBOT_OTHER', 'ADDR_TIBOT_ASSERV'), self.SmallEnemyBot, self.BigEnemyBot, (self.Tourelle, arduino_constantes['address']['ADDR_HOKUYO']), PULL_PERIODE)
+		self.PullData = PullData(Communication, (self.Flussmittel, 'ADDR_FLUSSMITTEL_OTHER', 'ADDR_FLUSSMITTEL_ASSERV'), (self.Tibot, 'ADDR_TIBOT_OTHER', 'ADDR_TIBOT_ASSERV'), self.SmallEnemyBot, self.BigEnemyBot, self.ComputeHokuyoData, (self.Tourelle, arduino_constantes['address']['ADDR_HOKUYO']), PULL_PERIODE)
 
 		

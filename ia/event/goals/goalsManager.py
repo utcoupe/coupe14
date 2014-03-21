@@ -15,6 +15,7 @@ from .goalExecution import *
 import os
 
 
+
 class GoalsManager:
 
 	def __init__(self):

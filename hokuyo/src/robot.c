@@ -5,17 +5,14 @@
 
 int
 clusterize(struct coord *points, int n, int *group, int *groupNbPoints){
-	/*#ifndef DEBUG_DO_NOT_REMOVE_POINTS
-	if( points[i].x == 0 && points[i].y == 0) continue;
-	#endif*/
 	for(int i=0; i<n; i++){
 		group[i] = -1; 
 	}
 	int nbGroup = 0;
 	for(int i=MAX_AB_POINTS; i<n; i++) {
-		#ifndef DEBUG_DO_NOT_REMOVE_POINTS
+		//#ifndef DEBUG_DO_NOT_REMOVE_POINTS
 		if( points[i].x == 0 && points[i].y == 0) continue;
-		#endif
+		//#endif
 
 		int dmin = 35000, jmin = 0;
 		unsigned long d[MAX_AB_POINTS];
@@ -64,7 +61,7 @@ bestClusters(int nbClusters, int *clustersNbPoints, int *bestClusters){
 	}
 }
 
-struct coord robotCenter(struct coord *points, int n, int *clusters, int clusterId){
+struct coord robotCenter(int * sizeSquarred, struct coord *points, int n, int *clusters, int clusterId){
 	int first = -1, second = -1, blast = 0, last = 0;
 	for(int i=0; i<n; i++){
 		if(clusters[i] != clusterId) continue;
@@ -80,6 +77,7 @@ struct coord robotCenter(struct coord *points, int n, int *clusters, int cluster
 	struct coord pos;
 	pos.x = ( points[first].x + points[second].x + points[blast].x + points[last].x ) / 4;
 	pos.y = ( points[first].y + points[second].y + points[blast].y + points[last].y ) / 4;
+	*sizeSquarred = pow(points[last].x-points[first].x, 2) + pow(points[last].y-points[first].y, 2); 
 	return pos;
 }
 
@@ -104,9 +102,11 @@ getRobots(struct coord *points, int n, struct coord *robots){
 		}
 	}
 
-	//calcul du centre du robot
+	//calcul du centre du robot et de sa taille
+	int size[MAX_ROBOTS];
 	for(int i=0; i<nbClusters; i++){
-		robots[i] = robotCenter(points, n, clusters, bestClustersId[i]);
+		robots[i] = robotCenter(&(size[i]), points, n, clusters, bestClustersId[i]);
+		printf("%sCluster[%i] (%i,%i) size:%i\n", PREFIX, i, robots[i].x, robots[i].y, size[i]);
 	}	
 
 
