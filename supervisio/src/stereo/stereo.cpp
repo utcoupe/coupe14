@@ -1,24 +1,97 @@
 #include "stereo.h"
 #include <opencv2/opencv.hpp>
-#include <opencv2/calib3d/calib3d_c.h>
+//#include <opencv2/calib3d/calib3d_c.h>
 
 using namespace std;
 
-Stereo::Stereo(int index_left, int index_right):
-	cam_left(), cam_right(), calibrated(false) {
+Stereo::Stereo(){
+	init(0,1);
+}
+
+Stereo::Stereo(int index_left, int index_right){
+	init(index_left, index_right);
+}
+
+void Stereo::init(int index_left, int index_right) {
+	calibrated = false;
+	cam[l].open(index_left);
+	cam[r].open(index_right);
 	setAlphaROI(0.5);
-	cam_left.open(index_left);
-	cam_right.open(index_right);
-	if (!cam_right.isOpened() || !cam_left.isOpened()) {
+	if (!cam[0].isOpened() || !cam[1].isOpened()) {
 		cerr << "ERROR : Cameras not found" << endl;
 		exit(EXIT_FAILURE);
 	}
+	Mat temp_img;
+	cam[0] >> temp_img;
+	cameras_image_size = temp_img.size(); //Les cameras sont identiques, leurs taille d'image aussi
+}
+
+bool Stereo::singleCamCalibrate(enum side side, int nbr_of_views) {
+	string name;
+	if (side == l)
+		name = "Calibrating left camera";
+	else
+		name = "Calibrating right camera";
+
+	//points reels et image pour la calibration
+	vector<vector<Point3f> > objectPoints;
+	vector<vector<Point2f> > imagePoints;
+
+	//position des points corners (dimension abstraite)
+	vector<Point3f> obj;
+	for (int j=0; j<size_chessboard.height * size_chessboard.width; j++)
+	{
+		obj.push_back(Point3f(j/size_chessboard.width, j%size_chessboard.width, 0.0f));
+	}
+	//Calibration caméra gauche
+	namedWindow(name);
+	int key = 0;
+	bool capture = false;
+	for(int success=0; success < nbr_of_views;) {
+		Mat img, gray;
+		vector<Point2f> corners;
+		bool pattern_found;
+
+		//A-t-on appuyé sur 'c' pour capturer cette frame ?
+		if (key == 'c') {
+			capture = true;
+		}
+		if (key == 'q') {
+			cerr << "WARNING : Calibration failed" << endl;
+			destroyWindow("Left");
+			return false;
+		}
+		//Capture d'image
+		cam[side] >> img;
+		cvtColor(img, gray, CV_BGR2GRAY);
+		pattern_found = findChessboardCorners(gray, size_chessboard, corners, CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK);
+		if (pattern_found) {
+			cornerSubPix(gray, corners, Size(11, 11), Size(-1, -1), TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
+		}
+		//Retour graphique
+		drawChessboardCorners(img, size_chessboard, corners, pattern_found);
+		stringstream txt;
+		txt << "Captures effectuees : " << success << "/" << nbr_of_views;
+		putText(img, txt.str(), Point(10,10),1,1,Scalar(0,255,0),1);
+		//Si l'echiquier est détecté dans les deux images et que l'on souhaite capturer cette frame
+		if (capture && pattern_found) {
+			success++;
+			objectPoints.push_back(obj);
+			imagePoints.push_back(corners);
+			capture = false;
+		}
+		imshow(name, img);
+		key = waitKey(20);
+	}
+	destroyWindow(name);
+	vector<vector<Point2f> > empty;
+	calibrateCamera(objectPoints, imagePoints, cameras_image_size, CM[side], D[side], empty, empty);
+	return true;
 }
 
 bool Stereo::calibrate(int nbr_of_views, Size size_chessboard) {
-	namedWindow("ViewLeft");
-	namedWindow("ViewRight");
-
+	int key = 0;
+	bool capture = false;
 	//points reels et image pour la calibration
 	vector<vector<Point3f> > objectPoints;
 	vector<vector<Point2f> > imagePoints_left, imagePoints_right;
@@ -30,9 +103,12 @@ bool Stereo::calibrate(int nbr_of_views, Size size_chessboard) {
 		obj.push_back(Point3f(j/size_chessboard.width, j%size_chessboard.width, 0.0f));
 	}
 
+	singleCamCalibrate(l, nbr_of_views);
+	singleCamCalibrate(r, nbr_of_views);
+
+	namedWindow("ViewLeft");
+	namedWindow("ViewRight");
 	//On prend un certain nombre de vues de l'échiquier
-	bool capture = false; 
-	int key = 0;
 	for(int success=0; success < nbr_of_views;) {
 		Mat img[2], gray[2];
 		vector<Point2f> corners[2];
@@ -49,8 +125,8 @@ bool Stereo::calibrate(int nbr_of_views, Size size_chessboard) {
 			return false;
 		}
 		//Capture d'image
-		cam_left >> img[0];
-		cam_right >> img[1];
+		cam[l] >> img[l];
+		cam[r] >> img[r];
 
 		cameras_image_size = img[0].size(); //Les cameras sont identiques, leurs taille d'image aussi
 
@@ -76,8 +152,8 @@ bool Stereo::calibrate(int nbr_of_views, Size size_chessboard) {
 			imagePoints_right.push_back(corners[1]);
 			capture = false;
 		}
-		imshow("ViewLeft", img[0]);
-		imshow("ViewRight", img[1]);
+		imshow("ViewLeft", img[l]);
+		imshow("ViewRight", img[r]);
 		key = waitKey(20);
 	}
 	destroyWindow("ViewRight");
@@ -85,28 +161,22 @@ bool Stereo::calibrate(int nbr_of_views, Size size_chessboard) {
 
 	cout << "Views captured, computing data ..." << endl;
 
-	//Un tas de matrices necessaires
-	//Matrice de parametres intrinseques
-	Mat CM1 = Mat(3, 3, CV_64FC1); 
-    Mat CM2 = Mat(3, 3, CV_64FC1);
-	//Matrices de distorsion
-    Mat D1, D2;
 	//Rotation, transformation, essential matrix, matrice fondamentale
     Mat R, T, E, F;
-	//Rectificiation, transformation et disparity-to-depth matrices
-	Mat R1, R2, P1, P2, Q;
+	//Rectificiation, transformation
+	Mat R1, R2, P1, P2;
 	
 	//Calibration des cameras
 	stereoCalibrate(objectPoints, imagePoints_left, imagePoints_right,
-		CM1, D1, CM2, D2, cameras_image_size, R, T, E, F,
+		CM[l], D[l], CM[r], D[r], cameras_image_size, R, T, E, F,
 		cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 100, 1e-5), 
-		CV_CALIB_SAME_FOCAL_LENGTH | CV_CALIB_ZERO_TANGENT_DIST);
+		CV_CALIB_FIX_INTRINSIC | CV_CALIB_SAME_FOCAL_LENGTH | CV_CALIB_ZERO_TANGENT_DIST);
 	//Creation des matrices pour rectification des images
-	stereoRectify(CM1, D1, CM2, D2, cameras_image_size, R, T, R1, R2, P1, P2, Q,
-		CALIB_ZERO_DISPARITY, alpha_parameter_roi, cameras_image_size, &ROI_left, &ROI_right);
+	stereoRectify(CM[l], D[l], CM[r], D[r], cameras_image_size, R, T, R1, R2, P1, P2, Q,
+		CALIB_ZERO_DISPARITY, alpha_parameter_roi, cameras_image_size, &ROI[l], &ROI[r]);
 	//Creation des matrices de rectification des images *_remap_[1,2]
-	initUndistortRectifyMap(CM1, D1, R1, P1, cameras_image_size, CV_32FC1, left_remap_1, left_remap_2);
-	initUndistortRectifyMap(CM2, D2, R2, P2, cameras_image_size, CV_32FC1, right_remap_1, right_remap_2);
+	initUndistortRectifyMap(CM[l], D[l], R1, P1, cameras_image_size, CV_32FC1, remap_1[l], remap_2[l]);
+	initUndistortRectifyMap(CM[r], D[r], R2, P2, cameras_image_size, CV_32FC1, remap_1[r], remap_2[r]);
 
 	cout << "Done !" << endl;
 	calibrated = true;
@@ -115,22 +185,24 @@ bool Stereo::calibrate(int nbr_of_views, Size size_chessboard) {
 
 void Stereo::displayCalibration() {
 	namedWindow("Views");
-	Mat img_left, img_right;
+	namedWindow("Disparity");
+	Mat img_left, img_right, disp;
 	Scalar green(0,255,0), red(0,0,255);
+	StereoSGBM sbm;
 	//Retour graphique des parametres
 	int key = 0;
 	while (key != 'q') {
 		//Capture de frame
-		cam_left >> img_left;
-		cam_right >> img_right;
+		cam[l] >> img_left;
+		cam[r] >> img_right;
 
 		//Remap suivant les parametres de la stereo
-		remap(img_left, img_left, left_remap_1, left_remap_2,INTER_LINEAR);
-		remap(img_right, img_right, right_remap_1, right_remap_2,INTER_LINEAR);
+		remap(img_left, img_left, remap_1[l], remap_2[l], INTER_LINEAR);
+		remap(img_right, img_right, remap_1[r], remap_2[r], INTER_LINEAR);
 
 		//Dessin des ROI
-		rectangle(img_left, ROI_left, green, 2);
-		rectangle(img_right, ROI_right, green, 2);
+		rectangle(img_left, ROI[l], green, 2);
+		rectangle(img_right, ROI[r], green, 2);
 
 		//Combinaison des images
 		Mat combine(max(img_left.size().height, img_right.size().height), img_left.size().width + img_right.size().width, CV_8UC3);
@@ -146,12 +218,69 @@ void Stereo::displayCalibration() {
 			line(combine, l, r, red);
 		}
 
+		//Disparity
+		sbm(img_left, img_right, disp);
+		normalize(disp, disp, 0, 255, CV_MINMAX, CV_8U);
 		//Display
 		imshow("Views", combine);
+		imshow("Disparity", disp);
 		key = waitKey(20);
 	}
 }
 
 void Stereo::setAlphaROI(double a) {
 	alpha_parameter_roi = a;
+}
+
+void Stereo::getDisparity(Mat& out) {
+	StereoSGBM stereo;
+	Mat left, right;
+	cam[l] >> left;
+	cam[r] >> right;
+	stereo(left, right, out);
+}
+
+void Stereo::saveCalibration() {
+	if (!calibrated) {
+		cerr << "WARNING : Uncalibrated cameras, data not saved" << endl;
+		return;
+	}
+	FileStorage fs("calibration_data.yml", FileStorage::WRITE);
+	fs << "cameras_image_size" << cameras_image_size;
+	fs << "alpha" << alpha_parameter_roi;
+	fs << "Q" << Q;
+	fs << "remap1_l" << remap_1[l];
+	fs << "remap1_r" << remap_1[r];
+	fs << "remap2_l" << remap_2[l];
+	fs << "remap2_r" << remap_2[r];
+	fs << "CM_l" << CM[l];
+	fs << "CM_r" << CM[r];
+	fs << "D_l" << D[l];
+	fs << "D_r" << D[r];
+	fs << "ROI_l" << ROI[l];
+	fs << "ROI_r" << ROI[r];
+	fs.release();
+}
+
+bool Stereo::loadCalibration() {
+	FileStorage fs("calibration_data.yml", FileStorage::READ);
+	if (!fs.isOpened()) {
+		cerr << "ERROR : Couldn't find calibration_data.yml" << endl;
+		return false;
+	}
+	fs["cameras_image_size"] >> cameras_image_size;
+	fs["alpha"] >> alpha_parameter_roi;
+	fs["Q"] >> Q;
+	fs["remap1_l"] >> remap_1[l];
+	fs["remap1_r"] >> remap_1[r];
+	fs["remap2_l"] >> remap_2[l];
+	fs["remap2_r"] >> remap_2[r];
+	fs["CM_l"] >> CM[l];
+	fs["CM_r"] >> CM[r];
+	fs["D_l"] >> D[l];
+	fs["D_r"] >> D[r];
+	fs["ROI_l"] >> ROI[l];
+	fs["ROI_r"] >> ROI[r];
+	fs.release();
+	return true;
 }

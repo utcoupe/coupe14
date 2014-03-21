@@ -6,27 +6,36 @@
 
 using namespace cv;
 
+enum side { l, r };
+
 class Stereo {
 	public:
 	Stereo();
-	Stereo(int index_left=0, int index_right=1);
-	bool calibrate(int nbr_of_views=8, Size size_chessboard=Size(7,6));
+	Stereo(int index_left, int index_right);
+	bool calibrate(int nbr_of_views=10, Size size_chessboard=Size(7,6));
 	void displayCalibration();
 	bool loadCalibration();
-	bool saveCalibration();
+	void saveCalibration();
 
 	//SETTER
 	void setAlphaROI(double a);
+	//GETTER
+	void getDisparity(Mat& out);
 	private:
-	VideoCapture cam_left, cam_right;
+	void init(int index_left, int index_right);
+	bool singleCamCalibrate(enum side side, int nbr_of_views=10);
 	bool calibrated;
 	Size cameras_image_size;
+	Size size_chessboard;
 	Mat Q; //disparity to depth matrix
-	Mat left_remap_1, left_remap_2, right_remap_1, right_remap_2; //Matrices de rectification de l'image
-	Rect ROI_left, ROI_right;
+	VideoCapture cam[2];
+	Mat remap_1[2], remap_2[2]; //Matrices de rectification de l'image
+	Mat CM[2], D[2];
+	Rect ROI[2];
 
 	//parametre alpha de la fonction de detection des ROI
 	double alpha_parameter_roi;
 };
+
 
 #endif
