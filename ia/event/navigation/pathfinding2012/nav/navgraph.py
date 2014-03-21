@@ -85,11 +85,11 @@ class NavGraph:
 		self.width, self.height, polys = load_xml(filename)
 		self.obstacles = list([ poly.points for poly in polys])
 
-	def get_path(self, p_depart, p_arrive):
-		return self.get_path_vertex_mode(p_depart, p_arrive)
+	def get_path(self, p_depart, p_arrive, enable_smooth=True):
+		return self.get_path_vertex_mode(p_depart, p_arrive, enable_smooth)
 		#return self.get_path_areas_mode(p_depart, p_arrive)
 
-	def get_path_vertex_mode(self, p_depart, p_arrive):
+	def get_path_vertex_mode(self, p_depart, p_arrive, enable_smooth=True):
 		p_depart = Vec(p_depart)
 		p_arrive = Vec(p_arrive)
 		area_depart = self.find_area_for_point(p_depart)
@@ -124,6 +124,8 @@ class NavGraph:
 
 		# application du pathfinding
 		vertices, raw_path = self.pathfinding_vertices.compute_path(vertex_depart, vertex_arrive)
+		if not enable_smooth:
+			return [], vertices, raw_path
 
 		
 		# remove des vertices ajoutées
