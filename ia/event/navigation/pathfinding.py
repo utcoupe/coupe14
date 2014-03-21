@@ -61,9 +61,13 @@ class PathFinding:
 		self.__ng.update()
 		self.__log.info("Mise à jour des polygones convexes en " + str((time.time() - start_time) * 1000) + "ms")
 
-	def getPath(self, start, end):
+	def getPath(self, start, end, enable_smooth=True):
+		if enable_smooth == 'smooth':
+			enable_smooth = True
+		elif enable_smooth == 'raw':
+			enable_smooth = False
 		start_time = time.time()
-		foo, bar, path = self.__ng.get_path(start, end)
+		foo, bar, path = self.__ng.get_path(start, end, enable_smooth)
 		self.__log.info("Calcul de trajectoire en " + str((time.time() - start_time) * 1000) + "ms : " + str(path))
 		return Path(path)
 
