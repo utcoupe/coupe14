@@ -67,9 +67,9 @@ void perspectiveOnlyLoop(int index){
 }
 
 void testStereo() {
-	Stereo stereo;
+	Stereo stereo(0,1);
 	if (!stereo.loadCalibration()) {
-		stereo.calibrate(15);
+		stereo.calibrate();
 		stereo.saveCalibration();
 	}
 	stereo.displayCalibration();

@@ -1,6 +1,5 @@
 #include "stereo.h"
 #include <opencv2/opencv.hpp>
-//#include <opencv2/calib3d/calib3d_c.h>
 
 using namespace std;
 
@@ -14,6 +13,7 @@ Stereo::Stereo(int index_left, int index_right){
 
 void Stereo::init(int index_left, int index_right) {
 	calibrated = false;
+	size_chessboard = Size(7,6);
 	cam[l].open(index_left);
 	cam[r].open(index_right);
 	setAlphaROI(0.5);
@@ -83,13 +83,16 @@ bool Stereo::singleCamCalibrate(enum side side, int nbr_of_views) {
 		imshow(name, img);
 		key = waitKey(20);
 	}
+	cout << "Beginning processing" << endl;
 	destroyWindow(name);
-	vector<vector<Point2f> > empty;
+	vector<Mat> empty;
 	calibrateCamera(objectPoints, imagePoints, cameras_image_size, CM[side], D[side], empty, empty);
+	cout << "Done !" << endl;
 	return true;
 }
 
-bool Stereo::calibrate(int nbr_of_views, Size size_chessboard) {
+bool Stereo::calibrate(int nbr_of_views) {
+	cout << "Beginning overall calibration" << endl;
 	int key = 0;
 	bool capture = false;
 	//points reels et image pour la calibration
@@ -170,10 +173,10 @@ bool Stereo::calibrate(int nbr_of_views, Size size_chessboard) {
 	stereoCalibrate(objectPoints, imagePoints_left, imagePoints_right,
 		CM[l], D[l], CM[r], D[r], cameras_image_size, R, T, E, F,
 		cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 100, 1e-5), 
-		CV_CALIB_FIX_INTRINSIC | CV_CALIB_SAME_FOCAL_LENGTH | CV_CALIB_ZERO_TANGENT_DIST);
+		CV_CALIB_FIX_INTRINSIC);
 	//Creation des matrices pour rectification des images
 	stereoRectify(CM[l], D[l], CM[r], D[r], cameras_image_size, R, T, R1, R2, P1, P2, Q,
-		CALIB_ZERO_DISPARITY, alpha_parameter_roi, cameras_image_size, &ROI[l], &ROI[r]);
+		0, alpha_parameter_roi, cameras_image_size, &ROI[l], &ROI[r]);
 	//Creation des matrices de rectification des images *_remap_[1,2]
 	initUndistortRectifyMap(CM[l], D[l], R1, P1, cameras_image_size, CV_32FC1, remap_1[l], remap_2[l]);
 	initUndistortRectifyMap(CM[r], D[r], R2, P2, cameras_image_size, CV_32FC1, remap_1[r], remap_2[r]);
@@ -184,11 +187,24 @@ bool Stereo::calibrate(int nbr_of_views, Size size_chessboard) {
 }
 
 void Stereo::displayCalibration() {
+	cout << "Displaying calibration parameters" << endl;
 	namedWindow("Views");
 	namedWindow("Disparity");
 	Mat img_left, img_right, disp;
+	Mat gray_left, gray_right;
 	Scalar green(0,255,0), red(0,0,255);
 	StereoSGBM sbm;
+	sbm.SADWindowSize = 5;
+	sbm.numberOfDisparities = 192;
+	sbm.preFilterCap = 4;
+	sbm.minDisparity = -64;
+	sbm.uniquenessRatio = 1;
+	sbm.speckleWindowSize = 150;
+	sbm.speckleRange = 2;
+	sbm.disp12MaxDiff = 10;
+	sbm.fullDP = false;
+	sbm.P1 = 600;
+	sbm.P2 = 2400;
 	//Retour graphique des parametres
 	int key = 0;
 	while (key != 'q') {
@@ -199,6 +215,14 @@ void Stereo::displayCalibration() {
 		//Remap suivant les parametres de la stereo
 		remap(img_left, img_left, remap_1[l], remap_2[l], INTER_LINEAR);
 		remap(img_right, img_right, remap_1[r], remap_2[r], INTER_LINEAR);
+
+		//Disparity
+		
+		cvtColor(img_left, gray_left, CV_BGR2GRAY);
+		cvtColor(img_right, gray_right, CV_BGR2GRAY);
+		sbm(gray_left, gray_right, disp);
+		normalize(disp, disp, 0, 255, CV_MINMAX, CV_8U);
+		
 
 		//Dessin des ROI
 		rectangle(img_left, ROI[l], green, 2);
@@ -218,9 +242,6 @@ void Stereo::displayCalibration() {
 			line(combine, l, r, red);
 		}
 
-		//Disparity
-		sbm(img_left, img_right, disp);
-		normalize(disp, disp, 0, 255, CV_MINMAX, CV_8U);
 		//Display
 		imshow("Views", combine);
 		imshow("Disparity", disp);
@@ -233,7 +254,7 @@ void Stereo::setAlphaROI(double a) {
 }
 
 void Stereo::getDisparity(Mat& out) {
-	StereoSGBM stereo;
+	StereoBM stereo;
 	Mat left, right;
 	cam[l] >> left;
 	cam[r] >> right;
@@ -241,6 +262,7 @@ void Stereo::getDisparity(Mat& out) {
 }
 
 void Stereo::saveCalibration() {
+	cout << "Saving calibration data" << endl;
 	if (!calibrated) {
 		cerr << "WARNING : Uncalibrated cameras, data not saved" << endl;
 		return;
@@ -263,6 +285,7 @@ void Stereo::saveCalibration() {
 }
 
 bool Stereo::loadCalibration() {
+	cout << "Trying to lead calibration datas" << endl;
 	FileStorage fs("calibration_data.yml", FileStorage::READ);
 	if (!fs.isOpened()) {
 		cerr << "ERROR : Couldn't find calibration_data.yml" << endl;
@@ -282,5 +305,6 @@ bool Stereo::loadCalibration() {
 	fs["ROI_l"] >> ROI[l];
 	fs["ROI_r"] >> ROI[r];
 	fs.release();
+	cout << "Calibration data loaded" << endl;
 	return true;
 }

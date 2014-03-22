@@ -12,7 +12,7 @@ class Stereo {
 	public:
 	Stereo();
 	Stereo(int index_left, int index_right);
-	bool calibrate(int nbr_of_views=10, Size size_chessboard=Size(7,6));
+	bool calibrate(int nbr_of_views=10);
 	void displayCalibration();
 	bool loadCalibration();
 	void saveCalibration();
