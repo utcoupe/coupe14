@@ -64,7 +64,7 @@ class EventManager():
 
 	def __majObjectif(self):
 		"""Get new goals from objectifManager and add it to robot's goals queue"""
-		new_data_list = self.__SubProcessCommunicate.readBuffer()
+		new_data_list = self.__SubProcessCommunicate.readOrders()
 		for new_data in new_data_list:
 			nom_robot, id_prev_objectif, id_objectif, action_data = new_data
 

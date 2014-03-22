@@ -39,7 +39,7 @@ class OurBot():
 		self.__last_id_objectif_executed = None
 
 	#Getter
-	def getPositon(self):
+	def getPosition(self):
 		return (self.__positionX, self.__positionY)
 
 	def getName(self):
