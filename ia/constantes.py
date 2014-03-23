@@ -3,8 +3,6 @@
 Ce fichier regroupe toutes les constantes de l'IA
 """
 
-import math
-
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
 VITESSE_XBEE = 			57600
@@ -18,7 +16,7 @@ PARITY_OTHER = 			"NONE"
 MAX_UNCONFIRMED_PACKET =5 # maximum 32
 EMPTY_FIFO = 			True
 TIMEOUT = 				100
-HIGH_PRIO_SPEED = 		20 #période d'execution en ms
+HIGH_PRIO_SPEED = 		15 #période d'execution en ms
 LOW_PRIO_SPEED = 		1000 #période d'execution en ms
 KEEP_CONTACT_TIMEOUT = 	2000
 OFF_LIGNE_TIMEOUT = 	5000
@@ -39,7 +37,7 @@ renvoiImmediat = 		False # fonction non terminé, ne pas activer !
 NUMBER_OF_ENEMY = 		2
 
 #====================eventManager====================
-PERIODE_EVENT_MANAGER =	40
+PERIODE_EVENT_MANAGER =	50
 ID_ACTION_MAX =			29999
 
 #====================timeManager====================
@@ -52,7 +50,7 @@ END_OF_FUNNY_ACTION = 	94000
 ENABLE_TOURELLE = 		False #permet de deactiver la tourelle
 
 #====================pullData====================
-PULL_PERIODE = 			100 #période des pull en ms
+PULL_PERIODE = 			50 #période des pull en ms
 
 #====================CAMERA====================
 SEUIL_ROUGE = 			100 #TODO
@@ -62,7 +60,6 @@ SEUIL_JAUNE = 			100 #TODO
 ENABLE_FLUSSMITTEL = 	False #permet de deactiver Flussmitel
 LARGEUR_FLUSSMITTEL = 	100
 LONGUEUR_FLUSSMITTEL = 	100
-RAYON_FLUSSMITTEL = 	math.sqrt(LARGEUR_FLUSSMITTEL * LARGEUR_FLUSSMITTEL + LONGUEUR_FLUSSMITTEL * LONGUEUR_FLUSSMITTEL) #en mm
 
 
 
@@ -76,8 +73,6 @@ RAYON_FLUSSMITTEL = 	math.sqrt(LARGEUR_FLUSSMITTEL * LARGEUR_FLUSSMITTEL + LONGU
 ENABLE_TIBOT = 			True #permet de deactiver un Tibot
 LARGEUR_TIBOT = 		100
 LONGUEUR_TIBOT = 		100
-RAYON_TIBOT = 			math.sqrt(LARGEUR_TIBOT * LARGEUR_TIBOT + LONGUEUR_TIBOT * LONGUEUR_TIBOT) 
-
 
 
 

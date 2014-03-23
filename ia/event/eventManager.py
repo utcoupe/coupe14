@@ -9,6 +9,7 @@ import time
 
 from .constantes import *
 from .subProcessCommunicate import *
+from .navigation import *
 
 class EventManager():
 	def __init__(self, Communication, Data):
@@ -17,6 +18,8 @@ class EventManager():
 		self.__Data = Data
 		self.__Flussmittel = Data.Flussmittel
 		self.__Tibot = Data.Tibot
+		self.__SmallEnemyBot = Data.SmallEnemyBot
+		self.__BigEnemyBot = Data.BigEnemyBot
 		self.__Tourelle = Data.Tourelle
 		self.__MetaData = Data.MetaData
 
@@ -33,6 +36,7 @@ class EventManager():
 		self.__resume_date_tibot = 0
 
 		self.__SubProcessCommunicate = SubProcessCommunicate(Data)
+		self.__Collision = Collision((self.__Flussmittel, self.__Tibot, self.__BigEnemyBot, self.__SmallEnemyBot))
 
 		self.__managerThread = threading.Thread(target=self.__managerLoop)
 		self.__managerThread.start()
@@ -94,12 +98,13 @@ class EventManager():
 					robot.addNewObjectif(id_objectif, action_data)
 
 	def __checkEvent(self):
+		self.__testCollision()
 		if self.__Tourelle is not None:
 			new_data = ()
-			if self.__Flussmittel is not None:
-				new_data += (self.__Flussmittel.getPositon(),)
-			if self.__Tibot is not None:
-				new_data += (self.__Tibot.getPositon(),)
+			if self.__SmallEnemyBot is not None:
+				new_data += (self.__SmallEnemyBot.getPositon(),)
+			if self.__BigEnemyBot is not None:
+				new_data += (self.__BigEnemyBot.getPositon(),)
 			
 			if new_data != self.__last_hokuyo_data:
 				self.__last_hokuyo_data = new_data
@@ -148,7 +153,7 @@ class EventManager():
 							self.__pushOrders(self.__Tibot, next_actions)
 
 	def __pushOrders(self, Objet, data): 
-		print("On charge les actions: " + str(data))
+		print(str(Objet.getName()) + " charge les actions: " + str(data))
 		id_objectif = data[0]
 		data_action = data[1]#data_action est de type ((id_action, ordre, arguments),...)
 
@@ -203,7 +208,14 @@ class EventManager():
 
 
 	def __testCollision(self):
-		#TODO
-		id_objectifs_canceled = ()
-		if False:
-			self.__SubProcessCommunicate.sendObjectifCanceled(id_objectifs_canceled)
+		if self.__Flussmittel is not None:
+			collision_data = self.__Collision.getCollision(self.__Flussmittel)
+			if collision_data is not None:
+				self.__SubProcessCommunicate.sendObjectifCanceled(collision_data[0])
+
+		if self.__Tibot is not None:
+			collision_data = self.__Collision.getCollision(self.__Tibot)
+			if collision_data is not None:
+				self.__SubProcessCommunicate.sendObjectifCanceled(collision_data[0])
+
+
