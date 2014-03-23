@@ -36,6 +36,7 @@ class Data():
 		if ENABLE_TOURELLE == True:
 			self.Tourelle = Tourelle(self.Flussmittel, self.Tibot,self.BigEnemyBot, self.SmallEnemyBot, Communication, arduino_constantes, 'ADDR_HOKUYO')
 
-		self.PullData = PullData(Communication, (self.Flussmittel, 'ADDR_FLUSSMITTEL_OTHER', 'ADDR_FLUSSMITTEL_ASSERV'), (self.Tibot, 'ADDR_TIBOT_OTHER', 'ADDR_TIBOT_ASSERV'), self.SmallEnemyBot, self.BigEnemyBot, self.ComputeHokuyoData, (self.Tourelle, arduino_constantes['address']['ADDR_HOKUYO']), PULL_PERIODE)
+		self.__PullData = PullData(Communication, (self.Flussmittel, 'ADDR_FLUSSMITTEL_OTHER', 'ADDR_FLUSSMITTEL_ASSERV'), (self.Tibot, 'ADDR_TIBOT_OTHER', 'ADDR_TIBOT_ASSERV'), self.SmallEnemyBot, self.BigEnemyBot, self.ComputeHokuyoData, (self.Tourelle, arduino_constantes['address']['ADDR_HOKUYO']), PULL_PERIODE)
 
-		
+	def startPullData(self):
+		self.__PullData.start()

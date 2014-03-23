@@ -19,6 +19,7 @@ class TimeManager():
 
 		self.__broadcastStopOrder()
 		self.__sendResetBot()
+		Data.startPullData()
 
 
 

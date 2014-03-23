@@ -13,9 +13,13 @@ import time
 #self.__GoalsManager = goalsManager.GoalsManager()
 
 class subProcessManager():
-	def __init__(self, connection):
+	def __init__(self, connection, robot_name):
 		self.__logger = logging.getLogger(__name__.split('.')[0])
 		self.__connection = connection
+		if robot_name == "Flussmittel":
+			self.__script_filename = "data/script_flussmittel.xml"
+		else:
+			self.__script_filename = "data/script_tibot.xml"
 
 		self.__data = None
 
@@ -28,11 +32,13 @@ class subProcessManager():
 			if new_message[0] == "data":
 				self.__updateData(new_message[1])
 			else:
-				self.__readStatus(new_status)
+				self.__readStatus(new_message)
+
+			#TODO, si besoin retourner le dernier choix sinon relancer un choix
 			
-	def __loadActionScript(self, filename="data/tibot.xml"):
-		self.__logger.info("loading actionScript from: " + str(filename))
-		fd = open(filename,'r')
+	def __loadActionScript(self):
+		self.__logger.info("loading actionScript from: " + str(self.__script_filename))
+		fd = open(self.__script_filename,'r')
 		dom = parseString(fd.read())
 		fd.close()
 
@@ -78,5 +84,5 @@ class subProcessManager():
 
 
 
-def startSubprocess(connection):
-	a = subProcessManager(connection)
+def startSubprocess(connection, robot_name):
+	a = subProcessManager(connection, robot_name)

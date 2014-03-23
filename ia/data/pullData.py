@@ -24,22 +24,24 @@ class PullData():
 		self.address_tourelle = Tourelle[1]
 		self.PULL_PERIODE = PULL_PERIODE
 
-		self.pull_data = True
+		self.__pull_data = True
 		self.__id_flussmittel_other_asked = False
 		self.__data_flussmittel_asserv_asked = False
 		self.__id_tibot_other_asked = False
 		self.__data_tibot_asserv_asked = False
 		self.tourelle_asked = False
 
-		self.ThreadPull = threading.Thread(target=self.__gestion)
-		self.ThreadPull.start()
+		self.__ThreadPull = threading.Thread(target=self.__gestion)
+
+	def start(self):
+		self.__ThreadPull.start()
 
 	def stop(self):
 		"""méthode public pour arreter le système de pull data"""
-		self.pull_data = False
+		self.__pull_data = False
 
 	def __gestion(self):
-		while self.pull_data:
+		while self.__pull_data:
 			self.__readData()
 			self.__askData()
 			time.sleep(self.PULL_PERIODE/1000.0)

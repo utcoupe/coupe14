@@ -17,9 +17,9 @@ class SubProcessCommunicate():
 		self.__logger = logging.getLogger(__name__.split('.')[0])
 		
 		if self.__Data.Flussmittel is not None:
-			self.__subprocess_flussmittel = process(self.__Data)
+			self.__subprocess_flussmittel = MyProcess(self.__Data, self.__Data.Flussmittel.getName())
 		if self.__Data.Tibot is not None:
-			self.__subprocess_tibot = process(self.__Data)
+			self.__subprocess_tibot = MyProcess(self.__Data, self.__Data.Tibot.getName())
 
 		
 	def readOrders(self):
@@ -32,9 +32,9 @@ class SubProcessCommunicate():
 
 		input_list_1 = deque()
 		if self.__Data.Flussmittel is not None:
-			input_list_1 = self.subprocess_1.readPacket()
+			input_list_1 = self.__subprocess_flussmittel.readPacket()
 		if self.__Data.Tibot is not None:
-			input_list_2 = self.subprocess_2.readPacket()
+			input_list_2 = self.__subprocess_tibot.readPacket()
 			for info in input_list_2:
 				input_list_1.append(info)
 
@@ -93,14 +93,14 @@ class SubProcessCommunicate():
 
 	
 
-class process():
-	def __init__(self, Data):
+class MyProcess():
+	def __init__(self, Data, robot_name):
 		self.__Data = Data
 		self.__logger = logging.getLogger(__name__.split('.')[0])
 		self.__input_buffer = deque()
 
 		self.__parent_conn, self.__child_conn = Pipe()
-		self.__process = Process(target=goals.startSubprocess, args=(self.__child_conn,))
+		self.__process = Process(target=goals.startSubprocess, args=(self.__child_conn, robot_name) )
 		self.__process.start()
 
 		self.__Pull_thread = threading.Thread(target=self.__readPipe)
