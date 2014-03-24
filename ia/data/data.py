@@ -40,3 +40,42 @@ class Data():
 
 	def startPullData(self):
 		self.__PullData.start()
+
+	def dataToDico(self):
+		data = {}
+
+		if self.Flussmittel is not None:
+			system = self.Flussmittel
+			data["Flussmittel"] = {}
+			data["Flussmittel"]["getPositon"] = system.getPosition()
+		else:
+			data["Flussmittel"] = None
+
+		if self.Tibot is not None:
+			system = self.Tibot
+			data["Tibot"] = {}
+			data["Tibot"]["getPositon"] = system.getPosition()
+		else:
+			data["Tibot"] = None
+
+		if self.Tourelle is not None:
+			system = self.Tourelle
+			data["Tourelle"] = {}
+		else:
+			data["Tourelle"] = None
+
+		if self.SmallEnemyBot is not None:
+			system = self.SmallEnemyBot
+			data["SmallEnemyBot"] = {}
+			data["SmallEnemyBot"]["getPositon"] = system.getPosition()
+		else:
+			data["SmallEnemyBot"] = None
+
+		if self.BigEnemyBot is not None:
+			system = self.BigEnemyBot
+			data["BigEnemyBot"] = {}
+			data["BigEnemyBot"]["getPositon"] = system.getPosition()
+		else:
+			data["BigEnemyBot"] = None
+
+		return data

@@ -7,11 +7,8 @@ from xml.dom.minidom import parseString
 import logging
 from collections import deque
 import time
-import threading
 
-#TODO
-#import goalsManager
-#self.__GoalsManager = goalsManager.GoalsManager()
+from .goalsManager import *
 
 class subProcessManager():
 	def __init__(self, connection, robot_name):
@@ -26,6 +23,7 @@ class subProcessManager():
 			self.__logger.error("La variable robot_name n'a pas une valeur connu, self.__robot_name = " + str(self.__robot_name))
 
 		self.__data = None
+		self.__GoalsManager = GoalsManager(self.__robot_name)
 
 		self.__processEvent()
 

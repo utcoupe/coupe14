@@ -101,9 +101,9 @@ class EventManager():
 		if self.__Tourelle is not None:
 			new_data = ()
 			if self.__SmallEnemyBot is not None:
-				new_data += (self.__SmallEnemyBot.getPositon(),)
+				new_data += (self.__SmallEnemyBot.getPosition(),)
 			if self.__BigEnemyBot is not None:
-				new_data += (self.__BigEnemyBot.getPositon(),)
+				new_data += (self.__BigEnemyBot.getPosition(),)
 			
 			if new_data != self.__last_hokuyo_data:
 				self.__last_hokuyo_data = new_data
@@ -188,7 +188,7 @@ class EventManager():
 
 
 	def __sendOrders(self, address, data_action):#data_action est de type ((id_action, ordre, arguments),...)
-		#Si on est en jeuS
+		#Si on est en jeu
 		if self.__MetaData.getInGame():
 			for action in data_action:
 				arg = [action[0]]
