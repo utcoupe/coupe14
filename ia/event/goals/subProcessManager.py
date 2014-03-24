@@ -7,6 +7,7 @@ from xml.dom.minidom import parseString
 import logging
 from collections import deque
 import time
+import threading
 
 #TODO
 #import goalsManager
@@ -19,8 +20,10 @@ class subProcessManager():
 		self.__robot_name = robot_name
 		if self.__robot_name == 'FLUSSMITTEL':
 			self.__script_filename = "data/script_flussmittel.xml"
-		else:
+		elif self.__robot_name == 'TIBOT':
 			self.__script_filename = "data/script_tibot.xml"
+		else:
+			self.__logger.error("La variable robot_name n'a pas une valeur connu, self.__robot_name = " + str(self.__robot_name))
 
 		self.__data = None
 
@@ -35,6 +38,9 @@ class subProcessManager():
 			else:
 				self.__readStatus(new_message)
 
+			#for i in range(10000000):
+			#	pass
+			#print(self.__robot_name)
 			#TODO, si besoin retourner le dernier choix sinon relancer un choix
 			
 	def __loadActionScript(self):

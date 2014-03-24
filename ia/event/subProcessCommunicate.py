@@ -48,9 +48,9 @@ class SubProcessCommunicate():
 
 	def sendObjectifCanceled(self, id_objectifs_canceled):
 		if self.__Data.Flussmittel is not None:
-			self.__subprocess_flussmittel.sendPacket(("over", id_objectif))
+			self.__subprocess_flussmittel.sendPacket(("over", id_objectifs_canceled))
 		if self.__Data.Tibot is not None:
-			self.__subprocess_tibot.sendPacket(("over", id_objectif))
+			self.__subprocess_tibot.sendPacket(("over", id_objectifs_canceled))
 
 	def __dataToDico(self):
 		data = {}

@@ -16,9 +16,9 @@ PARITY_OTHER = 			"NONE"
 MAX_UNCONFIRMED_PACKET =5 # maximum 32
 EMPTY_FIFO = 			True
 TIMEOUT = 				100
-HIGH_PRIO_SPEED = 		15 #période d'execution en ms
-LOW_PRIO_SPEED = 		1000 #période d'execution en ms
-KEEP_CONTACT_TIMEOUT = 	2000
+HIGH_PRIO_SPEED = 		2 #période d'execution en ms
+LOW_PRIO_SPEED = 		400 #période d'execution en ms
+KEEP_CONTACT_TIMEOUT = 	1500
 OFF_LIGNE_TIMEOUT = 	5000
 
 #Systèmes arretable:
@@ -37,7 +37,7 @@ renvoiImmediat = 		False # fonction non terminé, ne pas activer !
 NUMBER_OF_ENEMY = 		2
 
 #====================eventManager====================
-PERIODE_EVENT_MANAGER =	50
+PERIODE_EVENT_MANAGER =	20
 ID_ACTION_MAX =			29999
 
 #====================timeManager====================
@@ -50,7 +50,7 @@ END_OF_FUNNY_ACTION = 	94000
 ENABLE_TOURELLE = 		False #permet de deactiver la tourelle
 
 #====================pullData====================
-PULL_PERIODE = 			50 #période des pull en ms
+PULL_PERIODE = 			10 #période des pull en ms
 
 #====================CAMERA====================
 SEUIL_ROUGE = 			100 #TODO
@@ -70,7 +70,7 @@ LONGUEUR_FLUSSMITTEL = 	100
 
 
 #====================TIBOT====================
-ENABLE_TIBOT = 			True #permet de deactiver un Tibot
+ENABLE_TIBOT = 			False #permet de deactiver un Tibot
 LARGEUR_TIBOT = 		100
 LONGUEUR_TIBOT = 		100
 

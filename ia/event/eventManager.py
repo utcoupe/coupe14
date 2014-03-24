@@ -98,7 +98,6 @@ class EventManager():
 					robot.addNewObjectif(id_objectif, action_data)
 
 	def __checkEvent(self):
-		self.__testCollision()
 		if self.__Tourelle is not None:
 			new_data = ()
 			if self.__SmallEnemyBot is not None:

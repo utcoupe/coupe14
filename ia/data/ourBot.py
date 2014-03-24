@@ -184,7 +184,7 @@ class OurBot():
 			data_objectif.append(action)
 
 		self.__objectifs.append((id_objectif, data_objectif))
-		self.__logger.debug("New goals queued: " + str((id_objectif, data_objectif)))
+		self.__logger.debug( str(self.getName()) + " new goals queued: " + str((id_objectif, data_objectif)))
 
 	def removeActionBellow(self, lastIddExecuted):
 		"""enleve les actions terminé de la liste des actions en cours """
