@@ -17,6 +17,8 @@ int main(int argc, char **argv){
 		index = argv[1][0] - '0';
 	}
 	//perspectiveOnlyLoop(index);
-	testStereo();
+	//testStereo();
+	cout << "coolor3d" << endl;
+	color3d();
 	return 0;
 }

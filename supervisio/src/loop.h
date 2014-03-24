@@ -3,5 +3,6 @@
 
 void perspectiveOnlyLoop(int index); 
 void testStereo();
+void color3d();
 
 #endif
