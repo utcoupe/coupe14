@@ -12,15 +12,17 @@ using namespace std;
 typedef vector<Point> Contour;
 typedef vector<vector<Point> > Contours;
 
-class Persp {
+class Visio {
 	public:
-		Persp();
-		Persp(Scalar min, Scalar max);
+		Visio();
+		Visio(Scalar min, Scalar max);
 		void getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, Contours& detected_contours);
+		void getRealWorldPosition(const Mat& img, vector<Point2f>& detected_pts, Contours& detected_contours, Rect ROI);
 		bool computeTransformMatrix(const Mat &img, const vector<Point2f> real_positions, Mat *out=0);
-		void warpPerspective(const Mat& frame, Mat& out, Size size);
 		//SETTER
 		void setParameters(Scalar min, Scalar max, int size=0);
+		//GETTER
+		Mat getQ();
 	private:
 		void init();
 		void detectColor(const Mat& img, Mat& out);

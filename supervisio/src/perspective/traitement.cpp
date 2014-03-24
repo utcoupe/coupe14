@@ -1,29 +1,28 @@
 #include "traitement.h"
 #include "gui.h"
 
-#include <iostream>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/types_c.h>
 
 using namespace std;
 
-Persp::Persp() : min(0,0,0), max(0,0,0) {
+Visio::Visio() : min(0,0,0), max(0,0,0) {
 	init();
 }
 
-Persp::Persp(Scalar min, Scalar max) {
+Visio::Visio(Scalar min, Scalar max) {
 	this->min = min;
 	this->max = max;
 	init();
 }
 
-void Persp::init() {
+void Visio::init() {
 	chessboard_size = Size(7,6);
 	min_size = 100;
 	calibrated = false;
 }
 
-void Persp::detectColor(const Mat& img, Mat& out) {
+void Visio::detectColor(const Mat& img, Mat& out) {
 	Mat hsv;
 	cvtColor(img, hsv, CV_RGB2HSV);
 	if (min.val[0] > max.val[0]) { //car les teintes sont circulaires
@@ -35,7 +34,7 @@ void Persp::detectColor(const Mat& img, Mat& out) {
 	inRange(hsv, min, max, out);
 }
 
-Contours Persp::getContour(const Mat& img) {
+Contours Visio::getContour(const Mat& img) {
 	Contours contours;
 	Mat thresh;
 	detectColor(img, thresh);
@@ -48,7 +47,7 @@ Contours Persp::getContour(const Mat& img) {
 	return contours;
 }
 
-bool Persp::computeTransformMatrix(const Mat &img, const vector<Point2f> real_positions, Mat *out) {
+bool Visio::computeTransformMatrix(const Mat &img, const vector<Point2f> real_positions, Mat *out) {
 	Mat gray;
 	bool pattern_found = false;
 	vector<Point2f> corners, ext_corn;
@@ -80,7 +79,7 @@ bool Persp::computeTransformMatrix(const Mat &img, const vector<Point2f> real_po
 	return calibrated;
 }
 
-void Persp::getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, Contours& detected_contours) {
+void Visio::getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, Contours& detected_contours) {
 	Contours contours = getContour(img);
 	float x, y;
 	for(int i=0 ; i < contours.size(); i++){
@@ -94,16 +93,26 @@ void Persp::getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, C
 	}
 }
 
-void Persp::warpPerspective(const Mat& frame, Mat& out, Size size) {
-	cv::warpPerspective(frame, out, perspectiveMatrix, size);
+void Visio::getRealWorldPosition(const Mat& img, vector<Point2f>& detected_pts, Contours& detected_contours, Rect ROI) {
+	getDetectedPosition(img, detected_pts, detected_contours);
+	perspectiveTransform(detected_pts, detected_pts, perspectiveMatrix);
+	for(int i=0; i < detected_contours.size(); i++) {
+		perspectiveTransform(detected_contours, detected_contours, perspectiveMatrix);
+	}
 }
 
 //SETTER
 
-void Persp::setParameters(Scalar min, Scalar max, int size) {
+void Visio::setParameters(Scalar min, Scalar max, int size) {
 	this->min = min;
 	this->max = max;
 	if (size > 0) {
 		min_size = size;
 	}
+}
+
+//GETTER
+
+Mat Visio::getQ() {
+	return perspectiveMatrix;
 }
