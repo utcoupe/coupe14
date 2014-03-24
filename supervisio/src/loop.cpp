@@ -46,6 +46,12 @@ void perspectiveOnlyLoop(int index){
 			calibrating = false;
 			real_time = !real_time;
 		}
+		if (key == 's') {
+			visio.saveTransformMatrix();
+		}
+		if (key == 'l') {
+			visio.loadTransformMatrix();
+		}
 		
 		if (calibrating || real_time) {
 			if (!real_time)
@@ -56,8 +62,12 @@ void perspectiveOnlyLoop(int index){
 			Scalar min(h_min,s_min,v_min), max(h_max,s_max,v_max);
 			visio.setParameters(min, max);
 
-			warpPerspective(frame, persp, visio.getQ(), Size(200,200));
-			visio.getDetectedPosition(persp, detected_pts, detected_contours);
+			//CAS 1
+			//warpPerspective(frame, persp, visio.getQ(), Size(200,200));
+			//visio.getDetectedPosition(persp, detected_pts, detected_contours);
+			//CAS 2
+			Rect ROI(0, 0, 200, 200);
+			visio.getRealWorldPosition(frame, detected_pts, detected_contours, ROI);
 			drawContours(persp, detected_contours, -1, red, 1);
 			for(int i=0; i<detected_pts.size(); i++) {
 				drawObject(detected_pts[i].x, detected_pts[i].y, persp);

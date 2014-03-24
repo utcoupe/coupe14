@@ -19,6 +19,9 @@ class Visio {
 		void getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, Contours& detected_contours);
 		void getRealWorldPosition(const Mat& img, vector<Point2f>& detected_pts, Contours& detected_contours, Rect ROI);
 		bool computeTransformMatrix(const Mat &img, const vector<Point2f> real_positions, Mat *out=0);
+		//FILE
+		bool loadTransformMatrix();
+		void saveTransformMatrix();
 		//SETTER
 		void setParameters(Scalar min, Scalar max, int size=0);
 		//GETTER

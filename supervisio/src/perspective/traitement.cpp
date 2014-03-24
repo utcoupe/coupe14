@@ -79,6 +79,29 @@ bool Visio::computeTransformMatrix(const Mat &img, const vector<Point2f> real_po
 	return calibrated;
 }
 
+void Visio::saveTransformMatrix() {
+	cout << "Saving calibration data" << endl;
+	if (!calibrated) {
+		cerr << "ERROR : Uncalibrated camera" << endl;
+		return;
+	}
+	FileStorage fs("calibration_persp.yml", FileStorage::WRITE);
+	fs << "Q" << perspectiveMatrix;
+	fs.release();
+}
+
+bool Visio::loadTransformMatrix() {
+	cout << "Loading calibration data" << endl;
+	FileStorage fs("calibration_persp.yml", FileStorage::READ);
+	if (!fs.isOpened()) {
+		cerr << "ERROR : Couldn't find calibration_persp.yml" << endl;
+		return false;
+	}
+	fs.release();
+	calibrated = true;
+	return true;
+}
+
 void Visio::getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, Contours& detected_contours) {
 	Contours contours = getContour(img);
 	float x, y;
