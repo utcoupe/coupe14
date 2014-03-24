@@ -25,7 +25,7 @@ class Data():
 		if ENABLE_FLUSSMITTEL == True:
 			self.Flussmittel = OurBot('FLUSSMITTEL', Communication, arduino_constantes, 'ADDR_FLUSSMITTEL_OTHER', 'ADDR_FLUSSMITTEL_ASSERV', LARGEUR_FLUSSMITTEL, LONGUEUR_FLUSSMITTEL)
 
-		if ENABLE_TIBOT == True:
+		if ENABLE_TIBOT == False:
 			self.Tibot = OurBot('TIBOT', Communication, arduino_constantes, 'ADDR_TIBOT_OTHER', 'ADDR_TIBOT_ASSERV', LARGEUR_TIBOT, LONGUEUR_TIBOT)
 
 		if NUMBER_OF_ENEMY >= 1:
@@ -40,3 +40,42 @@ class Data():
 
 	def startPullData(self):
 		self.__PullData.start()
+
+	def dataToDico(self):
+		data = {}
+
+		if self.Flussmittel is not None:
+			system = self.Flussmittel
+			data["Flussmittel"] = {}
+			data["Flussmittel"]["getPositon"] = system.getPosition()
+		else:
+			data["Flussmittel"] = None
+
+		if self.Tibot is not None:
+			system = self.Tibot
+			data["Tibot"] = {}
+			data["Tibot"]["getPositon"] = system.getPosition()
+		else:
+			data["Tibot"] = None
+
+		if self.Tourelle is not None:
+			system = self.Tourelle
+			data["Tourelle"] = {}
+		else:
+			data["Tourelle"] = None
+
+		if self.SmallEnemyBot is not None:
+			system = self.SmallEnemyBot
+			data["SmallEnemyBot"] = {}
+			data["SmallEnemyBot"]["getPositon"] = system.getPosition()
+		else:
+			data["SmallEnemyBot"] = None
+
+		if self.BigEnemyBot is not None:
+			system = self.BigEnemyBot
+			data["BigEnemyBot"] = {}
+			data["BigEnemyBot"]["getPositon"] = system.getPosition()
+		else:
+			data["BigEnemyBot"] = None
+
+		return data

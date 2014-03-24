@@ -24,7 +24,7 @@ class SubProcessCommunicate():
 		
 	def readOrders(self):
 		"""retourn les données des subprocess"""
-		data = self.__dataToDico()
+		data = self.__Data.dataToDico()
 		if self.__Data.Flussmittel is not None:
 			self.__subprocess_flussmittel.sendPacket(("data", data)) #TODO: ça n'a rien à faire ici !
 		if self.__Data.Tibot is not None:
@@ -52,46 +52,6 @@ class SubProcessCommunicate():
 		if self.__Data.Tibot is not None:
 			self.__subprocess_tibot.sendPacket(("over", id_objectifs_canceled))
 
-	def __dataToDico(self):
-		data = {}
-
-		if self.__Data.Flussmittel is not None:
-			system = self.__Data.Flussmittel
-			data["Flussmittel"] = {}
-			data["Flussmittel"]["getPositon"] = system.getPosition()
-		else:
-			data["Flussmittel"] = None
-
-		if self.__Data.Tibot is not None:
-			system = self.__Data.Tibot
-			data["Tibot"] = {}
-			data["Tibot"]["getPositon"] = system.getPosition()
-		else:
-			data["Tibot"] = None
-
-		if self.__Data.Tourelle is not None:
-			system = self.__Data.Tourelle
-			data["Tourelle"] = {}
-		else:
-			data["Tourelle"] = None
-
-		if self.__Data.SmallEnemyBot is not None:
-			system = self.__Data.SmallEnemyBot
-			data["SmallEnemyBot"] = {}
-			data["SmallEnemyBot"]["getPositon"] = system.getPosition()
-		else:
-			data["SmallEnemyBot"] = None
-
-		if self.__Data.BigEnemyBot is not None:
-			system = self.__Data.BigEnemyBot
-			data["BigEnemyBot"] = {}
-			data["BigEnemyBot"]["getPositon"] = system.getPosition()
-		else:
-			data["BigEnemyBot"] = None
-
-		return data
-
-	
 
 class MyProcess():
 	def __init__(self, Data, robot_name):

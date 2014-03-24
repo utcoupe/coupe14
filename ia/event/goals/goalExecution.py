@@ -8,16 +8,16 @@ GoalExecutions are compared on that score (lower is better choice)
 class GoalExecution:
 
 	def __init__(self, goal, location, orientation, points, priority, actions, time):
-		self.__location			= location
+		self.__location		= location
 		self.__orientation	= float(orientation)
-		self.__points				= int(points)
-		self.__priority			= int(priority) # Bigger is higher
-		self.__actions			= actions
-		self.__distance			= float("inf")
-		self.__time					= float(time)
-		self.__goal					= goal
-		self.score					= 0.0
-		self.routing				= -1
+		self.__points		= int(points)
+		self.__priority		= int(priority) # Bigger is higher
+		self.__actions		= actions
+		self.__distance		= float("inf")
+		self.__time			= float(time)
+		self.__goal			= goal
+		self.score			= 0.0
+		self.routing		= -1
 
 	def getGoal(self):
 		return self.__goal
