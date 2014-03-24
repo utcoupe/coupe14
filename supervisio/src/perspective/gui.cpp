@@ -1,5 +1,3 @@
-#ifdef VISUAL
-
 #include "gui.h"
 #include "traitement.h"
 
@@ -40,5 +38,3 @@ string intToString(int number)
 	ss << number;//add number to the stream
 	return ss.str();//return a string with the contents of the stream
 }
-
-#endif
