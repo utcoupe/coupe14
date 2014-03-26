@@ -23,6 +23,8 @@ class GoalsManager:
 		self.__available_goals	= [] #List of available goals
 		self.__blocked_goals	= [] # List of blocked goals
 		self.__finished_goals	= [] #List of finished goals
+
+		#TODO self.__loadElemScript()
 		self.__loadGoals("goals.xml")
 		self.__collectEnemyFinished()
 
@@ -54,32 +56,39 @@ class GoalsManager:
 		fd = open(filename,'r')
 		dom = parseString(fd.read())
 		fd.close()
-		
+
 		for xml_goal in dom.getElementsByTagName('goal'):
-			name		= str(xml_goal.attributes["name"].value)
-			type		= str(xml_goal.getElementsByTagName('type')[0].firstChild.nodeValue)
-			finished 	= int(xml_goal.getElementsByTagName('finished')[0].firstChild.nodeValue)
-			gx			= int(xml_goal.getElementsByTagName('location-x')[0].firstChild.nodeValue)
-			gy			= int(xml_goal.getElementsByTagName('location-x')[0].firstChild.nodeValue)
+			name 			= str(xml_goal.getElementsByTagName('name')[0].firstChild.nodeValue) #nom explicite
+			typee			= str(xml_goal.getElementsByTagName('typee')[0].firstChild.nodeValue) #triangle, 
+			concerned_robot = str(xml_goal.getElementsByTagName('concerned_robot')[0].firstChild.nodeValue) #ALL, TIBOT, FLUSSMITTEL
+			x				= int(xml_goal.getElementsByTagName('x')[0].firstChild.nodeValue)
+			y				= int(xml_goal.getElementsByTagName('y')[0].firstChild.nodeValue)
+			finished 		= int(xml_goal.getElementsByTagName('finished')[0].firstChild.nodeValue) #0-100
 
-			goal = Goal(name, type, [gx, gy], finished)
+			#On ajoute uniquement les objectifs qui nous concerne
+			if concerned_robot == "ALL" or concerned_robot == self.__robot_name:
+				goal = Goal(name, typee, concerned_robot, x, y, finished)
 
-			for xml_execution in xml_goal.getElementsByTagName('execution'):
-				x			= int(xml_execution.getElementsByTagName('location-x')[0].firstChild.nodeValue)
-				y			= int(xml_execution.getElementsByTagName('location-y')[0].firstChild.nodeValue)
-				orientation	= float(xml_execution.getElementsByTagName('orientation')[0].firstChild.nodeValue)
-				points		= int(xml_execution.getElementsByTagName('points')[0].firstChild.nodeValue)
-				priority	= int(xml_execution.getElementsByTagName('priority')[0].firstChild.nodeValue)
-				duration	= int(xml_execution.getElementsByTagName('duration')[0].firstChild.nodeValue)# Temps d'execution de l'action en s
-				id_actions	= int(xml_execution.getElementsByTagName('id_actions')[0].firstChild.nodeValue)
-			#TODO, gèrer les executions
+				if goal.isFinished():
+					self.__finished_goals.append(goal)
+				else:
+					self.__available_goals.append(goal)
 
-			if goal.isFinished():
-				self.__finished_goals.append(goal)
-			else:
-				self.__available_goals.append(goal)
+				for elem_goal in dom.getElementsByTagName('elem_goal'):
+					x			= int(elem_goal.getElementsByTagName('x')[0].firstChild.nodeValue)
+					y			= int(elem_goal.getElementsByTagName('y')[0].firstChild.nodeValue)
+					angle		= float(elem_goal.getElementsByTagName('angle')[0].firstChild.nodeValue)
+					points		= int(elem_goal.getElementsByTagName('points')[0].firstChild.nodeValue)
+					priority	= int(elem_goal.getElementsByTagName('priority')[0].firstChild.nodeValue)
+					duration	= int(elem_goal.getElementsByTagName('duration')[0].firstChild.nodeValue)
+					id_script	= int(elem_goal.getElementsByTagName('id_script')[0].firstChild.nodeValue)
+					#TODO instancier elem_goal
+					goal.appendElemGoal(x, y, angle, points, priority, duration, id_script)
 	
-	
+	def __loadElemScript(self):
+		#TODO
+		pass
+
 
 	"""def getBestGoalExecution(self, current_pos):
 		execution_heap = []

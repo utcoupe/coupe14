@@ -22,10 +22,10 @@ class Data():
 
 
 		#Instantation des objets
-		if ENABLE_FLUSSMITTEL == False:
+		if ENABLE_FLUSSMITTEL == True:
 			self.Flussmittel = OurBot('FLUSSMITTEL', Communication, arduino_constantes, 'ADDR_FLUSSMITTEL_OTHER', 'ADDR_FLUSSMITTEL_ASSERV', LARGEUR_FLUSSMITTEL, LONGUEUR_FLUSSMITTEL)
 
-		if ENABLE_TIBOT == False:
+		if ENABLE_TIBOT == True:
 			self.Tibot = OurBot('TIBOT', Communication, arduino_constantes, 'ADDR_TIBOT_OTHER', 'ADDR_TIBOT_ASSERV', LARGEUR_TIBOT, LONGUEUR_TIBOT)
 
 		if NUMBER_OF_ENEMY >= 1:

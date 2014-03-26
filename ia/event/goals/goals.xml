@@ -1,20 +1,61 @@
 <?xml version="1.0" ?>
 <goals>
-	<goal name='getFire1'>
-		<type>triangle</type>
+	<goal>
+		<name>Tirangle en haut à gauche</name>
+		<typee>triangle</typee>
+		<concerned_robot>TIBOT</concerned_robot>
+		<x>0</x>
+		<y>0</y>
 		<finished>20</finished>
-		<location-x>0</location-x>
-		<location-y>0</location-y>
-		<executions>
-			<execution>
+		<elem_action_id>0</elem_action_id>
+		<elem_goals>
+			<elem_goal>
+				<x>0</x>
+				<y>0</y>
+				<angle>0.0</angle>
 				<points>1</points>
 				<priority>1</priority>
-				<location-x>0</location-x>
-				<location-y>0</location-y>
-				<orientation>0.0</orientation>
 				<duration>1</duration>
-				<id_actions>0</id_actions>
-			</execution>
-		</executions>
+				<id_script>0</id_script>
+			</elem_goal>
+			<elem_goal>
+				<x>0</x>
+				<y>0</y>
+				<angle>0.0</angle>
+				<points>1</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<id_script>0</id_script>
+			</elem_goal>
+		</elem_goals>
+	</goal>
+	<goal>
+		<name>Tirangle en haut à droite</name>
+		<typee>triangle</typee>
+		<concerned_robot>ALL</concerned_robot>
+		<x>200</x>
+		<y>200</y>
+		<finished>20</finished>
+		<elem_action_id>0</elem_action_id>
+		<elem_goals>
+			<elem_goal>
+				<x>0</x>
+				<y>0</y>
+				<angle>0.0</angle>
+				<points>1</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<id_script>0</id_script>
+			</elem_goal>
+			<elem_goal>
+				<x>0</x>
+				<y>0</y>
+				<angle>0.0</angle>
+				<points>1</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<id_script>0</id_script>
+			</elem_goal>
+		</elem_goals>
 	</goal>
 </goals>
