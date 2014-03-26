@@ -32,9 +32,9 @@ void perspectiveOnlyLoop(int index){
 	Scalar red(0,0,255), blue(255, 0, 0);
 	vector<Point2f> position;
 	position.push_back(Point2f(0,0));
-	position.push_back(Point2f(200,0));
-	position.push_back(Point2f(0,170));
-	position.push_back(Point2f(200,170));
+	position.push_back(Point2f(147,0));
+	position.push_back(Point2f(0,122));
+	position.push_back(Point2f(147,122));
 	for(;;) { //int i=0; i>=0; i++) {
 		vector<vector<Point> > detected_contours;
 		vector<Point2f> detected_pts, realworld;
@@ -55,7 +55,7 @@ void perspectiveOnlyLoop(int index){
 			visio.computeTransformMatrix(frame, position, &frame);
 			imshow("origin", frame);
 		}
-		if (!calibrating) {
+		else {
 			Scalar min(h_min,s_min,v_min), max(h_max,s_max,v_max);
 			visio.setRedParameters(min, max);
 
@@ -81,7 +81,7 @@ void perspectiveOnlyLoop(int index){
 	//		resize(persp, persp, Size(600, 600));
 			imshow("origin", persp);
 		}
-		key = waitKey(1);
+		key = waitKey(20);
 	}
 }
 
