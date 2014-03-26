@@ -14,15 +14,13 @@ class Collision:
 	def getCollision(self, robot):
 		#on etablit la liste des robots autres que celui pour lequel on calcule la trajectoire
 		robot_list = [self.__big_enemy_bot, self.__small_enemy_bot]
-		if robot is self.__flussmittel:
+
+		if robot is self.__flussmittel and self.__tibot is not None:
 			robot_list.insert(0, self.__tibot)
 			self.__log.info("Calcul de collision pour Flussmittel")
-		elif robot is self.__tibot:
+		elif robot is self.__tibot and self.__flussmittel is not None:
 			robot_list.insert(0, self.__flussmittel)
 			self.__log.info("Calcul de collision pour Tibot")
-		else:
-			self.__log.error("Le robot spécifié n'est ni Flussmittel ni Tibot")
-			return None
 
 		""" .getTrajectoires() - > (dataObjectif, ...)
 			dataObjectif -> (id, (point, ...))
@@ -36,7 +34,6 @@ class Collision:
 
 			for a, b in zip(traj[:-1], traj[1:]):  # on parcours chaque segment de trajectoire
 				for robot_el in robot_list:  # on regarde si l'un des robot est sur ce segment
-
 					#pour la collision, on trace un cercle de rayon (obstacle + rayon du robot) pour tenir compte de la taille des robots
 					collision_pts_on_line = self.__circle_inter_line(robot_el.getPosition(), robot_el.getRayon() + robot.getRayon(), a, b)  # s'il y a intersection
 					collision_pts = self.__p_in_seg((a, b), collision_pts_on_line)  # on se restreint aux points sur le segment 
@@ -44,12 +41,11 @@ class Collision:
 						# cas particulier : 1er segment de trajectoire
 						if len(checked_traj) == 1 and self.__p_in_circle(robot_el.getPosition(), robot_el.getRayon() + robot.getRayon(), a):
 							distance_to_collision = 0
+							self.__log.info("Collision (1er segment) sur l'id %s a %s mm" % (id, distance_to_collision))
 							return (id, distance_to_collision)
 
 						checked_traj.append(self.__get_closest(checked_traj[-1], collision_pts))  # on ajoute le premier pt d'intersection
 						distance_to_collision = self.__traj_length(checked_traj)  # on calcule la longueur restante avant collsion
-
-						print("col : %dmm, robot :%s" % (distance_to_collision, robot_el))
 						self.__log.info("Collision sur l'id %s a %s mm" % (id, distance_to_collision))
 						return (id, distance_to_collision)
 				checked_traj.append(b)  # on ajoute le point de depart a la trajctoire verifiee

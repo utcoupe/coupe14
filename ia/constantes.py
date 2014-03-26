@@ -3,8 +3,6 @@
 Ce fichier regroupe toutes les constantes de l'IA
 """
 
-import math
-
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
 VITESSE_XBEE = 			57600
@@ -18,9 +16,9 @@ PARITY_OTHER = 			"NONE"
 MAX_UNCONFIRMED_PACKET =5 # maximum 32
 EMPTY_FIFO = 			True
 TIMEOUT = 				100
-HIGH_PRIO_SPEED = 		20 #période d'execution en ms
-LOW_PRIO_SPEED = 		1000 #période d'execution en ms
-KEEP_CONTACT_TIMEOUT = 	2000
+HIGH_PRIO_SPEED = 		2 #période d'execution en ms
+LOW_PRIO_SPEED = 		400 #période d'execution en ms
+KEEP_CONTACT_TIMEOUT = 	1500
 OFF_LIGNE_TIMEOUT = 	5000
 
 #Systèmes arretable:
@@ -39,7 +37,7 @@ renvoiImmediat = 		False # fonction non terminé, ne pas activer !
 NUMBER_OF_ENEMY = 		2
 
 #====================eventManager====================
-PERIODE_EVENT_MANAGER =	40
+PERIODE_EVENT_MANAGER =	20
 ID_ACTION_MAX =			29999
 
 #====================timeManager====================
@@ -53,7 +51,7 @@ ENABLE_TOURELLE = 		False	#permet de desactiver la tourelle
 OUR_ROBOTS_VISIBLE_TOURELLE = True #True si une balise visible par l'hokuyo est presente sur nos robots 
 
 #====================pullData====================
-PULL_PERIODE = 			100 #période des pull en ms
+PULL_PERIODE = 			10 #période des pull en ms
 
 #====================CAMERA====================
 SEUIL_ROUGE = 			100 #TODO
@@ -63,7 +61,6 @@ SEUIL_JAUNE = 			100 #TODO
 ENABLE_FLUSSMITTEL = 	False #permet de desactiver Flussmitel
 LARGEUR_FLUSSMITTEL = 	100
 LONGUEUR_FLUSSMITTEL = 	100
-RAYON_FLUSSMITTEL = 	math.sqrt(LARGEUR_FLUSSMITTEL * LARGEUR_FLUSSMITTEL + LONGUEUR_FLUSSMITTEL * LONGUEUR_FLUSSMITTEL) #en mm
 
 
 
@@ -77,8 +74,6 @@ RAYON_FLUSSMITTEL = 	math.sqrt(LARGEUR_FLUSSMITTEL * LARGEUR_FLUSSMITTEL + LONGU
 ENABLE_TIBOT = 			False #permet de desactiver un Tibot
 LARGEUR_TIBOT = 		100
 LONGUEUR_TIBOT = 		100
-RAYON_TIBOT = 			math.sqrt(LARGEUR_TIBOT * LARGEUR_TIBOT + LONGUEUR_TIBOT * LONGUEUR_TIBOT) 
-
 
 
 
