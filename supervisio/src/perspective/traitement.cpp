@@ -6,21 +6,25 @@
 
 using namespace std;
 
-Visio::Visio() : min(0,0,0), max(0,0,0) {
-	init();
-}
+/******************
+ * CONSTRUCTEUR   *
+ * ****************/
 
-Visio::Visio(Scalar min, Scalar max) {
-	this->min = min;
-	this->max = max;
+Visio::Visio() : 
+	color(red), calibrated(false), min_size(100),
+	chessboard_size(Size(7,6)), epsilon_poly(3) {
 	init();
 }
 
 void Visio::init() {
-	chessboard_size = Size(7,6);
-	min_size = 100;
-	calibrated = false;
+	setRedParameters(Scalar(0,70,70), Scalar(30, 255, 255));
+	setYelParameters(Scalar(90,70,70), Scalar(110, 255, 255));
+	erode_dilate_kernel = getStructuringElement(MORPH_ELLIPSE, Size(10,10));
 }
+
+/**********
+ * PUBLIC *
+ * ********/
 
 void Visio::detectColor(const Mat& img, Mat& out) {
 	Mat hsv;
@@ -32,19 +36,32 @@ void Visio::detectColor(const Mat& img, Mat& out) {
 		max.val[0] = 180;
 	}
 	inRange(hsv, min, max, out);
+	erode(out, out, erode_dilate_kernel);
+	dilate(out, out, erode_dilate_kernel);
+
 }
 
-Contours Visio::getContour(const Mat& img) {
-	Contours contours;
+void Visio::getContour(const Mat& img, vector<vector<Point> > contours) {
 	Mat thresh;
 	detectColor(img, thresh);
-	Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(10,10));
-	erode(thresh, thresh, kernel);
-	dilate(thresh, thresh, kernel);
-
-	//edges is a temporary variable here
 	findContours(thresh, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-	return contours;
+}
+
+//Renvoit positions et contours de la couleur détectée dans l'image en argument
+int Visio::getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, vector<vector<Point> >& detected_contours) {
+	vector<vector<Point> > contours;
+	getContour(img, contours);
+	float x, y;
+	for(int i=0 ; i < contours.size(); i++){
+		Moments moment = moments(contours[i]);
+		if (moment.m00 > min_size) {
+			x = moment.m10 / moment.m00;
+			y = moment.m01 / moment.m00;
+			detected_pts.push_back(Point2f(x,y));
+			detected_contours.push_back(contours[i]);
+		}
+	}
+	return detected_pts.size();
 }
 
 bool Visio::computeTransformMatrix(const Mat &img, const vector<Point2f> real_positions, Mat *out) {
@@ -79,16 +96,39 @@ bool Visio::computeTransformMatrix(const Mat &img, const vector<Point2f> real_po
 	return calibrated;
 }
 
-void Visio::saveTransformMatrix() {
-	cout << "Saving calibration data" << endl;
-	if (!calibrated) {
-		cerr << "ERROR : Uncalibrated camera" << endl;
-		return;
-	}
-	FileStorage fs("calibration_persp.yml", FileStorage::WRITE);
-	fs << "Q" << perspectiveMatrix;
-	fs.release();
+void Visio::polyDegree(const vector<vector<Point> >& contours, vector<int> degree, double epsilon) {
+	vector<vector<Point> > approx;
+	polyDegree(contours, degree, approx, epsilon);
 }
+
+void Visio::polyDegree(const vector<vector<Point> >& contours, vector<int> degree, vector<vector<Point> > approx, double epsilon) {
+	if (epsilon < 0)
+		epsilon = epsilon_poly;
+	for(int i=0; i < contours.size(); i++) {
+		vector<Point> poly;
+		approxPolyDP(contours[i], poly, epsilon, true);
+		approx.push_back(poly);
+		int size = poly.size();
+		degree.push_back(size);
+	}
+}
+
+int Visio::triangles(const Mat& img, vector<Triangle>& triangles, Rect area) {
+	vector<vector<Point> >detected_pts_red, contours_red, detected_pts_yel, contours_yel; 
+	Mat persp;
+	int nb_triangles = 0;
+	//Transformation de l'image
+	//TODO coordonnées negatives
+	Size area_temp(area.width, area.height);
+	warpPerspective(img, persp, perspectiveMatrix, area_temp);
+	//Analyse triangles rouges
+	nb_triangles += trianglesColor(persp, triangles, red);
+	nb_triangles += trianglesColor(persp, triangles, yellow);
+	//TODO triangles vus de dessus, entierement noirs
+	return nb_triangles;
+}
+
+//FILE MANAGER
 
 bool Visio::loadTransformMatrix() {
 	cout << "Loading calibration data" << endl;
@@ -102,29 +142,80 @@ bool Visio::loadTransformMatrix() {
 	return true;
 }
 
-void Visio::getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, Contours& detected_contours) {
-	Contours contours = getContour(img);
-	float x, y;
-	for(int i=0 ; i < contours.size(); i++){
-		Moments moment = moments(contours[i]);
-		if (moment.m00 > min_size) {
-			x = moment.m10 / moment.m00;
-			y = moment.m01 / moment.m00;
-			detected_pts.push_back(Point2f(x,y));
-			detected_contours.push_back(contours[i]);
-		}
+void Visio::saveTransformMatrix() {
+	cout << "Saving calibration data" << endl;
+	if (!calibrated) {
+		cerr << "ERROR : Uncalibrated camera" << endl;
+		return;
 	}
-}
-
-void Visio::getRealWorldPosition(const Mat& img, vector<Point2f>& detected_pts, Contours& detected_contours, Rect ROI) {
-	getDetectedPosition(img, detected_pts, detected_contours);
-	perspectiveTransform(detected_pts, detected_pts, perspectiveMatrix);
-	for(int i=0; i < detected_contours.size(); i++) {
-		perspectiveTransform(detected_contours, detected_contours, perspectiveMatrix);
-	}
+	FileStorage fs("calibration_persp.yml", FileStorage::WRITE);
+	fs << "Q" << perspectiveMatrix;
+	fs.release();
 }
 
 //SETTER
+
+void Visio::setRedParameters(Scalar min, Scalar max) {
+	red_min = min;
+	red_max = max;
+	if (color == red) {
+		setParameters(red_min, red_max);
+	}
+}
+
+void Visio::setYelParameters(Scalar min, Scalar max) {
+	yel_min = min;
+	yel_max = max;
+	if (color == yellow) {
+		setParameters(yel_min, yel_max);
+	}
+}
+
+void Visio::setMinSize(int size) {
+	min_size = size;
+}
+
+void Visio::setColor(Color color) {
+	if (color == yellow) {
+		min = yel_min;
+		max = yel_max;
+	}
+	else if (color == red) {
+		min = red_min;
+		max = red_max;
+	}
+	this->color = color;
+}
+
+void Visio::setErodeDilateKernel(Mat kernel) {
+	erode_dilate_kernel = kernel;
+}
+
+void Visio::setEpsilonPoly(double ep) {
+	epsilon_poly = ep;
+}
+
+//GETTER
+
+Mat Visio::getQ() {
+	return perspectiveMatrix;
+}
+
+//AFFICHAGE ET DEBUG
+
+//Renvoit les positions dans le repère du monde réel de la couleur dans l'imgae en argument
+int Visio::getRealWorldPosition(const Mat& img, vector<Point2f>& detected_pts) {
+	detected_pts.clear();
+	vector<vector<Point> > contours;
+	if (getDetectedPosition(img, detected_pts, contours) > 0) {
+		perspectiveTransform(detected_pts, detected_pts, perspectiveMatrix);
+	}
+	return detected_pts.size();
+}
+
+/***********
+ * PRIVATE *
+ * *********/
 
 void Visio::setParameters(Scalar min, Scalar max, int size) {
 	this->min = min;
@@ -134,8 +225,36 @@ void Visio::setParameters(Scalar min, Scalar max, int size) {
 	}
 }
 
-//GETTER
-
-Mat Visio::getQ() {
-	return perspectiveMatrix;
+//Fonction à usage unique pour rendre le code plus clair. Detecte des triangles dans une image
+//triangles n'est pas effacé, les triangles trouvés sont ajoutés
+int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color color) {
+	vector<vector<Point> > contours;
+	vector<Point2f> detected_pts;
+	int nb_triangles = 0, detected_size;
+	setColor(color);
+	if (detected_size = getDetectedPosition(img, detected_pts, contours) > 0) {
+		vector<int> degree;
+		//Calcul du nombre de polylignes
+		polyDegree(contours, degree);
+		//Pour chaque contour
+		for(int i=0; i < detected_size; i++) {
+			//Si c'est un triangle
+			if (degree[i] == 3) {
+				nb_triangles++;
+				Triangle tri;
+				tri.color == color;
+				//Si le triangle est couché
+				if(contourArea(contours[i]) > min_down_size) {
+					tri.isDown = true;
+				}
+				else {
+					tri.isDown = false;
+				}
+				triangles.push_back(tri);
+			}
+		}
+	}
+	return nb_triangles;
 }
+
+

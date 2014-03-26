@@ -12,9 +12,10 @@ void perspectiveOnlyLoop(int index){
 		return;
 
 	Visio visio;
+	visio.setColor(red);
 
-	int h_min(90), h_max(100), s_min(200), s_max(255), v_min(130), v_max(255), key = -1;
-	bool calibrating = true, real_time = false;
+	int h_min(90), h_max(100), s_min(200), s_max(255), v_min(130), v_max(255), epsilon(3), key = -1;
+	bool calibrating = true;
 
 	namedWindow("parameters");
 	namedWindow("origin");
@@ -25,26 +26,22 @@ void perspectiveOnlyLoop(int index){
 	createTrackbar("s_max", "parameters", &s_max, 255);
 	createTrackbar("v_min", "parameters", &v_min, 255);
 	createTrackbar("v_max", "parameters", &v_max, 255);
+	createTrackbar("epsilon", "parameters", &epsilon, 10);
 
-	Scalar red(0,0,255);
+	Scalar red(0,0,255), blue(255, 0, 0);
 	vector<Point2f> position;
 	position.push_back(Point2f(0,0));
-	position.push_back(Point2f(0,200));
 	position.push_back(Point2f(200,0));
-	position.push_back(Point2f(200,200));
+	position.push_back(Point2f(0,170));
+	position.push_back(Point2f(200,170));
 	for(;;) { //int i=0; i>=0; i++) {
-		Contours contour, detected_contours;
+		vector<vector<Point> > detected_contours;
 		vector<Point2f> detected_pts, realworld;
 		Mat frame, persp;
 		cam >> frame;
 
 		if (key == 'c') {
 			calibrating = !calibrating;
-			real_time = false;
-		}
-		if (key == 'r') {
-			calibrating = false;
-			real_time = !real_time;
 		}
 		if (key == 's') {
 			visio.saveTransformMatrix();
@@ -53,22 +50,25 @@ void perspectiveOnlyLoop(int index){
 			visio.loadTransformMatrix();
 		}
 		
-		if (calibrating || real_time) {
-			if (!real_time)
-				destroyWindow("perspective");
+		if (calibrating) {
+			destroyWindow("perspective");
 			visio.computeTransformMatrix(frame, position, &frame);
 		}
 		if (!calibrating) {
 			Scalar min(h_min,s_min,v_min), max(h_max,s_max,v_max);
-			visio.setParameters(min, max);
+			visio.setRedParameters(min, max);
 
+			warpPerspective(frame, persp, visio.getQ(), Size(200,200));
 			//CAS 1
-			//warpPerspective(frame, persp, visio.getQ(), Size(200,200));
-			//visio.getDetectedPosition(persp, detected_pts, detected_contours);
+			visio.getDetectedPosition(persp, detected_pts, detected_contours);
+			vector<vector<Point> > poly;
+			vector<int> deg;
+			visio.polyDegree(detected_contours, deg, poly, epsilon);
 			//CAS 2
-			Rect ROI(0, 0, 200, 200);
-			visio.getRealWorldPosition(frame, detected_pts, detected_contours, ROI);
-			drawContours(persp, detected_contours, -1, red, 1);
+			//visio.getRealWorldPosition(frame, detected_pts);
+			
+			drawContours(persp, detected_contours, -1, blue, 1);
+			drawContours(persp, poly, -1, red, 1);
 			for(int i=0; i<detected_pts.size(); i++) {
 				drawObject(detected_pts[i].x, detected_pts[i].y, persp);
 			}
@@ -92,6 +92,7 @@ void testStereo() {
 
 void color3d() {
 	int h_min(90), h_max(100), s_min(200), s_max(255), v_min(130), v_max(255);
+	Scalar min(h_min,s_min,v_min), max(h_max,s_max,v_max);
 	Mat disp;
 	vector<Point2f> position;
 	position.push_back(Point2f(0,0));
@@ -100,8 +101,10 @@ void color3d() {
 	position.push_back(Point2f(200,170));
 
 	Stereo stereo(1,2);
-	Scalar min(h_min,s_min,v_min), max(h_max,s_max,v_max);
-	Visio visio(min, max);
+
+	Visio visio;
+	visio.setYelParameters(min, max);
+	visio.setColor(red);
 
 	if (!stereo.loadCameraCalibration()) {
 		stereo.calibrate();
@@ -123,7 +126,7 @@ void color3d() {
 	while (key != 'q') {
 		vector<Point3f> real_world;
 		vector<Point> points;
-		Contours detected_contours;
+		vector<vector<Point> > detected_contours;
 		vector<Point2f> detected_pts;
 		Mat disp8, xyz;
 		
