@@ -23,7 +23,7 @@ class GoalsManager:
 		self.__available_goals	= [] #List of available goals
 		self.__blocked_goals	= [] # List of blocked goals
 		self.__finished_goals	= [] #List of finished goals
-		self.__loadGoals(str(self.__robot_name) + "_goals.xml")
+		self.__loadGoals("goals.xml")
 		self.__collectEnemyFinished()
 
 	def blockGoal(self, goal):
