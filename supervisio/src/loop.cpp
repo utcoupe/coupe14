@@ -13,8 +13,9 @@ void perspectiveOnlyLoop(int index){
 
 	Visio visio;
 	visio.setColor(red);
+	visio.setMinSize(1000);
 
-	int h_min(90), h_max(100), s_min(200), s_max(255), v_min(130), v_max(255), epsilon(3), key = -1;
+	int h_min(90), h_max(110), s_min(70), s_max(255), v_min(70), v_max(255), epsilon(7), key = -1;
 	bool calibrating = true;
 
 	namedWindow("parameters");
@@ -26,7 +27,7 @@ void perspectiveOnlyLoop(int index){
 	createTrackbar("s_max", "parameters", &s_max, 255);
 	createTrackbar("v_min", "parameters", &v_min, 255);
 	createTrackbar("v_max", "parameters", &v_max, 255);
-	createTrackbar("epsilon", "parameters", &epsilon, 10);
+	createTrackbar("epsilon", "parameters", &epsilon, 100);
 
 	Scalar red(0,0,255), blue(255, 0, 0);
 	vector<Point2f> position;
@@ -51,32 +52,35 @@ void perspectiveOnlyLoop(int index){
 		}
 		
 		if (calibrating) {
-			destroyWindow("perspective");
 			visio.computeTransformMatrix(frame, position, &frame);
+			imshow("origin", frame);
 		}
 		if (!calibrating) {
 			Scalar min(h_min,s_min,v_min), max(h_max,s_max,v_max);
 			visio.setRedParameters(min, max);
 
-			warpPerspective(frame, persp, visio.getQ(), Size(200,200));
+			warpPerspective(frame, persp, visio.getQ(), frame.size());
 			//CAS 1
 			visio.getDetectedPosition(persp, detected_pts, detected_contours);
 			vector<vector<Point> > poly;
 			vector<int> deg;
-			visio.polyDegree(detected_contours, deg, poly, epsilon);
+			visio.polyDegree(detected_contours, deg, poly, epsilon/100.0);
 			//CAS 2
 			//visio.getRealWorldPosition(frame, detected_pts);
 			
 			drawContours(persp, detected_contours, -1, blue, 1);
-			drawContours(persp, poly, -1, red, 1);
+			drawContours(persp, poly, -1, red, 2);
 			for(int i=0; i<detected_pts.size(); i++) {
-				drawObject(detected_pts[i].x, detected_pts[i].y, persp);
+				string txt = "";
+				if (poly[i].size() == 3)  {
+					txt = "TRIANGLE";
+					drawObject(detected_pts[i].x, detected_pts[i].y, persp, txt);
+				}
 			}
 
-			resize(persp, persp, Size(600, 600));
-			imshow("perspective", persp);
+	//		resize(persp, persp, Size(600, 600));
+			imshow("origin", persp);
 		}
-		imshow("origin", frame);
 		key = waitKey(1);
 	}
 }

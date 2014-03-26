@@ -20,11 +20,11 @@ class Visio {
 	public:
 		Visio();
 		void detectColor(const Mat& img, Mat& out);
-		void getContour(const Mat& img, vector<vector<Point> >);
+		void getContour(const Mat& img, vector<vector<Point> >& contours);
 		int getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, vector<vector<Point> >& detected_contours);
 		bool computeTransformMatrix(const Mat &img, const vector<Point2f> real_positions, Mat *out=0);
 		void polyDegree(const vector<vector<Point> >& contours, vector<int> degree, double epsilon=-1);
-		void polyDegree(const vector<vector<Point> >& contours, vector<int> degree, vector<vector<Point> > approx, double epsilon=-1);
+		void polyDegree(const vector<vector<Point> >& contours, vector<int> degree, vector<vector<Point> >& approx, double epsilon=-1);
 		int triangles(const Mat& img, vector<Triangle>& triangles, Rect area);
 		//FILE
 		bool loadTransformMatrix();

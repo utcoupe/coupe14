@@ -41,7 +41,7 @@ void Visio::detectColor(const Mat& img, Mat& out) {
 
 }
 
-void Visio::getContour(const Mat& img, vector<vector<Point> > contours) {
+void Visio::getContour(const Mat& img, vector<vector<Point> >& contours) {
 	Mat thresh;
 	detectColor(img, thresh);
 	findContours(thresh, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
@@ -101,12 +101,12 @@ void Visio::polyDegree(const vector<vector<Point> >& contours, vector<int> degre
 	polyDegree(contours, degree, approx, epsilon);
 }
 
-void Visio::polyDegree(const vector<vector<Point> >& contours, vector<int> degree, vector<vector<Point> > approx, double epsilon) {
+void Visio::polyDegree(const vector<vector<Point> >& contours, vector<int> degree, vector<vector<Point> >& approx, double epsilon) {
 	if (epsilon < 0)
 		epsilon = epsilon_poly;
 	for(int i=0; i < contours.size(); i++) {
 		vector<Point> poly;
-		approxPolyDP(contours[i], poly, epsilon, true);
+		approxPolyDP(contours[i], poly, arcLength(contours[i], true)*epsilon, true);
 		approx.push_back(poly);
 		int size = poly.size();
 		degree.push_back(size);
