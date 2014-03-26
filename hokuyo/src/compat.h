@@ -18,12 +18,8 @@ void serial_send(char c);
 int set_interface_attribs (int fd, int speed, int parity);
 void set_blocking (int fd, int should_block);
 
-#ifdef DEBUG
-#define PDEBUGLN(x) printf(x);printf("\n");
-#define PDEBUG(x) printf(x);
-#else
+//Segfault on printf(<int>)
 #define PDEBUGLN(x)
 #define PDEBUG(x)
-#endif
 
 #endif
