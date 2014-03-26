@@ -49,7 +49,8 @@ BEGIN_FUNNY_ACTION =	90000
 END_OF_FUNNY_ACTION = 	94000
 
 #====================tourelle====================
-ENABLE_TOURELLE = 		False #permet de deactiver la tourelle
+ENABLE_TOURELLE = 		False	#permet de desactiver la tourelle
+OUR_ROBOTS_VISIBLE_TOURELLE = True #True si une balise visible par l'hokuyo est presente sur nos robots 
 
 #====================pullData====================
 PULL_PERIODE = 			100 #période des pull en ms
@@ -59,7 +60,7 @@ SEUIL_ROUGE = 			100 #TODO
 SEUIL_JAUNE = 			100 #TODO
 
 #====================Flussmittel====================
-ENABLE_FLUSSMITTEL = 	False #permet de deactiver Flussmitel
+ENABLE_FLUSSMITTEL = 	False #permet de desactiver Flussmitel
 LARGEUR_FLUSSMITTEL = 	100
 LONGUEUR_FLUSSMITTEL = 	100
 RAYON_FLUSSMITTEL = 	math.sqrt(LARGEUR_FLUSSMITTEL * LARGEUR_FLUSSMITTEL + LONGUEUR_FLUSSMITTEL * LONGUEUR_FLUSSMITTEL) #en mm
@@ -73,7 +74,7 @@ RAYON_FLUSSMITTEL = 	math.sqrt(LARGEUR_FLUSSMITTEL * LARGEUR_FLUSSMITTEL + LONGU
 
 
 #====================TIBOT====================
-ENABLE_TIBOT = 			False #permet de deactiver un Tibot
+ENABLE_TIBOT = 			False #permet de desactiver un Tibot
 LARGEUR_TIBOT = 		100
 LONGUEUR_TIBOT = 		100
 RAYON_TIBOT = 			math.sqrt(LARGEUR_TIBOT * LARGEUR_TIBOT + LONGUEUR_TIBOT * LONGUEUR_TIBOT) 

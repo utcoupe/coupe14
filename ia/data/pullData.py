@@ -71,6 +71,10 @@ class PullData():
 				self.tourelle_asked = True
 
 
+		#Hokuyo Fictif
+		self.Tourelle.majPosition(generateFictionHokuyo());
+
+
 	def __readData(self):
 		orderTuple = self.Communication.readOrdersAPI() # (address, order, arguments)
 
@@ -123,3 +127,29 @@ class PullData():
 					self.__logger.warning("ce retour n'est pas implementé, address " + str(address) + " ordre " + str(order) + " arguments " + str(arguments))
 
 			
+
+
+
+def generateFictionHokuyo():
+	nombreRobots = 4				#Max:4
+	centre = {"x":1500, "y":1000}	#mm
+	amplitude = 500					#mm
+
+
+	import math
+	ret = [generateFictionHokuyo.iteration*100]
+	angle = (generateFictionHokuyo.iteration%30)*math.pi/15 #un tour toutes les 3s -> 30 iterations
+
+	for i in range(nombreRobots):
+		currAngle = angle+ i*2*math.pi/nombreRobots
+		ret.append(int(centre["x"] + math.cos(currAngle)*amplitude))
+		ret.append(int(centre["y"] + math.sin(currAngle)*amplitude))
+	for i in range(nombreRobots, 4):
+		ret.append(0)
+		ret.append(0)
+
+	generateFictionHokuyo.iteration += 1
+	return ret
+generateFictionHokuyo.iteration = 0
+
+
