@@ -30,7 +30,7 @@ void perspectiveOnlyLoop(int index){
 	createTrackbar("v_max", "parameters", &v_max, 255);
 	createTrackbar("epsilon", "parameters", &epsilon, 100);
 
-	Scalar red(0,0,255), blue(255, 0, 0);
+	Scalar c_red(0,0,255), c_blue(255, 0, 0);
 	vector<Point2f> position;
 	position.push_back(Point2f(100,100));
 	position.push_back(Point2f(247,100));
@@ -69,15 +69,20 @@ void perspectiveOnlyLoop(int index){
 			//CAS 2
 			//visio.getRealWorldPosition(frame, detected_pts);
 			
-			drawContours(persp, detected_contours, -1, blue, 1);
-			drawContours(persp, poly, -1, red, 2);
+			drawContours(persp, detected_contours, -1, c_blue, 1);
+			drawContours(persp, poly, -1, c_red, 2);
 
 			vector<Triangle> tri;
 			visio.triangles(frame, tri, Rect(0,0,1000,1000));
 			for(int i=0; i<tri.size(); i++) {
-				string txt = "";
-				txt = "TRIANGLE";
-				drawObject(tri[i].coords.x, tri[i].coords.y, persp, txt);
+				string txt = "TRI - ";
+				Scalar color;
+				if (tri[i].color == yellow) 
+					color = Scalar(255, 255, 0);
+				else if (tri[i].color == red)
+					color = Scalar(255, 0, 0);
+
+				drawObject(tri[i].coords.x, tri[i].coords.y, persp, txt, color);
 			}
 
 	//		resize(persp, persp, Size(600, 600));

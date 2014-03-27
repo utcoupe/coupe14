@@ -4,8 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/types_c.h>
 
-void drawObject(int x, int y, Mat &frame, string addtxt){
-	Scalar color(0,0,255);
+void drawObject(int x, int y, Mat &frame, string addtxt, Scalar color){
 	circle(frame,Point(x,y),10,color,1);
     if(y-10>0)
 		line(frame,Point(x,y),Point(x,y-10),color,1);
