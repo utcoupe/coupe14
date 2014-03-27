@@ -30,15 +30,13 @@ class SubProcessCommunicate():
 		if self.__Data.Tibot is not None:
 			self.__subprocess_tibot.sendPacket(("data", data))#TODO: ça n'a rien à faire ici !
 
-		input_list_1 = deque()
+		input_list = deque()
 		if self.__Data.Flussmittel is not None:
-			input_list_1 = self.__subprocess_flussmittel.readPacket()
+			input_list.extend(self.__subprocess_flussmittel.readPackets())
 		if self.__Data.Tibot is not None:
-			input_list_2 = self.__subprocess_tibot.readPacket()
-			for info in input_list_2:
-				input_list_1.append(info)
+			input_list.extend(self.__subprocess_tibot.readPackets())
 
-		return input_list_1
+		return input_list
 
 	def sendObjectifOver(self, id_objectif):
 		if self.__Data.Flussmittel is not None:
@@ -48,9 +46,9 @@ class SubProcessCommunicate():
 
 	def sendObjectifCanceled(self, id_objectifs_canceled):
 		if self.__Data.Flussmittel is not None:
-			self.__subprocess_flussmittel.sendPacket(("over", id_objectifs_canceled))
+			self.__subprocess_flussmittel.sendPacket(("canceled", id_objectifs_canceled))
 		if self.__Data.Tibot is not None:
-			self.__subprocess_tibot.sendPacket(("over", id_objectifs_canceled))
+			self.__subprocess_tibot.sendPacket(("canceled", id_objectifs_canceled))
 
 
 class MyProcess():
@@ -68,9 +66,11 @@ class MyProcess():
 		
 
 		
-	def readPacket(self):
+	def readPackets(self):
 		if self.__input_buffer:
-			return self.__input_buffer.popleft()
+			new_data = self.__input_buffer
+			self.__input_buffer = deque()
+			return new_data
 		else:
 			return self.__input_buffer
 

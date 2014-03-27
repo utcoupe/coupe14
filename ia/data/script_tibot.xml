@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <objectifs>
 	<objectif objectif_name='Sortir de la zone de depart'>
-		<idd>0</idd>
+		<idd>10</idd>
 		<actions>
 			<action>
 				<ordre>SLEEP</ordre>
@@ -18,7 +18,7 @@
 		</actions>
 	</objectif>
 	<objectif objectif_name='Prendre position'>
-		<idd>1</idd>
+		<idd>11</idd>
 		<actions>
 			<action>
 				<ordre>SLEEP</ordre>

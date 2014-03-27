@@ -14,7 +14,7 @@
 		</actions>
 	</objectif>
 	<objectif objectif_name='script triangle 1'>
-		<idd>0</idd>
+		<idd>1</idd>
 		<actions>
 			<action>
 				<ordre>A_GOTO</ordre>
@@ -39,7 +39,7 @@
 		</actions>
 	</objectif>
 	<objectif objectif_name='script triangle 2'>
-		<idd>0</idd>
+		<idd>2</idd>
 		<actions>
 			<action>
 				<ordre>A_GOTO</ordre>
@@ -64,7 +64,7 @@
 		</actions>
 	</objectif>
 	<objectif objectif_name='script triangle mur'>
-		<idd>0</idd>
+		<idd>3</idd>
 		<actions>
 			<action>
 				<ordre>A_GOTO</ordre>

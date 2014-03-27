@@ -10,84 +10,45 @@ import time
 
 from .goalsManager import *
 
-class subProcessManager():
+class SubProcessManager():
 	def __init__(self, connection, robot_name):
 		self.__logger = logging.getLogger(__name__.split('.')[0])
 		self.__connection = connection
 		self.__robot_name = robot_name
-		if self.__robot_name == 'FLUSSMITTEL':
-			self.__script_filename = "data/script_flussmittel.xml"
-		elif self.__robot_name == 'TIBOT':
-			self.__script_filename = "data/script_tibot.xml"
-		else:
-			self.__logger.error("La variable robot_name n'a pas une valeur connu, self.__robot_name = " + str(self.__robot_name))
 
-		self.__data = None
-		self.__GoalsManager = GoalsManager(self.__robot_name)
+		self.__data = {}
 
-		self.__processEvent()
+		self.__GoalsManager = GoalsManager(self, connection, robot_name)
 
-	def __processEvent(self):
-		self.__connection.send(self.__loadActionScript())
+	def sendGoal(self, id_objectif_prev, id_objectif, elem_script):
+		self.__connection.send((self.__robot_name, id_objectif_prev, id_objectif, elem_script))
+
+	def getData(self):
+		return self.__data
+
+	def readPipe(self):
 		while True:
 			new_message = self.__connection.recv()
 			if new_message[0] == "data":
 				self.__updateData(new_message[1])
 			else:
-				self.__readStatus(new_message)
-
-			#for i in range(10000000):
-			#	pass
-			#print(self.__robot_name)
-			#TODO, si besoin retourner le dernier choix sinon relancer un choix
-			
-	def __loadActionScript(self):
-		self.__logger.info("loading actionScript from: " + str(self.__script_filename))
-		fd = open(self.__script_filename,'r')
-		dom = parseString(fd.read())
-		fd.close()
-
-		objectif = deque()
-		for xml_goal in dom.getElementsByTagName('objectif'):
-			objectif_name	= xml_goal.attributes["objectif_name"].value #seulement pour information
-			id_objectif		= int(xml_goal.getElementsByTagName('idd')[0].firstChild.nodeValue)
-
-			data_objectif = deque()
-			for xml_execution in xml_goal.getElementsByTagName('action'):
-				ordre 		= (xml_execution.getElementsByTagName('ordre')[0].firstChild.nodeValue,)
-
-				raw_arguments = xml_execution.getElementsByTagName('arguments')[0].firstChild
-				if raw_arguments:
-					arguments = (raw_arguments.nodeValue.split(','),)
-				else:
-					arguments = (None,)
-
-				ordre += arguments
-				data_objectif.append(ordre)
-
-			objectif.append((self.__robot_name, 0, id_objectif, data_objectif))
-
-		
-		self.__logger.debug("Script chargé: " + str(objectif))
-		return objectif
+				self.__processStatus(new_message)
+			#TODO appel de choix d'objectif
 
 	def __updateData(self, data):
 		self.__data = data
 
-	def __readStatus(self, status):
+	def __processStatus(self, status):
 		"""read new status and update objectif_list"""
 		etat = status[0]
 		id_objectif = status[1]
 
 		if etat == "over":
-			#TODO
-			pass
+			self.__GoalsManager.goalFinishedId(id_objectif)
 		elif etat == "canceled":
-			#TODO
-			pass
-
-
+			self.__GoalsManager.goalCanceledId(id_objectif)
 
 
 def startSubprocess(connection, robot_name):
-	a = subProcessManager(connection, robot_name)
+	a = SubProcessManager(connection, robot_name)
+	a.readPipe()

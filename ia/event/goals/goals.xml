@@ -1,8 +1,9 @@
 <?xml version="1.0" ?>
 <goals>
 	<goal>
+		<id>0</id>
 		<name>Tirangle en haut à gauche</name>
-		<typee>triangle</typee>
+		<type>triangle</type>
 		<concerned_robot>TIBOT</concerned_robot>
 		<x>0</x>
 		<y>0</y>
@@ -28,8 +29,9 @@
 		</elem_goals>
 	</goal>
 	<goal>
+		<id>1</id>
 		<name>Tirangle en haut à droite</name>
-		<typee>triangle</typee>
+		<type>triangle</type>
 		<concerned_robot>ALL</concerned_robot>
 		<x>200</x>
 		<y>200</y>

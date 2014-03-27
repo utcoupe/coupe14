@@ -7,9 +7,10 @@ goal<-ElemGoal<-script
 from .constantes import *
 
 class Goal:
-	def __init__(self, name, typee, concerned_robot, x, y):
+	def __init__(self, id, name, type, concerned_robot, x, y):
+		self.__id 				= id
 		self.__name 			= name
-		self.__type				= typee
+		self.__type				= type
 		self.__concerned_robot 	= concerned_robot
 		self.__x 				= x
 		self.__y 				= y
@@ -22,6 +23,9 @@ class Goal:
 
 	def getName(self):
 		return self.__name
+
+	def getId(self):
+		return self.__id
 
 	def incrementFinished(self, by_value):
 		self.__finished += int(by_value)
