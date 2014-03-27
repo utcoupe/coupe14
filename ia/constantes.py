@@ -51,7 +51,9 @@ FINISHED_THRESHOLD = 50
 
 
 #====================tourelle====================
-ENABLE_TOURELLE = 		False #permet de deactiver la tourelle
+ENABLE_TOURELLE = 		False 		#permet de desactiver la tourelle
+OUR_ROBOTS_VISIBLE_TOURELLE = True 	#True si une balise visible par l'hokuyo est presente sur nos robots 
+TOURELLE_PULL_PERIODE = 100 		#ms
 
 #====================pullData====================
 PULL_PERIODE = 			10 #période des pull en ms
@@ -61,7 +63,7 @@ SEUIL_ROUGE = 			100 #TODO
 SEUIL_JAUNE = 			100 #TODO
 
 #====================Flussmittel====================
-ENABLE_FLUSSMITTEL = 	False #permet de deactiver Flussmitel
+ENABLE_FLUSSMITTEL = 	False #permet de desactiver Flussmitel
 LARGEUR_FLUSSMITTEL = 	100
 LONGUEUR_FLUSSMITTEL = 	100
 
@@ -70,7 +72,7 @@ LONGUEUR_FLUSSMITTEL = 	100
 
 
 #====================TIBOT====================
-ENABLE_TIBOT = 			False #permet de deactiver un Tibot
+ENABLE_TIBOT = 			False #permet de desactiver un Tibot
 LARGEUR_TIBOT = 		100
 LONGUEUR_TIBOT = 		100
 

@@ -18,7 +18,9 @@ void executeCmd(char serial_data){
 	static int data_counter = 0;
 	static bool doublon = false;
 	static bool client_concerne = false;
+#ifdef FORWARD_ADDR
 	static char forward_addr;
+#endif
 
 	static enum etape etape = wait_step;
 
@@ -90,11 +92,12 @@ void executeCmd(char serial_data){
 			data[data_counter] = serial_data;
 			data_counter++;
 			break;
-#ifdef FORWARD_ADDR
+
 		case forward:
+#ifdef FORWARD_ADDR
 			forward_serial_send(serial_data, forward_addr);
-			break;
 #endif
+			break;
 		case wait_step:
 			break;
 		}
