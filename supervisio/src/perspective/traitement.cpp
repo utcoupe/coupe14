@@ -12,7 +12,7 @@ using namespace std;
 
 Visio::Visio() : 
 	color(red), calibrated(false), min_size(100),
-	chessboard_size(Size(7,6)), epsilon_poly(3) {
+	chessboard_size(Size(7,6)), epsilon_poly(0.07) {
 	init();
 }
 
@@ -96,12 +96,18 @@ bool Visio::computeTransformMatrix(const Mat &img, const vector<Point2f> real_po
 	return calibrated;
 }
 
-void Visio::polyDegree(const vector<vector<Point> >& contours, vector<int> degree, double epsilon) {
-	vector<vector<Point> > approx;
-	polyDegree(contours, degree, approx, epsilon);
+void Visio::polyDegree(const vector<vector<Point> >& contours, vector<int>& degree, double epsilon) {
+	if (epsilon < 0)
+		epsilon = epsilon_poly;
+	for(int i=0; i < contours.size(); i++) {
+		vector<Point> poly;
+		approxPolyDP(contours[i], poly, arcLength(contours[i], true)*epsilon, true);
+		int size = poly.size();
+		degree.push_back(size);
+	}
 }
 
-void Visio::polyDegree(const vector<vector<Point> >& contours, vector<int> degree, vector<vector<Point> >& approx, double epsilon) {
+void Visio::polyDegree(const vector<vector<Point> >& contours, vector<int>& degree, vector<vector<Point> >& approx, double epsilon) {
 	if (epsilon < 0)
 		epsilon = epsilon_poly;
 	for(int i=0; i < contours.size(); i++) {
@@ -114,16 +120,14 @@ void Visio::polyDegree(const vector<vector<Point> >& contours, vector<int> degre
 }
 
 int Visio::triangles(const Mat& img, vector<Triangle>& triangles, Rect area) {
-	vector<vector<Point> >detected_pts_red, contours_red, detected_pts_yel, contours_yel; 
 	Mat persp;
 	int nb_triangles = 0;
 	//Transformation de l'image
 	//TODO coordonnées negatives
 	Size area_temp(area.width, area.height);
-	warpPerspective(img, persp, perspectiveMatrix, area_temp);
 	//Analyse triangles rouges
-	nb_triangles += trianglesColor(persp, triangles, red);
-	nb_triangles += trianglesColor(persp, triangles, yellow);
+	nb_triangles += trianglesColor(img, triangles, red);
+	nb_triangles += trianglesColor(img, triangles, yellow);
 	//TODO triangles vus de dessus, entierement noirs
 	return nb_triangles;
 }
@@ -232,8 +236,11 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 	vector<Point2f> detected_pts;
 	int nb_triangles = 0, detected_size;
 	setColor(color);
-	if (detected_size = getDetectedPosition(img, detected_pts, contours) > 0) {
+	if ((detected_size = getDetectedPosition(img, detected_pts, contours)) > 0) {
+		vector<Point2f> points_float;
 		vector<int> degree;
+		//Transformation perspective des points detectes
+		perspectiveTransform(detected_pts, points_float, perspectiveMatrix);
 		//Calcul du nombre de polylignes
 		polyDegree(contours, degree);
 		//Pour chaque contour
@@ -242,7 +249,8 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 			if (degree[i] == 3) {
 				nb_triangles++;
 				Triangle tri;
-				tri.color == color;
+				tri.color = color;
+				tri.coords = points_float[i];
 				//Si le triangle est couché
 				if(contourArea(contours[i]) > min_down_size) {
 					tri.isDown = true;
@@ -257,4 +265,14 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 	return nb_triangles;
 }
 
+vector<vector<Point2f> > convertItoF(vector<vector<Point> > v) {
+	vector<vector<Point> > out;
+	for(int i=0; i<v.size(); i++) {
+		vector<Point> vtemp;
+		for(int j=0; j<v[i].size(); j++) {
+			vtemp.push_back(v[i][j]);
+		}
+		out.push_back(vtemp);
+	}
+}
 

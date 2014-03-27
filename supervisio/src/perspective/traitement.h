@@ -11,7 +11,7 @@ using namespace std;
 
 typedef enum color {red, yellow} Color;
 typedef struct triangle {
-	Point2f coord;
+	Point2f coords;
 	Color color;
 	bool isDown;
 } Triangle;
@@ -23,8 +23,8 @@ class Visio {
 		void getContour(const Mat& img, vector<vector<Point> >& contours);
 		int getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, vector<vector<Point> >& detected_contours);
 		bool computeTransformMatrix(const Mat &img, const vector<Point2f> real_positions, Mat *out=0);
-		void polyDegree(const vector<vector<Point> >& contours, vector<int> degree, double epsilon=-1);
-		void polyDegree(const vector<vector<Point> >& contours, vector<int> degree, vector<vector<Point> >& approx, double epsilon=-1);
+		void polyDegree(const vector<vector<Point> >& contours, vector<int>& degree, double epsilon=-1);
+		void polyDegree(const vector<vector<Point> >& contours, vector<int>& degree, vector<vector<Point> >& approx, double epsilon=-1);
 		int triangles(const Mat& img, vector<Triangle>& triangles, Rect area);
 		//FILE
 		bool loadTransformMatrix();
@@ -56,5 +56,7 @@ class Visio {
 		bool calibrated;
 		Color color;
 };
+
+vector<vector<Point2f> > convertItoF(vector<vector<Point> > v);
 
 #endif

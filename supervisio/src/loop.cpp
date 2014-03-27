@@ -20,6 +20,7 @@ void perspectiveOnlyLoop(int index){
 
 	namedWindow("parameters");
 	namedWindow("origin");
+	namedWindow("c");
 
 	createTrackbar("h_min", "parameters", &h_min, 180);
 	createTrackbar("h_max", "parameters", &h_max, 180);
@@ -31,10 +32,10 @@ void perspectiveOnlyLoop(int index){
 
 	Scalar red(0,0,255), blue(255, 0, 0);
 	vector<Point2f> position;
-	position.push_back(Point2f(0,0));
-	position.push_back(Point2f(147,0));
-	position.push_back(Point2f(0,122));
-	position.push_back(Point2f(147,122));
+	position.push_back(Point2f(100,100));
+	position.push_back(Point2f(247,100));
+	position.push_back(Point2f(100,222));
+	position.push_back(Point2f(247,222));
 	for(;;) { //int i=0; i>=0; i++) {
 		vector<vector<Point> > detected_contours;
 		vector<Point2f> detected_pts, realworld;
@@ -61,7 +62,7 @@ void perspectiveOnlyLoop(int index){
 
 			warpPerspective(frame, persp, visio.getQ(), frame.size());
 			//CAS 1
-			visio.getDetectedPosition(persp, detected_pts, detected_contours);
+			visio.getDetectedPosition(frame, detected_pts, detected_contours);
 			vector<vector<Point> > poly;
 			vector<int> deg;
 			visio.polyDegree(detected_contours, deg, poly, epsilon/100.0);
@@ -70,12 +71,13 @@ void perspectiveOnlyLoop(int index){
 			
 			drawContours(persp, detected_contours, -1, blue, 1);
 			drawContours(persp, poly, -1, red, 2);
-			for(int i=0; i<detected_pts.size(); i++) {
+
+			vector<Triangle> tri;
+			visio.triangles(frame, tri, Rect(0,0,1000,1000));
+			for(int i=0; i<tri.size(); i++) {
 				string txt = "";
-				if (poly[i].size() == 3)  {
-					txt = "TRIANGLE";
-					drawObject(detected_pts[i].x, detected_pts[i].y, persp, txt);
-				}
+				txt = "TRIANGLE";
+				drawObject(tri[i].coords.x, tri[i].coords.y, persp, txt);
 			}
 
 	//		resize(persp, persp, Size(600, 600));
