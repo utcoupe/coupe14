@@ -6,6 +6,7 @@ Classe pour les données hokuyo
 from .dataStructure import *
 from constantes import *
 
+
 class Tourelle():
 	def __init__(self, Flussmittel, Tibot, BigEnemyBot, SmallEnemyBot, communication, arduinoConstantes, address):
 		self.Flussmittel = Flussmittel
@@ -16,12 +17,11 @@ class Tourelle():
 		self.__address = address
 
 		#Variables
-		self.__old_data_position = []
-		self.__old_data_timestamp = []
+		self.__old_data = []
 		
 	"""
 	def getLastDataPosition(self):
-		return self.__last_data_position
+		return self.__old_data[len(self.__old_data)-1][1]
 	"""
 
 	def majPosition(self, arguments):
@@ -48,21 +48,28 @@ class Tourelle():
 		#temp testing
 		self.__tracking(timestamp, position_hokuyo[0:2], position_hokuyo[2:4])
 
-	"""
-	def __estimate_pos(self, timestamp): #ennemy_pos [big, small]
+	
+	def __estimate_pos(self): 
+		self.__old_data.pop(0)
+		
+		nRobots = len(self.__old_data[0][1])
 
+		#print("DEBUG:nRobots:"+str(nRobots))
+		#print("DEBUG:__old_data"+str(self.__old_data))
 
+		coeff = TOURELLE_PULL_PERIODE / (self.__old_data[-1][0] - self.__old_data[-2][0])
+		print("DEBUG:coeff"+str(coeff))
 
-
-
+		self.__old_data.append( (self.__old_data[-2][0], list( map(lambda pos: pos[1].add(pos[1].subtract(pos[0]).multiply(coeff)), zip(self.__old_data[-2][1], self.__old_data[-1][1]))) ))
+		print("DEBUG:__old_data"+str(self.__old_data))
 		pass
-	"""
+	
 
 
 	def __tracking(self, timestamp, position_nos_robots, position_hokuyo):
 		#TODO traitement pour suivi des robots ici
 
-		print("-----------------\n" + str(timestamp) +"\n"+ str(position_nos_robots) +"\n"+ str(position_hokuyo))
+		#print("-----------------\n" + str(timestamp) +"\n"+ str(position_nos_robots) +"\n"+ str(position_hokuyo))
 
 
 		if OUR_ROBOTS_VISIBLE_TOURELLE == True:
@@ -92,9 +99,18 @@ class Tourelle():
 			else:
 				big = p
 
+		if len(self.__old_data) >= 3:
+			self.__old_data.pop(-1)
+		self.__old_data.append( (timestamp, [big, small]) )
+		print("tourelle:real: big:"+str(big)+" small:"+str(small))
 
-		print("debug: position_hokuyo:"+str(position_hokuyo))
-		self.__setFormatedPosition(big, small)
+		if len(self.__old_data) >= 3:
+			self.__estimate_pos()
+
+		#print("DEBUG:__old_data:"+str(self.__old_data))
+		#print("debug:__old_data[-1]:"+str(self.__old_data[-1]))
+		#print("debug:__old_data[-1][1]:"+str(self.__old_data[-1][1]))
+		self.__setFormatedPosition(self.__old_data[-1][1][0], self.__old_data[-1][1][1])
 
 
 		""" 
@@ -112,6 +128,6 @@ class Tourelle():
 
 	def __setFormatedPosition(self, position_big_enemy, position_small_enemy):
 		"""Cette méthode ne doit être appelé qu'avec des données formatées par data/computeHokuyoData.py"""
-		print("tourelle: big:"+str(position_big_enemy)+" small:"+str(position_small_enemy))
+		print("tourelle:predected: big:"+str(position_big_enemy)+" small:"+str(position_small_enemy))
 		pass
 		#TODO

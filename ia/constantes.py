@@ -47,8 +47,9 @@ BEGIN_FUNNY_ACTION =	90000
 END_OF_FUNNY_ACTION = 	94000
 
 #====================tourelle====================
-ENABLE_TOURELLE = 		False	#permet de desactiver la tourelle
-OUR_ROBOTS_VISIBLE_TOURELLE = True #True si une balise visible par l'hokuyo est presente sur nos robots 
+ENABLE_TOURELLE = 		False 		#permet de desactiver la tourelle
+OUR_ROBOTS_VISIBLE_TOURELLE = True 	#True si une balise visible par l'hokuyo est presente sur nos robots 
+TOURELLE_PULL_PERIODE = 100 		#ms
 
 #====================pullData====================
 PULL_PERIODE = 			10 #période des pull en ms

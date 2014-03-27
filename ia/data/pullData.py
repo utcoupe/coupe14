@@ -140,7 +140,7 @@ def generateFictionHokuyo():
 
 	import math
 	ret = [generateFictionHokuyo.iteration*100]
-	angle = (generateFictionHokuyo.iteration%30)*math.pi/15 #un tour toutes les 3s -> 30 iterations
+	angle = (generateFictionHokuyo.iteration%100)*math.pi/50 #un tour toutes les 10s -> 100 iterations
 
 	for i in range(nombreRobots):
 		currAngle = angle+ i*2*math.pi/nombreRobots
