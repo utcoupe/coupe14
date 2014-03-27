@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 """
 Class used to reprsent a goal
-A goal reprsent a task & contains a list of executions
-It is loaded from XML file
+goal<-ElemGoal<-script
 """
 
+from .constantes import *
 
 class Goal:
-	FINISHED_THRESHOLD = 50
-
-	def __init__(self, name, typee, concerned_robot, x, y, finished):
-		print(name)
+	def __init__(self, name, typee, concerned_robot, x, y):
 		self.__name 			= name
 		self.__type				= typee
 		self.__concerned_robot 	= concerned_robot
 		self.__x 				= x
 		self.__y 				= y
-		self.__finished			= finished # From 0 (not finished) to 100 (finished)
+		self.__finished			= 0 # From 0 (not finished) to 100 (finished)
+
+		self.__ElemGoal = []
 
 	def __eq__(self, other): 
 		return self.__dict__ == other.__dict__
@@ -28,11 +27,10 @@ class Goal:
 		self.__finished += int(by_value)
 
 	def isFinished(self):
-		return (self.__finished > self.FINISHED_THRESHOLD)
+		return (self.__finished > FINISHED_THRESHOLD)
 
-	def appendElemGoal(self, x, y, angle, points, priority, duration, id_script):
-		#TODO
-		pass
+	def appendElemGoal(self, ElemGoal):
+		self.__ElemGoal.append(ElemGoal)
 
 
 

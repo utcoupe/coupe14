@@ -46,6 +46,10 @@ END_OF_MATCH = 			89500
 BEGIN_FUNNY_ACTION =	90000
 END_OF_FUNNY_ACTION = 	94000
 
+#====================Goal====================
+FINISHED_THRESHOLD = 50
+
+
 #====================tourelle====================
 ENABLE_TOURELLE = 		False #permet de deactiver la tourelle
 
@@ -60,10 +64,6 @@ SEUIL_JAUNE = 			100 #TODO
 ENABLE_FLUSSMITTEL = 	False #permet de deactiver Flussmitel
 LARGEUR_FLUSSMITTEL = 	100
 LONGUEUR_FLUSSMITTEL = 	100
-
-
-
-
 
 
 

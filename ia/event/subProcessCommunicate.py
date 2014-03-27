@@ -23,7 +23,7 @@ class SubProcessCommunicate():
 
 		
 	def readOrders(self):
-		"""retourn les données des subprocess"""
+		"""retourne les données des subprocess"""
 		data = self.__Data.dataToDico()
 		if self.__Data.Flussmittel is not None:
 			self.__subprocess_flussmittel.sendPacket(("data", data)) #TODO: ça n'a rien à faire ici !
