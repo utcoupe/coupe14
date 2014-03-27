@@ -13,8 +13,8 @@ class EnemyBot():
 
 
 		#Valeurs récupérées (read-only)
-		self.__positionX = 0
-		self.__positionY = 0
+		self.__positionX = 2500#TODO, parametrage en focntion du coté où on commence
+		self.__positionY = 1500
 
 	def getPosition(self):
 		return (self.__positionX, self.__positionY)
