@@ -58,10 +58,10 @@ class Tourelle():
 		#print("DEBUG:__old_data"+str(self.__old_data))
 
 		coeff = TOURELLE_PULL_PERIODE / (self.__old_data[-1][0] - self.__old_data[-2][0])
-		print("DEBUG:coeff"+str(coeff))
+		#print("DEBUG:coeff"+str(coeff))
 
 		self.__old_data.append( (self.__old_data[-2][0], list( map(lambda pos: pos[1].add(pos[1].subtract(pos[0]).multiply(coeff)), zip(self.__old_data[-2][1], self.__old_data[-1][1]))) ))
-		print("DEBUG:__old_data"+str(self.__old_data))
+		#print("DEBUG:__old_data"+str(self.__old_data))
 		pass
 	
 
@@ -102,7 +102,7 @@ class Tourelle():
 		if len(self.__old_data) >= 3:
 			self.__old_data.pop(-1)
 		self.__old_data.append( (timestamp, [big, small]) )
-		print("tourelle:real: big:"+str(big)+" small:"+str(small))
+		#print("tourelle:real: big:"+str(big)+" small:"+str(small))
 
 		if len(self.__old_data) >= 3:
 			self.__estimate_pos()
@@ -128,6 +128,6 @@ class Tourelle():
 
 	def __setFormatedPosition(self, position_big_enemy, position_small_enemy):
 		"""Cette méthode ne doit être appelé qu'avec des données formatées par data/computeHokuyoData.py"""
-		print("tourelle:predected: big:"+str(position_big_enemy)+" small:"+str(position_small_enemy))
+		#print("tourelle:predected: big:"+str(position_big_enemy)+" small:"+str(position_small_enemy))
 		pass
 		#TODO
