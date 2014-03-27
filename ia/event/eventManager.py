@@ -107,7 +107,8 @@ class EventManager():
 			
 			if new_data != self.__last_hokuyo_data:
 				self.__last_hokuyo_data = new_data
-				self.__testCollision()
+				if self.__MetaData.getCheckCollision():
+					self.__testCollision()
 
 		if self.__Flussmittel is not None:
 			new_id = self.__Flussmittel.getLastIdGlobale()
