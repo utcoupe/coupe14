@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<elemScripts>
+	<elemScript>
+		<id_script>0</id_script>
+		<orders>
+			<order>GOTO 10 10</order>
+			<order>GOTO 40 40</order>
+		</orders>
+	</elemScript>
+	<elemScript>
+		<id_script>1</id_script>
+		<orders>
+			<order>GOTO 70 100</order>
+			<order>GOTO 400 75</order>
+		</orders>
+	</elemScript>
+</elemScripts>

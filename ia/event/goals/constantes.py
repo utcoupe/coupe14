@@ -1,0 +1,1 @@
+/home/noxy/cedric.bache@gmail.com/vrac/Projets/utcoupe/coupe14/ia/constantes.py
