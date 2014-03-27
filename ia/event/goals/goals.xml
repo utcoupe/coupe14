@@ -6,8 +6,6 @@
 		<concerned_robot>TIBOT</concerned_robot>
 		<x>0</x>
 		<y>0</y>
-		<finished>20</finished>
-		<elem_action_id>0</elem_action_id>
 		<elem_goals>
 			<elem_goal>
 				<x>0</x>
@@ -35,8 +33,6 @@
 		<concerned_robot>ALL</concerned_robot>
 		<x>200</x>
 		<y>200</y>
-		<finished>20</finished>
-		<elem_action_id>0</elem_action_id>
 		<elem_goals>
 			<elem_goal>
 				<x>0</x>

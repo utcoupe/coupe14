@@ -46,6 +46,10 @@ END_OF_MATCH = 			89500
 BEGIN_FUNNY_ACTION =	90000
 END_OF_FUNNY_ACTION = 	94000
 
+#====================Goal====================
+FINISHED_THRESHOLD = 50
+
+
 #====================tourelle====================
 ENABLE_TOURELLE = 		False 		#permet de desactiver la tourelle
 OUR_ROBOTS_VISIBLE_TOURELLE = True 	#True si une balise visible par l'hokuyo est presente sur nos robots 
@@ -62,10 +66,6 @@ SEUIL_JAUNE = 			100 #TODO
 ENABLE_FLUSSMITTEL = 	False #permet de desactiver Flussmitel
 LARGEUR_FLUSSMITTEL = 	100
 LONGUEUR_FLUSSMITTEL = 	100
-
-
-
-
 
 
 

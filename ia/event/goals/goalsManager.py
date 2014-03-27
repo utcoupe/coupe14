@@ -11,20 +11,22 @@ from xml.dom.minidom import parseString
 
 from .goal import *
 from .goalExecution import *
+from .ElemGoal import *
 import os
 
 
 
 class GoalsManager:
 	def __init__(self, robot_name):
-		self.__robot_name = robot_name
-
+		self.__robot_name 		= robot_name
 		self.__logger			= logging.getLogger(__name__)
+
 		self.__available_goals	= [] #List of available goals
 		self.__blocked_goals	= [] # List of blocked goals
 		self.__finished_goals	= [] #List of finished goals
+		self.__elem_script		= {}
 
-		#TODO self.__loadElemScript()
+		self.__loadElemScript("elemScripts.xml")
 		self.__loadGoals("goals.xml")
 		self.__collectEnemyFinished()
 
@@ -63,16 +65,11 @@ class GoalsManager:
 			concerned_robot = str(xml_goal.getElementsByTagName('concerned_robot')[0].firstChild.nodeValue) #ALL, TIBOT, FLUSSMITTEL
 			x				= int(xml_goal.getElementsByTagName('x')[0].firstChild.nodeValue)
 			y				= int(xml_goal.getElementsByTagName('y')[0].firstChild.nodeValue)
-			finished 		= int(xml_goal.getElementsByTagName('finished')[0].firstChild.nodeValue) #0-100
 
 			#On ajoute uniquement les objectifs qui nous concerne
 			if concerned_robot == "ALL" or concerned_robot == self.__robot_name:
-				goal = Goal(name, typee, concerned_robot, x, y, finished)
-
-				if goal.isFinished():
-					self.__finished_goals.append(goal)
-				else:
-					self.__available_goals.append(goal)
+				goal = Goal(name, typee, concerned_robot, x, y)
+				self.__available_goals.append(goal)
 
 				for elem_goal in dom.getElementsByTagName('elem_goal'):
 					x			= int(elem_goal.getElementsByTagName('x')[0].firstChild.nodeValue)
@@ -83,11 +80,23 @@ class GoalsManager:
 					duration	= int(elem_goal.getElementsByTagName('duration')[0].firstChild.nodeValue)
 					id_script	= int(elem_goal.getElementsByTagName('id_script')[0].firstChild.nodeValue)
 					#TODO instancier elem_goal
-					goal.appendElemGoal(x, y, angle, points, priority, duration, id_script)
+					goal.appendElemGoal( ElemGoal(x, y, angle, points, priority, duration, id_script) )
 	
-	def __loadElemScript(self):
-		#TODO
-		pass
+	def __loadElemScript(self, filename):
+		"""XML import of elementary scripts"""
+		filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
+		self.__logger.info(str(self.__robot_name) + ' is loading elementary scripts from: %s'% filename)
+		fd = open(filename,'r')
+		dom = parseString(fd.read())
+		fd.close()
+
+		for elemScript in dom.getElementsByTagName('elemScript'):
+			id_script 		= str(elemScript.getElementsByTagName('id_script')[0].firstChild.nodeValue) #nom explicite
+			order_list = []
+			for order in dom.getElementsByTagName('order'):
+				order_list.append(order.childNodes[0].nodeValue)
+			self.__elem_script[id_script] = order_list
+			
 
 
 	"""def getBestGoalExecution(self, current_pos):
