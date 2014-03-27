@@ -78,11 +78,11 @@ void perspectiveOnlyLoop(int index){
 				string txt = "TRI - ";
 				Scalar color;
 				if (tri[i].color == yellow) 
-					color = Scalar(255, 255, 0);
+					color = Scalar(0, 195, 210);
 				else if (tri[i].color == red)
 					color = Scalar(255, 0, 0);
 
-				drawObject(tri[i].coords.x, tri[i].coords.y, persp, txt, color);
+				drawObject(tri[i].coords.x, tri[i].coords.y, persp, txt, color, true);
 			}
 
 	//		resize(persp, persp, Size(600, 600));

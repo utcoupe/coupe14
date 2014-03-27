@@ -4,7 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/types_c.h>
 
-void drawObject(int x, int y, Mat &frame, string addtxt, Scalar color){
+void drawObject(int x, int y, Mat &frame, string addtxt, Scalar color, bool fill){
 	circle(frame,Point(x,y),10,color,1);
     if(y-10>0)
 		line(frame,Point(x,y),Point(x,y-10),color,1);
@@ -27,7 +27,13 @@ void drawObject(int x, int y, Mat &frame, string addtxt, Scalar color){
 	if (addtxt != "") {
 		write += " - " + addtxt;
 	}
-	putText(frame, write,Point(x,y+15),1,1,color,1);
+	int baseline;
+	Point pt(x,y+15);
+	if (fill) {
+		Size size_text = getTextSize(write, 1, 1, 1, &baseline);
+		rectangle(frame, pt + Point(0, baseline), pt + Point(size_text.width, -size_text.height), CV_RGB(255,255,255), CV_FILLED);
+	}
+	putText(frame, write,pt,1,1,color,1);
 
 }
 
