@@ -64,7 +64,7 @@ SEUIL_ROUGE = 			100 #TODO
 SEUIL_JAUNE = 			100 #TODO
 
 #====================Flussmittel====================
-ENABLE_FLUSSMITTEL = 	False #permet de desactiver Flussmitel
+ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
 LARGEUR_FLUSSMITTEL = 	100
 LONGUEUR_FLUSSMITTEL = 	100
 
