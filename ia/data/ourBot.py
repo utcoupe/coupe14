@@ -201,17 +201,26 @@ class OurBot():
 
 	def removeObjectifAbove(self, id_objectif):
 		"""remove all queued goal on top of id_objectif, id_objectif included"""
-		if self.__objectifs:
-			for objectif in self.__objectifs:
-				id = objectif[0]
-				if objectif == id:
-					self.__objectifs.clear()
-					break;
+		id_canceled_list = []
 
+		#on vide les objectifs en cours
 		if self.__actions_en_cours is not None:
 			id = self.__actions_en_cours[0]
 			if id_objectif == id:
 				self.__actions_en_cours = None
+				id_canceled_list.append(id)
+
+		#on vide les objectifs en attente
+		for objectif in self.__objectifs:
+			id = objectif[0]
+			if id_objectif == id:
+				removed_objectif = self.__objectifs.pop()
+				while removed_objectif[0] != id_objectif:
+					id_canceled_list.append(removed_objectif[0])
+					removed_objectif = self.__objectifs.pop()
+				break
+
+		return id_canceled_list
 	
 
 	def maxRot(self, id1, id2):

@@ -44,11 +44,13 @@ class SubProcessCommunicate():
 		if self.__Data.Tibot is not None:
 			self.__subprocess_tibot.sendPacket(("over", id_objectif))
 
-	def sendObjectifCanceled(self, id_objectifs_canceled):
+	def sendObjectifsCanceled(self, id_canceled_list):
 		if self.__Data.Flussmittel is not None:
-			self.__subprocess_flussmittel.sendPacket(("canceled", id_objectifs_canceled))
+			for id_canceled in id_canceled_list:
+				self.__subprocess_flussmittel.sendPacket(("canceled", id_canceled))
 		if self.__Data.Tibot is not None:
-			self.__subprocess_tibot.sendPacket(("canceled", id_objectifs_canceled))
+			for id_canceled in id_canceled_list:
+				self.__subprocess_tibot.sendPacket(("canceled", id_canceled))
 
 
 class MyProcess():

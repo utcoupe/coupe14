@@ -33,7 +33,6 @@ class SubProcessManager():
 				self.__updateData(new_message[1])
 			else:
 				self.__processStatus(new_message)
-			#TODO appel de choix d'objectif
 
 	def __updateData(self, data):
 		self.__data = data

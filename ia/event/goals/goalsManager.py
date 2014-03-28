@@ -22,17 +22,18 @@ class GoalsManager:
 		self.__robot_name 		= robot_name
 		self.__logger			= logging.getLogger(__name__)
 
-		self.__available_goals	= [] #List of available goals
-		self.__blocked_goals	= [] # List of blocked goals
-		self.__finished_goals	= [] #List of finished goals
-		self.__elem_script		= {}
+		self.__available_goals		= [] #List of available goals
+		self.__blocked_goals		= [] # List of blocked goals
+		self.__finished_goals		= [] #List of finished goals
+		self.__elem_script			= {}
+		self.__SubProcessManager 	= SubProcessManager
+		self.__last_id_objectif_send = 0
 
-		self.__SubProcessManager = SubProcessManager
 		self.__loadElemScript("elemScripts.xml")
 		self.__loadGoals("goals.xml")
 		self.__collectEnemyFinished()
 
-		self.__loadScript()
+		self.__loadBeginScript()
 
 	def goalFinishedId(self, id_objectif):
 		for objectif in self.__blocked_goals:
@@ -44,16 +45,27 @@ class GoalsManager:
 			if objectif.getId() == id_objectif:
 				self.__releaseGoal(objectif)
 
+	def __addGoal(self, goal, elem_goal_id):
+		if self.__tryBlockGoal(goal):
+			self.__SubProcessManager.sendGoal(self.__last_id_objectif_send, goal.getId(), self.__elem_script[ goal.getElemGoal(elem_goal_id).getIdScript() ])
+			self.__last_id_objectif_send = goal.getId()
+		else:
+			self.__logger.error('Impossible to block ' + goal.getName())
+
 	def __blockGoalFromId(self, id_objectif):
 		"""utilisé uniquement au chargement du script initial"""
 		for goal in self.__available_goals:
 			if goal.getId() == id_objectif:
 				self.__blockGoal(goal)
 
-	def __blockGoal(self, goal):
-		self.__blocked_goals.append(goal)
-		self.__available_goals.remove(goal)
-		self.__logger.info('Goal ' + goal.getName() + ' is blocked')
+	def __tryBlockGoal(self, goal):
+		if goal in self.__available_goals:
+			self.__blocked_goals.append(goal)
+			self.__available_goals.remove(goal)
+			self.__logger.info('Goal ' + goal.getName() + ' is blocked')
+			return True
+		else:
+			return False
 
 	def __releaseGoal(self, goal):
 		self.__available_goals.append(goal)
@@ -70,6 +82,25 @@ class GoalsManager:
 			if goal.isFinished():
 				self.__logger.info('Goal ' + goal.getName() + ' has been calculated as accomplished by the enemy')
 				self.finishGoal(goal)
+
+	
+	def __loadElemScript(self, filename):
+		"""XML import of elementary scripts"""
+		filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
+		self.__logger.info(str(self.__robot_name) + ' is loading elementary scripts from: %s'% filename)
+		fd = open(filename,'r')
+		dom = parseString(fd.read())
+		fd.close()
+
+		for elemScript in dom.getElementsByTagName('elemScript'):
+			id_script 	= int(elemScript.getElementsByTagName('id_script')[0].firstChild.nodeValue) #nom explicite
+			order_list 	= []
+			for order in elemScript.getElementsByTagName('order'):
+				raw_order = order.childNodes[0].nodeValue.split()
+				order = raw_order[0]
+				arguments = raw_order[1:]
+				order_list.append((order, arguments))
+			self.__elem_script[id_script] = order_list
 
 	def __loadGoals(self, filename):
 		"""XML import of goals"""
@@ -92,7 +123,8 @@ class GoalsManager:
 				goal = Goal(id, name, type, concerned_robot, x, y)
 				self.__available_goals.append(goal)
 
-				for elem_goal in dom.getElementsByTagName('elem_goal'):
+				for elem_goal in xml_goal.getElementsByTagName('elem_goal'):
+					id			= int(elem_goal.getElementsByTagName('id')[0].firstChild.nodeValue)
 					x			= int(elem_goal.getElementsByTagName('x')[0].firstChild.nodeValue)
 					y			= int(elem_goal.getElementsByTagName('y')[0].firstChild.nodeValue)
 					angle		= float(elem_goal.getElementsByTagName('angle')[0].firstChild.nodeValue)
@@ -101,35 +133,44 @@ class GoalsManager:
 					duration	= int(elem_goal.getElementsByTagName('duration')[0].firstChild.nodeValue)
 					id_script	= int(elem_goal.getElementsByTagName('id_script')[0].firstChild.nodeValue)
 					#TODO instancier elem_goal
-					goal.appendElemGoal( ElemGoal(x, y, angle, points, priority, duration, id_script) )
-	
-	def __loadElemScript(self, filename):
-		"""XML import of elementary scripts"""
-		filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
-		self.__logger.info(str(self.__robot_name) + ' is loading elementary scripts from: %s'% filename)
-		fd = open(filename,'r')
-		dom = parseString(fd.read())
-		fd.close()
+					goal.appendElemGoal( ElemGoal(id, x, y, angle, points, priority, duration, id_script) )
 
-		for elemScript in dom.getElementsByTagName('elemScript'):
-			id_script 		= str(elemScript.getElementsByTagName('id_script')[0].firstChild.nodeValue) #nom explicite
-			order_list = []
-			for order in dom.getElementsByTagName('order'):
-				order_list.append(order.childNodes[0].nodeValue)
-			self.__elem_script[id_script] = order_list
-	
-	def __loadScript(self):
+	def __loadBeginScript(self):
 		if self.__robot_name == 'FLUSSMITTEL':
 			script_filename = "data/script_flussmittel.xml"
 		elif self.__robot_name == 'TIBOT':
 			script_filename = "data/script_tibot.xml"
 
-		self.__logger.info("loading actionScript from: " + str(script_filename))
+		self.__logger.info(str(self.__robot_name) + " loading beginScript from: " + str(script_filename))
 		fd = open(script_filename,'r')
 		dom = parseString(fd.read())
 		fd.close()
 
-		id_objectif_prev = 0
+		for xml_goal in dom.getElementsByTagName('objectif'):
+			id_objectif	= int(xml_goal.getElementsByTagName('id_objectif')[0].firstChild.nodeValue)
+			elem_goal_id= int(xml_goal.getElementsByTagName('elem_goal_id')[0].firstChild.nodeValue)
+
+			find = False
+			for goal in self.__available_goals:
+				if goal.getId() == id_objectif:
+					find = True
+					self.__addGoal(goal, elem_goal_id)
+					break
+
+			if not find:
+				self.__logger.error(str(self.__robot_name) + " impossible de lui ajouter le goal d'id: " + str(id_objectif))
+	
+	"""def __loadScript(self):
+		if self.__robot_name == 'FLUSSMITTEL':
+			script_filename = "data/script_flussmittel.xml"
+		elif self.__robot_name == 'TIBOT':
+			script_filename = "data/script_tibot.xml"
+
+		self.__logger.info(str(self.__robot_name) + " loading actionScript from: " + str(script_filename))
+		fd = open(script_filename,'r')
+		dom = parseString(fd.read())
+		fd.close()
+
 		for xml_goal in dom.getElementsByTagName('objectif'):
 			objectif_name	= xml_goal.attributes["objectif_name"].value #seulement pour information
 			id_objectif		= int(xml_goal.getElementsByTagName('idd')[0].firstChild.nodeValue)
@@ -148,8 +189,9 @@ class GoalsManager:
 				data_objectif.append(ordre)
 
 			self.__blockGoalFromId(id_objectif)
-			self.__SubProcessManager.sendGoal(id_objectif_prev, id_objectif, data_objectif)
-			id_objectif_prev = id_objectif
+			self.__SubProcessManager.sendGoal(self.__last_id_objectif_send, id_objectif, data_objectif)
+			self.__last_id_objectif_send = id_objectif
+		"""
 
 
 

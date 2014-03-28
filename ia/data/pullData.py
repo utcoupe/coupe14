@@ -74,7 +74,8 @@ class PullData():
 
 
 		#Hokuyo Fictif
-		self.Tourelle.majPosition(generateFictionHokuyo());
+		#TODO
+		#self.Tourelle.majPosition(generateFictionHokuyo());
 
 
 	def __readData(self):

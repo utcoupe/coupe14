@@ -131,7 +131,6 @@ class EventManager():
 							self.__pushOrders(self.__Flussmittel, next_actions)
 
 
-
 		if self.__Tibot is not None:
 			new_id = self.__Tibot.getLastIdGlobale()
 			#si un nouvel ordre s'est terminé
@@ -213,18 +212,20 @@ class EventManager():
 			collision_data = self.__Collision.getCollision(self.__Flussmittel)
 			if collision_data is not None:
 				first_id_to_remove = collision_data[0]
-				self.__Flussmittel.removeObjectifAbove(first_id_to_remove)
+				id_canceled_list = self.__Flussmittel.removeObjectifAbove(first_id_to_remove)
 				self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_CLEANG', *arg)
 				self.__id_to_reach_flussmittel = "ANY"
-				self.__SubProcessCommunicate.sendObjectifCanceled(first_id_to_remove)
+				print(collision_data)
+				print(id_canceled_list)
+				self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
 
 		if self.__Tibot is not None:
 			collision_data = self.__Collision.getCollision(self.__Tibot)
 			if collision_data is not None:
 				first_id_to_remove = collision_data[0]
-				self.__Tibot.removeObjectifAbove(first_id_to_remove)
+				id_canceled_list = self.__Tibot.removeObjectifAbove(first_id_to_remove)
 				self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_CLEANG', *arg)
 				self.__id_to_reach_tibot = "ANY"
-				self.__SubProcessCommunicate.sendObjectifCanceled(first_id_to_remove)
+				self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
 
 

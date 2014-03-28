@@ -16,7 +16,7 @@ class Goal:
 		self.__y 				= y
 		self.__finished			= 0 # From 0 (not finished) to 100 (finished)
 
-		self.__ElemGoal = []
+		self.__elem_goal = []
 
 	def __eq__(self, other): 
 		return self.__dict__ == other.__dict__
@@ -27,6 +27,9 @@ class Goal:
 	def getId(self):
 		return self.__id
 
+	def getElemGoal(self, elem_goal_id):
+		return self.__elem_goal[elem_goal_id]
+
 	def incrementFinished(self, by_value):
 		self.__finished += int(by_value)
 
@@ -34,7 +37,7 @@ class Goal:
 		return (self.__finished > FINISHED_THRESHOLD)
 
 	def appendElemGoal(self, ElemGoal):
-		self.__ElemGoal.append(ElemGoal)
+		self.__elem_goal.append(ElemGoal)
 
 
 

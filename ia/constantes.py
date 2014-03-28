@@ -73,7 +73,7 @@ LONGUEUR_FLUSSMITTEL = 	100
 
 
 #====================TIBOT====================
-ENABLE_TIBOT = 			False #permet de desactiver un Tibot
+ENABLE_TIBOT = 			True #permet de desactiver un Tibot
 LARGEUR_TIBOT = 		100
 LONGUEUR_TIBOT = 		100
 
