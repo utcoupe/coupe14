@@ -45,7 +45,7 @@ PERIODE_TIME_MANAGER =	100
 END_OF_MATCH = 			89500
 BEGIN_FUNNY_ACTION =	90000
 END_OF_FUNNY_ACTION = 	94000
-BEGIN_CHECK_COLLISION =	3000 #TODO
+BEGIN_CHECK_COLLISION =	-1 #TODO
 
 #====================Goal====================
 FINISHED_THRESHOLD = 50
@@ -64,7 +64,7 @@ SEUIL_ROUGE = 			100 #TODO
 SEUIL_JAUNE = 			100 #TODO
 
 #====================Flussmittel====================
-ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
+ENABLE_FLUSSMITTEL = 	False #permet de desactiver Flussmitel
 LARGEUR_FLUSSMITTEL = 	100
 LONGUEUR_FLUSSMITTEL = 	100
 
@@ -73,7 +73,7 @@ LONGUEUR_FLUSSMITTEL = 	100
 
 
 #====================TIBOT====================
-ENABLE_TIBOT = 			True #permet de desactiver un Tibot
+ENABLE_TIBOT = 			False #permet de desactiver un Tibot
 LARGEUR_TIBOT = 		100
 LONGUEUR_TIBOT = 		100
 

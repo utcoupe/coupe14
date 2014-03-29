@@ -9,7 +9,7 @@ import time
 
 from .constantes import *
 from .subProcessCommunicate import *
-from .navigation import *
+from .collision import *
 
 class EventManager():
 	def __init__(self, Communication, Data):
