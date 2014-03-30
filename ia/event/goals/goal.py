@@ -27,6 +27,9 @@ class Goal:
 	def getId(self):
 		return self.__id
 
+	def getPosition(self):
+		return (self.__x, self.__y)
+
 	def getElemGoal(self, elem_goal_id):
 		return self.__elem_goal[elem_goal_id]
 

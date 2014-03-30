@@ -15,7 +15,7 @@ class Path(list):
 		return dist
 
 class PathFinding:
-	def __init__(self, robot_list, xml_filename):
+	def __init__(self, robot_list, xml_filename="event/goals/navigation/map.xml"):
 		self.__log = logging.getLogger(__name__)
 		self.__flussmittel, self.__tibot, self.__big_enemy_bot, self.__small_enemy_bot = robot_list
 		#on cree le navgraph

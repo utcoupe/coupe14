@@ -36,6 +36,7 @@ class GoalExecution:
 	def __cmp__(self, other):
 		return self.score - other.score
 
+	"""
 	def toXml(self):
 		string =  "<execution>\n"
 		string += "\t<points>" + str(self.__points) + "</points>\n\t<location-x>" + str(self.__location[0]) + "</location-x>\n"
@@ -46,3 +47,4 @@ class GoalExecution:
 			string += "\n\t\t<action>" + str(action) + "</action>"
 		string += "\n\t</actions>\n\t</execution>\n"
 		return string
+	"""
