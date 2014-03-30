@@ -17,6 +17,7 @@ class Goal:
 		self.__finished			= 0 # From 0 (not finished) to 100 (finished)
 
 		self.__elem_goal = []
+		self.__elem_goal_locked = None
 
 	def __eq__(self, other): 
 		return self.__dict__ == other.__dict__
@@ -32,6 +33,12 @@ class Goal:
 
 	def getElemGoal(self, elem_goal_id):
 		return self.__elem_goal[elem_goal_id]
+
+	def getElemGoalLocked(self):
+		return self.__elem_goal_locked
+
+	def setElemGoalLocked(self, elem_goal):
+		self.__elem_goal_locked = elem_goal
 
 	def incrementFinished(self, by_value):
 		self.__finished += int(by_value)
