@@ -12,12 +12,12 @@ using namespace std;
 
 Visio::Visio() : 
 	color(red), calibrated(false), min_size(100),
-	chessboard_size(Size(7,6)), epsilon_poly(0.07) {
+	chessboard_size(Size(9,6)), epsilon_poly(0.07) {
 	init();
 }
 
 void Visio::init() {
-	setRedParameters(Scalar(0,70,70), Scalar(30, 255, 255));
+	setRedParameters(Scalar(110,110,70), Scalar(140, 255, 255));
 	setYelParameters(Scalar(90,70,70), Scalar(110, 255, 255));
 	erode_dilate_kernel = getStructuringElement(MORPH_ELLIPSE, Size(10,10));
 }
@@ -141,6 +141,7 @@ bool Visio::loadTransformMatrix() {
 		cerr << "ERROR : Couldn't find calibration_persp.yml" << endl;
 		return false;
 	}
+	fs["Q"] >> perspectiveMatrix;
 	fs.release();
 	calibrated = true;
 	return true;
@@ -197,6 +198,10 @@ void Visio::setErodeDilateKernel(Mat kernel) {
 
 void Visio::setEpsilonPoly(double ep) {
 	epsilon_poly = ep;
+}
+
+void Visio::setChessboardSize(Size s) {
+	chessboard_size = s;
 }
 
 //GETTER

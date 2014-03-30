@@ -31,7 +31,7 @@ void drawObject(int x, int y, Mat &frame, string addtxt, Scalar color, bool fill
 	Point pt(x,y+15);
 	if (fill) {
 		Size size_text = getTextSize(write, 1, 1, 1, &baseline);
-		rectangle(frame, pt + Point(0, baseline), pt + Point(size_text.width, -size_text.height), CV_RGB(255,255,255), CV_FILLED);
+		rectangle(frame, pt + Point(0, baseline), pt + Point(size_text.width, -size_text.height), CV_RGB(0,0,0), CV_FILLED);
 	}
 	putText(frame, write,pt,1,1,color,1);
 

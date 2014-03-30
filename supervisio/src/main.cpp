@@ -18,6 +18,5 @@ int main(int argc, char **argv){
 	}
 	perspectiveOnlyLoop(index);
 	//testStereo();
-	//color3d();
 	return 0;
 }

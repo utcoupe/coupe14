@@ -36,6 +36,7 @@ class Visio {
 		void setColor(Color color);
 		void setErodeDilateKernel(Mat kernel);
 		void setEpsilonPoly(double ep);
+		void setChessboardSize(Size s);
 		//GETTER
 		Mat getQ();
 		//DEBUG
