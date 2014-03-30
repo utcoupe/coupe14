@@ -12,8 +12,10 @@ using namespace std;
 typedef enum color {red, yellow} Color;
 typedef struct triangle {
 	Point2f coords;
+	double angle;
 	Color color;
 	bool isDown;
+	vector<Point2f> contour;
 } Triangle;
 
 class Visio {
@@ -59,5 +61,7 @@ class Visio {
 };
 
 vector<vector<Point2f> > convertItoF(vector<vector<Point> > v);
+vector<Point2f> convertItoF(vector<Point> v);
+vector<Point> convertFtoI(vector<Point2f> v);
 
 #endif

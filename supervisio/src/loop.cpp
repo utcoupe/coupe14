@@ -1,6 +1,6 @@
 #include <opencv2/opencv.hpp>
-#include "perspective/traitement.h"
-#include "perspective/gui.h"
+#include "traitement/traitement.h"
+#include "traitement/gui.h"
 #include "stereo/stereo.h"
 #include "loop.h"
 
@@ -86,6 +86,13 @@ void perspectiveOnlyLoop(int index){
 					color = Scalar(0, 0, 255);
 
 				drawObject(tri[i].coords.x, tri[i].coords.y, persp, txt, color, true);
+				 //Repr de l'angle
+				int len = 100;
+				Point2f angle(len*cos(tri[i].angle), len*sin(tri[i].angle));
+				angle += tri[i].coords;
+				line(persp, tri[i].coords, angle, c_blue, 2);
+				vector<vector<Point> > t; t.push_back(convertFtoI(tri[i].contour));
+				drawContours(persp, t, -1, c_blue, 2);
 			}
 
 	//		resize(persp, persp, Size(600, 600));
