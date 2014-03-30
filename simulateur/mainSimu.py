@@ -37,7 +37,7 @@ from engine import *
 import match
 from map import maploader
 from objects import bigrobot, minirobot
-from processIA import ProcessIA
+import processIA
 
 
 
@@ -90,8 +90,8 @@ if __name__ == "__main__":
 		robots_yellow = (bigbotYellow, minibotYellow, bigbotRed, minibotRed)
 
 		#lancement des subProcess IA
-		ProcessIA(robots_red)
-		ProcessIA(robots_yellow)
+		processIA.ProcessIA(robots_red)
+		#processIA.ProcessIA(robots_yellow)
 
 		#chargement de la map
 		maploader.load_map("map/map.xml",engine)

@@ -9,7 +9,10 @@ import heapq
 import logging
 from xml.dom.minidom import parseString
 from collections import deque
+import sys
 import os
+DIR_PATH = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(DIR_PATH, "../..", "data"))
 
 from .goal import *
 from .goalExecution import *

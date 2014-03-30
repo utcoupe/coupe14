@@ -22,7 +22,7 @@ class Data():
 
 
 		#Instantation des objets
-		if ENABLE_FLUSSMITTEL == True:
+		if ENABLE_FLUSSMITTEL == False:
 			self.Flussmittel = OurBot('FLUSSMITTEL', Communication, arduino_constantes, 'ADDR_FLUSSMITTEL_OTHER', 'ADDR_FLUSSMITTEL_ASSERV', LARGEUR_FLUSSMITTEL, LONGUEUR_FLUSSMITTEL)
 
 		if ENABLE_TIBOT == True:

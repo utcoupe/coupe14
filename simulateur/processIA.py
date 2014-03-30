@@ -3,14 +3,15 @@ __author__ = 'furmi'
 import sys
 import os
 DIR_PATH = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(DIR_PATH, "..", "map"))
+sys.path.append(os.path.join(DIR_PATH, "..", "ia"))
 
-from communication import Communication
+from comSimu import Communication
 from hokuyo import Hokuyo
 import threading
 from multiprocessing import Process, Pipe
 from define import *
 import test
+import main
 
 class ProcessIA():
 	"""
@@ -25,7 +26,7 @@ class ProcessIA():
 		#communication de data entre l'IA et le simu
 		self.__parent_conn, self.__child_conn = Pipe()
 		#TODO lancer l'IA
-		self.__process = Process(target=test.testIa, args=(self.__child_conn,))
+		self.__process = Process(target=main.startIa, args=(self.__child_conn,))
 		self.__process.start()
 		#on démarre le thread de lecture des données IA renvoyées à travers le pipe
 		self.__read_thread = threading.Thread(target=self.__readPipe)

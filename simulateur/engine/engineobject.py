@@ -39,7 +39,6 @@ class EngineObject:
 		@param offset l'offset à appliquer aux points
 		@param extension_objects les objets à "greffer"
 		"""
-		print("IN : Cstr EngineObject")
 		if not issubclass(self.__class__, EngineObject):
 			raise Exception("EngineObject est une class abstraite")
 		self.t 					= t
@@ -51,7 +50,6 @@ class EngineObject:
 		self.offset 			= offset
 		self.extension_objects 	= []
 		self.is_extension		= is_extension
-		print("OUT : Cstr EngineObject")
 
 		if not is_extension:
 			self.body, self.shape = self.create_body_n_shape()
@@ -144,7 +142,6 @@ class EngineObjectSegment(EngineObject):
 	def create_shape(self, body):
 		inita = Vec(self.inita) + self.offset
 		initb = Vec(self.initb) + self.offset
-		print(inita)
 		shape = self.engine.physicsengine.create_shape_segment(body, list(inita), list(initb), self.width)
 		return shape
 		
