@@ -3,6 +3,17 @@
 Ce fichier regroupe toutes les constantes de l'IA
 """
 
+
+DEBUG_MODE = True
+
+
+
+
+#====================Enable====================
+ENABLE_TOURELLE = 		True 
+ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
+ENABLE_TIBOT = 			True
+
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
 VITESSE_XBEE = 			57600
@@ -52,7 +63,6 @@ FINISHED_THRESHOLD = 50
 
 
 #====================tourelle====================
-ENABLE_TOURELLE = 		False 		#permet de desactiver la tourelle
 OUR_ROBOTS_VISIBLE_TOURELLE = True 	#True si une balise visible par l'hokuyo est presente sur nos robots 
 TOURELLE_PULL_PERIODE = 100 		#ms
 
@@ -64,7 +74,6 @@ SEUIL_ROUGE = 			100 #TODO
 SEUIL_JAUNE = 			100 #TODO
 
 #====================Flussmittel====================
-ENABLE_FLUSSMITTEL = 	False #permet de desactiver Flussmitel
 LARGEUR_FLUSSMITTEL = 	100
 LONGUEUR_FLUSSMITTEL = 	100
 
@@ -73,7 +82,6 @@ LONGUEUR_FLUSSMITTEL = 	100
 
 
 #====================TIBOT====================
-ENABLE_TIBOT = 			False #permet de desactiver un Tibot
 LARGEUR_TIBOT = 		100
 LONGUEUR_TIBOT = 		100
 

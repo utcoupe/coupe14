@@ -4,11 +4,13 @@ Ce fichier attend le jack, arrete le robot à 90s et lance la funny action. Il s
 """
 
 import time
+import logging
 
 from constantes import *
 
 class TimeManager():
 	def __init__(self, Communication, Data):
+		self.__logger = logging.getLogger(__name__.split('.')[0])
 		self.__Communication = Communication
 		self.__Flussmittel = Data.Flussmittel
 		self.__Tibot = Data.Tibot
@@ -57,24 +59,30 @@ class TimeManager():
 		self.__broadcastStopOrder()
 
 	def __broadcastStopOrder(self):
-		arg = []
+		empty_arg = []
 
 		for i in range(1):#TODO augmenter le nombre de stop ?
 			if self.__Flussmittel is not None:
-				self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_CLEANG', *arg)
+				self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_CLEANG', *empty_arg)
 			if self.__Tibot is not None:
-				self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_CLEANG', *arg)
+				self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_CLEANG', *empty_arg)
 			time.sleep(0.05)
 
 	def __sendResetBot(self):
-		arg = []
+		empty_arg = []
 
 		if self.__Flussmittel is not None:
-			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_RESET_POS', *arg)
-			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'RESET_ID', *arg)
-			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressOther() , 'RESET_ID', *arg)
+			position_arg = self.__MetaData.getFirstPositionFlussmittel()
+			if position_arg is None:
+				self.__logger.error("On a pas initialisé la position de Flussmittel")
+			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_SET_POS', *position_arg)
+			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'RESET_ID', *empty_arg)
+			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressOther() , 'RESET_ID', *empty_arg)
 		if self.__Tibot is not None:
-			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_RESET_POS', *arg)
-			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'RESET_ID', *arg)
-			self.__Communication.sendOrderAPI(self.__Tibot.getAddressOther() , 'RESET_ID', *arg)
+			position_arg = self.__MetaData.getFirstPositionTibot()
+			if position_arg is None:
+				self.__logger.error("On a pas initialisé la position de Tibot")
+			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_SET_POS', *position_arg)
+			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'RESET_ID', *empty_arg)
+			self.__Communication.sendOrderAPI(self.__Tibot.getAddressOther() , 'RESET_ID', *empty_arg)
 
