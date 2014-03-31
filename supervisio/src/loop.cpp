@@ -12,10 +12,9 @@ void perspectiveOnlyLoop(int index){
 		return;
 
 	Visio visio;
-	visio.setMinSize(1000);
 	visio.setChessboardSize(Size(9,6));
 
-	int s_max(255), v_max(255);
+	int s_max(255), v_max(255), size_min(5000), max_diff_triangle_edge(30);
 	int h_min_r(110), h_max_r(140), s_min_r(100), v_min_r(70);
 	int h_min_y(90), h_max_y(110), s_min_y(110), v_min_y(70), epsilon(7), key = -1;
 	bool calibrating = !visio.loadTransformMatrix();
@@ -33,6 +32,8 @@ void perspectiveOnlyLoop(int index){
 	createTrackbar("s_min_r", "parameters", &s_min_r, 255);
 	createTrackbar("v_min_r", "parameters", &v_min_r, 255);
 	createTrackbar("epsilon", "parameters", &epsilon, 100);
+	createTrackbar("is equi", "parameters", &max_diff_triangle_edge, 100);
+	createTrackbar("size_min", "parameters", &size_min, 20000);
 
 	Scalar c_red(0,0,255), c_blue(255, 0, 0), c_yel(0,110,130);
 	vector<Point2f> position;
@@ -63,6 +64,9 @@ void perspectiveOnlyLoop(int index){
 		else {
 			Scalar min_r(h_min_r,s_min_r,v_min_r), max_r(h_max_r,s_max,v_max);
 			Scalar min_y(h_min_y,s_min_y,v_min_y), max_y(h_max_y,s_max,v_max);
+			visio.setMinSize(size_min);
+			visio.setMaxDiffTriangleEdget(max_diff_triangle_edge);
+			visio.setEpsilonPoly(epsilon);
 			visio.setYelParameters(min_y, max_y);
 			visio.setRedParameters(min_r, max_r);
 
@@ -78,7 +82,7 @@ void perspectiveOnlyLoop(int index){
 			vector<Triangle> tri;
 			visio.triangles(frame, tri, Rect(0,0,1000,1000));
 			for(int i=0; i<tri.size(); i++) {
-				string txt = "TRIANGLE";
+				string txt = intToString(tri[i].size);
 				Scalar color;
 				if (tri[i].color == yellow) 
 					color = Scalar(0, 195, 210);

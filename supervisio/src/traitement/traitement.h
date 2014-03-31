@@ -16,6 +16,7 @@ typedef struct triangle {
 	Color color;
 	bool isDown;
 	vector<Point2f> contour;
+	double size;
 } Triangle;
 
 class Visio {
@@ -39,6 +40,7 @@ class Visio {
 		void setErodeDilateKernel(Mat kernel);
 		void setEpsilonPoly(double ep);
 		void setChessboardSize(Size s);
+		void setMaxDiffTriangleEdget(int max);
 		//GETTER
 		Mat getQ();
 		//DEBUG
@@ -47,6 +49,7 @@ class Visio {
 		void init();
 		void setParameters(Scalar min, Scalar max, int size=-1);
 		int trianglesColor(const Mat& img, vector<Triangle>& triangles, Color color);
+		bool isEqui(Point2f p1, Point2f p2, Point2f p3);
 
 		Scalar min, max;
 		Scalar yel_min, yel_max, red_min, red_max;
@@ -55,6 +58,7 @@ class Visio {
 		Mat erode_dilate_kernel; //kernel utilisé lors des erode/dilate
 		int min_size; //Taille minimal d'une zone de couleur valide
 		int min_down_size; //Seuil de taille au dessus duquel un triangl est considéré comme renversé
+		int max_diff_triangle_edge;
 		double epsilon_poly; //Marge d'erreur lors de l'estimation de polyligne
 		bool calibrated;
 		Color color;

@@ -12,7 +12,8 @@ using namespace std;
 
 Visio::Visio() : 
 	color(red), calibrated(false), min_size(100),
-	chessboard_size(Size(9,6)), epsilon_poly(0.07) {
+	chessboard_size(Size(9,6)), epsilon_poly(0.07),
+	max_diff_triangle_edge(30) {
 	init();
 }
 
@@ -203,6 +204,10 @@ void Visio::setChessboardSize(Size s) {
 	chessboard_size = s;
 }
 
+void Visio::setMaxDiffTriangleEdget(int max) {
+	max_diff_triangle_edge = max;
+}
+
 //GETTER
 
 Mat Visio::getQ() {
@@ -270,7 +275,7 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 					tri.angle -= 2*M_PI/3;
 				}
 				//Si le triangle est couché
-				if(contourArea(contour_real) > min_down_size) {
+				if((tri.size = contourArea(contour_real)) > min_down_size) {
 					tri.isDown = true;
 				}
 				else {
@@ -279,10 +284,58 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 				tri.contour = contour_real;
 				triangles.push_back(tri);
 			}
+			if (degree[i] > 3) {
+				vector<Point2f> contour_real = convertItoF(contours[i]);
+				perspectiveTransform(contour_real, contour_real, perspectiveMatrix);
+				//Voir si on a pas plusieurs triangles collés
+				for (int j=0; j<contour_real.size(); j++) {
+					Point2f p1 = contour_real[j];
+					for (int k=j+1; k<contour_real.size(); k++) {
+						Point2f p2 = contour_real[k];
+						for (int l=k+1; l<contour_real.size(); l++) {
+							Point2f p3 = contour_real[l];
+							if (isEqui(p1, p2, p3)) {
+								nb_triangles++;
+								Triangle tri;
+								tri.color = color;
+								tri.coords = points_real[i];
+								//Calcule de l'angle du triangle
+								double dx = contour_real[0].x - tri.coords.x;
+								double dy = contour_real[0].y - tri.coords.y; 
+								tri.angle = atan2(dy, dx);
+
+								//Modulo 2*PI/3
+								while (tri.angle < 0) {
+									tri.angle += 2*M_PI/3;
+								}
+								while (tri.angle > 2*M_PI/3) {
+									tri.angle -= 2*M_PI/3;
+								}
+
+								//On ne detecte pas les triangles debout dans ce cas, ce ne serait pas assez fiable
+								tri.isDown = false;
+								tri.contour = contour_real;
+								triangles.push_back(tri);
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 	return nb_triangles;
 }
+
+bool Visio::isEqui(Point2f p1, Point2f p2, Point2f p3) {
+	double d1 = norm(p1 - p2), d2 = norm(p3 - p2), d3 = norm(p1 - p3);
+	if (abs(d1 - d2) < max_diff_triangle_edge && 
+		abs(d2 - d3) < max_diff_triangle_edge &&
+		abs(d3 - d1) < max_diff_triangle_edge) {
+		return true;
+	}
+	return false;
+}
+
 
 vector<vector<Point2f> > convertItoF(vector<vector<Point> > v) {
 	vector<vector<Point2f> > out;
