@@ -24,13 +24,12 @@ import gpio
 
 #lancement de l'IA via le subprocess simu
 def startIa(conn=None):
-	print('IA started powa !!!!')
 	logger.info("Demarrage de l'ia")
 	Communication = communication.CommunicationGlobale()
 	arduino_constantes = Communication.getConst()
 	time.sleep(2) # on attend que les communications s'établissent
 
-	if DEBUG_MODE == False:
+	if TEST_MODE == False:
 		#On teste si les systèmes demandés sont bien en lignes
 		ready_list = Communication.getSystemReady()
 		if ENABLE_FLUSSMITTEL == True and ( ('ADDR_FLUSSMITTEL_OTHER' not in ready_list) or ('ADDR_FLUSSMITTEL_ASSERV' not in ready_list) ):
@@ -44,19 +43,27 @@ def startIa(conn=None):
 			exit()
 		logger.info("Les systèmes attendu ont bien été détéctés. Flussmittel: %s   Tibot: %s   Tourelle: %s   ready_list: %s", ENABLE_FLUSSMITTEL, ENABLE_TIBOT, ENABLE_TOURELLE, ready_list)
 	else:
-		logger.warning("----------------------------------------DEBUG_MODE activé----------------------------------------")
+		print("---------------------TEST_MODE activé---------------------")
+		logger.warning("----------------------------------------TEST_MODE activé----------------------------------------")
 
 	Data = data.Data(Communication, arduino_constantes)
-	Gpio = gpio.Gpio()
-	data.parametrerHokuyo()
-	data.parametrerIa(Data.MetaData)
+	
+	if TEST_MODE == False and ENABLE_FLUSSMITTEL == True:
+		Gpio = gpio.Gpio()
+		data.parametrerHokuyo()
+		data.parametrerIa(Data.MetaData, Gpio.getColor)
+	else:
+		data.parametrerHokuyo()
+		data.parametrerIa(Data.MetaData, "RED")
 
 	TimeManager = event.TimeManager(Communication, Data)
 	EventManager = event.EventManager(Communication, Data)
 
 
 
-	#TODO if jack ready
+	if TEST_MODE == False and ENABLE_FLUSSMITTEL == True:
+		while Gpio.getJack() != True: #TODO à verifier
+			pass
 	TimeManager.startMatch()
 
 #si on lance l'IA via le main.py

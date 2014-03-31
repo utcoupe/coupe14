@@ -23,13 +23,13 @@ class Gpio:
 		return status
 
 	def getColor(self):
-		"""HIGH = Yellow ; LOW = Red"""
+		"""HIGH = YELLOW ; LOW = RED"""
 		f = open(self.colorSelectPort)
 		status = f.readline()[0]
 		if status == '1':
-			return 'Yellow'
+			return 'YELLOW'
 		if status == '0':
-			return 'Red'
+			return 'RED'
 
 	def __parsePorts(self, path='ports.xml'):
 		path = os.path.join(os.path.dirname(os.path.abspath(__file__)) + "/" +path)

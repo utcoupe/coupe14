@@ -4,7 +4,7 @@ Ce fichier regroupe toutes les constantes de l'IA
 """
 
 
-DEBUG_MODE = True
+TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
