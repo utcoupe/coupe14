@@ -253,7 +253,7 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 		//Calcul du nombre de polylignes
 		polyDegree(contours, degree, contours);
 		//Pour chaque contour
-		for(int i=0; i < detected_size; i++) {
+		for (int i=0; i < detected_size; i++) {
 			//Si c'est un triangle
 			if (degree[i] == 3) {
 				vector<Point2f> contour_real = convertItoF(contours[i]);
@@ -275,7 +275,7 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 					tri.angle -= 2*M_PI/3;
 				}
 				//Si le triangle est couché
-				if((tri.size = contourArea(contour_real)) > min_down_size) {
+				if ((tri.size = contourArea(contour_real)) > min_down_size) {
 					tri.isDown = true;
 				}
 				else {
@@ -295,27 +295,37 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 						for (int l=k+1; l<contour_real.size(); l++) {
 							Point2f p3 = contour_real[l];
 							if (isEqui(p1, p2, p3)) {
-								nb_triangles++;
-								Triangle tri;
-								tri.color = color;
-								tri.coords = points_real[i];
-								//Calcule de l'angle du triangle
-								double dx = contour_real[0].x - tri.coords.x;
-								double dy = contour_real[0].y - tri.coords.y; 
-								tri.angle = atan2(dy, dx);
+								//Point central
+								contour_real.clear();
+								contour_real.push_back(p1);
+								contour_real.push_back(p2);
+								contour_real.push_back(p3);
+								Moments moment = moments(contour_real);
+								if (moment.m00 > min_size) {
+									Triangle tri;
+									nb_triangles++;
+									float x = moment.m10 / moment.m00;
+									float y = moment.m01 / moment.m00;
+									tri.coords = Point2f(x,y);
+									tri.color = color;
+									//Calcule de l'angle du triangle
+									double dx = contour_real[0].x - tri.coords.x;
+									double dy = contour_real[0].y - tri.coords.y; 
+									tri.angle = atan2(dy, dx);
 
-								//Modulo 2*PI/3
-								while (tri.angle < 0) {
-									tri.angle += 2*M_PI/3;
-								}
-								while (tri.angle > 2*M_PI/3) {
-									tri.angle -= 2*M_PI/3;
-								}
+									//Modulo 2*PI/3
+									while (tri.angle < 0) {
+										tri.angle += 2*M_PI/3;
+									}
+									while (tri.angle > 2*M_PI/3) {
+										tri.angle -= 2*M_PI/3;
+									}
 
-								//On ne detecte pas les triangles debout dans ce cas, ce ne serait pas assez fiable
-								tri.isDown = false;
-								tri.contour = contour_real;
-								triangles.push_back(tri);
+									//On ne detecte pas les triangles debout dans ce cas, ce ne serait pas assez fiable
+									tri.isDown = false;
+									tri.contour = contour_real;
+									triangles.push_back(tri);
+								}
 							}
 						}
 					}

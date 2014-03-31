@@ -6,8 +6,9 @@
 
 using namespace cv;
 
-void perspectiveOnlyLoop(int index){
-	VideoCapture cam(index);
+template <typename T>
+void perspectiveOnlyLoop(T index_or_filename){
+	VideoCapture cam(index_or_filename);
 	 if(!cam.isOpened())  // check if we succeeded
 		return;
 
