@@ -24,27 +24,35 @@ import gpio
 
 #lancement de l'IA via le subprocess simu
 def startIa(conn=None):
-	logger.info("Demarrage de l'ia")
 	Communication = communication.CommunicationGlobale()
 	arduino_constantes = Communication.getConst()
-	time.sleep(2) # on attend que les communications s'établissent
 
-	if TEST_MODE == False:
-		#On teste si les systèmes demandés sont bien en lignes
-		ready_list = Communication.getSystemReady()
-		if ENABLE_FLUSSMITTEL == True and ( ('ADDR_FLUSSMITTEL_OTHER' not in ready_list) or ('ADDR_FLUSSMITTEL_ASSERV' not in ready_list) ):
-			logger.critical("ERREUR: Incohérence de communication avec le gros robot, le systeme suivant a été demandé mais pas trouvé: ENABLE_FLUSSMITTEL: " + str(ENABLE_FLUSSMITTEL) + " ready_list: " + str(ready_list))
-			exit()
-		if ENABLE_TIBOT == True and ( ('ADDR_TIBOT_OTHER' not in ready_list) or ('ADDR_TIBOT_ASSERV' not in ready_list) ):
-			logger.critical("ERREUR: Incohérence de communication avec le petit robot, le systeme suivant a été demandé mais pas trouvé: ENABLE_TIBOT: " + str(ENABLE_TIBOT) + " ready_list: " + str(ready_list))
-			exit()
-		if ENABLE_TOURELLE ==  True and 'ADDR_HOKUYO' not in ready_list:
-			logger.critical("ERREUR: Incohérence de communication avec la tourelle, le systeme suivant a été demandé mais pas trouvé: ENABLE_TOURELLE: " + str(ENABLE_TOURELLE) + " ready_list: " + str(ready_list))
-			exit()
-		logger.info("Les systèmes attendu ont bien été détéctés. Flussmittel: %s   Tibot: %s   Tourelle: %s   ready_list: %s", ENABLE_FLUSSMITTEL, ENABLE_TIBOT, ENABLE_TOURELLE, ready_list)
+	if conn == None:
+		logger.info("Demarrage d'une IA normal")
+		time.sleep(2) # on attend que les communications s'établissent
+
+		if TEST_MODE == False:
+			#On teste si les systèmes demandés sont bien en lignes
+			ready_list = Communication.getSystemReady()
+			if ENABLE_FLUSSMITTEL == True and ( ('ADDR_FLUSSMITTEL_OTHER' not in ready_list) or ('ADDR_FLUSSMITTEL_ASSERV' not in ready_list) ):
+				logger.critical("ERREUR: Incohérence de communication avec le gros robot, le systeme suivant a été demandé mais pas trouvé: ENABLE_FLUSSMITTEL: " + str(ENABLE_FLUSSMITTEL) + " ready_list: " + str(ready_list))
+				exit()
+			if ENABLE_TIBOT == True and ( ('ADDR_TIBOT_OTHER' not in ready_list) or ('ADDR_TIBOT_ASSERV' not in ready_list) ):
+				logger.critical("ERREUR: Incohérence de communication avec le petit robot, le systeme suivant a été demandé mais pas trouvé: ENABLE_TIBOT: " + str(ENABLE_TIBOT) + " ready_list: " + str(ready_list))
+				exit()
+			if ENABLE_TOURELLE ==  True and 'ADDR_HOKUYO' not in ready_list:
+				logger.critical("ERREUR: Incohérence de communication avec la tourelle, le systeme suivant a été demandé mais pas trouvé: ENABLE_TOURELLE: " + str(ENABLE_TOURELLE) + " ready_list: " + str(ready_list))
+				exit()
+			logger.info("Les systèmes attendu ont bien été détéctés. Flussmittel: %s   Tibot: %s   Tourelle: %s   ready_list: %s", ENABLE_FLUSSMITTEL, ENABLE_TIBOT, ENABLE_TOURELLE, ready_list)
+		else:
+			print("---------------------TEST_MODE activé---------------------")
+			logger.warning("----------------------------------------TEST_MODE activé----------------------------------------")
+
 	else:
-		print("---------------------TEST_MODE activé---------------------")
-		logger.warning("----------------------------------------TEST_MODE activé----------------------------------------")
+		logger.info("Demarrage d'une IA depuis le simuateur")
+		Communication = None #TODO remplacer par un emulateur de READAPI et SENDAPI en utilisant conn
+
+
 
 	Data = data.Data(Communication, arduino_constantes)
 	
