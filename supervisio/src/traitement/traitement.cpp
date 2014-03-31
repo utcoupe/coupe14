@@ -1,4 +1,5 @@
 #include "traitement.h"
+#include "global.h"
 #include "gui.h"
 
 #include <opencv2/opencv.hpp>
@@ -18,8 +19,9 @@ Visio::Visio() :
 }
 
 void Visio::init() {
-	setRedParameters(Scalar(110,110,70), Scalar(140, 255, 255));
-	setYelParameters(Scalar(90,70,70), Scalar(110, 255, 255));
+	setRedParameters(Scalar(RED_HUE_MIN, RED_SAT_MIN, RED_VAL_MIN), Scalar(RED_HUE_MAX, RED_SAT_MAX, RED_VAL_MAX));
+	setYelParameters(Scalar(YEL_HUE_MIN, YEL_SAT_MIN, YEL_VAL_MIN), Scalar(YEL_HUE_MAX, YEL_SAT_MAX, YEL_VAL_MAX));
+	setBlkParameters(Scalar(BLK_HUE_MIN, BLK_SAT_MIN, BLK_VAL_MIN), Scalar(BLK_HUE_MAX, BLK_SAT_MAX, BLK_VAL_MAX));
 	erode_dilate_kernel = getStructuringElement(MORPH_ELLIPSE, Size(10,10));
 }
 
@@ -128,7 +130,10 @@ int Visio::triangles(const Mat& img, vector<Triangle>& triangles, Rect area) {
 	//Analyse triangles rouges
 	nb_triangles += trianglesColor(img, triangles, red);
 	nb_triangles += trianglesColor(img, triangles, yellow);
-	//TODO triangles vus de dessus, entierement noirs
+	//triangles vus de dessus, entierement noirs, seulement si on ne detecte rien d'autre
+	if (nb_triangles == 0) {
+		nb_triangles += trianglesColor(img, triangles, black);
+	}
 	return nb_triangles;
 }
 
@@ -176,6 +181,14 @@ void Visio::setYelParameters(Scalar min, Scalar max) {
 	}
 }
 
+void Visio::setBlkParameters(Scalar min, Scalar max) {
+	blk_min = min;
+	blk_max = max;
+	if (color == black) {
+		setParameters(blk_min, blk_max);
+	}
+}
+
 void Visio::setMinSize(int size) {
 	min_size = size;
 }
@@ -188,6 +201,10 @@ void Visio::setColor(Color color) {
 	else if (color == red) {
 		min = red_min;
 		max = red_max;
+	}
+	else if (color == black) {
+		min = blk_max;
+		max = blk_max;
 	}
 	this->color = color;
 }
@@ -255,79 +272,98 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 		//Pour chaque contour
 		for (int i=0; i < detected_size; i++) {
 			//Si c'est un triangle
-			if (degree[i] == 3) {
-				vector<Point2f> contour_real = convertItoF(contours[i]);
-				perspectiveTransform(contour_real, contour_real, perspectiveMatrix);
-				nb_triangles++;
-				Triangle tri;
-				tri.color = color;
-				tri.coords = points_real[i];
-				//Calcule de l'angle du triangle
-				double dx = contour_real[0].x - tri.coords.x;
-				double dy = contour_real[0].y - tri.coords.y; 
-				tri.angle = atan2(dy, dx);
-
-				//Modulo 2*PI/3
-				while (tri.angle < 0) {
-					tri.angle += 2*M_PI/3;
+			if (color != black) {
+				if (degree[i] == 3) {
+					vector<Point2f> contour_real = convertItoF(contours[i]);
+					perspectiveTransform(contour_real, contour_real, perspectiveMatrix);
+					addTriangle(points_real[i], contour_real, triangles);
+					nb_triangles++;
 				}
-				while (tri.angle > 2*M_PI/3) {
-					tri.angle -= 2*M_PI/3;
+				else if (degree[i] > 3 && color != black) {
+					vector<Point2f> contour_real = convertItoF(contours[i]);
+					perspectiveTransform(contour_real, contour_real, perspectiveMatrix);
+					//Voir si on a pas plusieurs triangles collés
+					nb_triangles += deduceTrianglesFromContour(contour_real, triangles);
 				}
-				//Si le triangle est couché
-				if ((tri.size = contourArea(contour_real)) > min_down_size) {
-					tri.isDown = true;
-				}
-				else {
-					tri.isDown = false;
-				}
-				tri.contour = contour_real;
-				triangles.push_back(tri);
 			}
-			if (degree[i] > 3) {
-				vector<Point2f> contour_real = convertItoF(contours[i]);
-				perspectiveTransform(contour_real, contour_real, perspectiveMatrix);
-				//Voir si on a pas plusieurs triangles collés
-				for (int j=0; j<contour_real.size(); j++) {
-					Point2f p1 = contour_real[j];
-					for (int k=j+1; k<contour_real.size(); k++) {
-						Point2f p2 = contour_real[k];
-						for (int l=k+1; l<contour_real.size(); l++) {
-							Point2f p3 = contour_real[l];
-							if (isEqui(p1, p2, p3)) {
-								//Point central
-								contour_real.clear();
-								contour_real.push_back(p1);
-								contour_real.push_back(p2);
-								contour_real.push_back(p3);
-								Moments moment = moments(contour_real);
-								if (moment.m00 > min_size) {
-									Triangle tri;
-									nb_triangles++;
-									float x = moment.m10 / moment.m00;
-									float y = moment.m01 / moment.m00;
-									tri.coords = Point2f(x,y);
-									tri.color = color;
-									//Calcule de l'angle du triangle
-									double dx = contour_real[0].x - tri.coords.x;
-									double dy = contour_real[0].y - tri.coords.y; 
-									tri.angle = atan2(dy, dx);
+			else { //black
+				if (degree[i] == 4){
+					vector<Point2f> contour_real = convertItoF(contours[i]);
+					addTriangle(points_real[i], contour_real, triangles);
+					nb_triangles++;
+				}
+			}
+		}
+	}
+	return nb_triangles;
+}
 
-									//Modulo 2*PI/3
-									while (tri.angle < 0) {
-										tri.angle += 2*M_PI/3;
-									}
-									while (tri.angle > 2*M_PI/3) {
-										tri.angle -= 2*M_PI/3;
-									}
+void Visio::addTriangle(const Point2f& point_real, const vector<Point2f>& contour_real, vector<Triangle> triangles) {
+	Triangle tri;
+	tri.color = color;
+	tri.coords = point_real;
+	//Calcule de l'angle du triangle
+	double dx = contour_real[0].x - tri.coords.x;
+	double dy = contour_real[0].y - tri.coords.y; 
+	tri.angle = atan2(dy, dx);
 
-									//On ne detecte pas les triangles debout dans ce cas, ce ne serait pas assez fiable
-									tri.isDown = false;
-									tri.contour = contour_real;
-									triangles.push_back(tri);
-								}
-							}
+	//Modulo 2*PI/3
+	while (tri.angle < 0) {
+		tri.angle += 2*M_PI/3;
+	}
+	while (tri.angle > 2*M_PI/3) {
+		tri.angle -= 2*M_PI/3;
+	}
+	//Si le triangle est couché
+	if ((tri.size = contourArea(contour_real)) > min_down_size) {
+		tri.isDown = true;
+	}
+	else {
+		tri.isDown = false;
+	}
+	tri.contour = contour_real;
+	triangles.push_back(tri);
+}
+
+int Visio::deduceTrianglesFromContour(vector<Point2f>& contour_real, vector<Triangle>& triangles) {
+	int nb_triangles = 0;
+	for (int j=0; j<contour_real.size(); j++) {
+		Point2f p1 = contour_real[j];
+		for (int k=j+1; k<contour_real.size(); k++) {
+			Point2f p2 = contour_real[k];
+			for (int l=k+1; l<contour_real.size(); l++) {
+				Point2f p3 = contour_real[l];
+				if (isEqui(p1, p2, p3)) {
+					//Point central
+					contour_real.clear();
+					contour_real.push_back(p1);
+					contour_real.push_back(p2);
+					contour_real.push_back(p3);
+					Moments moment = moments(contour_real);
+					if (moment.m00 > min_size) {
+						Triangle tri;
+						nb_triangles++;
+						float x = moment.m10 / moment.m00;
+						float y = moment.m01 / moment.m00;
+						tri.coords = Point2f(x,y);
+						tri.color = color;
+						//Calcule de l'angle du triangle
+						double dx = contour_real[0].x - tri.coords.x;
+						double dy = contour_real[0].y - tri.coords.y; 
+						tri.angle = atan2(dy, dx);
+
+						//Modulo 2*PI/3
+						while (tri.angle < 0) {
+							tri.angle += 2*M_PI/3;
 						}
+						while (tri.angle > 2*M_PI/3) {
+							tri.angle -= 2*M_PI/3;
+						}
+
+						//On ne detecte pas les triangles debout dans ce cas, ce ne serait pas assez fiable
+						tri.isDown = false;
+						tri.contour = contour_real;
+						triangles.push_back(tri);
 					}
 				}
 			}

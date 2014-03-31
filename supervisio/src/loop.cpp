@@ -3,6 +3,7 @@
 #include "traitement/gui.h"
 #include "stereo/stereo.h"
 #include "loop.h"
+#include "global.h"
 
 using namespace cv;
 
@@ -15,9 +16,11 @@ void perspectiveOnlyLoop(T index_or_filename){
 	Visio visio;
 	visio.setChessboardSize(Size(9,6));
 
-	int s_max(255), v_max(255), size_min(5000), max_diff_triangle_edge(30);
-	int h_min_r(110), h_max_r(140), s_min_r(100), v_min_r(70);
-	int h_min_y(90), h_max_y(110), s_min_y(110), v_min_y(70), epsilon(7), key = -1;
+	int size_min(5000), max_diff_triangle_edge(30);
+	int h_min_y(YEL_HUE_MIN), h_max_y(YEL_HUE_MAX), s_min_y(YEL_SAT_MIN), s_max_y(YEL_SAT_MAX), v_min_y(YEL_VAL_MIN), v_max_y(YEL_VAL_MAX);
+	int h_min_r(RED_HUE_MIN), h_max_r(RED_HUE_MAX), s_min_r(RED_SAT_MIN), s_max_r(RED_SAT_MAX), v_min_r(RED_VAL_MIN), v_max_r(RED_VAL_MAX);
+	int h_min_b(BLK_HUE_MIN), h_max_b(BLK_HUE_MAX), s_min_b(BLK_SAT_MIN), s_max_b(BLK_SAT_MAX), v_min_b(BLK_VAL_MIN), v_max_b(BLK_SAT_MAX);
+	int epsilon(7), key = -1;
 	bool calibrating = !visio.loadTransformMatrix();
 
 	namedWindow("parameters");
@@ -32,6 +35,12 @@ void perspectiveOnlyLoop(T index_or_filename){
 	createTrackbar("h_max_r", "parameters", &h_max_r, 180);
 	createTrackbar("s_min_r", "parameters", &s_min_r, 255);
 	createTrackbar("v_min_r", "parameters", &v_min_r, 255);
+	createTrackbar("h_min_b", "parameters", &h_min_b, 180);
+	createTrackbar("h_max_b", "parameters", &h_max_b, 180);
+	createTrackbar("s_min_b", "parameters", &s_min_b, 255);
+	createTrackbar("s_max_b", "parameters", &s_max_b, 255);
+	createTrackbar("v_min_b", "parameters", &v_min_b, 255);
+	createTrackbar("v_max_b", "parameters", &v_max_b, 255);
 	createTrackbar("epsilon", "parameters", &epsilon, 100);
 	createTrackbar("is equi", "parameters", &max_diff_triangle_edge, 100);
 	createTrackbar("size_min", "parameters", &size_min, 20000);
@@ -63,13 +72,15 @@ void perspectiveOnlyLoop(T index_or_filename){
 			imshow("origin", frame);
 		}
 		else {
-			Scalar min_r(h_min_r,s_min_r,v_min_r), max_r(h_max_r,s_max,v_max);
-			Scalar min_y(h_min_y,s_min_y,v_min_y), max_y(h_max_y,s_max,v_max);
+			Scalar min_r(h_min_r,s_min_r,v_min_r), max_r(h_max_r,s_max_r,v_max_r);
+			Scalar min_y(h_min_y,s_min_y,v_min_y), max_y(h_max_y,s_max_y,v_max_y);
+			Scalar min_b(h_min_b,s_min_b,v_min_b), max_b(h_max_b,s_max_b,v_max_b);
 			visio.setMinSize(size_min);
 			visio.setMaxDiffTriangleEdget(max_diff_triangle_edge);
 			visio.setEpsilonPoly(epsilon);
 			visio.setYelParameters(min_y, max_y);
 			visio.setRedParameters(min_r, max_r);
+			visio.setBlkParameters(min_b, max_b);
 
 			warpPerspective(frame, persp, visio.getQ(), frame.size());
 			visio.setColor(yellow);

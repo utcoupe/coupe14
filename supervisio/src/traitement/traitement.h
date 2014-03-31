@@ -9,7 +9,7 @@
 using namespace cv;
 using namespace std;
 
-typedef enum color {red, yellow} Color;
+typedef enum color {red, yellow, black} Color;
 typedef struct triangle {
 	Point2f coords;
 	double angle;
@@ -35,6 +35,7 @@ class Visio {
 		//SETTER
 		void setRedParameters(Scalar min, Scalar max);
 		void setYelParameters(Scalar min, Scalar max);
+		void setBlkParameters(Scalar min, Scalar max);
 		void setMinSize(int size);
 		void setColor(Color color);
 		void setErodeDilateKernel(Mat kernel);
@@ -49,10 +50,12 @@ class Visio {
 		void init();
 		void setParameters(Scalar min, Scalar max, int size=-1);
 		int trianglesColor(const Mat& img, vector<Triangle>& triangles, Color color);
+		void addTriangle(const Point2f& point_real, const vector<Point2f>& contour_real, vector<Triangle> triangles);
+		int deduceTrianglesFromContour(vector<Point2f>& contour_real, vector<Triangle>& triangles);
 		bool isEqui(Point2f p1, Point2f p2, Point2f p3);
 
 		Scalar min, max;
-		Scalar yel_min, yel_max, red_min, red_max;
+		Scalar yel_min, yel_max, red_min, red_max, blk_min, blk_max;
 		Size chessboard_size;
 		Mat perspectiveMatrix;
 		Mat erode_dilate_kernel; //kernel utilisé lors des erode/dilate
