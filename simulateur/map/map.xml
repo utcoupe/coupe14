@@ -1,0 +1,53 @@
+<map>
+	
+	<backgroundmap src="map.png" />
+	
+	<!-- Placement des bords de la table -->
+	<wall x1="0" y1="0" x2="3000" y2="0" />
+	<wall x1="3000" y1="0" x2="3000" y2="2000" />
+	<wall x1="0" y1="2000" x2="3000" y2="2000" />
+	<wall x1="0" y1="0" x2="0" y2="2000" />
+
+    <!-- COUPE 2014 -->
+
+	<!-- Placement des feux du côté droite (jaune) -->
+	<feu x="900" y="600" orientation="vert"/>
+	<feu x="400" y="1100" orientation=""/>
+	<feu x="900" y="1600" orientation="vert"/>
+	<feu x="15" y="800" orientation="vert"/>
+	<feu x="1300" y="1985" orientation=""/>
+
+	<!-- Placement des feux du côté droite (jaune) -->
+	<feu x="2100" y="600" orientation="vert"/>
+	<feu x="2100" y="1600" orientation="vert"/>
+	<feu x="2600" y="1100" orientation=""/>
+	<feu x="2985" y="800" orientation="vert"/>
+	<feu x="1700" y="1985" orientation=""/>
+
+    <!-- Placement des arbres -->
+	<arbre x="60" y="1300" orientation="droite"/>
+    <arbre x="700" y="1940" orientation=""/>
+    <arbre x="2300" y="1940" orientation=""/>
+    <arbre x="2940" y="1300" orientation="gauche"/>
+
+    <!-- Placement des torches -->
+	<torche x="900" y="1100" />
+    <torche x="2100" y="1100" />
+
+    <!-- Placement de la fresque -->
+    <fresque x="1500" y="12" />
+
+    <!-- Placement des mammouths -->
+    <mammouth x="750" y="12" />
+    <mammouth x="2250" y="12" />
+
+    <!-- Placement des foyers -->
+	<foyerCentre x="1500" y="1050" />
+	<foyerBord x="83" y="1917" position="gauche"/>
+    <foyerBord x="2917" y="1917" position="droite"/>
+
+    <!-- Placement des bacs à fruits -->
+	<bac x="750" y="163" color="yellow"/>
+	<bac x="2250" y="163" color="red"/>
+
+</map>

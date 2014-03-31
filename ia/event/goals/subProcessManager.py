@@ -8,57 +8,55 @@ import logging
 from collections import deque
 import time
 
+from .goalsManager import *
 
-#import goalsManager
-#self.__GoalsManager = goalsManager.GoalsManager()
-
-class subProcessManager():
-	def __init__(self, connection):
+class SubProcessManager():
+	def __init__(self, connection, robot_name):
 		self.__logger = logging.getLogger(__name__.split('.')[0])
 		self.__connection = connection
+		self.__robot_name = robot_name
 
-		self.__processEvent()
-
-	def __processEvent(self):
-		script_loaded = False
-		while True:
-			time.sleep(0.1)
-			if not script_loaded:
-				script_loaded = True
-				self.__connection.send(self.__loadActionScript())
-			
-
-
-
-	def __loadActionScript(self, filename="data/tibot.xml"):
-		self.__logger.info("loading actionScript from: " + str(filename))
-		fd = open(filename,'r')
-		dom = parseString(fd.read())
-		fd.close()
-
-		objectif = deque()
-		for xml_goal in dom.getElementsByTagName('objectif'):
-			objectif_name	= xml_goal.attributes["objectif_name"].value #seulement pour information
-			id_objectif		= int(xml_goal.getElementsByTagName('idd')[0].firstChild.nodeValue)
-
-			data_objectif = deque()
-			for xml_execution in xml_goal.getElementsByTagName('action'):
-				ordre 		= (xml_execution.getElementsByTagName('ordre')[0].firstChild.nodeValue,)
-
-				raw_arguments = xml_execution.getElementsByTagName('arguments')[0].firstChild
-				if raw_arguments:
-					arguments = (raw_arguments.nodeValue.split(','),)
-				else:
-					arguments = (None,)
-
-				ordre += arguments
-				data_objectif.append(ordre)
-
-			objectif.append(("TIBOT", 0, id_objectif, data_objectif))#TODO
-
+		self.__data = {}
+		while self.__data == {}:
+			self.readPipe(loop=False) #Normalement on ne peut pas recevoir over ni canaceled à ce stade
 		
-		self.__logger.debug("Script chargé: " + str(objectif))
-		return objectif
+		self.__GoalsManager = GoalsManager(self, connection, robot_name)
 
-def startSubprocess(connection):
-	a = subProcessManager(connection)
+	def sendGoal(self, id_objectif_prev, id_objectif, elem_script):
+		self.__connection.send((self.__robot_name, id_objectif_prev, id_objectif, elem_script))
+
+	def getData(self):
+		return self.__data
+
+	def readPipe(self, loop):
+		if loop:
+			while True:
+				new_message = self.__connection.recv()
+				if new_message[0] == "data":
+					self.__updateData(new_message[1])
+				else:
+					self.__processStatus(new_message)
+		else:
+			new_message = self.__connection.recv()
+			if new_message[0] == "data":
+				self.__updateData(new_message[1])
+			else:
+				self.__processStatus(new_message)
+
+	def __updateData(self, data):
+		self.__data = data
+
+	def __processStatus(self, status):
+		"""read new status and update objectif_list"""
+		etat = status[0]
+		id_objectif = status[1]
+
+		if etat == "over":
+			self.__GoalsManager.goalFinishedId(id_objectif)
+		elif etat == "canceled":
+			self.__GoalsManager.goalCanceledId(id_objectif)
+
+
+def startSubprocess(connection, robot_name):
+	a = SubProcessManager(connection, robot_name)
+	a.readPipe(loop=True)

@@ -16,6 +16,7 @@ class MetaData():
 		self.__triangle_en_position = ("Rien", 0) #(Rien ou JAUNE ou ROUGE, timestanp de l'info pour savoir si on peut l'utiliser directment ou non)
 		self.__in_game = False
 		self.__in_funny_action = False
+		self.__checkCollision = False #Demarrage différé des collisions pour eviter le cas particulier du debut de match 
 		self.__game_clock = None
 
 
@@ -55,6 +56,8 @@ class MetaData():
 		else:
 			self.__logger.warning("Demande la fin de funny action alors que funny action est arreté.")
 
+	def startCheckCollision(self):
+		self.__checkCollision = True
 
 			# GETTER
 	def getInGame(self):
@@ -65,6 +68,9 @@ class MetaData():
 
 	def getGameClock(self):
 		return self.__game_clock
+
+	def getCheckCollision(self):
+		return self.__checkCollision
 
 			#SETTER
 	def setGameClock(self, clock):

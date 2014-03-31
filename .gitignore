@@ -16,6 +16,7 @@ hokuyo/hokuyo
 *.pyc
 *.exe
 *.save
+*.sublime-*
 workspace*
 libs/cgal/Makefile
 libs/cgal/cmake_install.cmake

@@ -24,22 +24,24 @@ class PullData():
 		self.address_tourelle = Tourelle[1]
 		self.PULL_PERIODE = PULL_PERIODE
 
-		self.pull_data = True
+		self.__pull_data = True
 		self.__id_flussmittel_other_asked = False
 		self.__data_flussmittel_asserv_asked = False
 		self.__id_tibot_other_asked = False
 		self.__data_tibot_asserv_asked = False
 		self.tourelle_asked = False
 
-		self.ThreadPull = threading.Thread(target=self.__gestion)
-		self.ThreadPull.start()
+		self.__ThreadPull = threading.Thread(target=self.__gestion)
+
+	def start(self):
+		self.__ThreadPull.start()
 
 	def stop(self):
 		"""méthode public pour arreter le système de pull data"""
-		self.pull_data = False
+		self.__pull_data = False
 
 	def __gestion(self):
-		while self.pull_data:
+		while self.__pull_data:
 			self.__readData()
 			self.__askData()
 			time.sleep(self.PULL_PERIODE/1000.0)
@@ -69,6 +71,11 @@ class PullData():
 			if self.tourelle_asked == False:
 				self.Communication.sendOrderAPI(self.address_tourelle, 'GET_HOKUYO', *arguments)
 				self.tourelle_asked = True
+
+
+		#Hokuyo Fictif
+		#TODO
+		#self.Tourelle.majPosition(generateFictionHokuyo());
 
 
 	def __readData(self):
@@ -123,3 +130,29 @@ class PullData():
 					self.__logger.warning("ce retour n'est pas implementé, address " + str(address) + " ordre " + str(order) + " arguments " + str(arguments))
 
 			
+
+
+
+def generateFictionHokuyo():
+	nombreRobots = 4				#Max:4
+	centre = {"x":1500, "y":1000}	#mm
+	amplitude = 500					#mm
+
+
+	import math
+	ret = [generateFictionHokuyo.iteration*100]
+	angle = (generateFictionHokuyo.iteration%100)*math.pi/50 #un tour toutes les 10s -> 100 iterations
+
+	for i in range(nombreRobots):
+		currAngle = angle+ i*2*math.pi/nombreRobots
+		ret.append(int(centre["x"] + math.cos(currAngle)*amplitude))
+		ret.append(int(centre["y"] + math.sin(currAngle)*amplitude))
+	for i in range(nombreRobots, 4):
+		ret.append(0)
+		ret.append(0)
+
+	generateFictionHokuyo.iteration += 1
+	return ret
+generateFictionHokuyo.iteration = 0
+
+
