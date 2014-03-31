@@ -13,6 +13,7 @@
 #include "serial_switch.h"
 #include "serial_defines.h"
 #include "serial_types.h"
+#include "actions.h"
 
 extern Servo servoBras, servoRet;
 extern AF_DCMotor motor_ascenseur;
