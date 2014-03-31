@@ -69,7 +69,7 @@ enum ordre {
 	O_BAISSER_ASC, //@int
 
 	GET_CAM,	//#int #int
-	GET_HOKUYO,	//#int #int #int #int #int #int #int #int #long
+	GET_HOKUYO,	//#long #int #int #int #int #int #int #int #int
 	GET_LAST_ID, //#int
 
 	RESET_ID,

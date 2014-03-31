@@ -76,7 +76,7 @@ initLidarAndCalibrate(enum lidarModel model, char* device, struct coord position
 	if(angles == NULL) exit(EXIT_FAILURE);
 	for(int i=0; i<nAngles; i++){
 		angles[i] = getAngleFromIndexHokuyoUrg(l.lidarObject, i) + l.orientation;
-		printf("angleFromhokuyo:%f\tangle[%i]:%f\n", getAngleFromIndexHokuyoUrg(l.lidarObject, i)*180/PI, i, angles[i]*180/PI);
+		//printf("angleFromhokuyo:%f\tangle[%i]:%f\n", getAngleFromIndexHokuyoUrg(l.lidarObject, i)*180/PI, i, angles[i]*180/PI);
 	}
 	freeFastmath(l.fm);
 	l.fm = initFastmath( nAngles, angles );

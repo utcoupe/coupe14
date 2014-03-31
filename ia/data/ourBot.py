@@ -22,6 +22,7 @@ class OurBot():
 
 		self.largeur = largeur 
 		self.longueur = longueur
+		self.rayon = sqrt(self.largeur * self.largeur + self.longueur * self.longueur)
 
 
 		#Valeurs récupérées (read-only)
@@ -39,8 +40,11 @@ class OurBot():
 		self.__last_id_objectif_executed = None
 
 	#Getter
-	def getPositon(self):
+	def getPosition(self):
 		return (self.__positionX, self.__positionY)
+
+	def getRayon(self):
+		return self.rayon
 
 	def getName(self):
 		return self.__name
@@ -62,27 +66,38 @@ class OurBot():
 
 	def getTrajectoires(self):
 		data_trajectoires = ()
+		trajectoire = ((self.__positionX, self.__positionY),)
+
 
 		#Pour les actions en cours d'execution
+		id_action_en_cours = None
 		if self.__actions_en_cours is not None:
-			idd = objectif[0]
-			trajectoire = ((self.__positionX, self.__positionY),)
-			for order in objectif[1]:
+			id_action_en_cours = self.__actions_en_cours[0]
+			for order in self.__actions_en_cours[1]:
 				if order[1] == 'A_GOTO':
-					trajectoire += ((order[2][0]), order[2][1])
-			data_objectif += (idd, trajectoire)
+					trajectoire += ((order[2][0], order[2][1]),)
+			if not self.__objectifs:
+				if len(trajectoire)>1:
+					data_trajectoires += ((id_action_en_cours, trajectoire),)
+					trajectoire = ()
 
 		#Pour les objectifs prévu par la suite
-		elif self.__objectifs:
+		if self.__objectifs:
+			id_first_action_objectif = self.__objectifs[0][0]
+			#Si un objectif est à moitier en cours
+			if id_action_en_cours is not None:
+				if id_action_en_cours != id_first_action_objectif:
+					data_trajectoires += ((id_action_en_cours, trajectoire),)
+					trajectoire = ()
 			
-			idd = self.__objectifs[0][0]
-			trajectoire = ((self.__positionX, self.__positionY),)
-
 			for objectif in self.__objectifs:
+				id_objectif = objectif[0]
 				for order in objectif[1]:
 					if order[1] == 'A_GOTO':
-						trajectoire += ((order[2][0]), order[2][1])
-				data_objectif += (idd, trajectoire)
+						trajectoire += ((order[2][0], order[2][1]),)
+				if len(trajectoire)>1:
+					data_trajectoires += ((id_objectif, trajectoire),)
+					trajectoire = ()
 
 		return data_trajectoires #type: ((id_objectif, ((x,y),(x,y),...)), (id_objectif, ((x,y),(x,y),...)), ...)
 
@@ -169,7 +184,7 @@ class OurBot():
 			data_objectif.append(action)
 
 		self.__objectifs.append((id_objectif, data_objectif))
-		self.__logger.debug("New goals queued: " + str((id_objectif, data_objectif)))
+		self.__logger.debug( str(self.getName()) + " new goals queued: " + str((id_objectif, data_objectif)))
 
 	def removeActionBellow(self, lastIddExecuted):
 		"""enleve les actions terminé de la liste des actions en cours """
@@ -183,6 +198,29 @@ class OurBot():
 
 				if not order_of_objectif:
 					self.__actions_en_cours = None
+
+	def removeObjectifAbove(self, id_objectif):
+		"""remove all queued goal on top of id_objectif, id_objectif included"""
+		id_canceled_list = []
+
+		#on vide les objectifs en cours
+		if self.__actions_en_cours is not None:
+			id = self.__actions_en_cours[0]
+			if id_objectif == id:
+				self.__actions_en_cours = None
+				id_canceled_list.append(id)
+
+		#on vide les objectifs en attente
+		for objectif in self.__objectifs:
+			id = objectif[0]
+			if id_objectif == id:
+				removed_objectif = self.__objectifs.pop()
+				while removed_objectif[0] != id_objectif:
+					id_canceled_list.append(removed_objectif[0])
+					removed_objectif = self.__objectifs.pop()
+				break
+
+		return id_canceled_list
 	
 
 	def maxRot(self, id1, id2):

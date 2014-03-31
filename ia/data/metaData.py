@@ -12,13 +12,41 @@ class MetaData():
 		self.__logger = logging.getLogger(__name__.split('.')[0])
 		self.numberOfenemy = NUMBER_OF_ENEMY
 
+		#Constantes à initialiser 
+		self.__first_position_flussmittel = None #position est un tableau [x, y, angle]
+		self.__first_position_tibot = None
+		self.__our_color = None
+
 		#Variables
 		self.__triangle_en_position = ("Rien", 0) #(Rien ou JAUNE ou ROUGE, timestanp de l'info pour savoir si on peut l'utiliser directment ou non)
 		self.__in_game = False
 		self.__in_funny_action = False
+		self.__checkCollision = False #Demarrage différé des collisions pour eviter le cas particulier du debut de match 
 		self.__game_clock = None
 
 
+	def getFirstPositionFlussmittel(self):
+		return self.__first_position_flussmittel
+
+	def setFirstPositionFlussmittel(self, position):
+		"""position est un tableau [x, y, angle]"""
+		self.__first_position_flussmittel = position
+
+	def getFirstPositionTibot(self):
+		return self.__first_position_tibot
+
+	def setFirstPositionTibot(self, position):
+		"""position est un tableau [x, y, angle]"""
+		self.__first_position_tibot = position
+
+	def getOurColor(self):
+		return self.__our_color
+
+	def setOurColor(self, color):
+		"""prend en parametre "RED" ou "YELLOW" """
+		self.__our_color = color
+
+		
 	#utilise les données en provenance des caméras pour mettre à jour les données de la classe
 	def majCam(self, arguments):
 		if arguments[0] > SEUIL_ROUGE and arguments[1] > SEUIL_JAUNE:
@@ -55,6 +83,8 @@ class MetaData():
 		else:
 			self.__logger.warning("Demande la fin de funny action alors que funny action est arreté.")
 
+	def startCheckCollision(self):
+		self.__checkCollision = True
 
 			# GETTER
 	def getInGame(self):
@@ -65,6 +95,9 @@ class MetaData():
 
 	def getGameClock(self):
 		return self.__game_clock
+
+	def getCheckCollision(self):
+		return self.__checkCollision
 
 			#SETTER
 	def setGameClock(self, clock):
