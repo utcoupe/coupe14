@@ -1,8 +1,8 @@
 from xml.etree import ElementTree as ET
 import os
+import sys
 
-
-class GPIO:
+class Gpio:
 	def __init__(self):
 		self.__parsePorts()
 		self.initJackPort(1)
@@ -32,6 +32,7 @@ class GPIO:
 			return 'Red'
 
 	def __parsePorts(self, path='ports.xml'):
+		path = os.path.join(os.path.dirname(os.path.abspath(__file__)) + "/" +path)
 		self.ports = {}
 		table = ET.parse(path).getroot()
 		for port_el in table:

@@ -20,7 +20,7 @@ import communication
 import data
 from constantes import *
 import event
-import timeManager
+import gpio
 
 #lancement de l'IA via le subprocess simu
 def startIa(conn=None):
@@ -47,10 +47,11 @@ def startIa(conn=None):
 		logger.warning("----------------------------------------DEBUG_MODE activé----------------------------------------")
 
 	Data = data.Data(Communication, arduino_constantes)
+	Gpio = gpio.Gpio()
 	data.parametrerHokuyo()
 	data.parametrerIa(Data.MetaData)
 
-	TimeManager = timeManager.TimeManager(Communication, Data)
+	TimeManager = event.TimeManager(Communication, Data)
 	EventManager = event.EventManager(Communication, Data)
 
 
