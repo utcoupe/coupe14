@@ -10,21 +10,21 @@ class Gpio:
 
 	def initJackPort(self, port):
 		self.jackPort = self.ports[str(port)]
-		os.system('echo in > ' + self.jackPort)
+		os.system('echo in > ' + self.jackPort + 'direction')
 
 	def initColorSelectPort(self, port):
 		self.colorSelectPort = self.ports[str(port)]
-		os.system('echo in > ' + self.colorSelectPort)
+		os.system('echo in > ' + self.colorSelectPort + 'direction')
 
 	def getJack(self):
 		"""Returns electrical level on jack port"""
-		f = open(self.jackPort)
+		f = open(self.jackPort + 'value')
 		status = f.readline()[0]
 		return status
 
 	def getColor(self):
 		"""HIGH = YELLOW ; LOW = RED"""
-		f = open(self.colorSelectPort)
+		f = open(self.colorSelectPort + 'value')
 		status = f.readline()[0]
 		if status == '1':
 			return 'YELLOW'
