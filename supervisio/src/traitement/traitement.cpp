@@ -1,5 +1,5 @@
 #include "traitement.h"
-#include "global.h"
+#include "../global.h"
 #include "gui.h"
 
 #include <opencv2/opencv.hpp>
@@ -11,10 +11,10 @@ using namespace std;
  * CONSTRUCTEUR   *
  * ****************/
 
-Visio::Visio() : 
+Visio::Visio(VideoCapture& cam) : 
 	color(red), calibrated(false), min_size(100),
 	chessboard_size(Size(9,6)), epsilon_poly(0.07),
-	max_diff_triangle_edge(30) {
+	max_diff_triangle_edge(30), camera(cam) {
 	init();
 }
 
@@ -124,7 +124,7 @@ void Visio::polyDegree(const vector<vector<Point> >& contours, vector<int>& degr
 	approx = temp;
 }
 
-int Visio::triangles(const Mat& img, vector<Triangle>& triangles, Rect area) {
+int Visio::trianglesFromImg(const Mat& img, vector<Triangle>& triangles) {
 	int nb_triangles = 0;
 	//Transformation de l'image
 	//Analyse triangles rouges
@@ -137,6 +137,11 @@ int Visio::triangles(const Mat& img, vector<Triangle>& triangles, Rect area) {
 	return nb_triangles;
 }
 
+int Visio::triangles(vector<Triangle>& triangles) {
+	Mat img;
+	camera >> img;
+	return trianglesFromImg(img, triangles);
+}
 //FILE MANAGER
 
 bool Visio::loadTransformMatrix() {

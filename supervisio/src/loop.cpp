@@ -1,19 +1,17 @@
 #include <opencv2/opencv.hpp>
 #include "traitement/traitement.h"
 #include "traitement/gui.h"
-#include "stereo/stereo.h"
 #include "loop.h"
 #include "global.h"
 
 using namespace cv;
 
-template <typename T>
-void perspectiveOnlyLoop(T index_or_filename){
-	VideoCapture cam(index_or_filename);
+void perspectiveOnlyLoop(int index){
+	VideoCapture cam(index);
 	 if(!cam.isOpened())  // check if we succeeded
 		return;
 
-	Visio visio;
+	Visio visio(cam);
 	visio.setChessboardSize(Size(9,6));
 
 	int size_min(5000), max_diff_triangle_edge(30);
@@ -92,7 +90,7 @@ void perspectiveOnlyLoop(T index_or_filename){
 			drawContours(frame, detected_contours_red, -1, c_red, 2);
 
 			vector<Triangle> tri;
-			visio.triangles(frame, tri, Rect(0,0,1000,1000));
+			visio.trianglesFromImg(frame, tri);
 			for(int i=0; i<tri.size(); i++) {
 				string txt = intToString(tri[i].size);
 				Scalar color;
@@ -118,13 +116,4 @@ void perspectiveOnlyLoop(T index_or_filename){
 		}
 		key = waitKey(20);
 	}
-}
-
-void testStereo() {
-	Stereo stereo(1,2);
-	if (!stereo.loadCameraCalibration()) {
-		stereo.calibrate();
-		stereo.saveCameraCalibration();
-	}
-	stereo.displayCalibration();
 }
