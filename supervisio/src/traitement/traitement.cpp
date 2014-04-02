@@ -126,8 +126,6 @@ void Visio::polyDegree(const vector<vector<Point> >& contours, vector<int>& degr
 
 int Visio::trianglesFromImg(const Mat& img, vector<Triangle>& triangles) {
 	int nb_triangles = 0;
-	//Transformation de l'image
-	//Analyse triangles rouges
 	nb_triangles += trianglesColor(img, triangles, red);
 	nb_triangles += trianglesColor(img, triangles, yellow);
 	//triangles vus de dessus, entierement noirs, seulement si on ne detecte rien d'autre
@@ -208,7 +206,7 @@ void Visio::setColor(Color color) {
 		max = red_max;
 	}
 	else if (color == black) {
-		min = blk_max;
+		min = blk_min;
 		max = blk_max;
 	}
 	this->color = color;
@@ -284,7 +282,7 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 					addTriangle(points_real[i], contour_real, triangles);
 					nb_triangles++;
 				}
-				else if (degree[i] > 3 && color != black) {
+				else if (degree[i] > 3) {
 					vector<Point2f> contour_real = convertItoF(contours[i]);
 					perspectiveTransform(contour_real, contour_real, perspectiveMatrix);
 					//Voir si on a pas plusieurs triangles collés
@@ -292,8 +290,9 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 				}
 			}
 			else { //black
-				if (degree[i] == 4){
+				if (degree[i] >= 4){
 					vector<Point2f> contour_real = convertItoF(contours[i]);
+					perspectiveTransform(contour_real, contour_real, perspectiveMatrix);
 					addTriangle(points_real[i], contour_real, triangles);
 					nb_triangles++;
 				}
@@ -303,7 +302,7 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 	return nb_triangles;
 }
 
-void Visio::addTriangle(const Point2f& point_real, const vector<Point2f>& contour_real, vector<Triangle> triangles) {
+void Visio::addTriangle(const Point2f& point_real, const vector<Point2f>& contour_real, vector<Triangle>& triangles) {
 	Triangle tri;
 	tri.color = color;
 	tri.coords = point_real;

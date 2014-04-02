@@ -17,11 +17,12 @@ void perspectiveOnlyLoop(int index){
 	int size_min(5000), max_diff_triangle_edge(30);
 	int h_min_y(YEL_HUE_MIN), h_max_y(YEL_HUE_MAX), s_min_y(YEL_SAT_MIN), s_max_y(YEL_SAT_MAX), v_min_y(YEL_VAL_MIN), v_max_y(YEL_VAL_MAX);
 	int h_min_r(RED_HUE_MIN), h_max_r(RED_HUE_MAX), s_min_r(RED_SAT_MIN), s_max_r(RED_SAT_MAX), v_min_r(RED_VAL_MIN), v_max_r(RED_VAL_MAX);
-	int h_min_b(BLK_HUE_MIN), h_max_b(BLK_HUE_MAX), s_min_b(BLK_SAT_MIN), s_max_b(BLK_SAT_MAX), v_min_b(BLK_VAL_MIN), v_max_b(BLK_SAT_MAX);
+	int h_min_b(BLK_HUE_MIN), h_max_b(BLK_HUE_MAX), s_min_b(BLK_SAT_MIN), s_max_b(BLK_SAT_MAX), v_min_b(BLK_VAL_MIN), v_max_b(BLK_VAL_MAX);
 	int epsilon(7), key = -1;
 	bool calibrating = !visio.loadTransformMatrix();
 
 	namedWindow("parameters");
+	namedWindow("parameters2");
 	namedWindow("origin");
 	namedWindow("persp");
 
@@ -33,15 +34,15 @@ void perspectiveOnlyLoop(int index){
 	createTrackbar("h_max_r", "parameters", &h_max_r, 180);
 	createTrackbar("s_min_r", "parameters", &s_min_r, 255);
 	createTrackbar("v_min_r", "parameters", &v_min_r, 255);
-	createTrackbar("h_min_b", "parameters", &h_min_b, 180);
-	createTrackbar("h_max_b", "parameters", &h_max_b, 180);
-	createTrackbar("s_min_b", "parameters", &s_min_b, 255);
-	createTrackbar("s_max_b", "parameters", &s_max_b, 255);
-	createTrackbar("v_min_b", "parameters", &v_min_b, 255);
-	createTrackbar("v_max_b", "parameters", &v_max_b, 255);
-	createTrackbar("epsilon", "parameters", &epsilon, 100);
-	createTrackbar("is equi", "parameters", &max_diff_triangle_edge, 100);
-	createTrackbar("size_min", "parameters", &size_min, 20000);
+	createTrackbar("h_min_b", "parameters2", &h_min_b, 180);
+	createTrackbar("h_max_b", "parameters2", &h_max_b, 180);
+	createTrackbar("s_min_b", "parameters2", &s_min_b, 255);
+	createTrackbar("s_max_b", "parameters2", &s_max_b, 255);
+	createTrackbar("v_min_b", "parameters2", &v_min_b, 255);
+	createTrackbar("v_max_b", "parameters2", &v_max_b, 255);
+	createTrackbar("epsilon", "parameters2", &epsilon, 100);
+	createTrackbar("is equi", "parameters2", &max_diff_triangle_edge, 100);
+	createTrackbar("size_min", "parameters2", &size_min, 20000);
 
 	Scalar c_red(0,0,255), c_blue(255, 0, 0), c_yel(0,110,130);
 	vector<Point2f> position;
@@ -50,8 +51,8 @@ void perspectiveOnlyLoop(int index){
 	position.push_back(Point2f(239,119));
 	position.push_back(Point2f(239,328));
 	for(;;) { //int i=0; i>=0; i++) {
-		vector<vector<Point> > detected_contours_yel, detected_contours_red;
-		vector<Point2f> detected_pts_yel, detected_pts_red;
+		vector<vector<Point> > detected_contours_yel, detected_contours_red, detected_contours_blk;
+		vector<Point2f> detected_pts_yel, detected_pts_red, detected_pts_blk;
 		Mat frame, persp;
 		cam >> frame;
 
@@ -75,7 +76,7 @@ void perspectiveOnlyLoop(int index){
 			Scalar min_b(h_min_b,s_min_b,v_min_b), max_b(h_max_b,s_max_b,v_max_b);
 			visio.setMinSize(size_min);
 			visio.setMaxDiffTriangleEdget(max_diff_triangle_edge);
-			visio.setEpsilonPoly(epsilon);
+			visio.setEpsilonPoly(epsilon/100.0);
 			visio.setYelParameters(min_y, max_y);
 			visio.setRedParameters(min_r, max_r);
 			visio.setBlkParameters(min_b, max_b);
@@ -85,9 +86,12 @@ void perspectiveOnlyLoop(int index){
 			visio.getDetectedPosition(frame, detected_pts_yel, detected_contours_yel);
 			visio.setColor(red);
 			visio.getDetectedPosition(frame, detected_pts_red, detected_contours_red);
+			visio.setColor(black);
+			visio.getDetectedPosition(frame, detected_pts_blk, detected_contours_blk);
 			
 			drawContours(frame, detected_contours_yel, -1, c_yel, 2);
 			drawContours(frame, detected_contours_red, -1, c_red, 2);
+			drawContours(frame, detected_contours_blk, -1, Scalar(255,255,0), 2);
 
 			vector<Triangle> tri;
 			visio.trianglesFromImg(frame, tri);
@@ -98,6 +102,9 @@ void perspectiveOnlyLoop(int index){
 					color = Scalar(0, 195, 210);
 				else if (tri[i].color == red)
 					color = Scalar(0, 0, 255);
+				else if (tri[i].color == black) {
+					color = Scalar(0,0,0);
+				}
 
 				drawObject(tri[i].coords.x, tri[i].coords.y, persp, txt, color, true);
 				 //Repr de l'angle

@@ -51,7 +51,7 @@ class Visio {
 		void init();
 		void setParameters(Scalar min, Scalar max, int size=-1);
 		int trianglesColor(const Mat& img, vector<Triangle>& triangles, Color color);
-		void addTriangle(const Point2f& point_real, const vector<Point2f>& contour_real, vector<Triangle> triangles);
+		void addTriangle(const Point2f& point_real, const vector<Point2f>& contour_real, vector<Triangle>& triangles);
 		int deduceTrianglesFromContour(vector<Point2f>& contour_real, vector<Triangle>& triangles);
 		bool isEqui(Point2f p1, Point2f p2, Point2f p3);
 
