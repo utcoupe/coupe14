@@ -137,7 +137,8 @@ int Visio::trianglesFromImg(const Mat& img, vector<Triangle>& triangles) {
 
 int Visio::triangles(vector<Triangle>& triangles) {
 	Mat img;
-	camera >> img;
+	for(int i=0; i<6; i++) camera >> img;
+	imshow("img", img);
 	return trianglesFromImg(img, triangles);
 }
 //FILE MANAGER

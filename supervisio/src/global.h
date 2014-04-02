@@ -4,15 +4,15 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define YEL_HUE_MIN 90
-#define YEL_HUE_MAX 110
+#define YEL_HUE_MIN 70
+#define YEL_HUE_MAX 100
 #define YEL_SAT_MIN 185
 #define YEL_SAT_MAX 255
 #define YEL_VAL_MIN 95
 #define YEL_VAL_MAX 255
 
-#define RED_HUE_MIN 100
-#define RED_HUE_MAX 130
+#define RED_HUE_MIN 105
+#define RED_HUE_MAX 140
 #define RED_SAT_MIN 180
 #define RED_SAT_MAX 255
 #define RED_VAL_MIN 60
