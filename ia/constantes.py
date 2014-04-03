@@ -59,12 +59,7 @@ END_OF_FUNNY_ACTION = 	94000
 BEGIN_CHECK_COLLISION =	3000 #TODO
 
 #====================Goal====================
-FINISHED_THRESHOLD = 50
-
-
-#====================tourelle====================
-OUR_ROBOTS_VISIBLE_TOURELLE = True 	#True si une balise visible par l'hokuyo est presente sur nos robots 
-TOURELLE_PULL_PERIODE = 100 		#ms
+FINISHED_THRESHOLD = 	50
 
 #====================pullData====================
 PULL_PERIODE = 			10 #période des pull en ms
@@ -73,32 +68,28 @@ PULL_PERIODE = 			10 #période des pull en ms
 SEUIL_ROUGE = 			100 #TODO
 SEUIL_JAUNE = 			100 #TODO
 
+#====================NAVIGATION================
+POINTS_PAR_CERCLE = 	8
+MARGE_PASSAGE_PATH = 	10
+COLLISION_THRESHOLD =	200
+
+
+#=======================================Systemes physiques========================================
+#====================tourelle====================
+OUR_ROBOTS_VISIBLE_TOURELLE = True 	#True si une balise visible par l'hokuyo est presente sur nos robots 
+TOURELLE_PULL_PERIODE = 100 		#ms
+
 #====================Flussmittel====================
 LARGEUR_FLUSSMITTEL = 	100
 LONGUEUR_FLUSSMITTEL = 	100
-
-
-
-
 
 #====================TIBOT====================
 LARGEUR_TIBOT = 		100
 LONGUEUR_TIBOT = 		100
 
-
-
-
 #====================BIG ENEMY====================
 #Si un seul adversaire, on utilise les constantes de BIG ENEMY
 RAYON_BIG_ENEMY = 		100
 
-
-
-
 #====================SMALL ENEMY====================
 RAYON_SMALL_ENEMY = 	100
-
-#=======================================IA========================================
-#====================NAVIGATION================
-POINTS_PAR_CERCLE = 8
-MARGE_PASSAGE_PATH = 10

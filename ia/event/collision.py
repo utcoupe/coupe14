@@ -22,10 +22,8 @@ class Collision:
 
 		if robot is self.__flussmittel and self.__tibot is not None:
 			robot_list.insert(0, self.__tibot)
-			self.__log.info("Calcul de collision pour Flussmittel")
 		elif robot is self.__tibot and self.__flussmittel is not None:
 			robot_list.insert(0, self.__flussmittel)
-			self.__log.info("Calcul de collision pour Tibot")
 
 		""" .getTrajectoires() - > (dataObjectif, ...)
 			dataObjectif -> (id, (point, ...))
@@ -46,12 +44,12 @@ class Collision:
 						# cas particulier : 1er segment de trajectoire
 						if len(checked_traj) == 1 and self.__p_in_circle(robot_el.getPosition(), robot_el.getRayon() + robot.getRayon(), a):
 							distance_to_collision = 0
-							self.__log.info("Collision (1er segment) sur l'id %s a %s mm" % (id, distance_to_collision))
+							self.__log.debug("Collision (1er segment) sur l'id %s a %s mm" % (id, distance_to_collision))
 							return (id, distance_to_collision)
 
 						checked_traj.append(self.__get_closest(checked_traj[-1], collision_pts))  # on ajoute le premier pt d'intersection
 						distance_to_collision = self.__traj_length(checked_traj)  # on calcule la longueur restante avant collsion
-						self.__log.info("Collision sur l'id %s a %s mm" % (id, distance_to_collision))
+						self.__log.debug("Collision sur l'id %s a %s mm" % (id, distance_to_collision))
 						return (id, distance_to_collision)
 				checked_traj.append(b)  # on ajoute le point de depart a la trajctoire verifiee
 		return None

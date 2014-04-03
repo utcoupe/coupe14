@@ -39,6 +39,9 @@ class OurBot():
 		self.__actions_en_cours = None
 		self.__last_id_objectif_executed = None
 
+		#Variable pour evenManager
+		self.__id_to_reach = "ANY"
+
 	#Getter
 	def getPosition(self):
 		return (self.__positionX, self.__positionY)
@@ -67,7 +70,6 @@ class OurBot():
 	def getTrajectoires(self):
 		data_trajectoires = ()
 		trajectoire = ((self.__positionX, self.__positionY),)
-
 
 		#Pour les actions en cours d'execution
 		id_action_en_cours = None
@@ -125,8 +127,14 @@ class OurBot():
 		
 		return self.__actions_en_cours
 
+	def getIdToReach(self):
+		return self.__id_to_reach
+
 	def __getNextIdToStack(self):
 		return self.__last_id_action_stacked.idIncrementation()
+
+	def setIdToReach(self, id):
+		self.__id_to_reach = id
 
 	def setLastIdObjectifExecuted(self, idd):
 		self.__last_id_objectif_executed = idd
