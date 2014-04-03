@@ -13,17 +13,24 @@ using namespace cv;
 using namespace std;
 
 int main(int argc, char **argv){
+	char com = '1';
 	int index = 0;
 	if (argc > 1){
 		index = argv[1][0] - '0';
 	}
-	VideoCapture cam(index);
-	Visio visio(cam);
-	visio.loadTransformMatrix();
-	namedWindow("img");
-	Mat img;
-	cam >> img;
-	comLoop(visio);
-	//perspectiveOnlyLoop(index);
+	if (argc > 2){
+		com = argv[2][0];
+	}
+	if (com == '1') {
+		VideoCapture cam(index);
+		Visio visio(cam);
+		visio.loadTransformMatrix();
+		namedWindow("img");
+		Mat img;
+		cam >> img;
+		comLoop(visio);
+	}
+	else
+		perspectiveOnlyLoop(index);
 	return 0;
 }
