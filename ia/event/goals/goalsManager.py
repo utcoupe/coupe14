@@ -63,9 +63,12 @@ class GoalsManager:
 			#on ajoute la trajectoire calculé
 			orders.extend(self.__tupleTrajectoireToDeque(tuple_trajectoire_list))
 			orders.append( ("A_ROT", (goal.getElemGoal(elem_goal_id).getPosition()[2],),) )
-			#on ajoute le script d'action
+			#on ajoute attend d'être arrivé pour lancer les actions
 			orders.append( ("THEN", (),) )
+			#on ajoute le script d'action
 			orders.extend(self.__elem_script[ goal.getElemGoalLocked().getIdScript() ])
+			#on ajoute un marqueur de fin
+			orders.append( ("END", (),) )
 			#on envoi le tout
 			self.__SubProcessManager.sendGoal(self.__last_id_objectif_send, goal.getId(), orders)
 		else:
@@ -172,6 +175,9 @@ class GoalsManager:
 		dom = parseString(fd.read())
 		fd.close()
 
+		data = self.__SubProcessManager.getData()
+		self.__PathFinding.update(data[self.__robot_name])
+
 		for xml_goal in dom.getElementsByTagName('objectif'):
 			id_objectif	= int(xml_goal.getElementsByTagName('id_objectif')[0].firstChild.nodeValue)
 			elem_goal_id= int(xml_goal.getElementsByTagName('elem_goal_id')[0].firstChild.nodeValue)
@@ -187,15 +193,15 @@ class GoalsManager:
 			for goal in self.__available_goals:
 				if goal.getId() == id_objectif:
 					find = True
-					path = self.__getOrderTrajectoireTo(goal, elem_goal_id)
+					path = self.__getOrderTrajectoire(data, goal, elem_goal_id)
 					self.__addGoal(path, goal, elem_goal_id, prev_action=prev_action)
 					break
 
 			if not find:
 				self.__logger.error(str(self.__robot_name) + " impossible de lui ajouter le goal d'id: " + str(id_objectif))
 	
-	def __getOrderTrajectoireTo(self, goal, elem_goal_id):
-		data = self.__SubProcessManager.getData()
+	def __getOrderTrajectoire(self, data, goal, elem_goal_id):
+		"""Il faut mettre à jour les polygones avant d'utiliser cette fonction"""
 		if self.__blocked_goals:
 			last_goal = self.__blocked_goals[-1]
 			position_last_goal = last_goal.getElemGoalLocked().getPosition()
@@ -203,7 +209,6 @@ class GoalsManager:
 			position_last_goal = data[self.__robot_name]["getPositon"]
 		position_to_reach = goal.getElemGoal(elem_goal_id).getPosition()
 		
-		self.__PathFinding.update(data[self.__robot_name])
 		path = self.__PathFinding.getPath((position_last_goal[0], position_last_goal[1]), (position_to_reach[0], position_to_reach[1]), enable_smooth=True)
 
 		return path
