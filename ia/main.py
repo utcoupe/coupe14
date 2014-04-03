@@ -23,11 +23,11 @@ import event
 import gpio
 
 #lancement de l'IA via le subprocess simu
-def startIa(conn=None):
+def startIa(pipe=None):
 	Communication = communication.CommunicationGlobale()
 	arduino_constantes = Communication.getConst()
 
-	if conn == None:
+	if pipe == None:
 		logger.info("Demarrage d'une IA normal")
 		time.sleep(2) # on attend que les communications s'établissent
 
@@ -50,7 +50,7 @@ def startIa(conn=None):
 
 	else:
 		logger.info("Demarrage d'une IA depuis le simuateur")
-		Communication = None #TODO remplacer par un emulateur de READAPI et SENDAPI en utilisant conn
+		Communication = communication.CommSimulateur(pipe) #TODO remplacer par un emulateur de READAPI et SENDAPI en utilisant conn
 
 
 

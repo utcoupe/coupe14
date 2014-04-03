@@ -10,9 +10,8 @@ import logging
 from xml.dom.minidom import parseString
 from collections import deque
 import sys
-import os
-DIR_PATH = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(DIR_PATH, "../..", "data"))
+import inspect, os
+
 
 from .goal import *
 from .goalExecution import *
@@ -23,6 +22,7 @@ from .navigation import *
 
 class GoalsManager:
 	def __init__(self, SubProcessManager, connection, robot_name):
+		base_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 		self.__robot_name 		= robot_name
 		self.__logger			= logging.getLogger(__name__)
 
@@ -36,8 +36,8 @@ class GoalsManager:
 		data = self.__SubProcessManager.getData() #pas de self, data n'est pas stocké ici !
 		self.__PathFinding = PathFinding((data["FLUSSMITTEL"], data["TIBOT"], data["BIGENEMYBOT"], data["SMALLENEMYBOT"]))
 
-		self.__loadElemScript("elemScripts.xml")
-		self.__loadGoals("goals.xml")
+		self.__loadElemScript(base_dir+"/elemScripts.xml")
+		self.__loadGoals(base_dir+"/goals.xml")
 		self.__collectEnemyFinished()
 
 		self.__loadBeginScript()
@@ -133,7 +133,6 @@ class GoalsManager:
 
 	def __loadGoals(self, filename):
 		"""XML import of goals"""
-		filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
 		self.__logger.info(str(self.__robot_name) + ' is loading goals from: %s'% filename)
 		fd = open(filename,'r')
 		dom = parseString(fd.read())
@@ -166,10 +165,11 @@ class GoalsManager:
 					goal.appendElemGoal( ElemGoal(id, x, y, angle, points, priority, duration, color, id_script) )
 
 	def __loadBeginScript(self):
+		base_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 		if self.__robot_name == 'FLUSSMITTEL':
-			script_filename = "data/script_flussmittel.xml"
+			script_filename = base_dir+"/../../data/script_flussmittel.xml"
 		elif self.__robot_name == 'TIBOT':
-			script_filename = "data/script_tibot.xml"
+			script_filename = base_dir+"/../../data/script_tibot.xml"
 
 		self.__logger.info(str(self.__robot_name) + " loading beginScript from: " + str(script_filename))
 		fd = open(script_filename,'r')

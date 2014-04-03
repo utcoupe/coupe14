@@ -5,6 +5,9 @@ from geometry import Poly
 import logging
 import time
 
+import inspect, os
+base_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+
 class Path(list):
 	def __init__(self, list):
 		super().__init__(list)
@@ -15,7 +18,7 @@ class Path(list):
 		return dist
 
 class PathFinding:
-	def __init__(self, robot_list, xml_filename="event/goals/navigation/map.xml"):
+	def __init__(self, robot_list, xml_filename=base_dir+"/map.xml"):
 		self.__log = logging.getLogger(__name__)
 		self.__flussmittel, self.__tibot, self.__big_enemy_bot, self.__small_enemy_bot = robot_list
 		#on cree le navgraph

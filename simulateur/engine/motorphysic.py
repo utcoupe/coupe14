@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
 
+import sys
+import os
+
+current_path = os.getcwd()
+sys.path.insert(0, os.path.join( current_path, "pymunk-4.0.0" ) )
 
 import pymunk as pm
 from pymunk import Vec2d
 
-import sys
-import os
 DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(DIR_PATH, "..", "map"))
 
