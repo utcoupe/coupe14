@@ -160,9 +160,10 @@ class GoalsManager:
 					points		= int(elem_goal.getElementsByTagName('points')[0].firstChild.nodeValue)
 					priority	= int(elem_goal.getElementsByTagName('priority')[0].firstChild.nodeValue)
 					duration	= int(elem_goal.getElementsByTagName('duration')[0].firstChild.nodeValue)
+					color		= str(elem_goal.getElementsByTagName('color')[0].firstChild.nodeValue)
 					id_script	= int(elem_goal.getElementsByTagName('id_script')[0].firstChild.nodeValue)
 					#TODO instancier elem_goal
-					goal.appendElemGoal( ElemGoal(id, x, y, angle, points, priority, duration, id_script) )
+					goal.appendElemGoal( ElemGoal(id, x, y, angle, points, priority, duration, color, id_script) )
 
 	def __loadBeginScript(self):
 		if self.__robot_name == 'FLUSSMITTEL':
