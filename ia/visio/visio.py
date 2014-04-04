@@ -14,12 +14,23 @@ class Triangle:
 	def __init__(self, coord, angle, color, isDown):
 		self.coord = [int(float(x)) for x in coord.split(':')]
 		self.angle = float(angle)
-		self.color = str(color)
+		self.color = ''
+		color = int(color)
+		if color == 0:
+			self.color = 'RED'
+		elif color == 1:
+			self.color = 'YELLOW'
+		elif color == 2:
+			self.color = 'BLACK'
 		self.isDown = bool(isDown)
 		self.real_coords = (-1, -1)
 
 	def __repr__(self):
-		return str(self.coord) + ' : ' + str(self.angle) + '  - couleur : ' + self.color + ' down : ' + str(self.isDown)
+		if self.isDown:
+			state = ' down '
+		else:
+			state = ' up '
+		return str(self.coord) + ' : a=' + str(self.angle) + ' - ' + self.color + state
 
 
 class Visio:
