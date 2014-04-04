@@ -51,5 +51,4 @@ class ProcessIA():
 		Formate les données IA reçues pour les adapter à la méthode
 		sendOrderAPI de Communication
 		"""
-		print("---------------------------------------------"+str(data))
-		self.__communication.sendOrderAPI(data[0],data[1],data[2])
+		self.__communication.orderBalancing(data[0],data[1],data[2])

@@ -277,7 +277,7 @@
 		</elem_goals>
 	</goal>
 	<goal>
-		<id>6</id>
+		<id>10</id>
 		<name>Deplace toi en 0 0</name>
 		<type>other</type>
 		<concerned_robot>ALL</concerned_robot>

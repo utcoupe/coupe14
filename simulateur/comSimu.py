@@ -16,11 +16,10 @@ class Communication():
 	def __init__(self, bigrobot, minirobot, hokuyo, ia):
 		self.__bigrobot = bigrobot	#objet robot, afin d'envoyer les ordres
 		self.__minirobot = minirobot	#objet robot, afin d'envoyer les ordres
-		self.__orders_to_return = deque()	#structure de donnée contenant les ordres à renvoyer via readOrdersApi
 		self.__hokuyo = hokuyo #objet de type Hokuyo
 		self.__ia = ia #objet processIA
 
-	def sendOrderAPI(self, address, order, arguments):
+	def orderBalancing(self, address, order, arguments):
 		"""
 		Méthode appelée par l'IA pour envoyer un ordre à travers le protocole
 		@param enum de la partie du robot qui est appelée
@@ -41,21 +40,6 @@ class Communication():
 			self.__traitementHokuyo(order, arguments)
 		else:
 			print('ordre non valide')
-
-	def readOrdersAPI(self, address = 'all'):
-		"""
-		Méthode appelée par l'IA pour vérifier les ordres en attente
-		"""
-		#if address == 'all':
-		if self.__orders_to_return:
-			order = self.__orders_to_return.popleft()
-		else:
-			order = None
-		if order is not None:
-			print(order)
-			return order[0], order[1], order[2]
-		else:
-			return -1
 
 	def __traitementFlussmittelOthers(self, order, args):
 		"""
@@ -158,24 +142,5 @@ class Communication():
 			self.__addOrder("ADDR_HOKUYO", order, data_to_ret)
 
 	def __addOrder(self, addr, ordre, args):
-		self.__orders_to_return.append((addr, ordre, args))
 		self.__ia.writePipe(addr, ordre, args)
 
-	def testCom(self):
-		print('testCom')
-		self.sendOrderAPI("ADDR_TIBOT_ASSERV","A_GOTO",(49,2000,400,))
-		print('order 0', self.readOrdersAPI())
-		time.sleep(1)
-		self.sendOrderAPI("ADDR_FLUSSMITTEL_ASSERV","A_GOTO",(50,180,500,))
-		print('order 1', self.readOrdersAPI())
-		self.sendOrderAPI("ADDR_FLUSSMITTEL_ASSERV","A_GOTO",(51,1200,1500,))
-		print('order 2', self.readOrdersAPI())
-		self.sendOrderAPI("ADDR_FLUSSMITTEL_ASSERV","A_GOTO",(52,2000,1500,))
-		print('order 3', self.readOrdersAPI())
-		self.sendOrderAPI("ADDR_FLUSSMITTEL_ASSERV","A_GET_POS",(35,))
-		print('order 4', self.readOrdersAPI())
-		self.sendOrderAPI("ADDR_FLUSSMITTEL_ASSERV","A_GET_POS_ID",(36,))
-		print('order 5', self.readOrdersAPI())
-		#time.sleep(5)
-		self.sendOrderAPI("ADDR_HOKUYO","GET_HOKUYO",(123,))
-		print('order 6', self.readOrdersAPI())
