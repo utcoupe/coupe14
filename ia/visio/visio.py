@@ -2,6 +2,7 @@
 import logging
 from subprocess import Popen, PIPE
 import time
+import atexit
 
 
 """TODO : Post-traitement des positions des triangles pour corriger
@@ -11,15 +12,18 @@ la position des triangles en hauteur"""
 class Triangle:
 	"""Simple structure de stockage des infos triangles"""
 	def __init__(self, coord, angle, color, isDown):
-		self.coord = [int(x) for x in coord.split(':')]
+		self.coord = [int(float(x)) for x in coord.split(':')]
 		self.angle = float(angle)
 		self.color = str(color)
 		self.isDown = bool(isDown)
-		self.real_coords = (-1,-1)
+		self.real_coords = (-1, -1)
+
+	def __repr__(self):
+		return str(self.coord) + ' : ' + str(self.angle) + '  - couleur : ' + self.color + ' down : ' + str(self.isDown)
 
 
 class Visio:
-	def __init__(self, path_exec, big_bot=None):
+	def __init__(self, path_exec, index=0, big_bot=None):
 		#Parameters
 		self.__updatePeriod = 0.001  # période d'attente entre deux demandes au client
 		self.__offset_coords = (0, 0)  # changement de repère
@@ -29,7 +33,17 @@ class Visio:
 		self.__big_bot = big_bot
 
 		#Lancement du client
-		self.client = Popen(self.path_exec, stdin=PIPE, stdout=PIPE)
+		self.__log.info("Executing C++ program")
+		self.client = Popen([self.path_exec, str(index)], stdin=PIPE, universal_newlines=True, stdout=PIPE)
+		atexit.register(self.client.kill)
+		stdout = ''
+		time.sleep(1)
+		while stdout != 'READY\n':
+			#Attente des données client
+			stdout = self.client.stdout.readline()
+			#Sleep 1ms
+			time.sleep(self.__updatePeriod)
+		self.__log.info("Visio ready")
 
 		self._triangles = []
 
@@ -39,23 +53,19 @@ class Visio:
 	def update(self):
 		"""Demande au client de mettre à jour les triangles,
 		puis renvoit les nouvelles données"""
-		self.client.communicate('ASK_DATA')
-		stdout = ''
+		self.client.stdin.write('ASK_DATA\n')
 		data = ''
 
 		# On lit jusqu'à la fin de la tramme de retour
-		while stdout != 'END\n':
+		while data[-4:] != 'END\n':
 			#Attente des données client
-			stdout, stderr = self.client.communicate()
+			stdout = self.client.stdout.readline()
 			data += stdout
-			if stderr != '':  # Erreurs clients
-				self.__log.warning('Erreurs C++ visio : ' + stderr)
-				raise Exception(stderr)
 			#Sleep 1ms
 			time.sleep(self.__updatePeriod)
 
 		# On supprime le END
-		data = data[-4:]
+		data = data[:-4]
 		# Maj des triangles
 		self.__updateTriFromStr(data)
 		return self._triangles
@@ -64,10 +74,11 @@ class Visio:
 		triangles = data.split('\n')
 		self._triangles.clear()
 		#Pour chaque triangle
-		for triangle in triangles:
-			attr = triangles.split(' ')
+		for triangle in triangles[:-1]:
+			attr = triangle.split(' ')
 			tri = Triangle(*attr)
 			self._triangles.append(tri)
+		self.__log.info("Received data from C++ : " + str(self._triangles))
 
 		if self.__big_bot is not None:
 			self.__post_processing()

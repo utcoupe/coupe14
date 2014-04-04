@@ -14,11 +14,11 @@ void perspectiveOnlyLoop(int index){
 	Visio visio(cam);
 	visio.setChessboardSize(Size(9,6));
 
-	int size_min(5000), max_diff_triangle_edge(30);
+	int size_min(5000), max_diff_triangle_edge(50);
 	int h_min_y(YEL_HUE_MIN), h_max_y(YEL_HUE_MAX), s_min_y(YEL_SAT_MIN), s_max_y(YEL_SAT_MAX), v_min_y(YEL_VAL_MIN), v_max_y(YEL_VAL_MAX);
 	int h_min_r(RED_HUE_MIN), h_max_r(RED_HUE_MAX), s_min_r(RED_SAT_MIN), s_max_r(RED_SAT_MAX), v_min_r(RED_VAL_MIN), v_max_r(RED_VAL_MAX);
 	int h_min_b(BLK_HUE_MIN), h_max_b(BLK_HUE_MAX), s_min_b(BLK_SAT_MIN), s_max_b(BLK_SAT_MAX), v_min_b(BLK_VAL_MIN), v_max_b(BLK_VAL_MAX);
-	int epsilon(7), key = -1;
+	int epsilon(4), key = -1;
 	bool calibrating = !visio.loadTransformMatrix();
 
 	namedWindow("parameters");

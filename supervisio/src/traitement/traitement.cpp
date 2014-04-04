@@ -13,8 +13,8 @@ using namespace std;
 
 Visio::Visio(VideoCapture& cam) : 
 	color(red), calibrated(false), min_size(100),
-	chessboard_size(Size(9,6)), epsilon_poly(0.07),
-	max_diff_triangle_edge(30), camera(cam) {
+	chessboard_size(Size(9,6)), epsilon_poly(0.04),
+	max_diff_triangle_edge(50), camera(cam) {
 	init();
 }
 
@@ -138,7 +138,6 @@ int Visio::trianglesFromImg(const Mat& img, vector<Triangle>& triangles) {
 int Visio::triangles(vector<Triangle>& triangles) {
 	Mat img;
 	for(int i=0; i<6; i++) camera >> img;
-	imshow("img", img);
 	return trianglesFromImg(img, triangles);
 }
 //FILE MANAGER
@@ -283,14 +282,14 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 					addTriangle(points_real[i], contour_real, triangles);
 					nb_triangles++;
 				}
-				else if (degree[i] > 3) {
+				else if (degree[i] > 3 && degree[i] < 8) {
 					vector<Point2f> contour_real = convertItoF(contours[i]);
 					perspectiveTransform(contour_real, contour_real, perspectiveMatrix);
 					//Voir si on a pas plusieurs triangles collés
 					nb_triangles += deduceTrianglesFromContour(contour_real, triangles);
 				}
 			}
-			else { //black
+			else if (ENABLE_BLK) { //black
 				if (degree[i] >= 4){
 					vector<Point2f> contour_real = convertItoF(contours[i]);
 					perspectiveTransform(contour_real, contour_real, perspectiveMatrix);
@@ -340,11 +339,11 @@ int Visio::deduceTrianglesFromContour(vector<Point2f>& contour_real, vector<Tria
 				Point2f p3 = contour_real[l];
 				if (isEqui(p1, p2, p3)) {
 					//Point central
-					contour_real.clear();
-					contour_real.push_back(p1);
-					contour_real.push_back(p2);
-					contour_real.push_back(p3);
-					Moments moment = moments(contour_real);
+					vector<Point2f> contour_tri;
+					contour_tri.push_back(p1);
+					contour_tri.push_back(p2);
+					contour_tri.push_back(p3);
+					Moments moment = moments(contour_tri);
 					if (moment.m00 > min_size) {
 						Triangle tri;
 						nb_triangles++;
@@ -353,8 +352,8 @@ int Visio::deduceTrianglesFromContour(vector<Point2f>& contour_real, vector<Tria
 						tri.coords = Point2f(x,y);
 						tri.color = color;
 						//Calcule de l'angle du triangle
-						double dx = contour_real[0].x - tri.coords.x;
-						double dy = contour_real[0].y - tri.coords.y; 
+						double dx = contour_tri[0].x - tri.coords.x;
+						double dy = contour_tri[0].y - tri.coords.y; 
 						tri.angle = atan2(dy, dx);
 
 						//Modulo 2*PI/3
@@ -367,8 +366,9 @@ int Visio::deduceTrianglesFromContour(vector<Point2f>& contour_real, vector<Tria
 
 						//On ne detecte pas les triangles debout dans ce cas, ce ne serait pas assez fiable
 						tri.isDown = false;
-						tri.contour = contour_real;
+						tri.contour = contour_tri;
 						triangles.push_back(tri);
+						return nb_triangles;
 					}
 				}
 			}

@@ -25,9 +25,6 @@ int main(int argc, char **argv){
 		VideoCapture cam(index);
 		Visio visio(cam);
 		visio.loadTransformMatrix();
-		namedWindow("img");
-		Mat img;
-		cam >> img;
 		comLoop(visio);
 	}
 	else
