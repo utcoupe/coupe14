@@ -9,7 +9,7 @@ import time
 
 from .constantes import *
 from .subProcessCommunicate import *
-from .navigation import *
+from .collision import *
 
 class EventManager():
 	def __init__(self, Communication, Data):
@@ -26,12 +26,12 @@ class EventManager():
 		self.__last_hokuyo_data = None
 
 		self.__last_flussmittel_order_finished = ID_ACTION_MAX	#id_action
-		self.__id_to_reach_flussmittel = 0
+		self.__id_to_reach_flussmittel = "ANY"
 		self.__sleep_time_flussmittel = 0
 		self.__resume_date_flussmittel = 0
 
 		self.__last_tibot_order_finished = ID_ACTION_MAX			#id_action
-		self.__id_to_reach_tibot = 0
+		self.__id_to_reach_tibot = "ANY"
 		self.__sleep_time_tibot = 0
 		self.__resume_date_tibot = 0
 
@@ -107,7 +107,8 @@ class EventManager():
 			
 			if new_data != self.__last_hokuyo_data:
 				self.__last_hokuyo_data = new_data
-				self.__testCollision()
+				if self.__MetaData.getCheckCollision():
+					self.__testCollision()
 
 		if self.__Flussmittel is not None:
 			new_id = self.__Flussmittel.getLastIdGlobale()
@@ -117,7 +118,7 @@ class EventManager():
 				self.__Flussmittel.removeActionBellow(new_id)
 
 			#si on est sur l'action bloquante
-			if self.__last_flussmittel_order_finished == self.__id_to_reach_flussmittel:
+			if self.__last_flussmittel_order_finished == self.__id_to_reach_flussmittel or self.__id_to_reach_flussmittel == "ANY":
 				#Gestion des sleep
 				if self.__sleep_time_flussmittel > 0:
 					self.__resume_date_flussmittel = int(time.time()*1000) + self.__sleep_time_flussmittel
@@ -130,7 +131,6 @@ class EventManager():
 							self.__pushOrders(self.__Flussmittel, next_actions)
 
 
-
 		if self.__Tibot is not None:
 			new_id = self.__Tibot.getLastIdGlobale()
 			#si un nouvel ordre s'est terminé
@@ -139,7 +139,7 @@ class EventManager():
 				self.__Tibot.removeActionBellow(new_id)
 
 			#si on est sur l'action bloquante
-			if self.__last_tibot_order_finished == self.__id_to_reach_tibot:
+			if self.__last_tibot_order_finished == self.__id_to_reach_tibot or self.__id_to_reach_tibot == "ANY":
 				#Gestion des sleep
 				if self.__sleep_time_tibot > 0:
 					self.__resume_date_tibot = int(time.time()*1000) + self.__sleep_time_tibot
@@ -208,13 +208,22 @@ class EventManager():
 
 	def __testCollision(self):
 		if self.__Flussmittel is not None:
+			arg = []
 			collision_data = self.__Collision.getCollision(self.__Flussmittel)
 			if collision_data is not None:
-				self.__SubProcessCommunicate.sendObjectifCanceled(collision_data[0])
+				first_id_to_remove = collision_data[0]
+				id_canceled_list = self.__Flussmittel.removeObjectifAbove(first_id_to_remove)
+				self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_CLEANG', *arg)
+				self.__id_to_reach_flussmittel = "ANY"
+				self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
 
 		if self.__Tibot is not None:
 			collision_data = self.__Collision.getCollision(self.__Tibot)
 			if collision_data is not None:
-				self.__SubProcessCommunicate.sendObjectifCanceled(collision_data[0])
+				first_id_to_remove = collision_data[0]
+				id_canceled_list = self.__Tibot.removeObjectifAbove(first_id_to_remove)
+				self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_CLEANG', *arg)
+				self.__id_to_reach_tibot = "ANY"
+				self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
 
 

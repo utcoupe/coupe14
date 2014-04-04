@@ -3,6 +3,17 @@
 Ce fichier regroupe toutes les constantes de l'IA
 """
 
+
+TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+
+
+
+
+#====================Enable====================
+ENABLE_TOURELLE = 		True 
+ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
+ENABLE_TIBOT = 			True
+
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
 VITESSE_XBEE = 			57600
@@ -45,13 +56,13 @@ PERIODE_TIME_MANAGER =	100
 END_OF_MATCH = 			89500
 BEGIN_FUNNY_ACTION =	90000
 END_OF_FUNNY_ACTION = 	94000
+BEGIN_CHECK_COLLISION =	3000 #TODO
 
 #====================Goal====================
 FINISHED_THRESHOLD = 50
 
 
 #====================tourelle====================
-ENABLE_TOURELLE = 		False 		#permet de desactiver la tourelle
 OUR_ROBOTS_VISIBLE_TOURELLE = True 	#True si une balise visible par l'hokuyo est presente sur nos robots 
 TOURELLE_PULL_PERIODE = 100 		#ms
 
@@ -63,7 +74,6 @@ SEUIL_ROUGE = 			100 #TODO
 SEUIL_JAUNE = 			100 #TODO
 
 #====================Flussmittel====================
-ENABLE_FLUSSMITTEL = 	False #permet de desactiver Flussmitel
 LARGEUR_FLUSSMITTEL = 	100
 LONGUEUR_FLUSSMITTEL = 	100
 
@@ -72,7 +82,6 @@ LONGUEUR_FLUSSMITTEL = 	100
 
 
 #====================TIBOT====================
-ENABLE_TIBOT = 			False #permet de desactiver un Tibot
 LARGEUR_TIBOT = 		100
 LONGUEUR_TIBOT = 		100
 

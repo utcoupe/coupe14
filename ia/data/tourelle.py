@@ -35,12 +35,12 @@ class Tourelle():
 
 		position_nos_robots = []
 		if self.Flussmittel is not None:
-			temp = self.Flussmittel.getPositon
-			position_nos_robots.append(Position(temp[0], temp[0]))
+			temp = self.Flussmittel.getPosition()
+			position_nos_robots.append(Position(temp[0], temp[1]))
 
 		if self.Tibot is not None:
-			temp = self.Tibot.getPositon
-			position_nos_robots.append(Position(temp[0], temp[0]))
+			temp = self.Tibot.getPosition()
+			position_nos_robots.append(Position(temp[0], temp[1]))
 
 		position_hokuyo = []
 		for i in range(1,9,2):

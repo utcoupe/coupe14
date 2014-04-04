@@ -68,9 +68,9 @@ class CommunicationGlobale():
 		self.nbUnconfirmedPacket = [(0, -1)]*(self.nbAddress+1) # (nbUnconfimed, dateFirstUnconfirmed)
 		
 		
-		if ENABLE_TOURELLE or ENABLE_TIBOT:
+		if TEST_MODE == False and (ENABLE_TOURELLE == True or ENABLE_TIBOT == True):
 			self.liaisonXbee = serial_comm.ComSerial(PORT_XBEE, VITESSE_XBEE, PARITY_XBEE)
-		if ENABLE_FLUSSMITTEL:
+		if TEST_MODE == False and ENABLE_FLUSSMITTEL == True:
 			self.liaisonArduino = serial_comm.ComSerial(PORT_OTHER, VITESSE_OTHER, PARITY_OTHER)
 
 
@@ -183,9 +183,9 @@ class CommunicationGlobale():
 
 
 	def sendMessage(self, address, data):
-		if (address == self.address['ADDR_FLUSSMITTEL_OTHER'] or address == self.address['ADDR_FLUSSMITTEL_ASSERV']) and ENABLE_FLUSSMITTEL: 
+		if (address == self.address['ADDR_FLUSSMITTEL_OTHER'] or address == self.address['ADDR_FLUSSMITTEL_ASSERV']) and ENABLE_FLUSSMITTEL == True and TEST_MODE == False: 
 			self.liaisonArduino.send(data)
-		elif ENABLE_TOURELLE or ENABLE_TIBOT:
+		elif (ENABLE_TOURELLE == True or ENABLE_TIBOT ==  True) and TEST_MODE == False:
 			self.liaisonXbee.send(data)
 
 
@@ -355,10 +355,10 @@ class CommunicationGlobale():
 	def getXbeeOrders(self):
 		rawInputList = []
 		""" retourne ordersList, une liste d'élements sous la forme(adresse, id, data) où data est prêt à être interpréter"""
-		if ENABLE_TOURELLE or ENABLE_TIBOT:
+		if TEST_MODE == False and (ENABLE_TOURELLE == True or ENABLE_TIBOT == True):
 			rawInputList += self.liaisonXbee.read()
 
-		if ENABLE_FLUSSMITTEL:
+		if TEST_MODE == False and ENABLE_FLUSSMITTEL == True:
 			rawInputList += self.liaisonArduino.read()
 
 		ordersList = deque()

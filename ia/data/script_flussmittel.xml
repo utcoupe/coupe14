@@ -1,111 +1,27 @@
 <?xml version="1.0" ?>
 <objectifs>
-	<objectif objectif_name='reset pos'>
-		<idd>0</idd>
-		<actions>
-			<action>
-				<ordre>O_BRAS_FERMER</ordre>
-				<arguments></arguments>
-			</action>
-			<action>
-				<ordre>END</ordre>
-				<arguments></arguments>
-			</action>
-		</actions>
+	<objectif>
+		<id_objectif>0</id_objectif>
+		<elem_goal_id>0</elem_goal_id>
+		<prev_actions>
+		</prev_actions>
 	</objectif>
-	<objectif objectif_name='script triangle 1'>
-		<idd>0</idd>
-		<actions>
-			<action>
-				<ordre>A_GOTO</ordre>
-				<arguments>400, 1150</arguments>
-			</action>
-			<action>
-				<ordre>A_ROT</ordre>
-				<arguments>-1.5708</arguments>
-			</action>
-			<action>
-				<ordre>A_GOTO</ordre>
-				<arguments>400, 900</arguments>
-			</action>
-			<action>
-				<ordre>A_GOTO</ordre>
-				<arguments>400, 1150</arguments>
-			</action>
-			<action>
-				<ordre>END</ordre>
-				<arguments></arguments>
-			</action>
-		</actions>
+	<objectif>
+		<id_objectif>1</id_objectif>
+		<elem_goal_id>0</elem_goal_id>
+		<prev_actions>
+		</prev_actions>
 	</objectif>
-	<objectif objectif_name='script triangle 2'>
-		<idd>0</idd>
-		<actions>
-			<action>
-				<ordre>A_GOTO</ordre>
-				<arguments>700, 1400</arguments>
-			</action>
-			<action>
-				<ordre>A_ROT</ordre>
-				<arguments>0</arguments>
-			</action>
-			<action>
-				<ordre>A_GOTO</ordre>
-				<arguments>900, 1400</arguments>
-			</action>
-			<action>
-				<ordre>A_GOTO</ordre>
-				<arguments>700, 1400</arguments>
-			</action>
-			<action>
-				<ordre>END</ordre>
-				<arguments></arguments>
-			</action>
-		</actions>
+	<objectif>
+		<id_objectif>2</id_objectif>
+		<elem_goal_id>1</elem_goal_id>
+		<prev_actions>
+		</prev_actions>
 	</objectif>
-	<objectif objectif_name='script triangle mur'>
-		<idd>0</idd>
-		<actions>
-			<action>
-				<ordre>A_GOTO</ordre>
-				<arguments>400, 1200</arguments>
-			</action>
-			<action>
-				<ordre>A_ROT</ordre>
-				<arguments>3.14158</arguments>
-			</action>
-			<action>
-				<ordre>O_BRAS_OUVRIR</ordre>
-				<arguments></arguments>				
-			</action>
-			<action>
-				<ordre>SLEEP</ordre>
-				<arguments>500</arguments>
-			</action>
-			<action>
-				<ordre>A_PWM</ordre>
-				<arguments>100, 100, 500</arguments>
-			</action>
-			<action>
-				<ordre>SLEEP</ordre>
-				<arguments>500</arguments>
-			</action>
-			<action>
-				<ordre>O_BRAS_FERMER</ordre>
-				<arguments></arguments>
-			</action>
-			<action>
-				<ordre>SLEEP</ordre>
-				<arguments>500</arguments>
-			</action>
-			<action>
-				<ordre>A_PWM</ordre>
-				<arguments>-100, -100, 500</arguments>
-			</action>
-			<action>
-				<ordre>END</ordre>
-				<arguments></arguments>
-			</action>
-		</actions>
+	<objectif>
+		<id_objectif>3</id_objectif>
+		<elem_goal_id>1</elem_goal_id>
+		<prev_actions>
+		</prev_actions>
 	</objectif>
 </objectifs>

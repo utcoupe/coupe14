@@ -1,15 +1,17 @@
 <?xml version="1.0" ?>
 <goals>
 	<goal>
+		<id>0</id>
 		<name>Tirangle en haut à gauche</name>
-		<typee>triangle</typee>
-		<concerned_robot>TIBOT</concerned_robot>
-		<x>0</x>
-		<y>0</y>
+		<type>triangle</type>
+		<concerned_robot>ALL</concerned_robot>
+		<x>900</x>
+		<y>1400</y>
 		<elem_goals>
 			<elem_goal>
-				<x>0</x>
-				<y>0</y>
+				<id>0</id>
+				<x>800</x>
+				<y>1400</y>
 				<angle>0.0</angle>
 				<points>1</points>
 				<priority>1</priority>
@@ -17,9 +19,10 @@
 				<id_script>0</id_script>
 			</elem_goal>
 			<elem_goal>
-				<x>0</x>
-				<y>0</y>
-				<angle>0.0</angle>
+				<id>1</id>
+				<x>1000</x>
+				<y>1400</y>
+				<angle>1.55</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -28,15 +31,17 @@
 		</elem_goals>
 	</goal>
 	<goal>
+		<id>1</id>
 		<name>Tirangle en haut à droite</name>
-		<typee>triangle</typee>
+		<type>triangle</type>
 		<concerned_robot>ALL</concerned_robot>
-		<x>200</x>
-		<y>200</y>
+		<x>2100</x>
+		<y>1400</y>
 		<elem_goals>
 			<elem_goal>
-				<x>0</x>
-				<y>0</y>
+				<id>0</id>
+				<x>2000</x>
+				<y>1400</y>
 				<angle>0.0</angle>
 				<points>1</points>
 				<priority>1</priority>
@@ -44,13 +49,94 @@
 				<id_script>0</id_script>
 			</elem_goal>
 			<elem_goal>
+				<id>1</id>
+				<x>2200</x>
+				<y>1400</y>
+				<angle>1.55</angle>
+				<points>1</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<id_script>0</id_script>
+			</elem_goal>
+		</elem_goals>
+	</goal>
+	<goal>
+		<id>2</id>
+		<name>Tirangle en bas à droite</name>
+		<type>triangle</type>
+		<concerned_robot>ALL</concerned_robot>
+		<x>2100</x>
+		<y>400</y>
+		<elem_goals>
+			<elem_goal>
+				<id>0</id>
+				<x>2000</x>
+				<y>400</y>
+				<angle>0.0</angle>
+				<points>1</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<id_script>0</id_script>
+			</elem_goal>
+			<elem_goal>
+				<id>1</id>
+				<x>2200</x>
+				<y>400</y>
+				<angle>1.55</angle>
+				<points>1</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<id_script>0</id_script>
+			</elem_goal>
+		</elem_goals>
+	</goal>
+	<goal>
+		<id>3</id>
+		<name>Tirangle en bas à gauche</name>
+		<type>triangle</type>
+		<concerned_robot>ALL</concerned_robot>
+		<x>900</x>
+		<y>400</y>
+		<elem_goals>
+			<elem_goal>
+				<id>0</id>
+				<x>800</x>
+				<y>400</y>
+				<angle>0.0</angle>
+				<points>1</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<id_script>0</id_script>
+			</elem_goal>
+			<elem_goal>
+				<id>1</id>
+				<x>1000</x>
+				<y>400</y>
+				<angle>1.55</angle>
+				<points>1</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<id_script>0</id_script>
+			</elem_goal>
+		</elem_goals>
+	</goal>
+	<goal>
+		<id>4</id>
+		<name>Deplace toi en 0 0</name>
+		<type>other</type>
+		<concerned_robot>ALL</concerned_robot>
+		<x>0</x>
+		<y>0</y>
+		<elem_goals>
+			<elem_goal>
+				<id>0</id>
 				<x>0</x>
 				<y>0</y>
 				<angle>0.0</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
-				<id_script>0</id_script>
+				<id_script>2</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>

@@ -33,7 +33,7 @@ class Data():
 		if NUMBER_OF_ENEMY >= 2:
 			self.BigEnemyBot = EnemyBot(RAYON_SMALL_ENEMY)
 
-		if ENABLE_TOURELLE == False:#True:
+		if ENABLE_TOURELLE == True:
 			self.Tourelle = Tourelle(self.Flussmittel, self.Tibot,self.BigEnemyBot, self.SmallEnemyBot, Communication, arduino_constantes, 'ADDR_HOKUYO')
 
 		self.__PullData = PullData(Communication, (self.Flussmittel, 'ADDR_FLUSSMITTEL_OTHER', 'ADDR_FLUSSMITTEL_ASSERV'), (self.Tibot, 'ADDR_TIBOT_OTHER', 'ADDR_TIBOT_ASSERV'), self.SmallEnemyBot, self.BigEnemyBot, self.ComputeHokuyoData, (self.Tourelle, arduino_constantes['address']['ADDR_HOKUYO']), PULL_PERIODE)
@@ -46,36 +46,40 @@ class Data():
 
 		if self.Flussmittel is not None:
 			system = self.Flussmittel
-			data["Flussmittel"] = {}
-			data["Flussmittel"]["getPositon"] = system.getPosition()
+			data["FLUSSMITTEL"] = {}
+			data["FLUSSMITTEL"]["getPositon"] = system.getPosition()
+			data["FLUSSMITTEL"]["getRayon"] = system.getRayon()
 		else:
-			data["Flussmittel"] = None
+			data["FLUSSMITTEL"] = None
 
 		if self.Tibot is not None:
 			system = self.Tibot
-			data["Tibot"] = {}
-			data["Tibot"]["getPositon"] = system.getPosition()
+			data["TIBOT"] = {}
+			data["TIBOT"]["getPositon"] = system.getPosition()
+			data["TIBOT"]["getRayon"] = system.getRayon()
 		else:
-			data["Tibot"] = None
+			data["TIBOT"] = None
 
 		if self.Tourelle is not None:
 			system = self.Tourelle
-			data["Tourelle"] = {}
+			data["TOURELLE"] = {}
 		else:
-			data["Tourelle"] = None
-
-		if self.SmallEnemyBot is not None:
-			system = self.SmallEnemyBot
-			data["SmallEnemyBot"] = {}
-			data["SmallEnemyBot"]["getPositon"] = system.getPosition()
-		else:
-			data["SmallEnemyBot"] = None
+			data["TOURELLE"] = None
 
 		if self.BigEnemyBot is not None:
 			system = self.BigEnemyBot
-			data["BigEnemyBot"] = {}
-			data["BigEnemyBot"]["getPositon"] = system.getPosition()
+			data["BIGENEMYBOT"] = {}
+			data["BIGENEMYBOT"]["getPositon"] = system.getPosition()
+			data["BIGENEMYBOT"]["getRayon"] = system.getRayon()
 		else:
-			data["BigEnemyBot"] = None
+			data["BIGENEMYBOT"] = None
+
+		if self.SmallEnemyBot is not None:
+			system = self.SmallEnemyBot
+			data["SMALLENEMYBOT"] = {}
+			data["SMALLENEMYBOT"]["getPositon"] = system.getPosition()
+			data["SMALLENEMYBOT"]["getRayon"] = system.getRayon()
+		else:
+			data["SMALLENEMYBOT"] = None
 
 		return data

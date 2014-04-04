@@ -81,12 +81,12 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 	case RESET_ID:
 		control.resetLastFinishedId();
 		break;
-	case A_RESET_POS:
+	case A_SET_POS:
 		if (!doublon) {
 			pos pos;
-			pos.x = 0;
-			pos.y = 0;
-			pos.angle = 0;
+			pos.x = btoi(argv);
+			pos.y = btoi(argv+2);
+			pos.angle = btof(argv+4);
 			control.pushPos(pos);
 		}
 		break;
