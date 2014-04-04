@@ -70,7 +70,7 @@ SEUIL_JAUNE = 			100 #TODO
 
 #====================NAVIGATION================
 POINTS_PAR_CERCLE = 	8
-MARGE_PASSAGE_PATH = 	10
+MARGE_PASSAGE_PATH = 	50
 COLLISION_THRESHOLD =	200
 
 
@@ -93,3 +93,4 @@ RAYON_BIG_ENEMY = 		100
 
 #====================SMALL ENEMY====================
 RAYON_SMALL_ENEMY = 	100
+
