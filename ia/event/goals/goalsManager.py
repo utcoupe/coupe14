@@ -55,7 +55,6 @@ class GoalsManager:
 	def __addGoal(self, tuple_trajectoire_list, goal, elem_goal_id, prev_action=deque()):
 		"""Méthode pour l'ajout d'un ordre dans la file du robot"""
 		if self.__tryBlockGoal(goal):
-			self.__last_id_objectif_send = goal.getId()
 			goal.setElemGoalLocked(goal.getElemGoal(elem_goal_id))
 
 			#on met les prev_action, ce sont des hack pour faire passer le robot d'une action à l'autre avec un trajectoire prédeterminé
@@ -71,12 +70,13 @@ class GoalsManager:
 			orders.append( ("END", (),) )
 			#on envoi le tout
 			self.__SubProcessManager.sendGoal(self.__last_id_objectif_send, goal.getId(), orders)
+			self.__logger.warning(str(self.__robot_name)+str(self.__last_id_objectif_send)+":"+str(goal.getId()))
+			self.__last_id_objectif_send = goal.getId()
 		else:
 			self.__logger.error('Unable to block ' + goal.getName())
 
 	def __tupleTrajectoireToDeque(self, tuple_trajectoire_list):
 		order_list = deque()
-
 		for tuple in tuple_trajectoire_list:
 			order_list.append(('A_GOTO', [tuple[0], tuple[1]]))
 		return order_list

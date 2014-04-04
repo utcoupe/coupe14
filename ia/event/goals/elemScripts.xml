@@ -23,4 +23,10 @@
 			<order>A_GOTO 0 0</order>
 		</orders>
 	</elemScript>
+	<elemScript>
+		<id_script>3</id_script>
+		<orders>
+			<order>SLEEP 1000</order>
+		</orders>
+	</elemScript>
 </elemScripts>

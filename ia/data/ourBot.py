@@ -151,10 +151,14 @@ class OurBot():
 
 	#utilise les données en provenance de de l'asserv uniquement !
 	def setPositionAndId(self, address, arguments):
-		self.positionX = arguments[0]
-		self.positionY = arguments[1]
-		self.angle = arguments[2]
+		self.__positionX = arguments[0]
+		self.__positionY = arguments[1]
+		self.__angle = arguments[2]
 		self.setLastId(address, arguments[3])
+
+	def setPosition(self, x, y):
+		self.__positionX = x
+		self.__positionY = y
 
 	def addNewObjectif(self, id_objectif, action_data):
 		new_objectif = (id_objectif,)

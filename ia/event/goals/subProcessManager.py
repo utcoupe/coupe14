@@ -8,13 +8,16 @@ import logging
 from collections import deque
 import time
 
+
 from .goalsManager import *
 
 class SubProcessManager():
 	def __init__(self, connection, robot_name):
-		self.__logger = logging.getLogger(__name__.split('.')[0])
+		
 		self.__connection = connection
 		self.__robot_name = robot_name
+
+		self.__logger = logging.getLogger(__name__.split('.')[0])
 
 		self.__data = {}
 		while self.__data == {}:

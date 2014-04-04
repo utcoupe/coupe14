@@ -43,6 +43,16 @@ class Asserv:
 	""" Émule l'arduino dédiée à l'asservissement """
 	def __init__(self, robot):
 		self.__robot = robot
+		self.__last_id_executed = 0
+
+	def resetId(self):
+		self.__last_id_executed = 0
+
+	def incId(self):
+		self.__last_id_executed += 1
+
+	def getId(self):
+		return self.__last_id_executed
 
 	def adresse(self):
 		#TODO return en fonction de l'enum
@@ -159,7 +169,17 @@ class Others:
 	""" Émule l'arduino dédiée aux others """
 	def __init__(self, robot):
 		self.__robot = robot
+		self.__last_id_executed = 0
 
+	def resetId(self):
+		self.__last_id_executed = 0
+
+	def incId(self):
+		self.__last_id_executed += 1
+
+	def getId(self):
+		return self.__last_id_executed
+		
 	def ping(self):
 		return "others pong"
 

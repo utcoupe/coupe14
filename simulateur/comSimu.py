@@ -54,13 +54,25 @@ class Communication():
 		print("-------------------------------------------- "+str(order)+"   "+str(args))
 
 		#on traite les ordres qui nécessitent de renvoyer des informations
-		if (order == A_GET_POS):
+		if (order == "A_GET_POS"):
 			pos = self.__bigrobot.getPosition()
 			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos)
-		elif (order == A_GET_POS_ID):
-			pos = self.__bigrobot.getPosition()
-			pos_id = (pos[0], pos[1], pos[2])
+
+		elif (order == "A_GET_POS_ID"):
+			pos = self.__bigrobot.getPositionId()
+			pos_id = (pos[0], pos[1], pos[2], pos[3])
 			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos_id)
+
+		elif (order == "A_CLEANG"):
+			pos = ()
+			self.__bigrobot.cleanGoals()
+			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos)
+
+		elif (order == "RESET_ID"):
+			pos = ()
+			self.__bigrobot.resetId()
+			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos)
+
 		else:
 			#on ajoute l'ordre reçu à la structure de renvoie
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, args)
@@ -78,8 +90,6 @@ class Communication():
 				self.__bigrobot.addGoalOrder(ROT, args)
 			elif (order == "A_ROTR"):
 				self.__bigrobot.addGoalOrder(ROTR, args)
-			elif (order == "A_CLEANG"):
-				self.__bigrobot.cleanGoals()
 			elif (order == "A_PWM"):
 				self.__bigrobot.addGoalOrder(PWM, args)
 			else:
@@ -105,10 +115,22 @@ class Communication():
 		if (order == "A_GET_POS"):
 			pos = self.__minirobot.getPosition()
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
+
 		elif (order == "A_GET_POS_ID"):
-			pos = self.__minirobot.getPosition()
-			pos_id = (pos[0], pos[1], pos[2])
+			pos = self.__minirobot.getPositionId()
+			pos_id = (pos[0], pos[1], pos[2], pos[3])
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos_id)
+
+		elif (order == "A_CLEANG"):
+			pos = ()
+			self.__bigrobot.cleanGoals()
+			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
+
+		elif (order == "RESET_ID"):
+			pos = ()
+			self.__bigrobot.resetId()
+			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
+
 		else:
 			if (order == "PINGPING"):
 				self.__minirobot.ping()
@@ -129,7 +151,7 @@ class Communication():
 			elif (order == "A_PWM"):
 				self.__minirobot.addGoalOrder(PWM, args)
 			else:
-				print('Error : mauvais paramètre traitement Flussmittel asserv !')
+				print('Error : mauvais paramètre traitement Tibot asserv !')
 
 	def __traitementHokuyo(self, order, args):
 		"""

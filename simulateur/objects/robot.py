@@ -62,6 +62,13 @@ class Robot(EngineObjectPoly):
 	def getPosition(self):
 		return self.x(), self.y(), self.a()
 
+	def getPositionId(self):
+		return self.x(), self.y(), self.a(), self.__asserv.getId()
+
+	def resetId(self):
+		self.__asserv.resetId()
+		self.__others.resetId()
+
 	def getTyperobot(self):
 		return self.__typerobot
 
@@ -84,22 +91,20 @@ class Robot(EngineObjectPoly):
 		@param numOrdre int définit dans define
 		"""
 		if (numOrdre == GOTO):
-			print("arg " + str(arg))
-			self.__asserv.goto(arg[0],arg[1])
+			self.__asserv.goto(arg[1],2000-arg[2])
 		elif (numOrdre == GOTOA):
-			self.__asserv.gotoa(arg[0],arg[1],arg[2])
+			self.__asserv.gotoa(arg[1],2000-arg[2],arg[3])
 		elif (numOrdre == GOTOAR):
-			self.__asserv.gotoar(arg[0],arg[1],arg[2])
+			self.__asserv.gotoar(arg[1],2000-arg[2],arg[3])
 		elif (numOrdre == GOTOR):
-			self.__asserv.gotor(arg[0],arg[1])
+			self.__asserv.gotor(arg[1],2000-arg[2])
 		elif (numOrdre == ROT):
-			self.__asserv.rot(arg[0])
+			self.__asserv.rot(arg[1])
 		elif (numOrdre == ROTR):
-			self.__asserv.rotr(arg[0])
+			self.__asserv.rotr(arg[1])
 		elif (numOrdre == PWM):
-			self.__asserv.pwm(arg[0],arg[1],arg[2])	#!! x=pwm_l, y=pwm_r, angle=delay !!
+			self.__asserv.pwm(arg[1],arg[2],arg[3])	#!! x=pwm_l, y=pwm_r, angle=delay !!
 
-	
 
 	def _my_velocity_func(self):
 		def f(body, gravity, damping, dt):
@@ -107,6 +112,7 @@ class Robot(EngineObjectPoly):
 			self.body._set_angular_velocity(0)
 			if not self.__stop and self.__goals:
 				current_goal = self.__goals[0]
+				self.__asserv.incId()
 				if isinstance(current_goal, GoalPOSR):
 					x,y = self.body.position
 					a = self.body.angle

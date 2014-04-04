@@ -55,7 +55,6 @@ def startIa(pipe=None):
 
 
 	Data = data.Data(Communication, arduino_constantes)
-	logger.critical(Data.Flussmittel)
 	if TEST_MODE == False and ENABLE_FLUSSMITTEL == True:
 		Gpio = gpio.Gpio()
 		data.parametrerHokuyo()

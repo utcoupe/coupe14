@@ -17,7 +17,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>R</color>
-				<id_script>0</id_script>
+				<id_script>3</id_script>
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
@@ -28,7 +28,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>Y</color>
-				<id_script>0</id_script>
+				<id_script>3</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>
@@ -49,7 +49,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>R</color>
-				<id_script>0</id_script>
+				<id_script>3</id_script>
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
@@ -60,7 +60,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>Y</color>
-				<id_script>0</id_script>
+				<id_script>3</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>
@@ -81,7 +81,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>R</color>
-				<id_script>0</id_script>
+				<id_script>3</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>
@@ -102,7 +102,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>Y</color>
-				<id_script>0</id_script>
+				<id_script>3</id_script>
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
@@ -113,7 +113,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>R</color>
-				<id_script>0</id_script>
+				<id_script>3</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>
@@ -134,7 +134,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>Y</color>
-				<id_script>0</id_script>
+				<id_script>3</id_script>
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
@@ -145,7 +145,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>R</color>
-				<id_script>0</id_script>
+				<id_script>3</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>
@@ -166,7 +166,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>Y</color>
-				<id_script>0</id_script>
+				<id_script>3</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>
@@ -187,7 +187,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>R</color>
-				<id_script>0</id_script>
+				<id_script>3</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>
@@ -208,7 +208,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>Y</color>
-				<id_script>0</id_script>
+				<id_script>3</id_script>
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
@@ -219,7 +219,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>R</color>
-				<id_script>0</id_script>
+				<id_script>3</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>
@@ -240,7 +240,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>R</color>
-				<id_script>0</id_script>
+				<id_script>3</id_script>
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
@@ -251,7 +251,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>Y</color>
-				<id_script>0</id_script>
+				<id_script>3</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>
@@ -272,7 +272,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>Y</color>
-				<id_script>0</id_script>
+				<id_script>3</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>
@@ -293,7 +293,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>NONE</color>
-				<id_script>2</id_script>
+				<id_script>3</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>

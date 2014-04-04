@@ -67,6 +67,7 @@ class EventManager():
 	def __majObjectif(self):
 		"""Get new goals from objectifManager and add it to robot's goals queue"""
 		new_data_list = self.__SubProcessCommunicate.readOrders()
+		self.__logger.debug("raw: "+str(new_data_list))
 		for new_data in new_data_list:
 			nom_robot, id_prev_objectif, id_objectif, action_data = new_data
 
@@ -91,9 +92,11 @@ class EventManager():
 					if last_objectif[0] == id_prev_objectif:
 						robot.addNewObjectif(id_objectif, action_data)
 					else:
-						self.__logger.warning("On drop un nouvel ordre car il n'est pas à jour, id_prev_objectif: " + str(id_prev_objectif) + " last_objectif[0]: " + str(last_objectif[0]) + " action_data " + str(action_data))
+						self.__logger.warning(str(nom_robot)+" On drop un nouvel ordre car il n'est pas à jour, id_prev_objectif: " + str(id_prev_objectif) + " last_objectif[0]: " + str(last_objectif[0]) + " action_data " + str(action_data))
 				else:
 					robot.addNewObjectif(id_objectif, action_data)
+			else:
+				self.logger.error(str(nom_robot)+" on a reçu un ordre pour un robot qui n'existe pas")
 
 	def __checkEvent(self):
 		if self.__Tourelle is not None:
