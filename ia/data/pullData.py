@@ -135,7 +135,8 @@ class PullData():
 def generateFictionHokuyo():
 	nombreRobots = 4				#Max:4
 	centre = {"x":1500, "y":1000}	#mm
-	amplitude = 500					#mm
+	amplitudeX = 800				#mm
+	amplitudeY = 300				#mm
 
 
 	import math
@@ -144,8 +145,8 @@ def generateFictionHokuyo():
 
 	for i in range(nombreRobots):
 		currAngle = angle+ i*2*math.pi/nombreRobots
-		ret.append(int(centre["x"] + math.cos(currAngle)*amplitude))
-		ret.append(int(centre["y"] + math.sin(currAngle)*amplitude))
+		ret.append(int(centre["x"] + math.cos(currAngle)*amplitudeX))
+		ret.append(int(centre["y"] + math.sin(currAngle)*amplitudeY))
 	for i in range(nombreRobots, 4):
 		ret.append(0)
 		ret.append(0)

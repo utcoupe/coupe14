@@ -5,6 +5,8 @@ Classe pour les données hokuyo
 
 from .dataStructure import *
 from constantes import *
+import logging
+
 
 
 class Tourelle():
@@ -15,6 +17,9 @@ class Tourelle():
 		self.SmallEnemyBot = SmallEnemyBot
 		self.__communication = communication
 		self.__address = address
+		self.__logger = logging.getLogger(__name__)
+
+		self.__logger.info("Starting")
 
 		#Variables
 		self.__old_data = []
@@ -50,7 +55,6 @@ class Tourelle():
 
 	
 	def __estimate_pos(self): 
-		self.__old_data.pop(0)
 		
 		nRobots = len(self.__old_data[0][1])
 
@@ -60,8 +64,15 @@ class Tourelle():
 		coeff = TOURELLE_PULL_PERIODE / (self.__old_data[-1][0] - self.__old_data[-2][0])
 		#print("DEBUG:coeff"+str(coeff))
 
-		self.__old_data.append( (self.__old_data[-2][0], list( map(lambda pos: pos[1].add(pos[1].subtract(pos[0]).multiply(coeff)), zip(self.__old_data[-2][1], self.__old_data[-1][1]))) ))
-		#print("DEBUG:__old_data"+str(self.__old_data))
+		def predict(pos):
+			offset = pos[0].subtract(pos[1]).multiply(-coeff)
+			self.__logger.info("offset:"+str(offset))
+			self.__logger.info("speed:"+str(Position(offset).multiply(1/TOURELLE_PULL_PERIODE)))
+			return pos[1].add(offset)
+
+		newpos = list( map(predict, zip(self.__old_data[-2][1], self.__old_data[-1][1])))
+
+		self.__old_data.append( (self.__old_data[-2][0], newpos) )
 		pass
 	
 
@@ -99,12 +110,16 @@ class Tourelle():
 			else:
 				big = p
 
+		predict = None
 		if len(self.__old_data) >= 3:
+			predict = True
+			self.__old_data.pop(0)
 			self.__old_data.pop(-1)
-		self.__old_data.append( (timestamp, [big, small]) )
-		#print("tourelle:real: big:"+str(big)+" small:"+str(small))
 
-		if len(self.__old_data) >= 3:
+		self.__old_data.append( (timestamp, [big, small]) )
+		self.__logger.info("real:     \tbig:"+str(big)+"\tsmall:"+str(small))
+
+		if predict:
 			self.__estimate_pos()
 
 		#print("DEBUG:__old_data:"+str(self.__old_data))
@@ -128,6 +143,6 @@ class Tourelle():
 
 	def __setFormatedPosition(self, position_big_enemy, position_small_enemy):
 		"""Cette méthode ne doit être appelé qu'avec des données formatées par data/computeHokuyoData.py"""
-		#print("tourelle:predected: big:"+str(position_big_enemy)+" small:"+str(position_small_enemy))
+		self.__logger.info("predicted:\tbig:"+str(position_big_enemy)+"\tsmall:"+str(position_small_enemy))
 		pass
 		#TODO
