@@ -70,7 +70,8 @@ SEUIL_JAUNE = 			100 #TODO
 
 #====================NAVIGATION================
 POINTS_PAR_CERCLE = 	8
-MARGE_PASSAGE_PATH = 	50
+MARGE_PASSAGE_PATH = 	0
+MARGE_COLLISION =		-20
 COLLISION_THRESHOLD =	200
 
 
@@ -80,17 +81,17 @@ OUR_ROBOTS_VISIBLE_TOURELLE = True 	#True si une balise visible par l'hokuyo est
 TOURELLE_PULL_PERIODE = 100 		#ms
 
 #====================Flussmittel====================
-LARGEUR_FLUSSMITTEL = 	100
-LONGUEUR_FLUSSMITTEL = 	100
+LARGEUR_FLUSSMITTEL = 	330
+LONGUEUR_FLUSSMITTEL = 	260
 
 #====================TIBOT====================
-LARGEUR_TIBOT = 		100
-LONGUEUR_TIBOT = 		100
+LARGEUR_TIBOT = 		200
+LONGUEUR_TIBOT = 		150
 
 #====================BIG ENEMY====================
 #Si un seul adversaire, on utilise les constantes de BIG ENEMY
-RAYON_BIG_ENEMY = 		100
+RAYON_BIG_ENEMY = 		200
 
 #====================SMALL ENEMY====================
-RAYON_SMALL_ENEMY = 	100
+RAYON_SMALL_ENEMY = 	120
 
