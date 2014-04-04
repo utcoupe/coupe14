@@ -627,10 +627,8 @@ class CommunicationGlobale():
 		#Si on veut n'importe quel parquet
 		if address == 'all':
 			self.mutexOrdersToRead.acquire()
-			try:
+			if self.ordersToRead:
 				orderToReturn = self.ordersToRead.popleft()
-			except:
-				pass
 			self.mutexOrdersToRead.release()
 
 		"""

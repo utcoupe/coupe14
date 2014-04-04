@@ -35,9 +35,8 @@ class ProcessIA():
 	def writePipe(self, addresse, ordre, args):
 		"""
 		Envoie des données à l'IA à travers le Pipe
-		Tourne dans un thread
 		"""
-		self.__parent_conn((addresse, ordre, args))
+		self.__parent_conn.send((addresse, ordre, args))
 
 	def __readPipe(self):
 		"""
@@ -52,4 +51,5 @@ class ProcessIA():
 		Formate les données IA reçues pour les adapter à la méthode
 		sendOrderAPI de Communication
 		"""
-		self.__communication.sendOrderAPI(data[0],data[1],data[2],data[3],data[4])
+		print("---------------------------------------------"+str(data))
+		self.__communication.sendOrderAPI(data[0],data[1],data[2])
