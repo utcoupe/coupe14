@@ -39,13 +39,33 @@ class Communication():
 		elif (address == "ADDR_HOKUYO"):
 			self.__traitementHokuyo(order, arguments)
 		else:
-			print('ordre non valide')
+			print('ordre non valide'+str(address))
 
 	def __traitementFlussmittelOthers(self, order, args):
 		"""
 		Parse l'ordre envoyé à ADDR_FLUSSMITTEL_OTHER
 		"""
-		pass
+		if (order == "O_BRAS_OUVRIR"):
+			pos = ()
+			self.__bigrobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+
+		elif (order == "O_BRAS_FERMER"):
+			pos = ()
+			self.__bigrobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+
+		elif (order == "GET_LAST_ID"):
+			pos = (self.__bigrobot.getLastIdOther(),)
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+
+		elif (order == "RESET_ID"):
+			pos = ()
+			self.__bigrobot.resetIdOther()
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+
+		else:
+			print('Error : mauvais paramètre traitement Flussmittel other !')
 
 	def __traitementFlussmittelAsserv(self, order, args):
 		"""
@@ -57,6 +77,10 @@ class Communication():
 			pos = self.__bigrobot.getPosition()
 			fixed_pos = (pos[0], 2000-pos[1], pos[2])
 			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, fixed_pos)
+
+		elif (order == "GET_LAST_ID"):
+			pos = (self.__bigrobot.getLastIdAsserv(),)
+			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos)
 
 		elif (order == "A_GET_POS_ID"):
 			pos = self.__bigrobot.getPositionId()
@@ -70,7 +94,7 @@ class Communication():
 
 		elif (order == "RESET_ID"):
 			pos = ()
-			self.__bigrobot.resetId()
+			self.__bigrobot.resetIdAsserv()
 			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos)
 
 		elif (order == "A_SET_POS"):
@@ -110,7 +134,27 @@ class Communication():
 		"""
 		Parse l'ordre envoyé à ADDR_TIBOT_OTHER
 		"""
-		pass
+		if (order == "O_BRAS_OUVRIR"):
+			pos = ()
+			self.__minirobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
+
+		elif (order == "O_BRAS_FERMER"):
+			pos = ()
+			self.__minirobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
+
+		elif (order == "GET_LAST_ID"):
+			pos = (self.__minirobot.getLastIdOther(),)
+			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
+
+		elif (order == "RESET_ID"):
+			pos = ()
+			self.__bigrobot.resetIdOther()
+			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
+
+		else:
+			print('Error : mauvais paramètre traitement Tibot other !')
 
 	def __traitementTibotAsserv(self, order, args):
 		"""
@@ -121,6 +165,10 @@ class Communication():
 			pos = self.__minirobot.getPosition()
 			fixed_pos = (pos[0], 2000-pos[1], pos[2])
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, fixed_pos)
+
+		elif (order == "GET_LAST_ID"):
+			pos = (self.__minirobot.getLastIdAsserv(),)
+			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
 
 		elif (order == "A_GET_POS_ID"):
 			pos = self.__minirobot.getPositionId()
@@ -134,7 +182,7 @@ class Communication():
 
 		elif (order == "RESET_ID"):
 			pos = ()
-			self.__bigrobot.resetId()
+			self.__bigrobot.resetIdAsserv()
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
 
 		elif (order == "A_SET_POS"):

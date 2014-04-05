@@ -66,8 +66,22 @@ class Robot(EngineObjectPoly):
 	def getPositionId(self):
 		return self.x(), self.y(), self.a()/180*3.14, self.__asserv.getLastIdAction()
 
-	def resetId(self):
+	def getLastIdAsserv(self):
+		return self.__asserv.getLastIdAction()
+
+	def getLastIdOther(self):
+		return self.__others.getLastIdAction()
+
+	def setLastIdActionAsserv(self, id):
+		self.__asserv.setLastIdAction(id)
+
+	def setlastIdActionOther(self, id):
+		self.__others.setLastIdAction(id)
+
+	def resetIdAsserv(self):
 		self.__asserv.resetLastIdAction()
+
+	def resetIdOther(self):
 		self.__others.resetLastIdAction()
 
 	def getTyperobot(self):
@@ -93,17 +107,17 @@ class Robot(EngineObjectPoly):
 		if (numOrdre == GOTO):
 			self.__asserv.goto(arg[0], arg[1],2000-arg[2])
 		elif (numOrdre == GOTOA):
-			self.__asserv.gotoa(arg[0], arg[1],2000-arg[2],arg[3]/3.14*180)
+			self.__asserv.gotoa(arg[0], arg[1],2000-arg[2],-arg[3]/3.14*180)
 		elif (numOrdre == GOTOAR):
-			self.__asserv.gotoar(arg[0], arg[1],2000-arg[2],arg[3]/3.14*180)
+			self.__asserv.gotoar(arg[0], arg[1],2000-arg[2],-arg[3]/3.14*180)
 		elif (numOrdre == GOTOR):
 			self.__asserv.gotor(arg[0], arg[1],2000-arg[2])
 		elif (numOrdre == ROT):
-			self.__asserv.rot(arg[0], arg[1]/3.14*180)
+			self.__asserv.rot(arg[0], -arg[1]/3.14*180)
 		elif (numOrdre == ROTR):
-			self.__asserv.rotr(arg[0], arg[1]/3.14*180)
+			self.__asserv.rotr(arg[0], -arg[1]/3.14*180)
 		elif (numOrdre == PWM):
-			self.__asserv.pwm(arg[0], arg[1],arg[2],arg[3])	#!! x=pwm_l, y=pwm_r, angle=delay !!
+			self.__asserv.pwm(arg[0], arg[1], arg[2], arg[3])	#!! x=pwm_l, y=pwm_r, angle=delay !!
 
 
 	def _my_velocity_func(self):
