@@ -47,7 +47,7 @@ class GoalsManager:
 			data = self.__SubProcessManager.getData()
 			self.__PathFinding.update(data[self.__robot_name])
 			if self.__available_goals:
-				goal = self.__available_goals.pop()
+				goal = self.__available_goals[0]
 				path = self.__getOrderTrajectoire(data, goal, 0)
 				self.__addGoal(path, goal, 0)
 
@@ -63,13 +63,15 @@ class GoalsManager:
 				self.__releaseGoal(objectif)
 			self.__queueBestGoals()
 
-	def __addGoal(self, tuple_trajectoire_list, goal, elem_goal_id, prev_action=deque()):
+	def __addGoal(self, tuple_trajectoire_list, goal, elem_goal_id, prev_action=None):
 		"""Méthode pour l'ajout d'un ordre dans la file du robot"""
-		if self.__tryBlockGoal(goal):
-			goal.setElemGoalLocked(goal.getElemGoal(elem_goal_id))
-
+		if self.__tryBlockGoal(goal, elem_goal_id):
 			#on met les prev_action, ce sont des hack pour faire passer le robot d'une action à l'autre avec un trajectoire prédeterminé
-			orders = prev_action
+			if prev_action is None:
+				orders = deque()
+			else:
+				orders = prev_action
+			self.__logger.debug("EMPTY prev_action " +str(orders))
 			#on ajoute la trajectoire calculé
 			orders.extend(self.__tupleTrajectoireToDeque(tuple_trajectoire_list))
 			orders.append( ("A_ROT", (goal.getElemGoal(elem_goal_id).getPositionAndAngle()[2],),) )
@@ -97,10 +99,11 @@ class GoalsManager:
 			if goal.getId() == id_objectif:
 				self.__blockGoal(goal)
 
-	def __tryBlockGoal(self, goal):
+	def __tryBlockGoal(self, goal, elem_goal_id):
 		if goal in self.__available_goals:
-			self.__blocked_goals.append(goal)
 			self.__available_goals.remove(goal)
+			self.__blocked_goals.append(goal)
+			goal.setElemGoalLocked(goal.getElemGoal(elem_goal_id))
 			self.__logger.info('Goal ' + goal.getName() + ' is blocked')
 			return True
 		else:

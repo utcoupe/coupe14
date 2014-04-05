@@ -4,7 +4,7 @@
 		<id>0</id>
 		<name>Triangle en haut à gauche (1)</name>
 		<type>triangle</type>
-		<concerned_robot>ALL</concerned_robot>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x>900</x>
 		<y>1400</y>
 		<elem_goals>
@@ -36,7 +36,7 @@
 		<id>1</id>
 		<name>Triangle en haut à droite (2)</name>
 		<type>triangle</type>
-		<concerned_robot>ALL</concerned_robot>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x>2100</x>
 		<y>1400</y>
 		<elem_goals>
@@ -68,13 +68,13 @@
 		<id>2</id>
 		<name>Triangle mur centre droite (3)</name>
 		<type>triangle</type>
-		<concerned_robot>ALL</concerned_robot>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x>3000</x>
 		<y>1200</y>
 		<elem_goals>
 			<elem_goal>
 				<id>1</id>
-				<x>2900</x>
+				<x>2850</x>
 				<y>1200</y>
 				<angle>0.0</angle>
 				<points>1</points>
@@ -89,7 +89,7 @@
 		<id>3</id>
 		<name>Triangle au centre à droite (4)</name>
 		<type>triangle</type>
-		<concerned_robot>ALL</concerned_robot>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x>2600</x>
 		<y>900</y>
 		<elem_goals>
@@ -121,7 +121,7 @@
 		<id>4</id>
 		<name>Triangle en bas à droite (5)</name>
 		<type>triangle</type>
-		<concerned_robot>ALL</concerned_robot>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x>2100</x>
 		<y>400</y>
 		<elem_goals>
@@ -153,14 +153,14 @@
 		<id>5</id>
 		<name>Triangle mur bas à droite (6)</name>
 		<type>triangle</type>
-		<concerned_robot>ALL</concerned_robot>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x>1700</x>
 		<y>0</y>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
 				<x>1700</x>
-				<y>100</y>
+				<y>300</y>
 				<angle>-1.55</angle>
 				<points>1</points>
 				<priority>1</priority>
@@ -174,14 +174,14 @@
 		<id>6</id>
 		<name>Triangle mur bas à gauche (7)</name>
 		<type>triangle</type>
-		<concerned_robot>ALL</concerned_robot>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x>1300</x>
 		<y>0</y>
 		<elem_goals>
 			<elem_goal>
 				<id>1</id>
 				<x>1300</x>
-				<y>100</y>
+				<y>300</y>
 				<angle>-1.55</angle>
 				<points>1</points>
 				<priority>1</priority>
@@ -195,7 +195,7 @@
 		<id>7</id>
 		<name>Triangle en bas à gauche (8)</name>
 		<type>triangle</type>
-		<concerned_robot>ALL</concerned_robot>
+		<concerned_robot>TIBOT</concerned_robot>
 		<x>900</x>
 		<y>400</y>
 		<elem_goals>
@@ -227,7 +227,7 @@
 		<id>8</id>
 		<name>Triangle au centre à gauche (9)</name>
 		<type>triangle</type>
-		<concerned_robot>ALL</concerned_robot>
+		<concerned_robot>TIBOT</concerned_robot>
 		<x>400</x>
 		<y>900</y>
 		<elem_goals>
@@ -259,14 +259,14 @@
 		<id>9</id>
 		<name>Triangle mur centre gauche (10)</name>
 		<type>triangle</type>
-		<concerned_robot>ALL</concerned_robot>
+		<concerned_robot>TIBOT</concerned_robot>
 		<x>0</x>
-		<y>800</y>
+		<y>1200</y>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x>100</x>
-				<y>800</y>
+				<x>150</x>
+				<y>1200</y>
 				<angle>3.14</angle>
 				<points>1</points>
 				<priority>1</priority>

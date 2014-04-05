@@ -46,7 +46,9 @@ class ProcessIA():
 		recv est bloquant, donc lancé dans un thread
 		"""
 		while True:
-			self.__parseDataIa(self.__parent_conn.recv())
+			if self.__parent_conn.poll(10.0):
+				self.__parseDataIa(self.__parent_conn.recv())
+				time.sleep(0.01)
 
 	def __parseDataIa(self, data):
 		"""

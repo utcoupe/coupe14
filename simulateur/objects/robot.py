@@ -61,10 +61,10 @@ class Robot(EngineObjectPoly):
 		return int(math.degrees(self.body.angle))
 
 	def getPosition(self):
-		return self.x(), self.y(), self.a()
+		return self.x(), self.y(), self.a()/180*3.14
 
 	def getPositionId(self):
-		return self.x(), self.y(), self.a(), self.__asserv.getLastIdAction()
+		return self.x(), self.y(), self.a()/180*3.14, self.__asserv.getLastIdAction()
 
 	def resetId(self):
 		self.__asserv.resetLastIdAction()
@@ -93,15 +93,15 @@ class Robot(EngineObjectPoly):
 		if (numOrdre == GOTO):
 			self.__asserv.goto(arg[0], arg[1],2000-arg[2])
 		elif (numOrdre == GOTOA):
-			self.__asserv.gotoa(arg[0], arg[1],2000-arg[2],arg[3])
+			self.__asserv.gotoa(arg[0], arg[1],2000-arg[2],arg[3]/3.14*180)
 		elif (numOrdre == GOTOAR):
-			self.__asserv.gotoar(arg[0], arg[1],2000-arg[2],arg[3])
+			self.__asserv.gotoar(arg[0], arg[1],2000-arg[2],arg[3]/3.14*180)
 		elif (numOrdre == GOTOR):
 			self.__asserv.gotor(arg[0], arg[1],2000-arg[2])
 		elif (numOrdre == ROT):
-			self.__asserv.rot(arg[0], arg[1])
+			self.__asserv.rot(arg[0], arg[1]/3.14*180)
 		elif (numOrdre == ROTR):
-			self.__asserv.rotr(arg[0], arg[1])
+			self.__asserv.rotr(arg[0], arg[1]/3.14*180)
 		elif (numOrdre == PWM):
 			self.__asserv.pwm(arg[0], arg[1],arg[2],arg[3])	#!! x=pwm_l, y=pwm_r, angle=delay !!
 

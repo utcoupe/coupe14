@@ -81,17 +81,17 @@ class EventManager():
 				action_en_cours, objectif = robot.getQueuedObjectif()
 
 				if objectif:
-					last_objectif = objectif[-1]
+					last_id_objectif = objectif[-1][0]
 				elif action_en_cours:
-					last_objectif = action_en_cours
+					last_id_objectif = action_en_cours[0]
 				else:
-					last_objectif = robot.getLastIdObjectifExecuted()
+					last_id_objectif = robot.getLastIdObjectifExecuted()
 				
-				if last_objectif is not None:
-					if last_objectif[0] == id_prev_objectif:
+				if last_id_objectif is not None:
+					if last_id_objectif == id_prev_objectif:
 						robot.addNewObjectif(id_objectif, action_data)
 					else:
-						self.__logger.warning(str(nom_robot)+" On drop un nouvel ordre car il n'est pas à jour, id_prev_objectif: " + str(id_prev_objectif) + " last_objectif[0]: " + str(last_objectif[0]) + " action_data " + str(action_data))
+						self.__logger.warning(str(nom_robot)+" On drop un nouvel ordre car il n'est pas à jour, id_prev_objectif: " + str(id_prev_objectif) + " last_id_objectif: " + str(last_id_objectif) + " action_data " + str(action_data))
 				else:
 					robot.addNewObjectif(id_objectif, action_data)
 			else:
