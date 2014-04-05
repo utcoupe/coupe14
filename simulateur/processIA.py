@@ -19,15 +19,16 @@ class ProcessIA():
 	Classe qui va lancer une IA en subprocess.
 	"""
 	def __init__(self, liste_robots):
-		self.__bigrobot = liste_robots[0]
-		self.__minirobot = liste_robots[1]
+		self.__color = liste_robots[0]
+		self.__bigrobot = liste_robots[1]
+		self.__minirobot = liste_robots[2]
 		self.__robots = liste_robots
-		self.__hokuyo = Hokuyo(self.__robots)
+		self.__hokuyo = Hokuyo(self.__robots[1:])
 		self.__communication = Communication(self.__bigrobot, self.__minirobot, self.__hokuyo, self)
 		#communication de data entre l'IA et le simu
 		self.__parent_conn, self.__child_conn = Pipe()
 		#TODO lancer l'IA
-		self.__process = Process(target=main.startIa, args=(self.__child_conn,))
+		self.__process = Process(target=main.startIa, args=(self.__child_conn,self.__color))
 		self.__process.start()
 		time.sleep(0.1)
 		#on démarre le thread de lecture des données IA renvoyées à travers le pipe

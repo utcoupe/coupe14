@@ -11,8 +11,7 @@ import time
 import logging
 
 #logfile_name = "log/" + time.strftime("%d %b %Y %H:%M:%S", time.gmtime()) + ".log"
-logging.basicConfig(filename=os.path.join(os.path.dirname(os.path.abspath(__file__)), "log/last.log"), filemode='w', level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__.split('.')[0])
+
 
 
 #Nos fichiers
@@ -23,9 +22,12 @@ import event
 import gpio
 
 #lancement de l'IA via le subprocess simu
-def startIa(pipe=None):
+def startIa(pipe=None, ia_color="RED"):
 	Communication = communication.CommunicationGlobale()
 	arduino_constantes = Communication.getConst()
+
+	logging.basicConfig(filename=os.path.join(os.path.dirname(os.path.abspath(__file__)), "log/last_"+str(ia_color)+".log"), filemode='w', level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+	logger = logging.getLogger(__name__.split('.')[0])
 
 	if pipe == None:
 		logger.info("Demarrage d'une IA normal")
@@ -61,7 +63,7 @@ def startIa(pipe=None):
 		data.parametrerIa(Data.MetaData, Gpio.getColor)
 	else:
 		data.parametrerHokuyo()
-		data.parametrerIa(Data.MetaData, "RED")
+		data.parametrerIa(Data.MetaData, ia_color)
 
 	TimeManager = event.TimeManager(Communication, Data)
 	EventManager = event.EventManager(Communication, Data)

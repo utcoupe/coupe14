@@ -34,11 +34,34 @@ class GoalsManager:
 		self.__last_id_objectif_send= 0
 
 		data = self.__SubProcessManager.getData() #pas de self, data n'est pas stocké ici !
+		self.__our_color = data["METADATA"]["getOurColor"]
 		self.__PathFinding = PathFinding((data["FLUSSMITTEL"], data["TIBOT"], data["BIGENEMYBOT"], data["SMALLENEMYBOT"]))
 
 		self.__loadElemScript(base_dir+"/elemScripts.xml")
 		self.__loadGoals(base_dir+"/goals.xml")
 		self.__collectEnemyFinished()
+
+		self.__reverse_table = {}
+		self.__reverse_table[(0,0)] = (1,1)
+		self.__reverse_table[(1,1)] = (0,0)
+		self.__reverse_table[(0,1)] = (1,0)
+		self.__reverse_table[(1,0)] = (0,1)
+
+		self.__reverse_table[(9,0)] = (2,0)
+		self.__reverse_table[(2,0)] = (9,0)
+
+		self.__reverse_table[(8,0)] = (3,0)
+		self.__reverse_table[(3,0)] = (8,0)
+		self.__reverse_table[(8,1)] = (3,1)
+		self.__reverse_table[(3,1)] = (8,1)
+
+		self.__reverse_table[(7,0)] = (4,1)
+		self.__reverse_table[(4,1)] = (7,0)
+		self.__reverse_table[(7,1)] = (4,0)
+		self.__reverse_table[(4,0)] = (7,1)
+
+		self.__reverse_table[(6,0)]=(5,0)
+		self.__reverse_table[(5,0)]=(6,0)
 
 		self.__loadBeginScript()
 
@@ -196,6 +219,10 @@ class GoalsManager:
 			id_objectif	= int(xml_goal.getElementsByTagName('id_objectif')[0].firstChild.nodeValue)
 			elem_goal_id= int(xml_goal.getElementsByTagName('elem_goal_id')[0].firstChild.nodeValue)
 
+			#Inversion du script
+			if self.__our_color == "YELLOW":
+				id_objectif, elem_goal_id = self.__reverse_table[(id_objectif, elem_goal_id)]
+				print(str(id_objectif)+" "+str(elem_goal_id))
 			prev_action = deque()
 			for raw_prev_action in xml_goal.getElementsByTagName('prev_action'):
 				raw_order = raw_prev_action.childNodes[0].nodeValue.split()

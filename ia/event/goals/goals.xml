@@ -195,7 +195,7 @@
 		<id>7</id>
 		<name>Triangle en bas à gauche (8)</name>
 		<type>triangle</type>
-		<concerned_robot>TIBOT</concerned_robot>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x>900</x>
 		<y>400</y>
 		<elem_goals>
@@ -227,7 +227,7 @@
 		<id>8</id>
 		<name>Triangle au centre à gauche (9)</name>
 		<type>triangle</type>
-		<concerned_robot>TIBOT</concerned_robot>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x>400</x>
 		<y>900</y>
 		<elem_goals>
@@ -259,7 +259,7 @@
 		<id>9</id>
 		<name>Triangle mur centre gauche (10)</name>
 		<type>triangle</type>
-		<concerned_robot>TIBOT</concerned_robot>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x>0</x>
 		<y>1200</y>
 		<elem_goals>

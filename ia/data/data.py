@@ -84,4 +84,6 @@ class Data():
 		else:
 			data["SMALLENEMYBOT"] = None
 
+		data["METADATA"] = {}
+		data["METADATA"]["getOurColor"] = self.MetaData.getOurColor()
 		return data
