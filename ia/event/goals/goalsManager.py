@@ -34,34 +34,70 @@ class GoalsManager:
 		self.__last_id_objectif_send= 0
 
 		data = self.__SubProcessManager.getData() #pas de self, data n'est pas stocké ici !
+		self.__our_color = data["METADATA"]["getOurColor"]
 		self.__PathFinding = PathFinding((data["FLUSSMITTEL"], data["TIBOT"], data["BIGENEMYBOT"], data["SMALLENEMYBOT"]))
 
 		self.__loadElemScript(base_dir+"/elemScripts.xml")
 		self.__loadGoals(base_dir+"/goals.xml")
 		self.__collectEnemyFinished()
 
+		self.__reverse_table = {}
+		self.__reverse_table[(0,0)] = (1,1)
+		self.__reverse_table[(1,1)] = (0,0)
+		self.__reverse_table[(0,1)] = (1,0)
+		self.__reverse_table[(1,0)] = (0,1)
+
+		self.__reverse_table[(9,0)] = (2,0)
+		self.__reverse_table[(2,0)] = (9,0)
+
+		self.__reverse_table[(8,0)] = (3,0)
+		self.__reverse_table[(3,0)] = (8,0)
+		self.__reverse_table[(8,1)] = (3,1)
+		self.__reverse_table[(3,1)] = (8,1)
+
+		self.__reverse_table[(7,0)] = (4,1)
+		self.__reverse_table[(4,1)] = (7,0)
+		self.__reverse_table[(7,1)] = (4,0)
+		self.__reverse_table[(4,0)] = (7,1)
+
+		self.__reverse_table[(6,0)]=(5,0)
+		self.__reverse_table[(5,0)]=(6,0)
+
 		self.__loadBeginScript()
+
+	def __queueBestGoals(self):
+		if not self.__blocked_goals:
+			data = self.__SubProcessManager.getData()
+			self.__PathFinding.update(data[self.__robot_name])
+			if self.__available_goals:
+				goal = self.__available_goals[0]
+				path = self.__getOrderTrajectoire(data, goal, 0)
+				self.__addGoal(path, goal, 0)
 
 	def goalFinishedId(self, id_objectif):
 		for objectif in self.__blocked_goals:
 			if objectif.getId() == id_objectif:
 				self.__finishGoal(objectif)
+			self.__queueBestGoals()
 
 	def goalCanceledId(self, id_objectif):
 		for objectif in self.__blocked_goals:
 			if objectif.getId() == id_objectif:
 				self.__releaseGoal(objectif)
+			self.__queueBestGoals()
 
-	def __addGoal(self, tuple_trajectoire_list, goal, elem_goal_id, prev_action=deque()):
+	def __addGoal(self, tuple_trajectoire_list, goal, elem_goal_id, prev_action=None):
 		"""Méthode pour l'ajout d'un ordre dans la file du robot"""
-		if self.__tryBlockGoal(goal):
-			goal.setElemGoalLocked(goal.getElemGoal(elem_goal_id))
-
+		if self.__tryBlockGoal(goal, elem_goal_id):
 			#on met les prev_action, ce sont des hack pour faire passer le robot d'une action à l'autre avec un trajectoire prédeterminé
-			orders = prev_action
+			if prev_action is None:
+				orders = deque()
+			else:
+				orders = prev_action
+			self.__logger.debug("EMPTY prev_action " +str(orders))
 			#on ajoute la trajectoire calculé
 			orders.extend(self.__tupleTrajectoireToDeque(tuple_trajectoire_list))
-			orders.append( ("A_ROT", (goal.getElemGoal(elem_goal_id).getPosition()[2],),) )
+			orders.append( ("A_ROT", (goal.getElemGoal(elem_goal_id).getPositionAndAngle()[2],),) )
 			#on ajoute attend d'être arrivé pour lancer les actions
 			orders.append( ("THEN", (),) )
 			#on ajoute le script d'action
@@ -86,10 +122,11 @@ class GoalsManager:
 			if goal.getId() == id_objectif:
 				self.__blockGoal(goal)
 
-	def __tryBlockGoal(self, goal):
+	def __tryBlockGoal(self, goal, elem_goal_id):
 		if goal in self.__available_goals:
-			self.__blocked_goals.append(goal)
 			self.__available_goals.remove(goal)
+			self.__blocked_goals.append(goal)
+			goal.setElemGoalLocked(goal.getElemGoal(elem_goal_id))
 			self.__logger.info('Goal ' + goal.getName() + ' is blocked')
 			return True
 		else:
@@ -182,6 +219,10 @@ class GoalsManager:
 			id_objectif	= int(xml_goal.getElementsByTagName('id_objectif')[0].firstChild.nodeValue)
 			elem_goal_id= int(xml_goal.getElementsByTagName('elem_goal_id')[0].firstChild.nodeValue)
 
+			#Inversion du script
+			if self.__our_color == "YELLOW":
+				id_objectif, elem_goal_id = self.__reverse_table[(id_objectif, elem_goal_id)]
+				print(str(id_objectif)+" "+str(elem_goal_id))
 			prev_action = deque()
 			for raw_prev_action in xml_goal.getElementsByTagName('prev_action'):
 				raw_order = raw_prev_action.childNodes[0].nodeValue.split()
@@ -204,11 +245,13 @@ class GoalsManager:
 		"""Il faut mettre à jour les polygones avant d'utiliser cette fonction"""
 		if self.__blocked_goals:
 			last_goal = self.__blocked_goals[-1]
-			position_last_goal = last_goal.getElemGoalLocked().getPosition()
+			position_last_goal = last_goal.getElemGoalLocked().getPositionAndAngle()
+			self.__logger.debug("Position from queue" + str(position_last_goal))
 		else:
-			position_last_goal = data[self.__robot_name]["getPositon"]
-		position_to_reach = goal.getElemGoal(elem_goal_id).getPosition()
-		
+			position_last_goal = data[self.__robot_name]["getPositionAndAngle"]
+			self.__logger.debug("Position from data" + str(position_last_goal))
+
+		position_to_reach = goal.getElemGoal(elem_goal_id).getPositionAndAngle()
 		path = self.__PathFinding.getPath((position_last_goal[0], position_last_goal[1]), (position_to_reach[0], position_to_reach[1]), enable_smooth=True)
 
 		return path

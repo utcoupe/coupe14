@@ -147,13 +147,13 @@ class Asserv:
 		"""
 		return self.__robot.x(), self.__robot.y(), self.__robot.a()
 
-	def pwm(self, pwm_l, pwm_r, delay):
+	def pwm(self, id_action, pwm_l, pwm_r, delay):
 		"""
 		Demande à avance en pwm
 		@param pwm_l int (0 - 255)
 		@param delay s
 		"""
-		self.__robot.addGoal(GoalPWM(pwm_l, delay/1000))
+		self.__robot.addGoal(GoalPWM(id_action, pwm_l, delay/1000))
 
 class Visio:
 	"""Émule le programme de visio"""
