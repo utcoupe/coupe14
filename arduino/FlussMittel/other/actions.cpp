@@ -3,6 +3,7 @@
 #include "parameters.h"
 #include <math.h>
 #include <Arduino.h>
+#include "DueTimer.h"
 
 extern Servo servoBras, servoRet, servoBrasAngle, servoBrasDist;
 
@@ -100,7 +101,7 @@ void cmdBras(double angle, int length, int height, bool n_depot) {
 
 void cmdAsc(int h) { //h en mm
 	goal_hauteur = h * H_TO_STEP;
-	Timer8.attatchInterrupt(asc_int).setFrequency(FREQUENCY_STEPPER).start();
+	Timer8.attachInterrupt(asc_int).setFrequency(FREQUENCY_STEPPER).start();
 }
 
 void cmdBrasServ(double a, int l) {
