@@ -22,7 +22,7 @@ class OurBot():
 
 		self.largeur = largeur 
 		self.longueur = longueur
-		self.rayon = sqrt(self.largeur * self.largeur + self.longueur * self.longueur)
+		self.rayon = sqrt(self.largeur * self.largeur + self.longueur * self.longueur)/2
 
 
 		#Valeurs récupérées (read-only)
@@ -45,6 +45,9 @@ class OurBot():
 	#Getter
 	def getPosition(self):
 		return (self.__positionX, self.__positionY)
+		
+	def getPositionAndAngle(self):
+		return (self.__positionX, self.__positionY, self.__angle)
 
 	def getRayon(self):
 		return self.rayon
@@ -156,9 +159,10 @@ class OurBot():
 		self.__angle = arguments[2]
 		self.setLastId(address, arguments[3])
 
-	def setPosition(self, x, y):
+	def setPosition(self, x, y, angle):
 		self.__positionX = x
 		self.__positionY = y
+		self.__angle = angle
 
 	def addNewObjectif(self, id_objectif, action_data):
 		new_objectif = (id_objectif,)

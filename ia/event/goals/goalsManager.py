@@ -42,15 +42,26 @@ class GoalsManager:
 
 		self.__loadBeginScript()
 
+	def __queueBestGoals(self):
+		if not self.__blocked_goals:
+			data = self.__SubProcessManager.getData()
+			self.__PathFinding.update(data[self.__robot_name])
+			if self.__available_goals:
+				goal = self.__available_goals.pop()
+				path = self.__getOrderTrajectoire(data, goal, 0)
+				self.__addGoal(path, goal, 0)
+
 	def goalFinishedId(self, id_objectif):
 		for objectif in self.__blocked_goals:
 			if objectif.getId() == id_objectif:
 				self.__finishGoal(objectif)
+			self.__queueBestGoals()
 
 	def goalCanceledId(self, id_objectif):
 		for objectif in self.__blocked_goals:
 			if objectif.getId() == id_objectif:
 				self.__releaseGoal(objectif)
+			self.__queueBestGoals()
 
 	def __addGoal(self, tuple_trajectoire_list, goal, elem_goal_id, prev_action=deque()):
 		"""Méthode pour l'ajout d'un ordre dans la file du robot"""
@@ -61,7 +72,7 @@ class GoalsManager:
 			orders = prev_action
 			#on ajoute la trajectoire calculé
 			orders.extend(self.__tupleTrajectoireToDeque(tuple_trajectoire_list))
-			orders.append( ("A_ROT", (goal.getElemGoal(elem_goal_id).getPosition()[2],),) )
+			orders.append( ("A_ROT", (goal.getElemGoal(elem_goal_id).getPositionAndAngle()[2],),) )
 			#on ajoute attend d'être arrivé pour lancer les actions
 			orders.append( ("THEN", (),) )
 			#on ajoute le script d'action
@@ -204,11 +215,13 @@ class GoalsManager:
 		"""Il faut mettre à jour les polygones avant d'utiliser cette fonction"""
 		if self.__blocked_goals:
 			last_goal = self.__blocked_goals[-1]
-			position_last_goal = last_goal.getElemGoalLocked().getPosition()
+			position_last_goal = last_goal.getElemGoalLocked().getPositionAndAngle()
+			self.__logger.debug("Position from queue" + str(position_last_goal))
 		else:
-			position_last_goal = data[self.__robot_name]["getPositon"]
-		position_to_reach = goal.getElemGoal(elem_goal_id).getPosition()
-		
+			position_last_goal = data[self.__robot_name]["getPositionAndAngle"]
+			self.__logger.debug("Position from data" + str(position_last_goal))
+
+		position_to_reach = goal.getElemGoal(elem_goal_id).getPositionAndAngle()
 		path = self.__PathFinding.getPath((position_last_goal[0], position_last_goal[1]), (position_to_reach[0], position_to_reach[1]), enable_smooth=True)
 
 		return path

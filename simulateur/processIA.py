@@ -2,6 +2,7 @@ __author__ = 'furmi'
 
 import sys
 import os
+import time
 DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(DIR_PATH, "..", "ia"))
 
@@ -28,6 +29,7 @@ class ProcessIA():
 		#TODO lancer l'IA
 		self.__process = Process(target=main.startIa, args=(self.__child_conn,))
 		self.__process.start()
+		time.sleep(0.1)
 		#on démarre le thread de lecture des données IA renvoyées à travers le pipe
 		self.__read_thread = threading.Thread(target=self.__readPipe)
 		self.__read_thread.start()

@@ -7,6 +7,7 @@ import threading
 from multiprocessing import Process, Pipe
 import logging
 from collections import deque
+import time
 
 
 from . import goals
@@ -62,6 +63,8 @@ class MyProcess():
 		self.__parent_conn, self.__child_conn = Pipe()
 		self.__process = Process(target=goals.startSubprocess, args=(self.__child_conn, robot_name) )
 		self.__process.start()
+
+		time.sleep(0.1)
 
 		self.__Pull_thread = threading.Thread(target=self.__readPipe)
 		self.__Pull_thread.start()

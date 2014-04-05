@@ -19,5 +19,5 @@ class ElemGoal:
 	def getIdScript(self):
 		return self.__id_script
 
-	def getPosition(self):
+	def getPositionAndAngle(self):
 		return (self.__x, self.__y, self.__angle)
