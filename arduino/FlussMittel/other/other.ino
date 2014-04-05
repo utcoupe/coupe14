@@ -14,7 +14,7 @@
 #include "compat.h"
 #include "parameters.h"
 
-Servo servoBras, servoRet, servoBrasAngle, servoBrasDist;
+Servo servoRet, servoBrasAngle, servoBrasDist;
 AF_DCMotor motor_ascenseur(1);
 
 #define MAX_READ 64 

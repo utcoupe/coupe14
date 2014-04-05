@@ -61,12 +61,12 @@ enum ordre {
 	A_GET_POS,	//#int #int #float
 	A_GET_POS_ID,	//#int #int #float #int
 
-	O_BRAS_OUVRIR, //@int
-	O_BRAS_FERMER, //@int
 	O_RET_OUVRIR, //@int
 	O_RET_FERMER, //@int
 	O_MONTER_ASC, //@int	
 	O_BAISSER_ASC, //@int
+	O_BRAS_DEPOT, //@int @int @int @int
+	O_BRAS_RET, //@int @int @int @int
 
 	GET_CAM,	//#int #int
 	GET_HOKUYO,	//#long #int #int #int #int #int #int #int #int

@@ -30,12 +30,12 @@ void initSize()
 	ordreSize[A_GET_POS]=0;
 	ordreSize[A_GET_POS_ID]=0;
 
-	ordreSize[O_BRAS_OUVRIR]=2;
-	ordreSize[O_BRAS_FERMER]=2;
 	ordreSize[O_RET_OUVRIR]=2;
 	ordreSize[O_RET_FERMER]=2;
 	ordreSize[O_MONTER_ASC]=2;
 	ordreSize[O_BAISSER_ASC]=2;
+	ordreSize[O_BRAS_DEPOT]=8;
+	ordreSize[O_BRAS_RET]=8;
 
 	ordreSize[GET_CAM]=0;
 	ordreSize[GET_HOKUYO]=0;
