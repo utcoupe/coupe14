@@ -70,7 +70,6 @@ class GoalsManager:
 			orders.append( ("END", (),) )
 			#on envoi le tout
 			self.__SubProcessManager.sendGoal(self.__last_id_objectif_send, goal.getId(), orders)
-			self.__logger.warning(str(self.__robot_name)+str(self.__last_id_objectif_send)+":"+str(goal.getId()))
 			self.__last_id_objectif_send = goal.getId()
 		else:
 			self.__logger.error('Unable to block ' + goal.getName())

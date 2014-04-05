@@ -143,11 +143,11 @@ class OurBot():
 		if address == 'ADDR_FLUSSMITTEL_OTHER' or address == 'ADDR_TIBOT_OTHER':
 			if idd != self.__last_id_executed_other:
 				self.__last_id_executed_other = idd
-				self.__logger.debug("changement d'id other " + str(idd))
+				self.__logger.debug(str(address)+" changement d'id other " + str(idd))
 		else:
 			if idd != self.__last_id_executed_asserv:
 				self.__last_id_executed_asserv = idd
-				self.__logger.debug("changement d'id asserv " + str(idd))
+				self.__logger.debug(str(address)+" changement d'id other " + str(idd))
 
 	#utilise les données en provenance de de l'asserv uniquement !
 	def setPositionAndId(self, address, arguments):

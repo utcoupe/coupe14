@@ -51,7 +51,6 @@ class Communication():
 		"""
 		Parse l'ordre envoyé à ADDR_FLUSSMITTEL_ASSERV
 		"""
-		print("-------------------------------------------- "+str(order)+"   "+str(args))
 
 		#on traite les ordres qui nécessitent de renvoyer des informations
 		if (order == "A_GET_POS"):
