@@ -35,6 +35,7 @@ class Robot(EngineObjectPoly):
 		self.__asserv = Asserv(self)
 		self.__others = Others(self)
 
+
 	#données du robot utiles au simulateur
 		self.__mod_teleport = False # quand on clique ça téléporte au lieu d'envoyer un ordre à l'asservissement
 		self.__mod_recul = False # marche arrière ou marche avant ?
@@ -63,11 +64,11 @@ class Robot(EngineObjectPoly):
 		return self.x(), self.y(), self.a()
 
 	def getPositionId(self):
-		return self.x(), self.y(), self.a(), self.__asserv.getId()
+		return self.x(), self.y(), self.a(), self.__asserv.getLastIdAction()
 
 	def resetId(self):
-		self.__asserv.resetId()
-		self.__others.resetId()
+		self.__asserv.resetLastIdAction()
+		self.__others.resetLastIdAction()
 
 	def getTyperobot(self):
 		return self.__typerobot
@@ -77,7 +78,6 @@ class Robot(EngineObjectPoly):
 
 	def addGoal(self, newGoal):
 		self.__goals.append(newGoal)
-		print (self.__goals)
 
 	def cleanGoals(self):
 		self.__goals = []
@@ -91,19 +91,19 @@ class Robot(EngineObjectPoly):
 		@param numOrdre int définit dans define
 		"""
 		if (numOrdre == GOTO):
-			self.__asserv.goto(arg[1],2000-arg[2])
+			self.__asserv.goto(arg[0], arg[1],2000-arg[2])
 		elif (numOrdre == GOTOA):
-			self.__asserv.gotoa(arg[1],2000-arg[2],arg[3])
+			self.__asserv.gotoa(arg[0], arg[1],2000-arg[2],arg[3])
 		elif (numOrdre == GOTOAR):
-			self.__asserv.gotoar(arg[1],2000-arg[2],arg[3])
+			self.__asserv.gotoar(arg[0], arg[1],2000-arg[2],arg[3])
 		elif (numOrdre == GOTOR):
-			self.__asserv.gotor(arg[1],2000-arg[2])
+			self.__asserv.gotor(arg[0], arg[1],2000-arg[2])
 		elif (numOrdre == ROT):
-			self.__asserv.rot(arg[1])
+			self.__asserv.rot(arg[0], arg[1])
 		elif (numOrdre == ROTR):
-			self.__asserv.rotr(arg[1])
+			self.__asserv.rotr(arg[0], arg[1])
 		elif (numOrdre == PWM):
-			self.__asserv.pwm(arg[1],arg[2],arg[3])	#!! x=pwm_l, y=pwm_r, angle=delay !!
+			self.__asserv.pwm(arg[0], arg[1],arg[2],arg[3])	#!! x=pwm_l, y=pwm_r, angle=delay !!
 
 
 	def _my_velocity_func(self):
@@ -112,7 +112,6 @@ class Robot(EngineObjectPoly):
 			self.body._set_angular_velocity(0)
 			if not self.__stop and self.__goals:
 				current_goal = self.__goals[0]
-				self.__asserv.incId()
 				if isinstance(current_goal, GoalPOSR):
 					x,y = self.body.position
 					a = self.body.angle
@@ -133,7 +132,8 @@ class Robot(EngineObjectPoly):
 					d = math.sqrt(dx**2+dy**2)
 					if d < abs(v * dt):
 						self.body._set_position((gx,gy))
-						self.__goals.pop(0)
+						removed_goal = self.__goals.pop(0)
+						self.__asserv.setLastIdAction(removed_goal.id_action)
 						self.body._set_velocity((0,0))
 					else:
 						a = math.atan2(dy, dx)
@@ -147,7 +147,8 @@ class Robot(EngineObjectPoly):
 					if current_goal.start == -1:
 						current_goal.start = time.time()
 					elif (time.time() - current_goal.start) > current_goal.delay:
-						self.__goals.pop(0)
+						removed_goal = self.__goals.pop(0)
+						self.__asserv.setLastIdAction(removed_goal.id_action)
 					else:
 						a = self.body.angle
 						v = self.__max_speed * current_goal.pwm / 255
@@ -156,7 +157,8 @@ class Robot(EngineObjectPoly):
 						self.body._set_velocity((vx,vy))
 				elif isinstance(current_goal, GoalANGLE):
 					self.body._set_angle(current_goal.a)
-					self.__goals.pop(0)
+					removed_goal = self.__goals.pop(0)
+					self.__asserv.setLastIdAction(removed_goal.id_action)
 				else:
 					raise Exception("type_goal inconnu")
 			else:

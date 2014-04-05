@@ -82,6 +82,5 @@ class MyProcess():
 	def __readPipe(self):
 		while True:
 			a = self.__parent_conn.recv()
-			self.__logger.warning("Vrai raw: "+str(a))
 			self.__input_buffer.append(a)
 

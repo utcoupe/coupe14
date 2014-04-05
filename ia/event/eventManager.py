@@ -67,7 +67,6 @@ class EventManager():
 	def __majObjectif(self):
 		"""Get new goals from objectifManager and add it to robot's goals queue"""
 		new_data_list = self.__SubProcessCommunicate.readOrders()
-		self.__logger.debug("raw: "+str(new_data_list))
 		for new_data in new_data_list:
 			nom_robot, id_prev_objectif, id_objectif, action_data = new_data
 
@@ -153,7 +152,7 @@ class EventManager():
 							self.__pushOrders(self.__Tibot, next_actions)
 
 	def __pushOrders(self, Objet, data): 
-		print(str(Objet.getName()) + " charge les actions: " + str(data))
+		print(str(Objet.getName()) + " charge les actions dans eventManager: " + str(data))
 		id_objectif = data[0]
 		data_action = data[1]#data_action est de type ((id_action, ordre, arguments),...)
 
@@ -204,7 +203,7 @@ class EventManager():
 				else:
 					self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
 
-				self.__logger.debug("Envoi de l'ordre: " + str(action))
+				self.__logger.debug(str(address) + " envoi de l'ordre: " + str(action))
 
 
 	def __testCollision(self):
