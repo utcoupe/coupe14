@@ -3,10 +3,10 @@
 	<elemScript><!--script récupèration triangle rouge avec mur-->
 		<id_script>0</id_script>
 		<orders>
-			<order>O_BRAS_OUVRIR</order>
+			<order>O_RET_OUVRIR</order>
 			<order>SLEEP 300</order>
 			<order>A_PWM 50 50 200</order>
-			<order>O_BRAS_FERMER</order>
+			<order>O_RET_FERMER</order>
 			<order>SLEEP 300</order>
 			<order>A_PWM -50 -50 100</order>
 		</orders>
@@ -14,10 +14,10 @@
 	<elemScript><!--script récupèration triangle jaune avec mur -->
 		<id_script>1</id_script>
 		<orders>
-			<order>O_BRAS_OUVRIR</order>
+			<order>O_RET_OUVRIR</order>
 			<order>SLEEP 300</order>
 			<order>A_PWM 50 50 200</order>
-			<order>O_BRAS_FERMER</order>
+			<order>O_RET_FERMER</order>
 			<order>SLEEP 300</order>
 			<order>A_PWM -50 -50 100</order>
 		</orders>
@@ -25,20 +25,20 @@
 	<elemScript><!--script récupèration triangle rouge sans mur -->
 		<id_script>2</id_script>
 		<orders>
-			<order>O_BRAS_OUVRIR</order>
+			<order>O_RET_OUVRIR</order>
 			<order>SLEEP 300</order>
 			<order>A_PWM 50 50 100</order>
-			<order>O_BRAS_FERMER</order>
+			<order>O_RET_FERMER</order>
 			<order>SLEEP 300</order>
 		</orders>
 	</elemScript>
 	<elemScript><!--script récupèration triangle jaune sans mur -->
 		<id_script>3</id_script>
 		<orders>
-			<order>O_BRAS_OUVRIR</order>
+			<order>O_RET_OUVRIR</order>
 			<order>SLEEP 300</order>
 			<order>A_PWM 50 50 100</order>
-			<order>O_BRAS_FERMER</order>
+			<order>O_RET_FERMER</order>
 			<order>SLEEP 300</order>
 		</orders>
 	</elemScript>

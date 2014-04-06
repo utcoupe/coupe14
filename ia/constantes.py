@@ -72,7 +72,7 @@ SEUIL_JAUNE = 			100 #TODO
 POINTS_PAR_CERCLE = 	8
 MARGE_PASSAGE_PATH = 	0
 MARGE_COLLISION =		-20
-COLLISION_THRESHOLD =	200
+COLLISION_THRESHOLD =	300
 
 
 #=======================================Systemes physiques========================================
