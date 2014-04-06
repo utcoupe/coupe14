@@ -37,7 +37,7 @@ void setup(){
 void loop(){
 	/* on note le temps de debut */
 	timeStart = micros();
-	if (timeStart - timeLED > 1000000) {
+	if (timeStart - timeLED > 60*1000000) {
 		digitalWrite(22, HIGH);
 	}
 		
