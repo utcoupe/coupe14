@@ -58,11 +58,11 @@
 //CONSIGNE_REACHED est la pwm en dessous de laquelle un robot peut etre considéré comme arrêté à son goal
 #define CONSIGNE_REACHED 10
 
-#define ENC_RESOLUTION 500 //resolution du codeur
+#define ENC_RESOLUTION 1024 //resolution du codeur
 
-#define ENC_LEFT_RADIUS 34.0 //REGLE PAR TEST - rayon de la roue codeuse
-#define ENC_RIGHT_RADIUS 34.0 //REGLE PAR TEST - rayon de la roue codeuse
-#define ENTRAXE_ENC 259.8 //REGLE PAR TES - Distance entre chaque roue codeuse en mm
+#define ENC_LEFT_RADIUS 36.1 //REGLE PAR TEST - rayon de la roue codeuse
+#define ENC_RIGHT_RADIUS 36.1 //REGLE PAR TEST - rayon de la roue codeuse
+#define ENTRAXE_ENC 324.5 //REGLE PAR TES - Distance entre chaque roue codeuse en mm
 
 #define ERROR_ANGLE 0.05 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
 #define ERROR_POS 10 // erreur en position (mm)  maximale pour considérer l'objectif comme atteint
