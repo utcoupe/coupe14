@@ -5,7 +5,7 @@ import sys
 class Gpio:
 	def __init__(self):
 		self.__parsePorts()
-		self.initJackPort(1)
+		self.initJackPort(27)
 		self.initColorSelectPort(2)
 
 	def initJackPort(self, port):
