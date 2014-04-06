@@ -28,6 +28,7 @@ class GoalsManager:
 
 		self.__available_goals		= [] #List of available goals
 		self.__blocked_goals		= [] # List of blocked goals
+		self.__goto_finished_goals	= [] # List of blocked goals
 		self.__finished_goals		= [] #List of finished goals
 		self.__elem_script			= {}
 		self.__SubProcessManager 	= SubProcessManager
@@ -75,10 +76,15 @@ class GoalsManager:
 				self.__addGoal(path, goal, 0)
 
 	def goalFinishedId(self, id_objectif):
-		for objectif in self.__blocked_goals:
+		for objectif in self.__goto_finished_goals:
 			if objectif.getId() == id_objectif:
 				self.__finishGoal(objectif)
 			self.__queueBestGoals()
+
+	def goalGotoFinishedId(self, id_objectif):
+		for objectif in self.__blocked_goals:
+			if objectif.getId() == id_objectif:
+				self.__gotoFinishGoal(objectif)
 
 	def goalCanceledId(self, id_objectif):
 		for objectif in self.__blocked_goals:
@@ -94,12 +100,12 @@ class GoalsManager:
 				orders = deque()
 			else:
 				orders = prev_action
-			self.__logger.debug("EMPTY prev_action " +str(orders))
+
 			#on ajoute la trajectoire calculé
 			orders.extend(self.__tupleTrajectoireToDeque(tuple_trajectoire_list))
 			orders.append( ("A_ROT", (goal.getElemGoal(elem_goal_id).getPositionAndAngle()[2],),) )
 			#on ajoute attend d'être arrivé pour lancer les actions
-			orders.append( ("THEN", (),) )
+			orders.append( ("END_GOTO", (),) )
 			#on ajoute le script d'action
 			orders.extend(self.__elem_script[ goal.getElemGoalLocked().getIdScript() ])
 			#on ajoute un marqueur de fin
@@ -133,13 +139,18 @@ class GoalsManager:
 			return False
 
 	def __releaseGoal(self, goal):
+		self.__blocked_goals.remove(goal)#On ne peut pas enlever les ordres dans self.__goto_finished_goals
 		self.__available_goals.append(goal)
-		self.__blocked_goals.remove(goal)
 		self.__logger.info('Goal ' + goal.getName() + ' is released')
 
-	def __finishGoal(self, goal):
-		self.__finished_goals.append(goal)
+	def __gotoFinishGoal(self, goal):
 		self.__blocked_goals.remove(goal)
+		self.__goto_finished_goals.append(goal)
+		self.__logger.info('Goal ' + goal.getName() + ' is goto finished')
+
+	def __finishGoal(self, goal):
+		self.__goto_finished_goals.remove(goal)
+		self.__finished_goals.append(goal)
 		self.__logger.info('Goal ' + goal.getName() + ' is finished')
 
 	def __collectEnemyFinished(self):
@@ -222,7 +233,6 @@ class GoalsManager:
 			#Inversion du script
 			if self.__our_color == "YELLOW":
 				id_objectif, elem_goal_id = self.__reverse_table[(id_objectif, elem_goal_id)]
-				print(str(id_objectif)+" "+str(elem_goal_id))
 			prev_action = deque()
 			for raw_prev_action in xml_goal.getElementsByTagName('prev_action'):
 				raw_order = raw_prev_action.childNodes[0].nodeValue.split()

@@ -107,7 +107,7 @@ class OurBot():
 		return data_trajectoires #type: ((id_objectif, ((x,y),(x,y),...)), (id_objectif, ((x,y),(x,y),...)), ...)
 
 	def getNextOrders(self):
-		"""retourne une liste d'action qui s'arrete sur le premier ordre bloquant trouvé (END,THEN ou SLEEP) """
+		"""retourne une liste d'action qui s'arrete sur le premier ordre bloquant trouvé (END, END_GOTO, THEN ou SLEEP) """
 		if self.__objectifs:
 			objectif_en_cours = self.__objectifs.popleft()
 			order_of_objectif = objectif_en_cours[1] # type ((id_action, ordre, arguments),...)
@@ -115,7 +115,7 @@ class OurBot():
 			data_order = order_of_objectif.popleft() #type (id_action, ordre, arguments)
 			output_temp = deque()
 			output_temp.append(data_order)
-			while data_order[1] != 'SLEEP' and data_order[1] != 'THEN' and data_order[1] != 'END':
+			while data_order[1] != 'SLEEP' and data_order[1] != 'THEN' and data_order[1] != 'END_GOTO' and data_order[1] != 'END':
 				data_order = order_of_objectif.popleft()
 				output_temp.append(data_order)
 
@@ -172,7 +172,7 @@ class OurBot():
 			order = elm_action[0]
 			action += (order,)
 
-			if order not in ("SLEEP", "THEN", "END"):
+			if order not in ("SLEEP", "THEN", "END_GOTO", "END"):
 				argument_type_list = self.__arduino_constantes['ordersArguments'][order]
 				arguments_temp = ()
 				for i, argument_type in enumerate(argument_type_list):

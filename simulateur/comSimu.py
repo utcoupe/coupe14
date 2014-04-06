@@ -64,6 +64,18 @@ class Communication():
 			self.__bigrobot.resetIdOther()
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
+		elif (order == "O_RET_OUVRIR"):
+			pos = ()
+			self.__bigrobot.setlastIdActionOther(args[0])
+			#TODO, implementer
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+
+		elif (order == "O_RET_FERMER"):
+			pos = ()
+			self.__bigrobot.setlastIdActionOther(args[0])
+			#TODO, implementer
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+
 		else:
 			print('Error : mauvais paramètre traitement Flussmittel other !')
 
@@ -151,6 +163,18 @@ class Communication():
 		elif (order == "RESET_ID"):
 			pos = ()
 			self.__bigrobot.resetIdOther()
+			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
+
+		elif (order == "O_RET_OUVRIR"):
+			pos = ()
+			self.__minirobot.setlastIdActionOther(args[0])
+			#TODO, implementer
+			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
+
+		elif (order == "O_RET_FERMER"):
+			pos = ()
+			self.__minirobot.setlastIdActionOther(args[0])
+			#TODO, implementer
 			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
 
 		else:
