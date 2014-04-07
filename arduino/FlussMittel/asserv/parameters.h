@@ -84,6 +84,16 @@
 #define DIS_D 0.5 //a regler par incrementation
 #define DIS_AWU 0
 
+//BLOCAGE
+//TIME_BLOCKED : période de vérification (ms)
+//MIN_DIST_BLOCKED : disatcne min a parcourir pour ne pas etre considere bloqué (mm)
+#define TIME_BLOCKED 100
+#define MIN_DIST_BLOCKED 1
+
+//PIN LED
+#define LED_MAINLOOP 22
+#define LED_BLOCKED 23
+
 //DEFINES ARDUINO
 #define PIN_ENC_RIGHT_A 21
 #define PIN_ENC_RIGHT_B 20

@@ -174,10 +174,11 @@ class EventManager():
 				self.__sleep_time_tibot = last_order[2][0]
 			else:
 				self.__logger.error("Objet inconnu")
+		elif last_order[1] == 'END_GOTO':
+			self.__SubProcessCommunicate.sendObjectifGotoOver(id_objectif)
 		elif last_order[1] == 'END':
 			Objet.setLastIdObjectifExecuted(id_objectif)
 			self.__SubProcessCommunicate.sendObjectifOver(id_objectif)
-			pass
 		elif last_order[1] == 'THEN':
 			#Rien à faire
 			pass
@@ -199,7 +200,10 @@ class EventManager():
 				if action[1][0] == 'O':
 					self.__Communication.sendOrderAPI(address[0], action[1], *arg)
 				elif action[1][0] == 'A':
-					self.__Communication.sendOrderAPI(address[1], action[1], *arg)
+					if action[1] == "A_GOTO_SCRIPT":#A_GOTO_SCRIPT n'existe que dans les scripts d'action elemetaire, on l'utilise pour ne pas inclure ces deplacements dans le calcul de collision
+						self.__Communication.sendOrderAPI(address[1], "A_GOTO", *arg)
+					else:
+						self.__Communication.sendOrderAPI(address[1], action[1], *arg)
 				else:
 					self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
 

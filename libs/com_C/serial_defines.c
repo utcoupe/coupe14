@@ -15,10 +15,7 @@ void initSize()
 	ordreSize[PINGPING]=0;
 	ordreSize[A_GOTOA]=10;
 	ordreSize[A_GOTO]=6;
-	ordreSize[A_GOTOAR]=10;
-	ordreSize[A_GOTOR]=6;
 	ordreSize[A_ROT]=6;
-	ordreSize[A_ROTR]=6;
 	ordreSize[A_KILLG]=0;
 	ordreSize[A_CLEANG]=0;
 	ordreSize[A_PIDA]=12;
@@ -32,8 +29,6 @@ void initSize()
 
 	ordreSize[O_RET_OUVRIR]=2;
 	ordreSize[O_RET_FERMER]=2;
-	ordreSize[O_MONTER_ASC]=2;
-	ordreSize[O_BAISSER_ASC]=2;
 	ordreSize[O_BRAS_DEPOT]=8;
 	ordreSize[O_BRAS_RET]=8;
 
@@ -41,6 +36,8 @@ void initSize()
 	ordreSize[GET_HOKUYO]=0;
 	ordreSize[GET_LAST_ID]=0;
 
+	ordreSize[PAUSE]=0;
+	ordreSize[RESUME]=0;
 	ordreSize[RESET_ID]=0;
 	//FINPARSE
 }

@@ -29,16 +29,18 @@ void setup(){
 #endif
 	init_protocol();
 	PDEBUGLN("INIT DONE");
-	// LED qui n'en est pas une
-	pinMode(22,OUTPUT);
-	digitalWrite(22, HIGH);
+
+	pinMode(LED_MAINLOOP, OUTPUT);
+	pinMode(LED_BLOCKED, OUTPUT) ;
+	digitalWrite(LED_MAINLOOP, HIGH); //HIGH = eteinte
+	digitalWrite(LED_BLOCKED, HIGH); //HIGH = eteinte
 }
 
 void loop(){
 	/* on note le temps de debut */
 	timeStart = micros();
 	if (timeStart - timeLED > 60*1000000) {
-		digitalWrite(22, HIGH);
+		digitalWrite(LED_MAINLOOP, HIGH);
 	}
 		
 	//Action asserv
@@ -58,7 +60,7 @@ void loop(){
 	long udelay = DUREE_CYCLE*1000-(micros()-timeStart);
 	if(udelay<0) {
 		timeLED = timeStart;
-		digitalWrite(22, LOW);
+		digitalWrite(LED_MAINLOOP, LOW);
 		PDEBUGLN("ouch : mainloop trop longue");
 	}
 	else

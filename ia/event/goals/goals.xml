@@ -69,12 +69,12 @@
 		<name>Triangle mur centre droite (3)</name>
 		<type>triangle</type>
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
-		<x>3000</x>
+		<x>2975</x>
 		<y>1200</y>
 		<elem_goals>
 			<elem_goal>
 				<id>1</id>
-				<x>2750</x>
+				<x>2735</x>
 				<y>1200</y>
 				<angle>0.0</angle>
 				<points>1</points>
@@ -155,12 +155,12 @@
 		<type>triangle</type>
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x>1700</x>
-		<y>0</y>
+		<y>15</y>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
 				<x>1700</x>
-				<y>250</y>
+				<y>265</y>
 				<angle>-1.55</angle>
 				<points>1</points>
 				<priority>1</priority>
@@ -176,12 +176,12 @@
 		<type>triangle</type>
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x>1300</x>
-		<y>0</y>
+		<y>15</y>
 		<elem_goals>
 			<elem_goal>
 				<id>1</id>
 				<x>1300</x>
-				<y>250</y>
+				<y>265</y>
 				<angle>-1.55</angle>
 				<points>1</points>
 				<priority>1</priority>
@@ -260,12 +260,12 @@
 		<name>Triangle mur centre gauche (10)</name>
 		<type>triangle</type>
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
-		<x>0</x>
+		<x>15</x>
 		<y>1200</y>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x>250</x>
+				<x>265</x>
 				<y>1200</y>
 				<angle>3.14</angle>
 				<points>1</points>
