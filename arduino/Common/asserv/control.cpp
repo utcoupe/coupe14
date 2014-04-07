@@ -57,6 +57,7 @@ void Control::compute(){
 			current_goal = fifo.getCurrentGoal();
 			PID_Angle.reset();
 			PID_Distance.reset();
+			robot.clearBlocked();
 			reset = false;
 			order_started = false;
 		}
@@ -72,7 +73,7 @@ void Control::compute(){
 					fifo.pushIsReached();
 				}
 				else
-					controlAngle(da);
+					controlPos(da,0);
 				break;
 			}
 
@@ -240,24 +241,6 @@ void Control::check_acc(float *consigne, float last)
 	else if(*consigne < last - max_acc){
 		*consigne = last - max_acc;
 	}
-}
-
-void Control::controlAngle(float da)
-{
-	float consigne;
-	static float last_consigne = 0;
-	int consignePwmL, consignePwmR;
-
-	//Asservissement en position, renvoie une consigne de vitesse
-	consigne = PID_Angle.compute(da);
-
-	check_acc(&consigne, last_consigne);
-
-	consignePwmR = consigne;
-	consignePwmL = -consigne;
-
-	setConsigne(consignePwmL, consignePwmR);
-	last_consigne = consigne;
 }
 
 void Control::controlPos(float da, float dd)
