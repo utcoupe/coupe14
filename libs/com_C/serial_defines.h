@@ -46,10 +46,7 @@ enum ordre {
 	PINGPING, 	
 	A_GOTOA, 	//@int @int @int @float
 	A_GOTO, 	//@int @int @int
-	A_GOTOAR, 	//@int @int @int @float
-	A_GOTOR, 	//@int @int @int
 	A_ROT, 		//@int @float
-	A_ROTR, 	//@int @float
 	A_KILLG, 
 	A_CLEANG,
 	A_PIDA, 	//@float @float @float
@@ -63,8 +60,6 @@ enum ordre {
 
 	O_RET_OUVRIR, //@int
 	O_RET_FERMER, //@int
-	O_MONTER_ASC, //@int	
-	O_BAISSER_ASC, //@int
 	O_BRAS_DEPOT, //@int @int @int @int
 	O_BRAS_RET, //@int @int @int @int
 
@@ -72,6 +67,8 @@ enum ordre {
 	GET_HOKUYO,	//#long #int #int #int #int #int #int #int #int
 	GET_LAST_ID, //#int
 
+	PAUSE,
+	RESUME,
 	RESET_ID,
 	ORDRE_NON_PARSE
 	//FINPARSE
