@@ -67,6 +67,9 @@ void Control::compute(){
 			case TYPE_ANG :
 			{
 				float da = (current_goal.data_1 - current_pos.angle);
+				
+				da = moduloPI(da);//Commenter pour multi-tour
+
 				if(abs(da) <= ERROR_ANGLE){
 					setConsigne(0, 0);
 					fifo.pushIsReached();
@@ -83,11 +86,18 @@ void Control::compute(){
 				float goal_a = atan2(dy, dx);
 				float da = (goal_a - current_pos.angle);
 				float dd = sqrt(pow(dx, 2.0)+pow(dy, 2.0));//erreur en distance
-				float d = dd * cos(da);
+				float d = dd * cos(da); //Distance opposée
+				float dop = dd * sin(da); //Distance adjacente
 				static char aligne = 0;
 
+				//Commenter pour multi-tour
 				da = moduloPI(da);
 
+				if (dop < D_MIN_ASSERV_ANGLE && dd < D_MIN_ASSERV_ANGLE) { //"Zone" de précision TODO
+					da = 0;
+				}
+
+				//Init ordre
 				if (!order_started) {
 					if(abs(da) < max_angle) {
 						aligne = 1;
@@ -97,17 +107,22 @@ void Control::compute(){
 					}
 					order_started = true;
 				}
+
+				//Fin de la procedure d'alignement
 				if(!aligne && abs(da) <= ERROR_ANGLE) {// && value_consigne_right < CONSIGNE_REACHED && value_consigne_left < CONSIGNE_REACHED) {
 					aligne = 1;
 				}
 
+				//En cours d'alignement
 				if(!aligne) {//On tourne sur place avant de se déplacer
 					controlPos(da, 0);
 				}
+				//En cours de déplacement
 				else {
 					controlPos(da, d + current_goal.data_3);//erreur en dist = dist au point + dist additionelle
 				}
 
+				//Fin de consigne
 				if(abs(dd) <= ERROR_POS) {// && value_consigne_right < CONSIGNE_REACHED && value_consigne_left < CONSIGNE_REACHED) {
 					setConsigne(0, 0);
 					fifo.pushIsReached();
