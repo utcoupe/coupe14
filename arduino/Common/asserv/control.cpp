@@ -66,7 +66,6 @@ void Control::compute(){
 		switch(current_goal.type){
 			case TYPE_ANG :
 			{
-				//float da = current_goal.data_1 - current_pos.angle;
 				float da = (current_goal.data_1 - current_pos.angle);
 				if(abs(da) <= ERROR_ANGLE){
 					setConsigne(0, 0);
