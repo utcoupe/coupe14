@@ -69,7 +69,7 @@
 
 #define MAX_ANGLE 0.20  //~10° angle en dessous duquel on décrit une trajectoire curviligne (trop bas, le robot s'arretera constamment pour se recaler au lieu d'avancer, trop haut, les trajectoires seront très courbes voir meme fausses (overflow spd -> overflow pwm).
 #define ERREUR_MARCHE_ARRIERE PI
-#define DISTANCE_MIN_ASSERV_ANGLE 20
+#define D_MIN_ASSERV_ANGLE 40
 
 //Intégrales et dérivée sont calculée avec un intervalle de temps en SECONDES
 //Ne modifier que le nombre, laisser les DUREE_CYCLE
