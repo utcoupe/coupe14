@@ -12,7 +12,7 @@ using namespace std;
  * ****************/
 
 Visio::Visio(VideoCapture& cam) : 
-	color(red), calibrated(false), min_size(100),
+	color(red), calibrated(false), min_size(500),
 	chessboard_size(Size(9,6)), epsilon_poly(0.04),
 	max_diff_triangle_edge(50), camera(cam) {
 	init();

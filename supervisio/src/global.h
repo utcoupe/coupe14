@@ -4,6 +4,8 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+#define MIN_SIZE 500
+
 #define YEL_HUE_MIN 70
 #define YEL_HUE_MAX 100
 #define YEL_SAT_MIN 85

@@ -46,10 +46,10 @@ void perspectiveOnlyLoop(int index){
 
 	Scalar c_red(0,0,255), c_blue(255, 0, 0), c_yel(0,110,130);
 	vector<Point2f> position;
-	position.push_back(Point2f(108,119));
-	position.push_back(Point2f(108,328));
-	position.push_back(Point2f(239,119));
-	position.push_back(Point2f(239,328));
+	position.push_back(Point2f(300,300));
+	position.push_back(Point2f(300,562));
+	position.push_back(Point2f(482,300));
+	position.push_back(Point2f(482,562));
 	for(;;) { //int i=0; i>=0; i++) {
 		vector<vector<Point> > detected_contours_yel, detected_contours_red, detected_contours_blk;
 		vector<Point2f> detected_pts_yel, detected_pts_red, detected_pts_blk;
@@ -81,7 +81,7 @@ void perspectiveOnlyLoop(int index){
 			visio.setRedParameters(min_r, max_r);
 			visio.setBlkParameters(min_b, max_b);
 
-			warpPerspective(frame, persp, visio.getQ(), frame.size());
+			warpPerspective(frame, persp, visio.getQ(), Size(3000,2000));
 			visio.setColor(yellow);
 			visio.getDetectedPosition(frame, detected_pts_yel, detected_contours_yel);
 			visio.setColor(red);
@@ -117,7 +117,7 @@ void perspectiveOnlyLoop(int index){
 			}
 
 	//		resize(persp, persp, Size(600, 600));
-			resize(persp, persp, Size(persp.size().width*1.5, persp.size().height*1.5));
+			resize(persp, persp, Size(900,600));
 			imshow("persp", persp);
 			imshow("origin", frame);
 		}
