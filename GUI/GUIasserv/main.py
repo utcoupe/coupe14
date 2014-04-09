@@ -45,6 +45,7 @@ class GUI:
 		self.path = []
 		"""
 		robot =""
+		self.last_pos = (1000,0,0)
 		self.fen = Tk()
 		self.fen.title("Asservissement " + robot)
 		self.goto_frame = Frame()
@@ -56,15 +57,22 @@ class GUI:
 		self.goto_frame.pack()
 
 		self.scale_frame = Frame()
-		self.inc_scale_b = Button(self.scale_frame, text="+", command=incScale).grid(column=1, row=0)
-		self.dec_scale_b = Button(self.scale_frame, text="-", command=decScale).grid(column=2, row=0)
+		self.inc_scale_b = Button(self.scale_frame, text="+", command=self.incScale).grid(column=1, row=0)
+		self.dec_scale_b = Button(self.scale_frame, text="-", command=self.decScale).grid(column=2, row=0)
 		self.scale_txt = Label(self.scale_frame, text=str(self.viz_y_scale))
 
 
 		self.zone = Canvas(self.fen, width=self.widthfen, height=self.heightfen, bg="white")
 		self.zone.pack()
 
-		self.drawRobot(400,300,0)
+		self.xoff = 100
+		self.x_scale = 1 
+		self.y_scale = 1
+		self.a_offset = 0
+		self.x_offset = self.xoff/2 - (self.last_pos[0] * self.x_scale)
+		self.y_offset = self.heightfen/2
+
+		self.drawRobot(*self.last_pos)
 
 		self.resetPos()
 		self.fen.mainloop()
@@ -81,8 +89,9 @@ class GUI:
 			size_temp = size
 			if i == 0:
 				size_temp = size*1.5
-			pts.append((x+(size_temp*cos(a+self.a_offset+i*2*pi/3))+self.x_offset)*self.x_scale)
-			pts.append(self.heightfen - (y+(size_temp*sin(a+self.a_offset+i*2*pi/3))+self.y_offset)*self.y_scale)
+			pts.append(x*self.x_scale+(size_temp*cos(a+self.a_offset+i*2*pi/3))+self.x_offset)
+			print(self.y_offset)
+			pts.append(self.heightfen - (y*self.y_scale+(size_temp*sin(a+self.a_offset+i*2*pi/3))+self.y_offset))
 
 		self.poly = self.zone.create_polygon(*pts, fill='', outline='red', width=2)
 
@@ -90,19 +99,28 @@ class GUI:
 		args = (0, 0, 0.0)
 		self.com.sendOrderAPI(self.robotaddr, 'A_SET_POS', *args)
 
+	def drawLine(self, x1, y1, x2, y2):
+		args = (x1*self.x_scale+self.x_offset,
+				y1*self.y_scale+self.y_offset,
+				x2*self.x_scale+self.x_offset,
+				y2*self.y_scale+self.y_offset)
+
+		self.lines.append(self.zone.create_line(*args))
+
 	def goto_handler(self):
 		self.robot_data = self.Data.dataToDico()[robot]
 		self.last_pos = robot_data["getPositionAndAngle"]
 		self.path.append(self.last_pos)
-		self.go = int(self.goto_e.get())
-		xoff = 100
+		self.go = (int(self.goto_e.get()), 0)
 
-		self.x_offset = xoff/2 - self.last_pos[0]
+		self.x_scale = (self.widthfen - self.xoff)/(self.go[0] - self.last_pos[0])
+		self.y_scale = self.x_scale * self.viz_y_scale
+
+		self.x_offset = self.xoff/2 - (self.last_pos[0] * self.x_scale)
 		self.y_offset = self.heightfen/2
 
-		self.x_scale = (self.widthfen - xoff)/(self.go - self.last_pos[0])
-		self.y_scale = self.x_scale * self.viz_y_scale
 		self.com.sendOrderAPI(self.robotaddr, 'A_GOTO', *self.go)
+		self.drawLine(self.last_pos[0], self.last_pos[1], *self.go)
 
 		#TODO draw direct line
 		#self.looper()
@@ -112,6 +130,10 @@ class GUI:
 			self.zone.delete(self.lines.pop())
 		for (p1, p2) in zip(self.path[:-1], self.path[1:]):
 			self.drawLine(p1[0], p1[1], p2[0], p2[1], color='red')
+
+	def clearPath(self):
+		for i in range(1,len(self.line)):
+			self.zone.delete(self.lines[i])
 
 	def looper(self):
 		self.robot_data = self.Data.dataToDico()[robot]
