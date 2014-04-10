@@ -11,7 +11,7 @@ void comLoop(Visio& visio) {
 	cout << "READY" << endl;
 	//On lit les ordres sur l'entrée standard
 	cin >> order;
-	while (order != "END") {
+	while (order != "EXIT") {
 		if (order == "ASK_DATA") {
 			vector<Triangle> tri;
 			try {
@@ -22,19 +22,17 @@ void comLoop(Visio& visio) {
 				cout << "END" << endl;
 			} catch (const std::exception &e) {
 				cerr << "Exception in visio.triangles() : " << e.what() << endl;
+				cout << "ERROR" << endl;
 			} catch (...) {
 				cerr << "Unknown exception in visio.triangles()" << endl;
+				cout << "ERROR" << endl;
 			}
 			order = "";
 		}
 		else {
-			cerr << "Unexpected answer : " << order << endl;
+			cerr << "Unexpected order : " << order << endl;
 		}
 		cin >> order;
-		//}
-		/*else {
-			cerr << "ERROR : Ordre inconnu" << endl;
-		}*/
 	}
 	cout << "exit" << endl;
 

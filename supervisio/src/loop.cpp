@@ -13,9 +13,9 @@ void communication(int index) {
 	VideoCapture cam(index);
 	Visio visio(cam);
 	if (visio.getDistortMode() != none) {
-		cout << "Starting visio WITH distortion correction" << endl;
+		cerr << "INFO : Starting visio WITH distortion correction" << endl;
 	} else {
-		cout << "Starting visio WITHOUT distortion correction" << endl;
+		cerr << "INFO : Starting visio WITHOUT distortion correction" << endl;
 	}
 	comLoop(visio);
 }
