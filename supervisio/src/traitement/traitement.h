@@ -32,7 +32,7 @@ class Visio {
 		int triangles(vector<Triangle>& triangles);
 		//UI CALIBRATION
 		bool computeTransformMatrix(const Mat &img, const vector<Point2f> real_positions, Mat *out=0);
-		void camPerspective();
+		bool camPerspective();
 		bool camCalibrate(int nbr_of_views=10);
 		//FILE
 		bool loadTransformMatrix();

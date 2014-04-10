@@ -49,6 +49,7 @@ void Visio::init() {
 	erode_dilate_kernel = getStructuringElement(MORPH_ELLIPSE, Size(10,10));
 	trans_calibrated = loadTransformMatrix();
 	cam_calibrated = loadCameraMatrix();
+	if (cam_calibrated) distort = points;
 }
 
 /**********
@@ -197,19 +198,34 @@ bool Visio::computeTransformMatrix(const Mat &img, const vector<Point2f> real_po
 	return calibrated;
 }
 
-void Visio::camPerspective() {
+bool Visio::camPerspective() {
+	//TODO choix position
 	vector<Point2f> position;
 	position.push_back(Point2f(300,300));
 	position.push_back(Point2f(300,562));
 	position.push_back(Point2f(482,300));
 	position.push_back(Point2f(482,562));
 	Mat img;
-	camera >> img;
+	bool calibrated = false;
+	int key = 0;
 	namedWindow("Perspective");
-	while (!computeTransformMatrix(img, position, &img)) {
+	while (!calibrated) {
+		camera >> img;
+		if (key == 'c') {
+			calibrated = computeTransformMatrix(img, position, &img);
+			key = 0;
+		}
+		if (key == 'q') {
+			cerr << "WARNING : Perspective calibration failed" << endl;
+			return false;
+		}
+		putText(img, "Appuyer sur 'c' pour valider une vue", Point(10,10),1,1,Scalar(0,255,0),1);
+		putText(img, "Appuyer sur 'q' pour quiter", Point(10,30),1,1,Scalar(0,255,0),1);
 		imshow("Perspective", img);
+		key = waitKey(20);
 	}
 	destroyWindow("Perspective");
+	return calibrated;
 }
 
 bool Visio::camCalibrate(int nbr_of_views) {
@@ -253,6 +269,8 @@ bool Visio::camCalibrate(int nbr_of_views) {
 		stringstream txt;
 		txt << "Captures effectuees : " << success << "/" << nbr_of_views;
 		putText(img, txt.str(), Point(10,10),1,1,Scalar(0,255,0),1);
+		putText(img, "Appuyer sur 'c' pour valider une vue", Point(10,30),1,1,Scalar(0,255,0),1);
+		putText(img, "Appuyer sur 'q' pour quiter", Point(10,50),1,1,Scalar(0,255,0),1);
 		//Si l'echiquier est détecté dans les deux images et que l'on souhaite capturer cette frame
 		if (capture && pattern_found) {
 			success++;

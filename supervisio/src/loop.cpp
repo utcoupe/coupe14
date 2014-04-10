@@ -23,10 +23,10 @@ void calibration(int index) {
 
 	Visio visio(cam);
 	visio.setChessboardSize(Size(9,6));
-	visio.camCalibrate();
-	visio.saveCameraMatrix();
-	visio.camPerspective();
-	visio.saveTransformMatrix();
+	if (visio.camCalibrate()) 
+		visio.saveCameraMatrix();
+	if (visio.camPerspective())
+		visio.saveTransformMatrix();
 }
 
 void perspectiveOnlyLoop(int index){
