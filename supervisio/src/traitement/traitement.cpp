@@ -12,9 +12,10 @@ using namespace std;
  * ****************/
 
 Visio::Visio(VideoCapture& cam) : 
-	color(red), calibrated(false), min_size(500),
+	color(red), min_size(500),
 	chessboard_size(Size(9,6)), epsilon_poly(0.04),
-	max_diff_triangle_edge(50), camera(cam) {
+	max_diff_triangle_edge(50), camera(cam),
+	size_frame(camera.get(CV_CAP_PROP_FRAME_WIDTH), camera.get(CV_CAP_PROP_FRAME_HEIGHT)){
 	init();
 }
 
@@ -23,6 +24,8 @@ void Visio::init() {
 	setYelParameters(Scalar(YEL_HUE_MIN, YEL_SAT_MIN, YEL_VAL_MIN), Scalar(YEL_HUE_MAX, YEL_SAT_MAX, YEL_VAL_MAX));
 	setBlkParameters(Scalar(BLK_HUE_MIN, BLK_SAT_MIN, BLK_VAL_MIN), Scalar(BLK_HUE_MAX, BLK_SAT_MAX, BLK_VAL_MAX));
 	erode_dilate_kernel = getStructuringElement(MORPH_ELLIPSE, Size(10,10));
+	trans_calibrated = loadTransformMatrix();
+	cam_calibrated = loadCameraMatrix();
 }
 
 /**********
@@ -67,37 +70,6 @@ int Visio::getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, ve
 	return detected_pts.size();
 }
 
-bool Visio::computeTransformMatrix(const Mat &img, const vector<Point2f> real_positions, Mat *out) {
-	Mat gray;
-	bool pattern_found = false;
-	vector<Point2f> corners, ext_corn;
-	cvtColor(img, gray, CV_BGR2GRAY);
-	pattern_found = findChessboardCorners(gray, chessboard_size, corners, CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK);
-	if (pattern_found) {
-		//On recupere les 4 points exterieurs de l'échiquier
-		ext_corn.push_back(corners[0]);
-		ext_corn.push_back(corners[chessboard_size.width - 1]);
-		ext_corn.push_back(corners[(chessboard_size.width)*(chessboard_size.height - 1)]);
-		ext_corn.push_back(corners[chessboard_size.height - 1 + (chessboard_size.width - 1)*(chessboard_size.height)]);
-		cornerSubPix(gray, ext_corn, Size(11, 11), Size(-1, -1), TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
-		perspectiveMatrix = getPerspectiveTransform(ext_corn, real_positions);
-		calibrated = true;
-		if (out != 0) { //La matrice ou existe
-			for(int i=0; i<4; i++) {
-				drawObject(ext_corn[i].x, ext_corn[i].y, *out, intToString(i));
-			}
-		}
-
-	}
-	else {
-		perspectiveMatrix =  Mat::eye(3, 3, CV_64F);
-		calibrated = false;
-		if (out != 0) { //La matrice ou existe
-			drawChessboardCorners(*out, chessboard_size, corners, pattern_found);
-		}
-	}
-	return calibrated;
-}
 
 void Visio::polyDegree(const vector<vector<Point> >& contours, vector<int>& degree, double epsilon) {
 	if (epsilon < 0)
@@ -141,10 +113,123 @@ int Visio::triangles(vector<Triangle>& triangles) {
 	camera >> img;
 	return trianglesFromImg(img, triangles);
 }
+
+/*********************
+ *	UI CALIBRATION	 *
+ *	******************/
+
+bool Visio::computeTransformMatrix(const Mat &img, const vector<Point2f> real_positions, Mat *out) {
+	Mat gray;
+	bool pattern_found = false;
+	bool &calibrated = trans_calibrated;
+	vector<Point2f> corners, ext_corn;
+	cvtColor(img, gray, CV_BGR2GRAY);
+	pattern_found = findChessboardCorners(gray, chessboard_size, corners, CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK);
+	if (pattern_found) {
+		//On recupere les 4 points exterieurs de l'échiquier
+		ext_corn.push_back(corners[0]);
+		ext_corn.push_back(corners[chessboard_size.width - 1]);
+		ext_corn.push_back(corners[(chessboard_size.width)*(chessboard_size.height - 1)]);
+		ext_corn.push_back(corners[chessboard_size.height - 1 + (chessboard_size.width - 1)*(chessboard_size.height)]);
+		cornerSubPix(gray, ext_corn, Size(11, 11), Size(-1, -1), TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
+		perspectiveMatrix = getPerspectiveTransform(ext_corn, real_positions);
+		calibrated = true;
+		if (out != 0) { //La matrice ou existe
+			for(int i=0; i<4; i++) {
+				drawObject(ext_corn[i].x, ext_corn[i].y, *out, intToString(i));
+			}
+		}
+
+	}
+	else {
+		perspectiveMatrix =  Mat::eye(3, 3, CV_64F);
+		calibrated = false;
+		if (out != 0) { //La matrice ou existe
+			drawChessboardCorners(*out, chessboard_size, corners, pattern_found);
+		}
+	}
+	return calibrated;
+}
+
+void Visio::camPerspective() {
+	vector<Point2f> position;
+	position.push_back(Point2f(300,300));
+	position.push_back(Point2f(300,562));
+	position.push_back(Point2f(482,300));
+	position.push_back(Point2f(482,562));
+	Mat img;
+	camera >> img;
+	namedWindow("Perspective");
+	while (!computeTransformMatrix(img, position, &img)) {
+		imshow("Perspective", img);
+	}
+	destroyWindow("Perspective");
+}
+
+bool Visio::camCalibrate(int nbr_of_views) {
+	//points reels et image pour la calibration
+	vector<vector<Point3f> > objectPoints;
+	vector<vector<Point2f> > imagePoints;
+
+	//position des points corners (dimension abstraite)
+	vector<Point3f> obj;
+	for (int j=0; j<chessboard_size.height * chessboard_size.width; j++)
+	{
+		obj.push_back(Point3f(j/chessboard_size.width, j%chessboard_size.width, 0.0f));
+	}
+	//Calibration caméra gauche
+	namedWindow("Calibration");
+	int key = 0;
+	bool capture = false;
+	for(int success=0; success < nbr_of_views;) {
+		Mat img, gray;
+		vector<Point2f> corners;
+		bool pattern_found;
+
+		//A-t-on appuyé sur 'c' pour capturer cette frame ?
+		if (key == 'c') {
+			capture = true;
+		}
+		if (key == 'q') {
+			cerr << "WARNING : Calibration failed" << endl;
+			destroyWindow("Calibration");
+			return false;
+		}
+		//Capture d'image
+		camera >> img;
+		cvtColor(img, gray, CV_BGR2GRAY);
+		pattern_found = findChessboardCorners(gray, chessboard_size, corners, CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK);
+		if (pattern_found) {
+			cornerSubPix(gray, corners, Size(11, 11), Size(-1, -1), TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
+		}
+		//Retour graphique
+		drawChessboardCorners(img, chessboard_size, corners, pattern_found);
+		stringstream txt;
+		txt << "Captures effectuees : " << success << "/" << nbr_of_views;
+		putText(img, txt.str(), Point(10,10),1,1,Scalar(0,255,0),1);
+		//Si l'echiquier est détecté dans les deux images et que l'on souhaite capturer cette frame
+		if (capture && pattern_found) {
+			success++;
+			objectPoints.push_back(obj);
+			imagePoints.push_back(corners);
+			capture = false;
+		}
+		imshow("Calibration", img);
+		key = waitKey(20);
+	}
+	cout << "Beginning processing" << endl;
+	destroyWindow("Calibration");
+	vector<Mat> empty;
+	calibrateCamera(objectPoints, imagePoints, size_frame, CM, D, empty, empty);
+	cout << "Done !" << endl;
+	return true;
+}
+
 //FILE MANAGER
 
 bool Visio::loadTransformMatrix() {
-	cout << "Loading calibration data" << endl;
+	bool &calibrated = trans_calibrated;
+	cout << "Loading transform data" << endl;
 	FileStorage fs("calibration_persp.yml", FileStorage::READ);
 	if (!fs.isOpened()) {
 		cerr << "ERROR : Couldn't find calibration_persp.yml" << endl;
@@ -156,10 +241,26 @@ bool Visio::loadTransformMatrix() {
 	return true;
 }
 
+bool Visio::loadCameraMatrix() {
+	bool &calibrated = cam_calibrated;
+	cout << "Loading camera data" << endl;
+	FileStorage fs("calibration_camera.yml", FileStorage::READ);
+	if (!fs.isOpened()) {
+		cerr << "ERROR : Couldn't find calibration_camera.yml" << endl;
+		return false;
+	}
+	fs["D"] >> D;
+	fs["CM"] >> CM;
+	fs["size"] >> size_frame;
+	fs.release();
+	calibrated = true;
+	return true;
+}
+
 void Visio::saveTransformMatrix() {
-	cout << "Saving calibration data" << endl;
-	if (!calibrated) {
-		cerr << "ERROR : Uncalibrated camera" << endl;
+	cout << "Saving transform data" << endl;
+	if (!trans_calibrated) {
+		cerr << "ERROR : Uncalibrated trasnform" << endl;
 		return;
 	}
 	FileStorage fs("calibration_persp.yml", FileStorage::WRITE);
@@ -167,6 +268,18 @@ void Visio::saveTransformMatrix() {
 	fs.release();
 }
 
+void Visio::saveCameraMatrix() {
+	cout << "Saving camera data" << endl;
+	if (!cam_calibrated) {
+		cerr << "ERROR : Uncalibrated camera" << endl;
+		return;
+	}
+	FileStorage fs("calibration_camera.yml", FileStorage::WRITE);
+	fs << "D" << D;
+	fs << "CM" << CM;
+	fs << "size" << size_frame;
+	fs.release();
+}
 //SETTER
 
 void Visio::setRedParameters(Scalar min, Scalar max) {

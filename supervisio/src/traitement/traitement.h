@@ -25,14 +25,19 @@ class Visio {
 		void detectColor(const Mat& img, Mat& out);
 		void getContour(const Mat& img, vector<vector<Point> >& contours);
 		int getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, vector<vector<Point> >& detected_contours);
-		bool computeTransformMatrix(const Mat &img, const vector<Point2f> real_positions, Mat *out=0);
 		void polyDegree(const vector<vector<Point> >& contours, vector<int>& degree, double epsilon=-1);
 		void polyDegree(const vector<vector<Point> >& contours, vector<int>& degree, vector<vector<Point> >& approx, double epsilon=-1);
 		int trianglesFromImg(const Mat& img, vector<Triangle>& triangles);
 		int triangles(vector<Triangle>& triangles);
+		//UI CALIBRATION
+		bool computeTransformMatrix(const Mat &img, const vector<Point2f> real_positions, Mat *out=0);
+		void camPerspective();
+		bool camCalibrate(int nbr_of_views=10);
 		//FILE
 		bool loadTransformMatrix();
+		bool loadCameraMatrix();
 		void saveTransformMatrix();
+		void saveCameraMatrix();
 		//SETTER
 		void setRedParameters(Scalar min, Scalar max);
 		void setYelParameters(Scalar min, Scalar max);
@@ -58,14 +63,14 @@ class Visio {
 		VideoCapture camera;
 		Scalar min, max;
 		Scalar yel_min, yel_max, red_min, red_max, blk_min, blk_max;
-		Size chessboard_size;
-		Mat perspectiveMatrix;
+		Size chessboard_size, size_frame;
+		Mat perspectiveMatrix, CM, D;
 		Mat erode_dilate_kernel; //kernel utilisé lors des erode/dilate
 		int min_size; //Taille minimal d'une zone de couleur valide
 		int min_down_size; //Seuil de taille au dessus duquel un triangl est considéré comme renversé
 		int max_diff_triangle_edge;
 		double epsilon_poly; //Marge d'erreur lors de l'estimation de polyligne
-		bool calibrated;
+		bool trans_calibrated, cam_calibrated;
 		Color color;
 };
 

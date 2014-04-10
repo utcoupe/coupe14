@@ -4,7 +4,22 @@
 #include "loop.h"
 #include "global.h"
 
+//Le fichier dégueu pour faire moins degueu
+
 using namespace cv;
+
+void calibration(int index) {
+	VideoCapture cam(index);
+	 if(!cam.isOpened())  // check if we succeeded
+		return;
+
+	Visio visio(cam);
+	visio.setChessboardSize(Size(9,6));
+	visio.camCalibrate();
+	visio.saveCameraMatrix();
+	visio.camPerspective();
+	visio.saveTransformMatrix();
+}
 
 void perspectiveOnlyLoop(int index){
 	VideoCapture cam(index);
