@@ -49,6 +49,7 @@ class Visio {
 		void setEpsilonPoly(double ep);
 		void setChessboardSize(Size s);
 		void setMaxDiffTriangleEdget(int max);
+		void setDistortMode(DistortType mode);
 		//GETTER
 		Mat getQ();
 	private:

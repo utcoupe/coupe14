@@ -6,6 +6,28 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/types_c.h>
 
+/***************************************************
+ *  CLASSE VISIO DE TRAITEMENT GENERAL 
+ *
+ *  Cette classe effectue toutes les operation
+ *  necessaires pour la visio UTCoupe 2014
+ *
+ *  Dans cette classes toutes les images sont  en HSV
+ *
+ *  Les fonctions timings() commentées permettent
+ *  de rapidement tester la vitesse d'execution
+ *  de certains bouts de code. Attention, ne pas
+ *  utiliser ces fonctions dans des fonctions
+ *  imbriquées, sans quoi les resultats seront faux
+ *
+ *
+ *  Tests de vitesse du code :
+ *  Les durées de transformations affines de 
+ *  perspectives sont negligeables. 
+ *  La durée de conversion RGB->HSV est ce qui prend
+ *  le plus de temps
+ *  *************************************************/
+
 using namespace std;
 
 /******************
@@ -34,30 +56,39 @@ void Visio::init() {
  * ********/
 
 void Visio::detectColor(const Mat& img, Mat& out) {
-	Mat hsv;
-	cvtColor(img, hsv, CV_RGB2HSV);
+	Mat hsv = img;
+	//timings();
 	if (min.val[0] > max.val[0]) { //car les teintes sont circulaires
 		//Si la détection "fait le tour" de la teinte, on la décale pour rester sur l'intervale 0-180
 		add(hsv, Scalar(-max.val[0], 0, 0), hsv);
 		min.val[0] -= max.val[0];
 		max.val[0] = 180;
 	}
+	//timings("\tcircularité : ");
 	inRange(hsv, min, max, out);
+	//timings("\tinRange : ");
 	erode(out, out, erode_dilate_kernel);
+	//timings("\terode : ");
 	dilate(out, out, erode_dilate_kernel);
+	//timings("\tdilate : ");
 
 }
 
 void Visio::getContour(const Mat& img, vector<vector<Point> >& contours) {
 	Mat thresh;
+	//timings();
 	detectColor(img, thresh);
+	//timings("\tdetectColor : ");
 	findContours(thresh, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+	//timings("\tfindContours : ");
 }
 
 //Renvoit positions et contours de la couleur détectée dans l'image en argument
 int Visio::getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, vector<vector<Point> >& detected_contours) {
+	//timings();
 	vector<vector<Point> > contours;
 	getContour(img, contours);
+	//timings("\t\tgetContour : ");
 	float x, y;
 	for(int i=0 ; i < contours.size(); i++){
 		Moments moment = moments(contours[i]);
@@ -68,6 +99,7 @@ int Visio::getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, ve
 			detected_contours.push_back(contours[i]);
 		}
 	}
+	//timings("\t\tMoments loop : ");
 	return detected_pts.size();
 }
 
@@ -99,21 +131,23 @@ void Visio::polyDegree(const vector<vector<Point> >& contours, vector<int>& degr
 
 int Visio::trianglesFromImg(const Mat& img, vector<Triangle>& triangles) {
 	int nb_triangles = 0;
+	//timings();
 	nb_triangles += trianglesColor(img, triangles, red);
 	nb_triangles += trianglesColor(img, triangles, yellow);
 	//triangles vus de dessus, entierement noirs, seulement si on ne detecte rien d'autre
 	if (ENABLE_BLK && nb_triangles == 0) {
 		nb_triangles += trianglesColor(img, triangles, black);
 	}
+	//timings("\tFrame : ");
 	return nb_triangles;
 }
 
 int Visio::triangles(vector<Triangle>& triangles) {
 	Mat img;
 	//for(int i=0; i<6; i++) camera >> img; //Hack provisoire
-	while (camera.grab()) { cerr << "Grabbing frame" << endl; } //A TESTER
-	//for(int i=0; i<6; i++) camera.grab(); //Hack provisoire, porbablement bon
+	for(int i=0; i<6; i++) camera.grab(); //Hack provisoire, porbablement bon
 	camera.retrieve(img);
+	cvtColor(img, img, CV_RGB2HSV);
 	if (distort == image) {
 		if (cam_calibrated) {
 			undistort(img, img, CM, D);
@@ -354,6 +388,10 @@ void Visio::setMaxDiffTriangleEdget(int max) {
 	max_diff_triangle_edge = max;
 }
 
+void Visio::setDistortMode(DistortType mode) {
+	distort = mode;
+}
+
 //GETTER
 
 Mat Visio::getQ() {
@@ -380,51 +418,43 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 	vector<Point2f> detected_pts;
 	int nb_triangles = 0, detected_size;
 	setColor(color);
-	timings();
+	//timings();
 	if ((detected_size = getDetectedPosition(img, detected_pts, contours)) > 0) {
-		timings("\tgetDetectedPosition : ");
+		//timings("\tDetection : ");
 		vector<Point2f> points_real;
 		vector<int> degree;
 		//Transformation perspective des points detectes
 		transformPts(detected_pts, detected_pts);
-		timings("\tPTS wholeTransform : ");
 		//Calcul du nombre de polylignes
 		polyDegree(contours, degree, contours);
-		timings("\tpolyDegree : ");
 		//Pour chaque contour
 		for (int i=0; i < detected_size; i++) {
 			//Si c'est un triangle
 			if (color != black) {
 				if (degree[i] == 3) {
-					timings();
 					vector<Point2f> contour_real;
 					transformPts(contours[i], contour_real);
 					addTriangle(points_real[i], contour_real, triangles);
-					timings("\tTRI wholeTransform : ");
 					nb_triangles++;
 				}
 				else if (degree[i] > 3 && degree[i] < 8) {
-					timings();
 					vector<Point2f> contour_real;
 					transformPts(contours[i], contour_real);
-					timings("\tTRI wholeTransform : ");
 					//Voir si on a pas plusieurs triangles collés
 					nb_triangles += deduceTrianglesFromContour(contour_real, triangles);
-					timings("\tdeduceTriangles : ");
 				}
 			}
 			else if (ENABLE_BLK) { //black
 				if (degree[i] >= 4){
 					vector<Point2f> contour_real;
-					timings();
 					transformPts(contours[i], contour_real);
 					addTriangle(points_real[i], contour_real, triangles);
-					timings("\tTRI BLK wholeTransform : ");
 					nb_triangles++;
 				}
 			}
 		}
 	}
+	//timings("Transformations : ");
 	return nb_triangles;
 }
 
@@ -520,15 +550,13 @@ void Visio::transformPts(const vector<Point>& pts_in, vector<Point2f>& pts_out) 
 void Visio::transformPts(const vector<Point2f>& pts_in, vector<Point2f>& pts_out) {
 	//TODO vérifier float/int
 	if (distort == points) {
-		timings();
+		//timings();
 		undistortPoints(pts_in, pts_out, CM, D);
-		timings("\t\tUndistort : ");
+		//timings("\t\tUndistort : ");
 		perspectiveTransform(pts_out, pts_out, perspectiveMatrix);
-		timings("\t\tPerspectiveTransform : ");
+		//timings("\t\tPerspectiveTransform : ");
 	} else {
-		timings();
 		perspectiveTransform(pts_in, pts_out, perspectiveMatrix);
-		timings("\t\tPerspectiveTransform : ");
 	}
 }
 
