@@ -10,6 +10,7 @@ using namespace cv;
 using namespace std;
 
 typedef enum color {red, yellow, black} Color;
+typedef enum distortType { none, image, points } DistortType;
 typedef struct triangle {
 	Point2f coords;
 	double angle;
@@ -57,6 +58,8 @@ class Visio {
 		void addTriangle(const Point2f& point_real, const vector<Point2f>& contour_real, vector<Triangle>& triangles);
 		int deduceTrianglesFromContour(vector<Point2f>& contour_real, vector<Triangle>& triangles);
 		bool isEqui(Point2f p1, Point2f p2, Point2f p3);
+		void transformPts(const vector<Point>& pts_in, vector<Point2f>& pts_out);
+		void transformPts(const vector<Point2f>& pts_in, vector<Point2f>& pts_out);
 
 		VideoCapture camera;
 		Scalar min, max;
@@ -70,6 +73,7 @@ class Visio {
 		double epsilon_poly; //Marge d'erreur lors de l'estimation de polyligne
 		bool trans_calibrated, cam_calibrated;
 		Color color;
+		DistortType distort;
 };
 
 vector<vector<Point2f> > convertItoF(vector<vector<Point> > v);

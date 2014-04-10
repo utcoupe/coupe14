@@ -13,7 +13,7 @@ using namespace std;
  * ****************/
 
 Visio::Visio(VideoCapture& cam) : 
-	color(red), min_size(500),
+	color(red), min_size(500), distort(none),
 	chessboard_size(Size(9,6)), epsilon_poly(0.04),
 	max_diff_triangle_edge(50), camera(cam),
 	size_frame(camera.get(CV_CAP_PROP_FRAME_WIDTH), camera.get(CV_CAP_PROP_FRAME_HEIGHT)){
@@ -114,6 +114,15 @@ int Visio::triangles(vector<Triangle>& triangles) {
 	while (camera.grab()) { cerr << "Grabbing frame" << endl; } //A TESTER
 	//for(int i=0; i<6; i++) camera.grab(); //Hack provisoire, porbablement bon
 	camera.retrieve(img);
+	if (distort == image) {
+		if (cam_calibrated) {
+			undistort(img, img, CM, D);
+		}
+		else {
+			cerr << "Distorsion par image demandé mais caméra non calibrée" << endl;
+			return 0;
+		}
+	}
 	return trianglesFromImg(img, triangles);
 }
 
@@ -377,8 +386,8 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 		vector<Point2f> points_real;
 		vector<int> degree;
 		//Transformation perspective des points detectes
-		perspectiveTransform(detected_pts, points_real, perspectiveMatrix);
-		timings("\tPTS perspectiveTransform : ");
+		transformPts(detected_pts, detected_pts);
+		timings("\tPTS wholeTransform : ");
 		//Calcul du nombre de polylignes
 		polyDegree(contours, degree, contours);
 		timings("\tpolyDegree : ");
@@ -388,17 +397,17 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 			if (color != black) {
 				if (degree[i] == 3) {
 					timings();
-					vector<Point2f> contour_real = convertItoF(contours[i]);
-					perspectiveTransform(contour_real, contour_real, perspectiveMatrix);
+					vector<Point2f> contour_real;
+					transformPts(contours[i], contour_real);
 					addTriangle(points_real[i], contour_real, triangles);
-					timings("\tTRI perspectiveTransform : ");
+					timings("\tTRI wholeTransform : ");
 					nb_triangles++;
 				}
 				else if (degree[i] > 3 && degree[i] < 8) {
 					timings();
-					vector<Point2f> contour_real = convertItoF(contours[i]);
-					perspectiveTransform(contour_real, contour_real, perspectiveMatrix);
-					timings("\tTRI perspectiveTransform : ");
+					vector<Point2f> contour_real;
+					transformPts(contours[i], contour_real);
+					timings("\tTRI wholeTransform : ");
 					//Voir si on a pas plusieurs triangles collés
 					nb_triangles += deduceTrianglesFromContour(contour_real, triangles);
 					timings("\tdeduceTriangles : ");
@@ -406,9 +415,11 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 			}
 			else if (ENABLE_BLK) { //black
 				if (degree[i] >= 4){
-					vector<Point2f> contour_real = convertItoF(contours[i]);
-					perspectiveTransform(contour_real, contour_real, perspectiveMatrix);
+					vector<Point2f> contour_real;
+					timings();
+					transformPts(contours[i], contour_real);
 					addTriangle(points_real[i], contour_real, triangles);
+					timings("\tTRI BLK wholeTransform : ");
 					nb_triangles++;
 				}
 			}
@@ -500,6 +511,25 @@ bool Visio::isEqui(Point2f p1, Point2f p2, Point2f p3) {
 		return true;
 	}
 	return false;
+}
+
+void Visio::transformPts(const vector<Point>& pts_in, vector<Point2f>& pts_out) {
+	transformPts(convertItoF(pts_in), pts_out);
+}
+
+void Visio::transformPts(const vector<Point2f>& pts_in, vector<Point2f>& pts_out) {
+	//TODO vérifier float/int
+	if (distort == points) {
+		timings();
+		undistortPoints(pts_in, pts_out, CM, D);
+		timings("\t\tUndistort : ");
+		perspectiveTransform(pts_out, pts_out, perspectiveMatrix);
+		timings("\t\tPerspectiveTransform : ");
+	} else {
+		timings();
+		perspectiveTransform(pts_in, pts_out, perspectiveMatrix);
+		timings("\t\tPerspectiveTransform : ");
+	}
 }
 
 
