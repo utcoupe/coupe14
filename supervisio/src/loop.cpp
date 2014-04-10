@@ -108,20 +108,22 @@ void perspectiveOnlyLoop(int index){
 			visio.setRedParameters(min_r, max_r);
 			visio.setBlkParameters(min_b, max_b);
 
+			Mat frame_hsv;
+			cvtColor(frame, frame_hsv, CV_RGB2HSV);
 			warpPerspective(frame, persp, visio.getQ(), Size(3000,2000));
 			visio.setColor(yellow);
-			visio.getDetectedPosition(frame, detected_pts_yel, detected_contours_yel);
+			visio.getDetectedPosition(frame_hsv, detected_pts_yel, detected_contours_yel);
 			visio.setColor(red);
-			visio.getDetectedPosition(frame, detected_pts_red, detected_contours_red);
+			visio.getDetectedPosition(frame_hsv, detected_pts_red, detected_contours_red);
 			visio.setColor(black);
-			visio.getDetectedPosition(frame, detected_pts_blk, detected_contours_blk);
+			visio.getDetectedPosition(frame_hsv, detected_pts_blk, detected_contours_blk);
 			
 			drawContours(frame, detected_contours_yel, -1, c_yel, 2);
 			drawContours(frame, detected_contours_red, -1, c_red, 2);
 			drawContours(frame, detected_contours_blk, -1, Scalar(255,255,0), 2);
 
 			vector<Triangle> tri;
-			visio.trianglesFromImg(frame, tri);
+			visio.trianglesFromImg(frame_hsv, tri);
 			for(int i=0; i<tri.size(); i++) {
 				string txt = intToString(tri[i].size);
 				Scalar color;

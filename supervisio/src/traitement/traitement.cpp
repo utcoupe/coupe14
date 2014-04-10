@@ -114,6 +114,9 @@ void Visio::polyDegree(const vector<vector<Point> >& contours, vector<int>& degr
 		int size = poly.size();
 		degree.push_back(size);
 	}
+	if (contours.size() <= 0) {
+		degree.push_back(0);
+	}
 }
 
 void Visio::polyDegree(const vector<vector<Point> >& contours, vector<int>& degree, vector<vector<Point> >& approx, double epsilon) {
@@ -126,6 +129,9 @@ void Visio::polyDegree(const vector<vector<Point> >& contours, vector<int>& degr
 		temp.push_back(poly);
 		int size = poly.size();
 		degree.push_back(size);
+	}
+	if (contours.size() <= 0) {
+		degree.push_back(0);
 	}
 	approx = temp;
 }
@@ -454,7 +460,7 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 		vector<Point2f> points_real;
 		vector<int> degree;
 		//Transformation perspective des points detectes
-		transformPts(detected_pts, detected_pts);
+		transformPts(detected_pts, points_real);
 		//Calcul du nombre de polylignes
 		polyDegree(contours, degree, contours);
 		//Pour chaque contour
