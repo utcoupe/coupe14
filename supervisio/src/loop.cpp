@@ -1,12 +1,20 @@
 #include <opencv2/opencv.hpp>
 #include "traitement/traitement.h"
 #include "traitement/gui.h"
+#include "communication/com.h"
 #include "loop.h"
 #include "global.h"
 
 //Le fichier dégueu pour faire moins degueu
 
 using namespace cv;
+
+void communication(int index) {
+	VideoCapture cam(index);
+	Visio visio(cam);
+	visio.loadTransformMatrix();
+	comLoop(visio);
+}
 
 void calibration(int index) {
 	VideoCapture cam(index);
