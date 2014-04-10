@@ -1,6 +1,7 @@
 #include "traitement.h"
 #include "../global.h"
 #include "gui.h"
+#include "timings.h"
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/types_c.h>
@@ -129,7 +130,7 @@ int Visio::trianglesFromImg(const Mat& img, vector<Triangle>& triangles) {
 	nb_triangles += trianglesColor(img, triangles, red);
 	nb_triangles += trianglesColor(img, triangles, yellow);
 	//triangles vus de dessus, entierement noirs, seulement si on ne detecte rien d'autre
-	if (nb_triangles == 0) {
+	if (ENABLE_BLK && nb_triangles == 0) {
 		nb_triangles += trianglesColor(img, triangles, black);
 	}
 	return nb_triangles;
@@ -137,7 +138,10 @@ int Visio::trianglesFromImg(const Mat& img, vector<Triangle>& triangles) {
 
 int Visio::triangles(vector<Triangle>& triangles) {
 	Mat img;
-	for(int i=0; i<6; i++) camera >> img;
+	//for(int i=0; i<6; i++) camera >> img; //Hack provisoire
+	while (camera.grab()) { cerr << "Grabbing frame" << endl; } //A TESTER
+	//for(int i=0; i<6; i++) camera.grab(); //Hack provisoire, porbablement bon
+	camera.retrieve(img);
 	return trianglesFromImg(img, triangles);
 }
 //FILE MANAGER
@@ -234,18 +238,6 @@ Mat Visio::getQ() {
 	return perspectiveMatrix;
 }
 
-//AFFICHAGE ET DEBUG
-
-//Renvoit les positions dans le repère du monde réel de la couleur dans l'imgae en argument
-int Visio::getRealWorldPosition(const Mat& img, vector<Point2f>& detected_pts) {
-	detected_pts.clear();
-	vector<vector<Point> > contours;
-	if (getDetectedPosition(img, detected_pts, contours) > 0) {
-		perspectiveTransform(detected_pts, detected_pts, perspectiveMatrix);
-	}
-	return detected_pts.size();
-}
-
 /***********
  * PRIVATE *
  * *********/
@@ -261,32 +253,42 @@ void Visio::setParameters(Scalar min, Scalar max, int size) {
 //Fonction à usage unique pour rendre le code plus clair. Detecte des triangles dans une image
 //triangles n'est pas effacé, les triangles trouvés sont ajoutés
 int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color color) {
+	if (color == black && ENABLE_BLK) { cerr << "Appel à la fonction de détection couleur noir alors que ENABLE_BLK=false" << endl; }
 	vector<vector<Point> > contours;
 	vector<Point2f> detected_pts;
 	int nb_triangles = 0, detected_size;
 	setColor(color);
+	timings();
 	if ((detected_size = getDetectedPosition(img, detected_pts, contours)) > 0) {
+		timings("\tgetDetectedPosition : ");
 		vector<Point2f> points_real;
 		vector<int> degree;
 		//Transformation perspective des points detectes
 		perspectiveTransform(detected_pts, points_real, perspectiveMatrix);
+		timings("\tPTS perspectiveTransform : ");
 		//Calcul du nombre de polylignes
 		polyDegree(contours, degree, contours);
+		timings("\tpolyDegree : ");
 		//Pour chaque contour
 		for (int i=0; i < detected_size; i++) {
 			//Si c'est un triangle
 			if (color != black) {
 				if (degree[i] == 3) {
+					timings();
 					vector<Point2f> contour_real = convertItoF(contours[i]);
 					perspectiveTransform(contour_real, contour_real, perspectiveMatrix);
 					addTriangle(points_real[i], contour_real, triangles);
+					timings("\tTRI perspectiveTransform : ");
 					nb_triangles++;
 				}
 				else if (degree[i] > 3 && degree[i] < 8) {
+					timings();
 					vector<Point2f> contour_real = convertItoF(contours[i]);
 					perspectiveTransform(contour_real, contour_real, perspectiveMatrix);
+					timings("\tTRI perspectiveTransform : ");
 					//Voir si on a pas plusieurs triangles collés
 					nb_triangles += deduceTrianglesFromContour(contour_real, triangles);
+					timings("\tdeduceTriangles : ");
 				}
 			}
 			else if (ENABLE_BLK) { //black

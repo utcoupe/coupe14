@@ -45,8 +45,6 @@ class Visio {
 		void setMaxDiffTriangleEdget(int max);
 		//GETTER
 		Mat getQ();
-		//DEBUG
-		int getRealWorldPosition(const Mat& img, vector<Point2f>& detected_pts);
 	private:
 		void init();
 		void setParameters(Scalar min, Scalar max, int size=-1);
