@@ -144,11 +144,17 @@ int Visio::trianglesFromImg(const Mat& img, vector<Triangle>& triangles) {
 }
 
 int Visio::triangles(vector<Triangle>& triangles) {
+	//timings();
 	Mat img;
+	//Hacks destiné à vider le buffer de la camera pour avoir une
+	//image récente. Le probleme : ces hacks prennent BEAUCOUP de temps
 	//for(int i=0; i<6; i++) camera >> img; //Hack provisoire
-	for(int i=0; i<6; i++) camera.grab(); //Hack provisoire, porbablement bon
-	camera.retrieve(img);
+	//for(int i=0; i<6; i++) camera.grab(); //Hack provisoire
+	//camera.retrieve(img);
+	camera >> img;
+	//timings("\tRetrieving : ");
 	cvtColor(img, img, CV_RGB2HSV);
+	//timings("\tColor : ");
 	if (distort == image) {
 		if (cam_calibrated) {
 			undistort(img, img, CM, D);
@@ -158,7 +164,9 @@ int Visio::triangles(vector<Triangle>& triangles) {
 			return 0;
 		}
 	}
-	return trianglesFromImg(img, triangles);
+	int nbr_of_tri = trianglesFromImg(img, triangles);
+	//timings("\tTriangles : ");
+	return nbr_of_tri;
 }
 
 /*********************
