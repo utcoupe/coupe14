@@ -20,7 +20,7 @@
 #define RED_VAL_MIN 60
 #define RED_VAL_MAX 255
 
-#define ENABLE_BLK 1
+#define ENABLE_BLK 0
 #define BLK_HUE_MIN 0
 #define BLK_HUE_MAX 180
 #define BLK_SAT_MIN 0
