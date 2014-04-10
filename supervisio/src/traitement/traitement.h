@@ -52,6 +52,7 @@ class Visio {
 		void setDistortMode(DistortType mode);
 		//GETTER
 		Mat getQ();
+		DistortType getDistortMode();
 	private:
 		void init();
 		void setParameters(Scalar min, Scalar max, int size=-1);

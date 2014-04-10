@@ -416,6 +416,10 @@ Mat Visio::getQ() {
 	return perspectiveMatrix;
 }
 
+DistortType Visio::getDistortMode() {
+	return distort;
+}
+
 /***********
  * PRIVATE *
  * *********/

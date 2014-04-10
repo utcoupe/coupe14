@@ -12,7 +12,11 @@ using namespace cv;
 void communication(int index) {
 	VideoCapture cam(index);
 	Visio visio(cam);
-	visio.loadTransformMatrix();
+	if (visio.getDistortMode() != none) {
+		cout << "Starting visio WITH distortion correction" << endl;
+	} else {
+		cout << "Starting visio WITHOUT distortion correction" << endl;
+	}
 	comLoop(visio);
 }
 
