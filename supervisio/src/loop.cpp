@@ -56,16 +56,20 @@ void perspectiveOnlyLoop(int index){
 	createTrackbar("h_max_y", "parameters", &h_max_y, 180);
 	createTrackbar("s_min_y", "parameters", &s_min_y, 255);
 	createTrackbar("v_min_y", "parameters", &v_min_y, 255);
+	createTrackbar("v_max_y", "parameters", &v_max_y, 255);
 	createTrackbar("h_min_r", "parameters", &h_min_r, 180);
 	createTrackbar("h_max_r", "parameters", &h_max_r, 180);
 	createTrackbar("s_min_r", "parameters", &s_min_r, 255);
 	createTrackbar("v_min_r", "parameters", &v_min_r, 255);
-	createTrackbar("h_min_b", "parameters2", &h_min_b, 180);
-	createTrackbar("h_max_b", "parameters2", &h_max_b, 180);
-	createTrackbar("s_min_b", "parameters2", &s_min_b, 255);
-	createTrackbar("s_max_b", "parameters2", &s_max_b, 255);
-	createTrackbar("v_min_b", "parameters2", &v_min_b, 255);
-	createTrackbar("v_max_b", "parameters2", &v_max_b, 255);
+	createTrackbar("v_max_r", "parameters", &v_max_r, 255);
+	if(ENABLE_BLK) {
+		createTrackbar("h_min_b", "parameters2", &h_min_b, 180);
+		createTrackbar("h_max_b", "parameters2", &h_max_b, 180);
+		createTrackbar("s_min_b", "parameters2", &s_min_b, 255);
+		createTrackbar("s_max_b", "parameters2", &s_max_b, 255);
+		createTrackbar("v_min_b", "parameters2", &v_min_b, 255);
+		createTrackbar("v_max_b", "parameters2", &v_max_b, 255);
+	}
 	createTrackbar("epsilon", "parameters2", &epsilon, 100);
 	createTrackbar("is equi", "parameters2", &max_diff_triangle_edge, 100);
 	createTrackbar("size_min", "parameters2", &size_min, 20000);
@@ -96,9 +100,9 @@ void perspectiveOnlyLoop(int index){
 			visio.setBlkParameters(min_b, max_b);
 
 			Mat frame_hsv, frame;
-			cvtColor(frame_ori, frame_hsv, CV_RGB2HSV);
+			cvtColor(frame_ori, frame_hsv, CV_BGR2HSV);
 			undistort(frame_ori, frame, visio.getCM(), visio.getD());
-			warpPerspective(frame, persp, visio.getQ(), Size(750,1500));
+			warpPerspective(frame, persp, visio.getQ(), Size(3000,2000));
 			visio.setColor(yellow);
 			visio.getDetectedPosition(frame_hsv, detected_pts_yel, detected_contours_yel);
 			visio.setColor(red);
@@ -112,7 +116,6 @@ void perspectiveOnlyLoop(int index){
 			drawContours(frame, detected_contours_yel, -1, c_yel, 2);
 			drawContours(frame, detected_contours_red, -1, c_red, 2);
 
-			cvtColor(frame_ori, frame_hsv, CV_RGB2HSV);
 			vector<Triangle> tri;
 			visio.trianglesFromImg(frame_hsv, tri);
 			for(int i=0; i<tri.size(); i++) {

@@ -7,11 +7,11 @@
 #define TIMEBENCH true 
 #define MIN_SIZE 500
 
-#define YEL_HUE_MIN 70
-#define YEL_HUE_MAX 100
-#define YEL_SAT_MIN 85
+#define YEL_HUE_MIN 20
+#define YEL_HUE_MAX 40
+#define YEL_SAT_MIN 35
 #define YEL_SAT_MAX 255
-#define YEL_VAL_MIN 95
+#define YEL_VAL_MIN 60
 #define YEL_VAL_MAX 255
 
 #define RED_HUE_MIN 105

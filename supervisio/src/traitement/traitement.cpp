@@ -161,7 +161,7 @@ int Visio::triangles(vector<Triangle>& triangles) {
 	//camera.retrieve(img);
 	camera >> src_img;
 	//timings("\tRetrieving : ");
-	cvtColor(src_img, src_img, CV_RGB2HSV);
+	cvtColor(src_img, src_img, CV_BGR2HSV);
 	//timings("\tColor : ");
 	if (distort == image && cam_calibrated) {
 		//timings();
