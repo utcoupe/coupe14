@@ -49,7 +49,8 @@ void Visio::init() {
 	erode_dilate_kernel = getStructuringElement(MORPH_ELLIPSE, Size(10,10));
 	trans_calibrated = loadTransformMatrix();
 	cam_calibrated = loadCameraMatrix();
-	if (cam_calibrated) distort = points;
+	//if (cam_calibrated) distort = image; //TRES LONG
+	if (cam_calibrated) distort = points; 
 }
 
 /**********
@@ -151,26 +152,30 @@ int Visio::trianglesFromImg(const Mat& img, vector<Triangle>& triangles) {
 
 int Visio::triangles(vector<Triangle>& triangles) {
 	//timings();
-	Mat img;
+	int nbr_of_tri = 0;
+	Mat img, src_img;
 	//Hacks destiné à vider le buffer de la camera pour avoir une
 	//image récente. Le probleme : ces hacks prennent BEAUCOUP de temps
 	//for(int i=0; i<6; i++) camera >> img; //Hack provisoire
 	//for(int i=0; i<6; i++) camera.grab(); //Hack provisoire
 	//camera.retrieve(img);
-	camera >> img;
+	camera >> src_img;
 	//timings("\tRetrieving : ");
-	cvtColor(img, img, CV_RGB2HSV);
+	cvtColor(src_img, src_img, CV_RGB2HSV);
 	//timings("\tColor : ");
-	if (distort == image) {
-		if (cam_calibrated) {
-			undistort(img, img, CM, D);
-		}
-		else {
+	if (distort == image && cam_calibrated) {
+		//timings();
+		undistort(src_img, img, CM, D);
+		nbr_of_tri = trianglesFromImg(img, triangles);
+		//timings("\tUndistort : ");
+	}
+	else {
+		if (distort == image) {
 			cerr << "Distorsion par image demandé mais caméra non calibrée" << endl;
 			return 0;
 		}
+		nbr_of_tri = trianglesFromImg(src_img, triangles);
 	}
-	int nbr_of_tri = trianglesFromImg(img, triangles);
 	//timings("\tTriangles : ");
 	return nbr_of_tri;
 }
@@ -219,14 +224,17 @@ bool Visio::camPerspective() {
 	position.push_back(Point2f(300,562));
 	position.push_back(Point2f(482,300));
 	position.push_back(Point2f(482,562));
-	Mat img;
+	Mat img, undistorted_img;
 	bool calibrated = false;
 	int key = 0;
 	namedWindow("Perspective");
 	while (!calibrated) {
 		camera >> img;
+		if (cam_calibrated) {
+			undistort(img, undistorted_img, CM, D);
+		}
 		if (key == 'c') {
-			calibrated = computeTransformMatrix(img, position, &img);
+			calibrated = computeTransformMatrix(undistorted_img, position, &undistorted_img);
 			key = 0;
 		}
 		if (key == 'q') {
@@ -235,7 +243,7 @@ bool Visio::camPerspective() {
 		}
 		putText(img, "Appuyer sur 'c' pour valider une vue", Point(10,10),1,1,Scalar(0,255,0),1);
 		putText(img, "Appuyer sur 'q' pour quiter", Point(10,30),1,1,Scalar(0,255,0),1);
-		imshow("Perspective", img);
+		imshow("Perspective", undistorted_img);
 		key = waitKey(20);
 	}
 	destroyWindow("Perspective");
@@ -300,6 +308,7 @@ bool Visio::camCalibrate(int nbr_of_views) {
 	vector<Mat> empty;
 	calibrateCamera(objectPoints, imagePoints, size_frame, CM, D, empty, empty);
 	cout << "Done !" << endl;
+	cam_calibrated = true;
 	return true;
 }
 
@@ -428,6 +437,14 @@ void Visio::setDistortMode(DistortType mode) {
 
 Mat Visio::getQ() {
 	return perspectiveMatrix;
+}
+
+Mat Visio::getCM() {
+	return CM;
+}
+
+Mat Visio::getD() {
+	return D;
 }
 
 DistortType Visio::getDistortMode() {
@@ -584,10 +601,9 @@ void Visio::transformPts(const vector<Point>& pts_in, vector<Point2f>& pts_out) 
 }
 
 void Visio::transformPts(const vector<Point2f>& pts_in, vector<Point2f>& pts_out) {
-	//TODO vérifier float/int
 	if (distort == points) {
 		//timings();
-		undistortPoints(pts_in, pts_out, CM, D);
+		undistortPoints(pts_in, pts_out, CM, D, Mat(), CM);
 		//timings("\t\tUndistort : ");
 		perspectiveTransform(pts_out, pts_out, perspectiveMatrix);
 		//timings("\t\tPerspectiveTransform : ");

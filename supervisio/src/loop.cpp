@@ -27,7 +27,7 @@ void calibration(int index) {
 
 	Visio visio(cam);
 	visio.setChessboardSize(Size(9,6));
-	if (visio.camCalibrate()) 
+	if (visio.camCalibrate(25)) 
 		visio.saveCameraMatrix();
 	if (visio.camPerspective())
 		visio.saveTransformMatrix();
@@ -46,7 +46,6 @@ void perspectiveOnlyLoop(int index){
 	int h_min_r(RED_HUE_MIN), h_max_r(RED_HUE_MAX), s_min_r(RED_SAT_MIN), s_max_r(RED_SAT_MAX), v_min_r(RED_VAL_MIN), v_max_r(RED_VAL_MAX);
 	int h_min_b(BLK_HUE_MIN), h_max_b(BLK_HUE_MAX), s_min_b(BLK_SAT_MIN), s_max_b(BLK_SAT_MAX), v_min_b(BLK_VAL_MIN), v_max_b(BLK_VAL_MAX);
 	int epsilon(4), key = -1;
-	bool calibrating = !visio.loadTransformMatrix();
 
 	namedWindow("parameters");
 	namedWindow("parameters2");
@@ -72,20 +71,12 @@ void perspectiveOnlyLoop(int index){
 	createTrackbar("size_min", "parameters2", &size_min, 20000);
 
 	Scalar c_red(0,0,255), c_blue(255, 0, 0), c_yel(0,110,130);
-	vector<Point2f> position;
-	position.push_back(Point2f(300,300));
-	position.push_back(Point2f(300,562));
-	position.push_back(Point2f(482,300));
-	position.push_back(Point2f(482,562));
 	for(;;) { //int i=0; i>=0; i++) {
 		vector<vector<Point> > detected_contours_yel, detected_contours_red, detected_contours_blk;
 		vector<Point2f> detected_pts_yel, detected_pts_red, detected_pts_blk;
-		Mat frame, persp;
-		cam >> frame;
+		Mat frame_ori, persp;
+		cam >> frame_ori;
 
-		if (key == 'c') {
-			calibrating = !calibrating;
-		}
 		if (key == 's') {
 			visio.saveTransformMatrix();
 		}
@@ -93,10 +84,6 @@ void perspectiveOnlyLoop(int index){
 			visio.loadTransformMatrix();
 		}
 		
-		if (calibrating) {
-			visio.computeTransformMatrix(frame, position, &frame);
-			imshow("origin", frame);
-		}
 		else {
 			Scalar min_r(h_min_r,s_min_r,v_min_r), max_r(h_max_r,s_max_r,v_max_r);
 			Scalar min_y(h_min_y,s_min_y,v_min_y), max_y(h_max_y,s_max_y,v_max_y);
@@ -108,20 +95,24 @@ void perspectiveOnlyLoop(int index){
 			visio.setRedParameters(min_r, max_r);
 			visio.setBlkParameters(min_b, max_b);
 
-			Mat frame_hsv;
-			cvtColor(frame, frame_hsv, CV_RGB2HSV);
-			warpPerspective(frame, persp, visio.getQ(), Size(3000,2000));
+			Mat frame_hsv, frame;
+			cvtColor(frame_ori, frame_hsv, CV_RGB2HSV);
+			undistort(frame_ori, frame, visio.getCM(), visio.getD());
+			warpPerspective(frame, persp, visio.getQ(), Size(750,1500));
 			visio.setColor(yellow);
 			visio.getDetectedPosition(frame_hsv, detected_pts_yel, detected_contours_yel);
 			visio.setColor(red);
 			visio.getDetectedPosition(frame_hsv, detected_pts_red, detected_contours_red);
-			visio.setColor(black);
-			visio.getDetectedPosition(frame_hsv, detected_pts_blk, detected_contours_blk);
+			if (ENABLE_BLK) {
+				visio.setColor(black);
+				visio.getDetectedPosition(frame_hsv, detected_pts_blk, detected_contours_blk);
+				drawContours(frame, detected_contours_blk, -1, Scalar(255,255,0), 2);
+			}
 			
 			drawContours(frame, detected_contours_yel, -1, c_yel, 2);
 			drawContours(frame, detected_contours_red, -1, c_red, 2);
-			drawContours(frame, detected_contours_blk, -1, Scalar(255,255,0), 2);
 
+			cvtColor(frame_ori, frame_hsv, CV_RGB2HSV);
 			vector<Triangle> tri;
 			visio.trianglesFromImg(frame_hsv, tri);
 			for(int i=0; i<tri.size(); i++) {
