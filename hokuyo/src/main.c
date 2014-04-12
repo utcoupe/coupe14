@@ -51,7 +51,7 @@ int main(int argc, char **argv){
         return EXIT_FAILURE;
     }
 
-	struct coord posl1, posl2;
+	struct coord posl1;
 	posl1.y = -25;
 	if( strcmp(argv[1], "red") == 0 ){
 		posl1.x = -25;	
@@ -66,7 +66,7 @@ int main(int argc, char **argv){
 		use_protocol = 1;
 	}
 
-	l1 = initLidarAndCalibrate( hokuyo_urg, "/dev/ttyACM0", pos1, PI/2, 0, PI/2);
+	l1 = initLidarAndCalibrate( hokuyo_urg, "/dev/ttyACM0", posl1, PI/2, 0, PI/2);
 	//l1 = initLidar( hokuyo_urg, "/dev/ttyACM0", pos1, 0, 0, PI/2);
 
 
