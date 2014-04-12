@@ -7,6 +7,7 @@ import threading
 from multiprocessing import Process, Pipe
 import logging
 from collections import deque
+import time
 
 
 from . import goals
@@ -40,9 +41,15 @@ class SubProcessCommunicate():
 
 	def sendObjectifOver(self, id_objectif):
 		if self.__Data.Flussmittel is not None:
-			self.__subprocess_flussmittel.sendPacket(("over", id_objectif))
+			self.__subprocess_flussmittel.sendPacket(("END", id_objectif))
 		if self.__Data.Tibot is not None:
-			self.__subprocess_tibot.sendPacket(("over", id_objectif))
+			self.__subprocess_tibot.sendPacket(("END", id_objectif))
+
+	def sendObjectifGotoOver(self, id_objectif):
+		if self.__Data.Flussmittel is not None:
+			self.__subprocess_flussmittel.sendPacket(("END_GOTO", id_objectif))
+		if self.__Data.Tibot is not None:
+			self.__subprocess_tibot.sendPacket(("END_GOTO", id_objectif))
 
 	def sendObjectifsCanceled(self, id_canceled_list):
 		if self.__Data.Flussmittel is not None:
@@ -63,6 +70,8 @@ class MyProcess():
 		self.__process = Process(target=goals.startSubprocess, args=(self.__child_conn, robot_name) )
 		self.__process.start()
 
+		time.sleep(0.1)
+
 		self.__Pull_thread = threading.Thread(target=self.__readPipe)
 		self.__Pull_thread.start()
 		
@@ -81,5 +90,6 @@ class MyProcess():
 
 	def __readPipe(self):
 		while True:
-			self.__input_buffer.append(self.__parent_conn.recv())
+			a = self.__parent_conn.recv()
+			self.__input_buffer.append(a)
 

@@ -75,13 +75,16 @@ class TimeManager():
 			position_arg = self.__MetaData.getFirstPositionFlussmittel()
 			if position_arg is None:
 				self.__logger.error("On a pas initialisé la position de Flussmittel")
+			self.__Flussmittel.setPosition(position_arg[0], position_arg[1], position_arg[2])
 			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_SET_POS', *position_arg)
 			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'RESET_ID', *empty_arg)
 			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressOther() , 'RESET_ID', *empty_arg)
+
 		if self.__Tibot is not None:
 			position_arg = self.__MetaData.getFirstPositionTibot()
 			if position_arg is None:
 				self.__logger.error("On a pas initialisé la position de Tibot")
+			self.__Tibot.setPosition(position_arg[0], position_arg[1], position_arg[2])
 			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_SET_POS', *position_arg)
 			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'RESET_ID', *empty_arg)
 			self.__Communication.sendOrderAPI(self.__Tibot.getAddressOther() , 'RESET_ID', *empty_arg)

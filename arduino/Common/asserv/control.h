@@ -44,7 +44,7 @@ class Control{
 	void pushPos(pos n_pos); 
 	pos getPos();
 
-	//Renvoie les valeurs des codeur (utile pour debug)
+	//Renvoie les codeurs (utile pour debug)
 	Encoder* getLenc();
 	Encoder* getRenc();
 
@@ -65,7 +65,6 @@ class Control{
 	void setConsigne(float consigne_left, float consigne_right); //controles puis modification (renvoie l'overflow)
 	void check_acc(float *consigne, float last);
 	void check_max(float *consigne, float max = CONSIGNE_RANGE_MAX);
-	void controlAngle(float goal_angle); //goal en radians
 	void controlPos(float e_angle, float e_dist); //goal en mm
 
 	void applyPwm();

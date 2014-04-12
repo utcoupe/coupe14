@@ -1,6 +1,5 @@
 import xml.dom.minidom
 
-
 from geometry import Poly
 
 def load_img(filename, scale=1, seuil=125):

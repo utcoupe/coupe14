@@ -60,7 +60,7 @@ class Engine:
 			if not feu:
 				print("Feu not found")
 			else:
-				print('feu eteindre')
+				#print('feu eteindre')
 				feu.eteindre()
 
 

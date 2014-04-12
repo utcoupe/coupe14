@@ -2,9 +2,9 @@
 <goals>
 	<goal>
 		<id>0</id>
-		<name>Tirangle en haut à gauche</name>
+		<name>Triangle en haut à gauche (1)</name>
 		<type>triangle</type>
-		<concerned_robot>ALL</concerned_robot>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x>900</x>
 		<y>1400</y>
 		<elem_goals>
@@ -16,25 +16,27 @@
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
-				<id_script>0</id_script>
+				<color>R</color>
+				<id_script>2</id_script>
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
 				<x>1000</x>
 				<y>1400</y>
-				<angle>1.55</angle>
+				<angle>3.14</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
-				<id_script>0</id_script>
+				<color>Y</color>
+				<id_script>3</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>
 	<goal>
 		<id>1</id>
-		<name>Tirangle en haut à droite</name>
+		<name>Triangle en haut à droite (2)</name>
 		<type>triangle</type>
-		<concerned_robot>ALL</concerned_robot>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x>2100</x>
 		<y>1400</y>
 		<elem_goals>
@@ -46,55 +48,154 @@
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
-				<id_script>0</id_script>
+				<color>R</color>
+				<id_script>2</id_script>
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
 				<x>2200</x>
 				<y>1400</y>
-				<angle>1.55</angle>
+				<angle>3.14</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
-				<id_script>0</id_script>
+				<color>Y</color>
+				<id_script>3</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>
 	<goal>
 		<id>2</id>
-		<name>Tirangle en bas à droite</name>
+		<name>Triangle mur centre droite (3)</name>
 		<type>triangle</type>
-		<concerned_robot>ALL</concerned_robot>
-		<x>2100</x>
-		<y>400</y>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
+		<x>2975</x>
+		<y>1200</y>
 		<elem_goals>
 			<elem_goal>
-				<id>0</id>
-				<x>2000</x>
-				<y>400</y>
+				<id>1</id>
+				<x>2735</x>
+				<y>1200</y>
 				<angle>0.0</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
-				<id_script>0</id_script>
-			</elem_goal>
-			<elem_goal>
-				<id>1</id>
-				<x>2200</x>
-				<y>400</y>
-				<angle>1.55</angle>
-				<points>1</points>
-				<priority>1</priority>
-				<duration>1</duration>
+				<color>R</color>
 				<id_script>0</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>
 	<goal>
 		<id>3</id>
-		<name>Tirangle en bas à gauche</name>
+		<name>Triangle au centre à droite (4)</name>
 		<type>triangle</type>
-		<concerned_robot>ALL</concerned_robot>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
+		<x>2600</x>
+		<y>900</y>
+		<elem_goals>
+			<elem_goal>
+				<id>0</id>
+				<x>2600</x>
+				<y>1000</y>
+				<angle>-1.55</angle>
+				<points>1</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<color>Y</color>
+				<id_script>3</id_script>
+			</elem_goal>
+			<elem_goal>
+				<id>1</id>
+				<x>2600</x>
+				<y>800</y>
+				<angle>1.55</angle>
+				<points>1</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<color>R</color>
+				<id_script>2</id_script>
+			</elem_goal>
+		</elem_goals>
+	</goal>
+	<goal>
+		<id>4</id>
+		<name>Triangle en bas à droite (5)</name>
+		<type>triangle</type>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
+		<x>2100</x>
+		<y>400</y>
+		<elem_goals>
+			<elem_goal>
+				<id>0</id>
+				<x>2000</x>
+				<y>400</y>
+				<angle>0.0</angle>
+				<points>1</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<color>Y</color>
+				<id_script>3</id_script>
+			</elem_goal>
+			<elem_goal>
+				<id>1</id>
+				<x>2200</x>
+				<y>400</y>
+				<angle>3.14</angle>
+				<points>1</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<color>R</color>
+				<id_script>2</id_script>
+			</elem_goal>
+		</elem_goals>
+	</goal>
+	<goal>
+		<id>5</id>
+		<name>Triangle mur bas à droite (6)</name>
+		<type>triangle</type>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
+		<x>1700</x>
+		<y>15</y>
+		<elem_goals>
+			<elem_goal>
+				<id>0</id>
+				<x>1700</x>
+				<y>265</y>
+				<angle>-1.55</angle>
+				<points>1</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<color>Y</color>
+				<id_script>1</id_script>
+			</elem_goal>
+		</elem_goals>
+	</goal>
+	<goal>
+		<id>6</id>
+		<name>Triangle mur bas à gauche (7)</name>
+		<type>triangle</type>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
+		<x>1300</x>
+		<y>15</y>
+		<elem_goals>
+			<elem_goal>
+				<id>1</id>
+				<x>1300</x>
+				<y>265</y>
+				<angle>-1.55</angle>
+				<points>1</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<color>R</color>
+				<id_script>0</id_script>
+			</elem_goal>
+		</elem_goals>
+	</goal>
+	<goal>
+		<id>7</id>
+		<name>Triangle en bas à gauche (8)</name>
+		<type>triangle</type>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x>900</x>
 		<y>400</y>
 		<elem_goals>
@@ -106,37 +207,72 @@
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
-				<id_script>0</id_script>
+				<color>Y</color>
+				<id_script>3</id_script>
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
 				<x>1000</x>
 				<y>400</y>
-				<angle>1.55</angle>
+				<angle>3.14</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
-				<id_script>0</id_script>
+				<color>R</color>
+				<id_script>2</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>
 	<goal>
-		<id>4</id>
-		<name>Deplace toi en 0 0</name>
-		<type>other</type>
-		<concerned_robot>ALL</concerned_robot>
-		<x>0</x>
-		<y>0</y>
+		<id>8</id>
+		<name>Triangle au centre à gauche (9)</name>
+		<type>triangle</type>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
+		<x>400</x>
+		<y>900</y>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x>0</x>
-				<y>0</y>
-				<angle>0.0</angle>
+				<x>400</x>
+				<y>1000</y>
+				<angle>-1.55</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
+				<color>R</color>
 				<id_script>2</id_script>
+			</elem_goal>
+			<elem_goal>
+				<id>1</id>
+				<x>400</x>
+				<y>800</y>
+				<angle>1.55</angle>
+				<points>1</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<color>Y</color>
+				<id_script>3</id_script>
+			</elem_goal>
+		</elem_goals>
+	</goal>
+	<goal>
+		<id>9</id>
+		<name>Triangle mur centre gauche (10)</name>
+		<type>triangle</type>
+		<concerned_robot>FLUSSMITTEL</concerned_robot>
+		<x>15</x>
+		<y>1200</y>
+		<elem_goals>
+			<elem_goal>
+				<id>0</id>
+				<x>265</x>
+				<y>1200</y>
+				<angle>3.14</angle>
+				<points>1</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<color>Y</color>
+				<id_script>1</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>

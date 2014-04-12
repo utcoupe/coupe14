@@ -11,8 +11,7 @@ import time
 import logging
 
 #logfile_name = "log/" + time.strftime("%d %b %Y %H:%M:%S", time.gmtime()) + ".log"
-logging.basicConfig(filename=os.path.join(os.path.dirname(os.path.abspath(__file__)), "log/last.log"), filemode='w', level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__.split('.')[0])
+
 
 
 #Nos fichiers
@@ -23,11 +22,14 @@ import event
 import gpio
 
 #lancement de l'IA via le subprocess simu
-def startIa(conn=None):
+def startIa(pipe=None, ia_color="RED"):
 	Communication = communication.CommunicationGlobale()
 	arduino_constantes = Communication.getConst()
 
-	if conn == None:
+	logging.basicConfig(filename=os.path.join(os.path.dirname(os.path.abspath(__file__)), "log/last_"+str(ia_color)+".log"), filemode='w', level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+	logger = logging.getLogger(__name__.split('.')[0])
+
+	if pipe == None:
 		logger.info("Demarrage d'une IA normal")
 		time.sleep(2) # on attend que les communications s'établissent
 
@@ -50,27 +52,26 @@ def startIa(conn=None):
 
 	else:
 		logger.info("Demarrage d'une IA depuis le simuateur")
-		Communication = None #TODO remplacer par un emulateur de READAPI et SENDAPI en utilisant conn
+		Communication = communication.CommSimulateur(pipe) #TODO remplacer par un emulateur de READAPI et SENDAPI en utilisant conn
 
 
 
 	Data = data.Data(Communication, arduino_constantes)
-	
 	if TEST_MODE == False and ENABLE_FLUSSMITTEL == True:
 		Gpio = gpio.Gpio()
 		data.parametrerHokuyo()
-		data.parametrerIa(Data.MetaData, Gpio.getColor)
+		data.parametrerIa(Data.MetaData, ia_color)
 	else:
 		data.parametrerHokuyo()
-		data.parametrerIa(Data.MetaData, "RED")
+		data.parametrerIa(Data.MetaData, ia_color)#TODO, remove ia_color
 
 	TimeManager = event.TimeManager(Communication, Data)
 	EventManager = event.EventManager(Communication, Data)
 
 
-
+	TimeManager.startMatch()#TODO, remove
 	if TEST_MODE == False and ENABLE_FLUSSMITTEL == True:
-		while Gpio.getJack() != True: #TODO à verifier
+		while Gpio.getJack() != 1: #TODO à verifier
 			pass
 	TimeManager.startMatch()
 

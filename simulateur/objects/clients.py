@@ -10,25 +10,28 @@ sys.path.append(os.path.join(DIR_PATH, "..", "engine"))
 from define import *
 
 class GoalPWM:
-	def __init__(self, pwm, delay):
+	def __init__(self, id_action, pwm, delay):
+		self.id_action = id_action
 		self.pwm = pwm
 		self.delay = delay
 		self.start = -1
 
 class GoalPOS:
-	def __init__(self, x, y):
+	def __init__(self, id_action, x, y):
 		"""
 		@param {int:px} x
 		@param {int:px} y
 		"""
+		self.id_action = id_action
 		self.pos = (x,y)
 
 
 class GoalANGLE:
-	def __init__(self, a):
+	def __init__(self, id_action, a):
 		"""
 		@param {float:radians} a
 		"""
+		self.id_action = id_action
 		self.a = a
 
 
@@ -43,6 +46,16 @@ class Asserv:
 	""" Émule l'arduino dédiée à l'asservissement """
 	def __init__(self, robot):
 		self.__robot = robot
+		self.__last_id_action_executed = -1
+
+	def resetLastIdAction(self):
+		self.__last_id_action_executed = -1
+
+	def setLastIdAction(self, id):
+		self.__last_id_action_executed = id
+
+	def getLastIdAction(self):
+		return self.__last_id_action_executed
 
 	def adresse(self):
 		#TODO return en fonction de l'enum
@@ -54,55 +67,55 @@ class Asserv:
 	def ping(self):
 		return 'asserv pong'
 
-	def goto(self, x, y):
+	def goto(self, id_action, x, y):
 		"""
 		Donner l'ordre d'aller à un point
 		@param x mm
 		@param y mm
 		"""
-		self.__robot.addGoal(GoalPOS(*mm_to_px(x,y)))
+		self.__robot.addGoal(GoalPOS(id_action, *mm_to_px(x,y)))
 
-	def gotor(self, x, y):
+	def gotor(self, id_action, x, y):
 		"""
 		Donner l'ordre d'aller à un point, relativement à la position actuelle
 		@param x mm
 		@param y mm
 		"""
-		self.__robot.addGoal( GoalPOSR(*mm_to_px(x,y)))
+		self.__robot.addGoal( GoalPOSR(id_action, *mm_to_px(x,y)))
 
-	def gotoa(self, x, y, a):
+	def gotoa(self, id_action, x, y, a):
 		"""
 		Donner l'ordre d'aller à un point et de tourner d'un angle
 		@param x mm
 		@param y mm
 		@param a rad
 		"""
-		self.__robot.addGoal(GoalPOS(*mm_to_px(x,y)))
-		self.__robot.addGoal(GoalANGLE(math.radians(a)))
+		self.__robot.addGoal(GoalPOS(id_action, *mm_to_px(x,y)))
+		self.__robot.addGoal(GoalANGLE(id_action, math.radians(a)))
 
-	def gotoar(self, x, y, a):
+	def gotoar(self, id_action, x, y, a):
 		"""
 		Donner l'ordre d'aller à un point et de tourner d'un angle,relativement à la position actuelle
 		@param x mm
 		@param y mm
 		@param a rad
 		"""
-		self.__robot.addGoal(GoalPOSR(*mm_to_px(x,y)))
-		self.__robot.addGoal(GoalANGLER(math.radians(a)))
+		self.__robot.addGoal(GoalPOSR(id_action, *mm_to_px(x,y)))
+		self.__robot.addGoal(GoalANGLER(id_action, math.radians(a)))
 
-	def rot(self, a):
+	def rot(self, id_action, a):
 		"""
 		Donner l'ordre de tourner d'un angle
 		@param a rad
 		"""
-		self.__robot.addGoal(GoalANGLE(math.radians(a)))
+		self.__robot.addGoal(GoalANGLE(id_action, math.radians(a)))
 
-	def rotr(self, a):
+	def rotr(self, id_action, a):
 		"""
 		Donner l'ordre de tourner d'un angle,relativement à l'angle actuel
 		@param a rad
 		"""
-		self.__robot.addGoal(GoalANGLER(math.radians(a)))
+		self.__robot.addGoal(GoalANGLER(id_action, math.radians(a)))
 
 	def cleang(self):
 		"""
@@ -134,13 +147,13 @@ class Asserv:
 		"""
 		return self.__robot.x(), self.__robot.y(), self.__robot.a()
 
-	def pwm(self, pwm_l, pwm_r, delay):
+	def pwm(self, id_action, pwm_l, pwm_r, delay):
 		"""
 		Demande à avance en pwm
 		@param pwm_l int (0 - 255)
 		@param delay s
 		"""
-		self.__robot.addGoal(GoalPWM(pwm_l, delay/1000))
+		self.__robot.addGoal(GoalPWM(id_action, pwm_l, delay/1000))
 
 class Visio:
 	"""Émule le programme de visio"""
@@ -159,6 +172,16 @@ class Others:
 	""" Émule l'arduino dédiée aux others """
 	def __init__(self, robot):
 		self.__robot = robot
+		self.__last_id_action_executed = -1
+
+	def resetLastIdAction(self):
+		self.__last_id_action_executed = -1
+
+	def setLastIdAction(self, id):
+		self.__last_id_action_executed = id
+
+	def getLastIdAction(self):
+		return self.__last_id_action_executed
 
 	def ping(self):
 		return "others pong"

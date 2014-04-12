@@ -61,7 +61,8 @@ bestClusters(int nbClusters, int *clustersNbPoints, int *bestClusters){
 	}
 }
 
-struct coord robotCenter(int * sizeSquarred, struct coord *points, int n, int *clusters, int clusterId){
+struct coord
+robotCenter(int * sizeSquarred, struct coord *points, int n, int *clusters, int clusterId){
 	int first = -1, second = -1, blast = 0, last = 0;
 	for(int i=0; i<n; i++){
 		if(clusters[i] != clusterId) continue;

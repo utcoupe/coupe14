@@ -8,13 +8,16 @@ import logging
 from collections import deque
 import time
 
+
 from .goalsManager import *
 
 class SubProcessManager():
 	def __init__(self, connection, robot_name):
-		self.__logger = logging.getLogger(__name__.split('.')[0])
+		
 		self.__connection = connection
 		self.__robot_name = robot_name
+
+		self.__logger = logging.getLogger(__name__.split('.')[0])
 
 		self.__data = {}
 		while self.__data == {}:
@@ -51,7 +54,9 @@ class SubProcessManager():
 		etat = status[0]
 		id_objectif = status[1]
 
-		if etat == "over":
+		if etat == "END_GOTO":
+			self.__GoalsManager.goalGotoFinishedId(id_objectif)
+		elif etat == "END":
 			self.__GoalsManager.goalFinishedId(id_objectif)
 		elif etat == "canceled":
 			self.__GoalsManager.goalCanceledId(id_objectif)

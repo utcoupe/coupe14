@@ -23,6 +23,7 @@ class MetaData():
 		self.__in_funny_action = False
 		self.__checkCollision = False #Demarrage différé des collisions pour eviter le cas particulier du debut de match 
 		self.__game_clock = None
+		self.__collision_threshold = COLLISION_THRESHOLD
 
 
 	def getFirstPositionFlussmittel(self):
@@ -42,9 +43,15 @@ class MetaData():
 	def getOurColor(self):
 		return self.__our_color
 
+	def getCollisionThreshold(self):
+		return self.__collision_threshold
+
 	def setOurColor(self, color):
 		"""prend en parametre "RED" ou "YELLOW" """
 		self.__our_color = color
+
+	def setCollisionThreshold(threshold):
+		self.__collision_threshold = threshold
 
 		
 	#utilise les données en provenance des caméras pour mettre à jour les données de la classe

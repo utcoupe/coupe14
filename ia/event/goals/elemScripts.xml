@@ -1,29 +1,51 @@
-<?xml version="1.0" ?>
+<?xml version="1.0" ?><!--Ce fichier ne doit pas contenir de A_GOTO, remplacez les par des A_GOTO_SCRIPT pour bypasser les tests de collisions-->
 <elemScripts>
-	<elemScript>
+	<elemScript><!--script récupèration triangle rouge avec mur-->
 		<id_script>0</id_script>
 		<orders>
-			<order>O_BRAS_OUVRIR</order>
-			<order>SLEEP 1000</order>
-			<order>O_BRAS_FERMER</order>
-			<order>END</order>
+			<order>O_RET_OUVRIR</order>
+			<order>SLEEP 300</order>
+			<order>A_PWM 50 50 200</order>
+			<order>O_RET_FERMER</order>
+			<order>SLEEP 300</order>
+			<order>A_PWM -50 -50 100</order>
 		</orders>
 	</elemScript>
-	<elemScript>
+	<elemScript><!--script récupèration triangle jaune avec mur -->
 		<id_script>1</id_script>
 		<orders>
-			<order>A_ROT 1.5</order>
-			<order>A_PWM 100 100 500</order>
-			<order>END</order>
+			<order>O_RET_OUVRIR</order>
+			<order>SLEEP 300</order>
+			<order>A_PWM 50 50 200</order>
+			<order>O_RET_FERMER</order>
+			<order>SLEEP 300</order>
+			<order>A_PWM -50 -50 100</order>
+		</orders>
+	</elemScript>
+	<elemScript><!--script récupèration triangle rouge sans mur -->
+		<id_script>2</id_script>
+		<orders>
+			<order>O_RET_OUVRIR</order>
+			<order>SLEEP 300</order>
+			<order>A_PWM 50 50 100</order>
+			<order>O_RET_FERMER</order>
+			<order>SLEEP 300</order>
+		</orders>
+	</elemScript>
+	<elemScript><!--script récupèration triangle jaune sans mur -->
+		<id_script>3</id_script>
+		<orders>
+			<order>O_RET_OUVRIR</order>
+			<order>SLEEP 300</order>
+			<order>A_PWM 50 50 100</order>
+			<order>O_RET_FERMER</order>
+			<order>SLEEP 300</order>
 		</orders>
 	</elemScript>
 	<elemScript>
-		<id_script>2</id_script>
+		<id_script>4</id_script>
 		<orders>
-			<order>A_GOTO 0 0</order>
-			<order>SLEEP 5000</order>
-			<order>A_GOTO 0 0</order>
-			<order>END</order>
+			<order>SLEEP 1000</order>
 		</orders>
 	</elemScript>
 </elemScripts>
