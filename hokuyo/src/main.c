@@ -23,9 +23,9 @@ void frame();
 
 
 static int use_protocol = 0;
-static struct lidar l1;
+static struct lidar l1, l2;
 #ifdef SDL
-static struct color l1Color;
+static struct color l1Color, l2Color;
 #endif
 
 long startTime;
@@ -35,6 +35,7 @@ static struct coord robots[MAX_ROBOTS];
 static void catch_SIGINT(int signal){
 	printf("Closing lidar(s), please wait...\n");
 	closeLidar(l1);
+	closeLidar(l2);
 	printf("Exitting\n");
 	exit(EXIT_SUCCESS);
 }
@@ -51,12 +52,16 @@ int main(int argc, char **argv){
         return EXIT_FAILURE;
     }
 
-	struct coord posl1;
+	struct coord posl1, posl2;
 	posl1.y = -25;
+	posl2.y = -25;
 	if( strcmp(argv[1], "red") == 0 ){
 		posl1.x = -25;	
+		//posl2.y = TAILLE_TABLE_X+25;
+		posl2.x = 1000;
 	}else{
 		posl1.x = TAILLE_TABLE_X+25;
+		posl2.x = -25;
 	}
 
 	
@@ -66,12 +71,16 @@ int main(int argc, char **argv){
 		use_protocol = 1;
 	}
 
-	l1 = initLidarAndCalibrate( hokuyo_urg, "/dev/ttyACM0", posl1, PI/2, 0, PI/2);
-	//l1 = initLidar( hokuyo_urg, "/dev/ttyACM0", pos1, 0, 0, PI/2);
+
+	//l1 = initLidarAndCalibrate( hokuyo_urg, "/dev/ttyACM0", pos1, PI/2, 0, PI/2);
+	l1 = initLidar( hokuyo_urg, "/dev/ttyACM0", posl1, PI/2, 0, PI/2);
+	l2 = initLidar( hokuyo_urg, "/dev/ttyACM1", posl2, PI/2, 0, PI);
+
 
 
 	#ifdef SDL
 	l1Color = newColor(255, 0, 0);
+	l2Color = newColor(0, 0, 255);
 	initSDL();
 	#endif
 
@@ -92,17 +101,22 @@ int main(int argc, char **argv){
 void frame(){
 	long timestamp;
 	getPoints(&l1);
+	getPoints(&l2);
 	timestamp = timeMillis() - startTime;
 	//printf("nPoints:%i\n", l1.fm.n);
 	int nRobots = getRobots(l1.points, l1.fm.n, robots);
 	#ifdef SDL
 	blitMap();
 	blitLidar(l1.pos, l1Color);
-	blitRobots(robots, nRobots);
-	blitPoints(l1.points, l1.fm.n, l1Color);
+	//blitLidar(l2.pos, l2Color);
+	//blitRobots(robots, nRobots);
+	//blitPoints(l1.points, l1.fm.n, l1Color);
+	//blitPoints(l2.points, l2.fm.n, l2Color);
 	waitScreen();
 	#endif
-	if (use_protocol){
+	printf("%li\n", timestamp);
+	fflush(stdout);
+	/*if (use_protocol){
 		pushCoords(robots, nRobots, timestamp);
 	}
 	else{
@@ -111,6 +125,6 @@ void frame(){
 			printf(";%i:%i", robots[i].x, robots[i].y);
 		}
 		printf("\n");
-	}
+	}*/
 }
 
