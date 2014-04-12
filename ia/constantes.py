@@ -10,9 +10,9 @@ TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux
 
 
 #====================Enable====================
-ENABLE_TOURELLE = 		True 
+ENABLE_TOURELLE = 		False 
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
-ENABLE_TIBOT = 			True
+ENABLE_TIBOT = 			False
 
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
@@ -48,7 +48,7 @@ renvoiImmediat = 		False # fonction non terminé, ne pas activer !
 NUMBER_OF_ENEMY = 		2
 
 #====================eventManager====================
-PERIODE_EVENT_MANAGER =	20
+PERIODE_EVENT_MANAGER =	2
 ID_ACTION_MAX =			29999
 
 #====================timeManager====================
@@ -59,12 +59,7 @@ END_OF_FUNNY_ACTION = 	94000
 BEGIN_CHECK_COLLISION =	3000 #TODO
 
 #====================Goal====================
-FINISHED_THRESHOLD = 50
-
-
-#====================tourelle====================
-OUR_ROBOTS_VISIBLE_TOURELLE = True 	#True si une balise visible par l'hokuyo est presente sur nos robots 
-TOURELLE_PULL_PERIODE = 100 		#ms
+FINISHED_THRESHOLD = 	50
 
 #====================pullData====================
 PULL_PERIODE = 			10 #période des pull en ms
@@ -73,32 +68,30 @@ PULL_PERIODE = 			10 #période des pull en ms
 SEUIL_ROUGE = 			100 #TODO
 SEUIL_JAUNE = 			100 #TODO
 
+#====================NAVIGATION================
+POINTS_PAR_CERCLE = 	8
+MARGE_PASSAGE_PATH = 	0
+MARGE_COLLISION =		-20
+COLLISION_THRESHOLD =	300
+
+
+#=======================================Systemes physiques========================================
+#====================tourelle====================
+OUR_ROBOTS_VISIBLE_TOURELLE = True 	#True si une balise visible par l'hokuyo est presente sur nos robots 
+TOURELLE_PULL_PERIODE = 100 		#ms
+
 #====================Flussmittel====================
-LARGEUR_FLUSSMITTEL = 	100
-LONGUEUR_FLUSSMITTEL = 	100
-
-
-
-
+LARGEUR_FLUSSMITTEL = 	330
+LONGUEUR_FLUSSMITTEL = 	260
 
 #====================TIBOT====================
-LARGEUR_TIBOT = 		100
-LONGUEUR_TIBOT = 		100
-
-
-
+LARGEUR_TIBOT = 		200
+LONGUEUR_TIBOT = 		150
 
 #====================BIG ENEMY====================
 #Si un seul adversaire, on utilise les constantes de BIG ENEMY
-RAYON_BIG_ENEMY = 		100
-
-
-
+RAYON_BIG_ENEMY = 		200
 
 #====================SMALL ENEMY====================
-RAYON_SMALL_ENEMY = 	100
+RAYON_SMALL_ENEMY = 	120
 
-#=======================================IA========================================
-#====================NAVIGATION================
-POINTS_PAR_CERCLE = 8
-MARGE_PASSAGE_PATH = 50

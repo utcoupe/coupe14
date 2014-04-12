@@ -33,10 +33,15 @@ class RobotState{
 	void pushMmPos(pos n_pos);
 	void update();
 
+	void clearBlocked();
+	bool isBlocked();
+
 	private:
+	void blocked_management();
 	Encoder encoderLeft;
 	Encoder encoderRight;
 	pos current_pos;
+	bool blocked; //Detecte si le robot est bloqué (attention ici immobile = bloqué)
 	long last_ticksR;
 	long last_ticksL;
 };

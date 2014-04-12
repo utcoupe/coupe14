@@ -63,7 +63,7 @@ class MotorGraphic():
 		self.debug.lock.release()"""
 
 		### Draw
-		for obj in self.objects :
+		for obj in self.objects:
 			self.draw_obj(obj)
 		### Draw collisions
 		for p,r in self.collisions_to_draw:
@@ -97,7 +97,7 @@ class MotorGraphic():
 	def draw_poly_from_obj(self, shape, color):
 		#print("IN : MotorGraphic::draw_poly_from_obj")
 		body = shape.body
-		ps = shape.get_points()
+		ps = shape.get_vertices()
 		self.draw_poly(ps, color)
 
 	def draw_poly(self, points, color):

@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import os
+import sys
+
+current_path = os.getcwd()
+sys.path.insert(0, os.path.join( current_path, "pymunk-4.0.0" ) )
+
 from pymunk import inf as MASS_INF
 from pygame.locals import *
 

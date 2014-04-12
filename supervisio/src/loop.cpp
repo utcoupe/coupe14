@@ -1,8 +1,11 @@
 #include <opencv2/opencv.hpp>
 #include "traitement/traitement.h"
 #include "traitement/gui.h"
+#include "communication/com.h"
 #include "loop.h"
 #include "global.h"
+
+//Le fichier dégueu pour faire moins degueu
 
 using namespace cv;
 
@@ -51,7 +54,6 @@ void perspectiveOnlyLoop(int index){
 	int h_min_r(RED_HUE_MIN), h_max_r(RED_HUE_MAX), s_min_r(RED_SAT_MIN), s_max_r(RED_SAT_MAX), v_min_r(RED_VAL_MIN), v_max_r(RED_VAL_MAX);
 	int h_min_b(BLK_HUE_MIN), h_max_b(BLK_HUE_MAX), s_min_b(BLK_SAT_MIN), s_max_b(BLK_SAT_MAX), v_min_b(BLK_VAL_MIN), v_max_b(BLK_VAL_MAX);
 	int epsilon(4), key = -1;
-	bool calibrating = !visio.loadTransformMatrix();
 
 	namedWindow("parameters");
 	namedWindow("parameters2");
@@ -62,35 +64,31 @@ void perspectiveOnlyLoop(int index){
 	createTrackbar("h_max_y", "parameters", &h_max_y, 180);
 	createTrackbar("s_min_y", "parameters", &s_min_y, 255);
 	createTrackbar("v_min_y", "parameters", &v_min_y, 255);
+	createTrackbar("v_max_y", "parameters", &v_max_y, 255);
 	createTrackbar("h_min_r", "parameters", &h_min_r, 180);
 	createTrackbar("h_max_r", "parameters", &h_max_r, 180);
 	createTrackbar("s_min_r", "parameters", &s_min_r, 255);
 	createTrackbar("v_min_r", "parameters", &v_min_r, 255);
-	createTrackbar("h_min_b", "parameters2", &h_min_b, 180);
-	createTrackbar("h_max_b", "parameters2", &h_max_b, 180);
-	createTrackbar("s_min_b", "parameters2", &s_min_b, 255);
-	createTrackbar("s_max_b", "parameters2", &s_max_b, 255);
-	createTrackbar("v_min_b", "parameters2", &v_min_b, 255);
-	createTrackbar("v_max_b", "parameters2", &v_max_b, 255);
+	createTrackbar("v_max_r", "parameters", &v_max_r, 255);
+	if(ENABLE_BLK) {
+		createTrackbar("h_min_b", "parameters2", &h_min_b, 180);
+		createTrackbar("h_max_b", "parameters2", &h_max_b, 180);
+		createTrackbar("s_min_b", "parameters2", &s_min_b, 255);
+		createTrackbar("s_max_b", "parameters2", &s_max_b, 255);
+		createTrackbar("v_min_b", "parameters2", &v_min_b, 255);
+		createTrackbar("v_max_b", "parameters2", &v_max_b, 255);
+	}
 	createTrackbar("epsilon", "parameters2", &epsilon, 100);
 	createTrackbar("is equi", "parameters2", &max_diff_triangle_edge, 100);
 	createTrackbar("size_min", "parameters2", &size_min, 20000);
 
 	Scalar c_red(0,0,255), c_blue(255, 0, 0), c_yel(0,110,130);
-	vector<Point2f> position;
-	position.push_back(Point2f(108,119));
-	position.push_back(Point2f(108,328));
-	position.push_back(Point2f(239,119));
-	position.push_back(Point2f(239,328));
 	for(;;) { //int i=0; i>=0; i++) {
 		vector<vector<Point> > detected_contours_yel, detected_contours_red, detected_contours_blk;
 		vector<Point2f> detected_pts_yel, detected_pts_red, detected_pts_blk;
-		Mat frame, persp;
-		cam >> frame;
+		Mat frame_ori, persp;
+		cam >> frame_ori;
 
-		if (key == 'c') {
-			calibrating = !calibrating;
-		}
 		if (key == 's') {
 			visio.saveTransformMatrix();
 		}
@@ -98,10 +96,6 @@ void perspectiveOnlyLoop(int index){
 			visio.loadTransformMatrix();
 		}
 		
-		if (calibrating) {
-			visio.computeTransformMatrix(frame, position, &frame);
-			imshow("origin", frame);
-		}
 		else {
 			Scalar min_r(h_min_r,s_min_r,v_min_r), max_r(h_max_r,s_max_r,v_max_r);
 			Scalar min_y(h_min_y,s_min_y,v_min_y), max_y(h_max_y,s_max_y,v_max_y);
@@ -113,20 +107,25 @@ void perspectiveOnlyLoop(int index){
 			visio.setRedParameters(min_r, max_r);
 			visio.setBlkParameters(min_b, max_b);
 
-			warpPerspective(frame, persp, visio.getQ(), frame.size());
+			Mat frame_hsv, frame;
+			cvtColor(frame_ori, frame_hsv, CV_BGR2HSV);
+			undistort(frame_ori, frame, visio.getCM(), visio.getD());
+			warpPerspective(frame, persp, visio.getQ(), Size(3000,2000));
 			visio.setColor(yellow);
-			visio.getDetectedPosition(frame, detected_pts_yel, detected_contours_yel);
+			visio.getDetectedPosition(frame_hsv, detected_pts_yel, detected_contours_yel);
 			visio.setColor(red);
-			visio.getDetectedPosition(frame, detected_pts_red, detected_contours_red);
-			visio.setColor(black);
-			visio.getDetectedPosition(frame, detected_pts_blk, detected_contours_blk);
+			visio.getDetectedPosition(frame_hsv, detected_pts_red, detected_contours_red);
+			if (ENABLE_BLK) {
+				visio.setColor(black);
+				visio.getDetectedPosition(frame_hsv, detected_pts_blk, detected_contours_blk);
+				drawContours(frame, detected_contours_blk, -1, Scalar(255,255,0), 2);
+			}
 			
 			drawContours(frame, detected_contours_yel, -1, c_yel, 2);
 			drawContours(frame, detected_contours_red, -1, c_red, 2);
-			drawContours(frame, detected_contours_blk, -1, Scalar(255,255,0), 2);
 
 			vector<Triangle> tri;
-			visio.trianglesFromImg(frame, tri);
+			visio.trianglesFromImg(frame_hsv, tri);
 			for(int i=0; i<tri.size(); i++) {
 				string txt = intToString(tri[i].size);
 				Scalar color;
@@ -149,7 +148,7 @@ void perspectiveOnlyLoop(int index){
 			}
 
 	//		resize(persp, persp, Size(600, 600));
-			resize(persp, persp, Size(persp.size().width*1.5, persp.size().height*1.5));
+			resize(persp, persp, Size(900,600));
 			imshow("persp", persp);
 			setMouseCallback("origin", getColor, &frame);
 			imshow("origin", frame);

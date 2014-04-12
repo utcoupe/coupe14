@@ -19,6 +19,7 @@ RobotState::RobotState():encoderLeft(LEFT_SIDE), encoderRight(RIGHT_SIDE)
 }
 
 void RobotState::reset(){
+	blocked = false;
 	current_pos.x = 0;
 	current_pos.y = 0;
 	current_pos.angle = 0;
@@ -70,6 +71,8 @@ void RobotState::update(){
 	}
 
 	static float last_angle = current_pos.angle; 
+
+
 	dl *= FIXED_POINT_PRECISION;
 	dr *= FIXED_POINT_PRECISION;
 
@@ -77,8 +80,60 @@ void RobotState::update(){
 	current_pos.x += round(dd*cos((current_pos.angle + last_angle)/2.0));
 	current_pos.y += round(dd*sin((current_pos.angle + last_angle)/2.0));
 
+
 	//prepare la prochaine update
 	last_ticksR = ticksR;
 	last_ticksL = ticksL;
 	last_angle = current_pos.angle;
+
+	blocked_management();
+}
+
+//Set un flag si robot bloqué (mais le peut pas le clear)
+void RobotState::blocked_management() {
+	static pos last_pos = current_pos;
+	static float time = 0, timer_led = 0;
+	static bool last_block = false;
+
+	if (!blocked) { //Si le robot est deja bloqué, pas la peine de calculer
+		if (time > TIME_BLOCKED) {
+			bool local_block;
+			int dx = current_pos.x - last_pos.x;
+			int dy = current_pos.y - last_pos.y;
+			float da = current_pos.angle - last_pos.angle; //delta angle
+			int dd2 = dx*dx + dy*dy; //Delta distrance carré
+			//On ajoute la distance parcourue par l'angle à la distance "droite"
+			dd2 += da*da*ENTRAXE_ENC*ENTRAXE_ENC; //Tout est au carré pour eviter les sqrt
+
+			//Si on a pas assez bougé
+			if (dd2 < MIN_DIST_BLOCKED*MIN_DIST_BLOCKED) {
+				local_block = true;
+			} else {
+				local_block = false;
+			}
+			blocked = local_block & last_block; //Evite les faux positifs
+			last_block = local_block;
+			if (blocked) {
+				time = -DUREE_CYCLE; //Remise à 0
+				digitalWrite(LED_BLOCKED, LOW); //Allume la led blocage 2s
+				timer_led = 0;
+			}
+		}
+		time += DUREE_CYCLE;
+	}
+	else {
+		timer_led = 0;
+	}
+	timer_led += DUREE_CYCLE;
+	if (timer_led > 2000) {
+		digitalWrite(LED_BLOCKED, HIGH); //Allume la led blocage
+	}
+}
+
+void RobotState::clearBlocked() {
+	blocked = false;
+}
+
+bool RobotState::isBlocked() {
+	return blocked;
 }
