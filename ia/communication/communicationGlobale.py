@@ -169,12 +169,7 @@ class CommunicationGlobale():
 									self.sendOrderAPI(address, self.orders['PINGPING_AUTO'])
 
 			waitBeforeNextExec = (HIGH_PRIO_SPEED -(int(time.time()*1000) - date))
-			if waitBeforeNextExec < 1:
-				faible_prio = False
-				if self.lastLowPrioTaskDate == date:
-					faible_prio = True
-				self.__logger.warning("La boucle de pool de communication n'est pas assez rapide %s, faible priorité en cours: %s", waitBeforeNextExec, faible_prio)
-			else:
+			if waitBeforeNextExec > 0:
 				time.sleep(waitBeforeNextExec/1000.0)
 
 
@@ -627,10 +622,8 @@ class CommunicationGlobale():
 		#Si on veut n'importe quel parquet
 		if address == 'all':
 			self.mutexOrdersToRead.acquire()
-			try:
+			if self.ordersToRead:
 				orderToReturn = self.ordersToRead.popleft()
-			except:
-				pass
 			self.mutexOrdersToRead.release()
 
 		"""

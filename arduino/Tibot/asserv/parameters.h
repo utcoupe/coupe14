@@ -86,6 +86,16 @@
 #define DIS_D 0 //a regler par incrementation
 #define DIS_AWU 0 //Anti-windup, en mm
 
+//BLOCAGE
+//TIME_BLOCKED : période de vérification (ms)
+//MIN_DIST_BLOCKED : disatcne min a parcourir pour ne pas etre considere bloqué (mm)
+#define TIME_BLOCKED 100
+#define MIN_DIST_BLOCKED 1
+
+//PIN LED
+#define LED_MAINLOOP 22
+#define LED_BLOCKED 23
+
 /*****************************************
  *            PRIVATE                    *
  *****************************************/

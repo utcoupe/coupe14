@@ -12,20 +12,17 @@
 extern Servo servoBras, servoRet, servoBrasAngle, servoBrasDist;
 
 void initPins(){
-	pinMode(PIN_SERVO_BRAS, OUTPUT);
-	servoBras.attach(PIN_SERVO_BRAS);
+	//RETOURNEMENT
 	pinMode(PIN_SERVO_RET, OUTPUT);
 	servoRet.attach(PIN_SERVO_RET);
 
+	//BRAS
 	pinMode(PIN_SERVO_BRAS_ANGLE, OUTPUT);
 	servoBrasAngle.attach(PIN_SERVO_BRAS_ANGLE);
 	pinMode(PIN_SERVO_BRAS_DIST, OUTPUT);
 	servoBrasDist.attach(PIN_SERVO_BRAS_DIST);
 
-	pinMode(PIN_INT_HAUT_ASC, INPUT_PULLUP);
-	pinMode(PIN_INT_BAS_ASC, INPUT_PULLUP);
-	attachInterrupt(PIN_INT_HAUT_ASC, couper_asc, RISING);
-	attachInterrupt(PIN_INT_BAS_ASC, couper_asc, RISING);
+	pinMode(PIN_INTERRUPT_BRAS, INPUT_PULLUP);
 }
 
 unsigned long timeMillis(){

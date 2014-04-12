@@ -35,6 +35,7 @@ class Robot(EngineObjectPoly):
 		self.__asserv = Asserv(self)
 		self.__others = Others(self)
 
+
 	#données du robot utiles au simulateur
 		self.__mod_teleport = False # quand on clique ça téléporte au lieu d'envoyer un ordre à l'asservissement
 		self.__mod_recul = False # marche arrière ou marche avant ?
@@ -60,7 +61,28 @@ class Robot(EngineObjectPoly):
 		return int(math.degrees(self.body.angle))
 
 	def getPosition(self):
-		return self.x(), self.y(), self.a()
+		return self.x(), self.y(), self.a()/180*3.14
+
+	def getPositionId(self):
+		return self.x(), self.y(), self.a()/180*3.14, self.__asserv.getLastIdAction()
+
+	def getLastIdAsserv(self):
+		return self.__asserv.getLastIdAction()
+
+	def getLastIdOther(self):
+		return self.__others.getLastIdAction()
+
+	def setLastIdActionAsserv(self, id):
+		self.__asserv.setLastIdAction(id)
+
+	def setlastIdActionOther(self, id):
+		self.__others.setLastIdAction(id)
+
+	def resetIdAsserv(self):
+		self.__asserv.resetLastIdAction()
+
+	def resetIdOther(self):
+		self.__others.resetLastIdAction()
 
 	def getTyperobot(self):
 		return self.__typerobot
@@ -70,7 +92,6 @@ class Robot(EngineObjectPoly):
 
 	def addGoal(self, newGoal):
 		self.__goals.append(newGoal)
-		print (self.__goals)
 
 	def cleanGoals(self):
 		self.__goals = []
@@ -78,25 +99,25 @@ class Robot(EngineObjectPoly):
 	def setStop(self, value):
 		self.__stop = value
 
-	def addGoalOrder(self, numOrdre, x = None, y = None, angle = None):
+	def addGoalOrder(self, numOrdre, arg):
 		"""
 		Méthode appelée depuis communication pour ajouter un goal au robot
 		@param numOrdre int définit dans define
 		"""
 		if (numOrdre == GOTO):
-			self.__asserv.goto(x,y)
+			self.__asserv.goto(arg[0], arg[1],2000-arg[2])
 		elif (numOrdre == GOTOA):
-			self.__asserv.gotoa(x,y,angle)
+			self.__asserv.gotoa(arg[0], arg[1],2000-arg[2],-arg[3]/3.14*180)
 		elif (numOrdre == GOTOAR):
-			self.__asserv.gotoar(x,y,angle)
+			self.__asserv.gotoar(arg[0], arg[1],2000-arg[2],-arg[3]/3.14*180)
 		elif (numOrdre == GOTOR):
-			self.__asserv.gotor(x,y)
+			self.__asserv.gotor(arg[0], arg[1],2000-arg[2])
 		elif (numOrdre == ROT):
-			self.__asserv.rot(angle)
+			self.__asserv.rot(arg[0], -arg[1]/3.14*180)
 		elif (numOrdre == ROTR):
-			self.__asserv.rotr(angle)
+			self.__asserv.rotr(arg[0], -arg[1]/3.14*180)
 		elif (numOrdre == PWM):
-			self.__asserv.pwm(x,y,angle)	#!! x=pwm_l, y=pwm_r, angle=delay !!
+			self.__asserv.pwm(arg[0], arg[1], arg[2], arg[3])	#!! x=pwm_l, y=pwm_r, angle=delay !!
 
 
 	def _my_velocity_func(self):
@@ -125,7 +146,8 @@ class Robot(EngineObjectPoly):
 					d = math.sqrt(dx**2+dy**2)
 					if d < abs(v * dt):
 						self.body._set_position((gx,gy))
-						self.__goals.pop(0)
+						removed_goal = self.__goals.pop(0)
+						self.__asserv.setLastIdAction(removed_goal.id_action)
 						self.body._set_velocity((0,0))
 					else:
 						a = math.atan2(dy, dx)
@@ -139,7 +161,8 @@ class Robot(EngineObjectPoly):
 					if current_goal.start == -1:
 						current_goal.start = time.time()
 					elif (time.time() - current_goal.start) > current_goal.delay:
-						self.__goals.pop(0)
+						removed_goal = self.__goals.pop(0)
+						self.__asserv.setLastIdAction(removed_goal.id_action)
 					else:
 						a = self.body.angle
 						v = self.__max_speed * current_goal.pwm / 255
@@ -148,7 +171,8 @@ class Robot(EngineObjectPoly):
 						self.body._set_velocity((vx,vy))
 				elif isinstance(current_goal, GoalANGLE):
 					self.body._set_angle(current_goal.a)
-					self.__goals.pop(0)
+					removed_goal = self.__goals.pop(0)
+					self.__asserv.setLastIdAction(removed_goal.id_action)
 				else:
 					raise Exception("type_goal inconnu")
 			else:

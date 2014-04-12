@@ -1,21 +1,10 @@
 # -*- coding: utf-8 -*-
 
 
-class Bot:
+class Bot(dict):
 	def __init__(self):
-		self.ray = 100
-		self.x = -1000
-		self.y = -1000
-
-	def getPosition(self):
-		return (self.x, self.y)
-
-	def getRayon(self):
-		return self.ray
-
-	def setPosition(self, pos):
-		self.x = pos[0]
-		self.y = pos[1]
+		self["getRayon"] = 0
+		self["getPosition"] = (-1000, -1000)
 
 if __name__ == "__main__":
 	import sys
@@ -27,23 +16,24 @@ if __name__ == "__main__":
 	import time
 	
 	from graphview import *
-	from event import navigation
+	from event.goals import navigation
 	
-	filename = os.path.join(FILE_DIR, "../../ia/event/navigation/map.xml")
+	filename = os.path.join(FILE_DIR, "../../ia/event/goals/navigation/map.xml")
 	try:
 		offset = sys.argv[1]
 	except:
 		offset = 0
 	start = time.time()
 	other_bot = Bot()
+	other_bot["getRayon"] = 200
 	used_bot = Bot()
+	used_bot["getRayon"] = 120
 	ennemy1 = Bot()
 	ennemy2 = Bot()
-	ennemy1.x = 1800
-	ennemy1.y = 1500
-	ennemy1.ray = 200
-	ennemy2.x = 2200
-	ennemy2.y = 500
+	ennemy1["getPosition"] = (1800, 1500)
+	ennemy1["getRayon"] = 200
+	"""ennemy2["getPosition"] = (2200, 500)
+	ennemy2["getRayon"] = 120"""
 	ng = navigation.PathFinding([used_bot, other_bot, ennemy1, ennemy2], filename)
 	print("init time : %s" % (time.time() - start))
 	
