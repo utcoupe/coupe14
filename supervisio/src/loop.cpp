@@ -6,6 +6,38 @@
 
 using namespace cv;
 
+void communication(int index) {
+	VideoCapture cam(index);
+	Visio visio(cam);
+	if (visio.getDistortMode() != none) {
+		cerr << "INFO : Starting visio WITH distortion correction" << endl;
+	} else {
+		cerr << "INFO : Starting visio WITHOUT distortion correction" << endl;
+	}
+	comLoop(visio);
+}
+
+void calibration(int index) {
+	VideoCapture cam(index);
+	 if(!cam.isOpened())  // check if we succeeded
+		return;
+
+	Visio visio(cam);
+	visio.setChessboardSize(Size(9,6));
+	if (visio.camCalibrate(25)) 
+		visio.saveCameraMatrix();
+	if (visio.camPerspective())
+		visio.saveTransformMatrix();
+}
+
+void getColor(int event, int x, int y, int, void* img_mat) {
+	Mat *img = reinterpret_cast<Mat*> (img_mat);
+	Mat hsv;
+	cvtColor(*img, hsv, CV_BGR2HSV);
+	Scalar pt(hsv.at<Vec3b>(x,y)[0],hsv.at<Vec3b>(x,y)[1],hsv.at<Vec3b>(x,y)[2]);
+	cout << "color = " << pt << endl;
+}
+
 void perspectiveOnlyLoop(int index){
 	VideoCapture cam(index);
 	 if(!cam.isOpened())  // check if we succeeded
@@ -119,6 +151,7 @@ void perspectiveOnlyLoop(int index){
 	//		resize(persp, persp, Size(600, 600));
 			resize(persp, persp, Size(persp.size().width*1.5, persp.size().height*1.5));
 			imshow("persp", persp);
+			setMouseCallback("origin", getColor, &frame);
 			imshow("origin", frame);
 		}
 		key = waitKey(20);
