@@ -21,11 +21,12 @@ void set_blocking (int fd, int should_block);
 
 //Segfault on printf(<int>)
 #ifdef DEBUG
-#define PDEBUGLN(x) //printf(x);printf("\n");
-#define PDEBUG(x) //printf(x);
+#define PDEBUGLN(x) /*printf(x);printf("\n");*/
+#define PDEBUG(x) /*printf(x);*/
 #else
 
 #define PDEBUGLN(x)
 #define PDEBUG(x)
 
+#endif
 #endif
