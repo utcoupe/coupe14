@@ -29,7 +29,7 @@ class Tourelle():
 		return self.__old_data[len(self.__old_data)-1][1]
 	"""
 
-	def majPosition(self, arguments):
+	def majPositionHokuyo(self, arguments):
 		#print("debug:arguments"+str(arguments)+"\n")
 		timestamp = arguments[0]
 
