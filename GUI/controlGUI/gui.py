@@ -208,7 +208,7 @@ class GUI:
 		self.sock.send(bytes(tosend, 'utf-8'))               # send the data
 
 	def sendPwm(self, g, d, duration):
-		self.chaine.configure(text = "Gotoa : "+str(g)+" ; "+str(d)+" ; "+str(duration))
+		self.chaine.configure(text = "pwm : "+str(g)+" ; "+str(d)+" ; "+str(duration))
 		#ENVOYER DATA PROTOCOLE
 		if self.fifo_switch.get() == 0:#on clean la file a chaque nouvel ordre
 			self.sock.send(bytes(self.asserv_addr +':A_CLEANG!', 'utf-8'))
@@ -218,7 +218,7 @@ class GUI:
 		self.sock.send(bytes(tosend, 'utf-8'))               # send the data
 
 	def pwm_handler(self):
-		self.sendPwm(self.pwm_g, self.pwm_d, self.pwm_duration)
+		self.sendPwm(self.pwm_g.get(), self.pwm_d.get(), self.pwm_duration.get())
 
 	def goto_handler(self):
 		self.goto(self.gotox_e.get(), self.gotoy_e.get())
