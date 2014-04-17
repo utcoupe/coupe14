@@ -8,6 +8,7 @@
 #include <sys/wait.h>
 
 #include "com.h"
+#include "global.h"
 
 /*************************************************************
  *                                                           *
@@ -69,51 +70,64 @@ int main(int argc, char **argv) {
 		exit(EXIT_FAILURE);
 	}
 
-	//Path hokuyo
-	strcpy(pipe_hok, path);
-	strcat(pipe_hok, "/config/raspi/pipe_hokuyo");
+	if (ENABLE_HOK) {
+		//Path hokuyo
+		strcpy(pipe_hok, path);
+		strcat(pipe_hok, "/config/raspi/pipe_hokuyo");
 
-	printf("%d - Initializing fifo for cameras : %s\n", getpid(), pipe_hok);
-	mkfifo(pipe_hok, 0666);
+		printf("%d - Initializing fifo for hokuyo : %s\n", getpid(), pipe_cam);
+		mkfifo(pipe_hok, 0666);
+	}
+	
+	if (ENABLE_CAM) {
+		//Path cam
+		char pipe[100]; 
+		strcpy(pipe_cam, path);
+		strcat(pipe_cam, "/config/raspi/pipe_cameras");
 
-	//Path cam
-	char pipe[100]; 
-	strcpy(pipe_cam, path);
-	strcat(pipe_cam, "/config/raspi/pipe_cameras");
-
-	printf("%d - Initializing fifo for hokuyo : %s\n", getpid(), pipe_cam);
-	//Ouvrir fifo
-	mkfifo(pipe_cam, 0666);
+		printf("%d - Initializing fifo for cameras : %s\n", getpid(), pipe_hok);
+		//Ouvrir fifo
+		mkfifo(pipe_cam, 0666);
+	}
 
 	pid_hokuyo = fork();
 	if (pid_hokuyo == 0) {
-		usleep(500000); //Le temps de créer les subprocess
-		//Programme hokuyo
-		char exec[100];
-		strcpy(exec, path);
-		strcat(exec, "/hokuyo/hokuyo");
+		if (ENABLE_HOK) {
+			usleep(500000); //Le temps de créer les subprocess
+			//Programme hokuyo
+			char exec[100];
+			strcpy(exec, path);
+			strcat(exec, "/hokuyo/hokuyo");
 
-		printf("%d - Hokuyo starting...\n", getpid());
-		//execl(exec, "hokuyo", color, path, (char *)NULL);
+			printf("%d - Hokuyo starting...\n", getpid());
+			execl(exec, "hokuyo", color, path, (char *)NULL);
+		}
 	} else {
-		printf("%d - Spawned hokuyo, pid %d\n", getpid(), pid_hokuyo);
+		if (ENABLE_HOK) {
+			printf("%d - Spawned hokuyo, pid %d\n", getpid(), pid_hokuyo);
+		}
 
 		pid_cameras = fork();
 		if (pid_cameras == 0) {
-			usleep(500000); //Le temps de créer les subprocess
-			//Cameras
-			//path python
-			char exec[] = "/usr/bin/python3", file[255];
-			strcpy(file, path);
-			strcat(file, "/raspi_exec/visio_raspi.py");
-			printf("%d - Cameras starting...\n", getpid());
-			execl(exec, "python3", file, path, color, (char *)NULL);
+			if (ENABLE_CAM) {
+				usleep(500000); //Le temps de créer les subprocess
+				//Cameras
+				//path python
+				char exec[] = "/usr/bin/python3", file[255];
+				strcpy(file, path);
+				strcat(file, "/raspi_exec/visio_raspi.py");
+				printf("%d - Cameras starting...\n", getpid());
+				execl(exec, "python3", file, path, color, (char *)NULL);
+			}
 		} else {
+			if (ENABLE_CAM) {
+				printf("%d - Spawned cameras, pid %d\n", getpid(), pid_cameras);
+			}
 			signal(SIGUSR1, sig_handler);
 			signal(SIGINT, sig_handler);
 			atexit(exit_handler);
-			printf("%d - Spawned cameras, pid %d\n", getpid(), pid_cameras);
 			//Suite du main
+			usleep(600000);
 			printf("[MAIN]  Waiting for initialization\n");
 			sleep(10);
 			

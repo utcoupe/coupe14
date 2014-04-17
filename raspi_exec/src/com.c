@@ -2,6 +2,7 @@
 #include "protocole/serial_switch.h"
 #include "protocole/compat.h"
 #include "protocole/protocole_serial.h"
+#include "global.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -21,26 +22,28 @@ void setNonBlocking(FILE *f) {
 void com_loop(const char* cam_pipe, const char* hok_pipe) {
 	FILE *cam = 0, *hok = 0;
 
-/*
-	printf("[MAIN]  Opening pipe : %s\n", hok_pipe);
-	hok = fopen(hok_pipe, "r");
-	setNonBlocking(hok);
-	if (hok == 0) {
-		perror("[MAIN]  Failed to open hokuyo pipe\n");
-		exit(EXIT_FAILURE);
-	} else {
-		printf("[MAIN]  Pipe opened with hokuyo\n");
+	if (ENABLE_HOK) {
+		printf("[MAIN]  Opening pipe : %s\n", hok_pipe);
+		hok = fopen(hok_pipe, "r");
+		setNonBlocking(hok);
+		if (hok == 0) {
+			perror("[MAIN]  Failed to open hokuyo pipe\n");
+			exit(EXIT_FAILURE);
+		} else {
+			printf("[MAIN]  Pipe opened with hokuyo\n");
+		}
 	}
-*/
 
-	printf("[MAIN]  Opening pipe : %s\n", cam_pipe);
-	cam = fopen(cam_pipe, "r");
-	setNonBlocking(cam);
-	if (cam == 0) {
-		perror("[MAIN]  Failed to open camera pipe\n");
-		exit(EXIT_FAILURE);
-	} else {
-		printf("[MAIN]  Pipe opened with cameras\n");
+	if (ENABLE_CAM) {
+		printf("[MAIN]  Opening pipe : %s\n", cam_pipe);
+		cam = fopen(cam_pipe, "r");
+		setNonBlocking(cam);
+		if (cam == 0) {
+			perror("[MAIN]  Failed to open camera pipe\n");
+			exit(EXIT_FAILURE);
+		} else {
+			printf("[MAIN]  Pipe opened with cameras\n");
+		}
 	}
 
 	printf("[MAIN]  Starting protocol thread\n");
@@ -52,55 +55,57 @@ void com_loop(const char* cam_pipe, const char* hok_pipe) {
 	int i_cam = 0, i_hok = 0, ignore_cam = 0, ignore_hok = 0, c = 0;
 	while (1) {
 		//Parse char cameras
-		do {
-			c = fgetc(cam);
-			if (c != EOF) {
-				if (i_cam < max_length) {
-					line_camera[i_cam] = c;
-					i_cam++;
-				} else if (!ignore_cam) { //Affiche une message d'erreur, une seule fois
-					ignore_cam = 1;
-					printf("[MAIN]  Error : camera line too long for buffer, dropping line max=%d\n", max_length);
-				} 
-			}
-
-			//Parse une ligne camera
-			if (c == '\n') {
-				if (!ignore_cam) {
-					parseCamera(line_camera);
-				} else {
-					ignore_cam = 0;
+		if (ENABLE_CAM) {
+			do {
+				c = fgetc(cam);
+				if (c != EOF) {
+					if (i_cam < max_length) {
+						line_camera[i_cam] = c;
+						i_cam++;
+					} else if (!ignore_cam) { //Affiche une message d'erreur, une seule fois
+						ignore_cam = 1;
+						printf("[MAIN]  Error : camera line too long for buffer, dropping line max=%d\n", max_length);
+					} 
 				}
-				i_cam = 0;
-			}
-		} while (c != EOF);
 
-/*
-		//Parse char hokuyo
-		do {
-			c = fgetc(hok);
-			if (c != EOF) {
-				if (i_hok < max_length) {
-					line_hokuyo[i_hok] = c;
-					i_hok++;
-				} else if (!ignore_hok) { //Affiche une message d'erreur, une seule fois
-					ignore_hok = 1;
-					printf("[MAIN]  Error : hokuyo line too long for buffer, dropping line max=%d\n", max_length);
-				} 
-			}
-
-			//Parse une ligne camera
-			if (c == '\n') {
-				if (!ignore_hok) {
-					parseHokuyo(line_hokuyo);
-				} else {
-					ignore_hok = 0;
+				//Parse une ligne camera
+				if (c == '\n') {
+					if (!ignore_cam) {
+						parseCamera(line_camera);
+					} else {
+						ignore_cam = 0;
+					}
+					i_cam = 0;
 				}
-				i_hok = 0;
-			}
-		} while (c != EOF);
-*/
-		usleep(50000);
+			} while (c != EOF);
+		}
+		
+		if (ENABLE_HOK) {
+			//Parse char hokuyo
+			do {
+				c = fgetc(hok);
+				if (c != EOF) {
+					if (i_hok < max_length) {
+						line_hokuyo[i_hok] = c;
+						i_hok++;
+					} else if (!ignore_hok) { //Affiche une message d'erreur, une seule fois
+						ignore_hok = 1;
+						printf("[MAIN]  Error : hokuyo line too long for buffer, dropping line max=%d\n", max_length);
+					} 
+				}
+
+				//Parse une ligne camera
+				if (c == '\n') {
+					if (!ignore_hok) {
+						parseHokuyo(line_hokuyo);
+					} else {
+						ignore_hok = 0;
+					}
+					i_hok = 0;
+				}
+			} while (c != EOF);
+		}
+		usleep(50000); //Pause
 	}
 	fclose(cam);
 	fclose(hok);
@@ -214,6 +219,6 @@ void parseHokuyo(char *ori_line) {
 		pushHokData(robots, timestamp);
 	} else {
 		printf("[MAIN]  Failed to parse hokuyo data, got %d args\n", arg_nbr);
-		printf("[MAIN]  %s\n", ori_line);
+		printf("[MAIN]  %s", ori_line);
 	}
 }

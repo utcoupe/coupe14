@@ -9,14 +9,14 @@ try:
 except:
 	index = 0
 
-v = Visio('../../../../supervisio/visio', index, '../../../../config/visio/visio_robot/', None, False)
-v2 = Visio('../../../../supervisio/visio', index+1, '../../../../config/visio/visio_robot/', None, False)
+v = Visio('../../../../supervisio/visio', index, '../../../../config/visio/visio_tourelle_red/', None, False)
+#v2 = Visio('../../../../supervisio/visio', index+1, '../../../../config/visio/visio_tourelle_red/', None, False)
 print('Visio started')
 
 while 1:
 	start = time.time()
 	tris = v.update()
-	tris = v2.update()
+	#tris = v2.update()
 	print("Duration : ", time.time() - start)
 	for tri in tris:
 		print(tri)
