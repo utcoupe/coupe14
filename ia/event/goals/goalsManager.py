@@ -231,30 +231,43 @@ class GoalsManager:
 			id_objectif	= int(xml_goal.getElementsByTagName('id_objectif')[0].firstChild.nodeValue)
 			elem_goal_id= int(xml_goal.getElementsByTagName('elem_goal_id')[0].firstChild.nodeValue)
 
+			position_depart_sepciale = None
 			#Inversion du script
 			if self.__our_color == "YELLOW":
 				id_objectif, elem_goal_id = self.__reverse_table[(id_objectif, elem_goal_id)]
 			prev_action = deque()
 			for raw_prev_action in xml_goal.getElementsByTagName('prev_action'):
 				raw_order = raw_prev_action.childNodes[0].nodeValue.split()
-				order = raw_order[0]
+				order = str(raw_order[0])
 				arguments = raw_order[1:]
-				prev_action.append((order, arguments))
+				if order == "MYPOSITION_INFO":
+					if self.__our_color == "RED":
+						position_depart_sepciale = (int(arguments[0]), int(arguments[1]), float(arguments[2]))
+					else:
+						position_depart_sepciale = (3000 - int(arguments[0]), int(arguments[1]), float(arguments[2]))
+				else:
+					prev_action.append((order, arguments))
 
 			find = False
 			for goal in self.__available_goals:
 				if goal.getId() == id_objectif:
 					find = True
-					path = self.__getOrderTrajectoire(data, goal, elem_goal_id)
-					self.__addGoal(path, goal, elem_goal_id, prev_action=prev_action)
+					path = self.__getOrderTrajectoire(data, goal, elem_goal_id, position_depart_sepciale)
+					if path != []:
+						self.__addGoal(path, goal, elem_goal_id, prev_action=prev_action)
+					else:
+						self.__logger.info(str(self.__robot_name) + " Aucun chemin disponible vers " +str(goal.getElemGoal(elem_goal_id).getPositionAndAngle())+" pour le goal d'id: " + str(id_objectif))
 					break
 
 			if not find:
 				self.__logger.error(str(self.__robot_name) + " impossible de lui ajouter le goal d'id: " + str(id_objectif))
 	
-	def __getOrderTrajectoire(self, data, goal, elem_goal_id):
+	def __getOrderTrajectoire(self, data, goal, elem_goal_id, position_depart_sepciale=None):
 		"""Il faut mettre à jour les polygones avant d'utiliser cette fonction"""
-		if self.__blocked_goals:
+		if position_depart_sepciale is not None:
+			position_last_goal = position_depart_sepciale
+			self.__logger.debug("Position from position_depart_sepciale" + str(position_last_goal))
+		elif self.__blocked_goals:
 			last_goal = self.__blocked_goals[-1]
 			position_last_goal = last_goal.getElemGoalLocked().getPositionAndAngle()
 			self.__logger.debug("Position from queue" + str(position_last_goal))
