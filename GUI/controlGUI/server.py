@@ -60,7 +60,11 @@ while 1:
 				elif data[1] == 'A_GOTO': #all int
 					for i in range(2,len(data)):
 						data[i] = int(data[i])
-				if data[1] == 'A_GOTO' or data[1] == 'A_GOTOA' or data[1] == 'A_ROT':
+				elif data[1] == 'A_PWM': #all int
+					for i in range(2,len(data)):
+						data[i] = int(data[i])
+
+				if data[1] == 'A_GOTO' or data[1] == 'A_GOTOA' or data[1] == 'A_ROT' or data[1] == 'A_PWM':
 					data.insert(2, 0) #ajout id
 				
 				print('Data : ' + str(data))
