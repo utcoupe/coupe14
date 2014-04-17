@@ -54,7 +54,7 @@ class SubProcessManager():
 		etat = status[0]
 		id_objectif = status[1]
 
-		if etat == "END_GOTO":
+		if etat == "GOTO_OVER":
 			self.__GoalsManager.goalGotoFinishedId(id_objectif)
 		elif etat == "END":
 			self.__GoalsManager.goalFinishedId(id_objectif)

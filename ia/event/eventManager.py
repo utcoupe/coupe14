@@ -174,12 +174,12 @@ class EventManager():
 				self.__sleep_time_tibot = last_order[2][0]
 			else:
 				self.__logger.error("Objet inconnu")
-		elif last_order[1] == 'END_GOTO':
+		elif last_order[1] == 'GOTO_OVER':
 			self.__SubProcessCommunicate.sendObjectifGotoOver(id_objectif)
 		elif last_order[1] == 'END':
 			Objet.setLastIdObjectifExecuted(id_objectif)
 			self.__SubProcessCommunicate.sendObjectifOver(id_objectif)
-		elif last_order[1] == 'THEN':
+		elif last_order[1] == 'THEN' or last_order[1] == 'END_GOTO':
 			#Rien à faire
 			pass
 		else:

@@ -106,6 +106,7 @@ class GoalsManager:
 			orders.append( ("A_ROT", (goal.getElemGoal(elem_goal_id).getPositionAndAngle()[2],),) )
 			#on ajoute attend d'être arrivé pour lancer les actions
 			orders.append( ("END_GOTO", (),) )
+			orders.append( ("GOTO_OVER", (),) )
 			#on ajoute le script d'action
 			orders.extend(self.__elem_script[ goal.getElemGoalLocked().getIdScript() ])
 			#on ajoute un marqueur de fin
