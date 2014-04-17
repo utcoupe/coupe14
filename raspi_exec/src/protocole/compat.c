@@ -79,7 +79,7 @@ set_blocking (int fd, int should_block)
 
 /*
 ...
-char *portname = "/dev/ttyUSB1"
+char *portname = SERIAL_PATH
  ...
  int fd = open (portname, O_RDWR | O_NOCTTY | O_SYNC);
  if (fd < 0)
