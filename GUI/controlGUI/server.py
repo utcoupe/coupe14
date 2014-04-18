@@ -68,6 +68,10 @@ while 1:
 				elif data[1] == 'A_PWM': #all int
 					for i in range(2,len(data)):
 						data[i] = int(data[i])
+				elif data[1] == 'A_SET_POS': #all int
+					data[2] = int(data[2])
+					data[3] = int(data[3])
+					data[4] = float(data[4])
 
 				if data[1] == 'A_GOTO' or data[1] == 'A_GOTOA' or data[1] == 'A_ROT' or data[1] == 'A_PWM':
 					data.insert(2, 0) #ajout id

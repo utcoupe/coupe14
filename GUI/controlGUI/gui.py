@@ -171,7 +171,10 @@ class GUI:
 		self.sock.send(bytes(tosend, 'utf-8'))               # send the data
 	
 	def reset_pos(self):
-		self.sock.send(bytes(self.asserv_addr+':A_RESET_POS!', 'utf-8'))               # send the datas
+		self.chaine.configure(text = "reset_pos : "+str(200)+" ; "+str(200)+" ; "+str(-1.57))
+		arguments = [str(200), str(200), str(-1.57)]
+		tosend = ':'.join([self.asserv_addr, 'A_SET_POS'] + arguments) + '!'
+		self.sock.send(bytes(tosend, 'utf-8'))               # send the data
 	
 	def reset_goals(self):
 		self.sock.send(bytes(self.asserv_addr+':A_CLEANG!', 'utf-8'))               # send the datas
