@@ -39,7 +39,7 @@ void getColor(int event, int x, int y, int, void* img_mat) {
 		Mat hsv;
 		cvtColor(*img, hsv, CV_BGR2HSV);
 		Scalar pt(hsv.at<Vec3b>(x,y)[0],hsv.at<Vec3b>(x,y)[1],hsv.at<Vec3b>(x,y)[2]);
-		cout << "color = " << pt << endl;
+		cout << x << ":" << y << " = " << pt << endl;
 	}
 }
 
