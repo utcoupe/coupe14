@@ -62,12 +62,14 @@ void Visio::detectColor(const Mat& img, Mat& out) {
 	//timings();
 	if (min.val[0] > max.val[0]) { //car les teintes sont circulaires
 		//Si la détection "fait le tour" de la teinte, on la décale pour rester sur l'intervale 0-180
-		add(hsv, Scalar(-max.val[0], 0, 0), hsv);
-		min.val[0] -= max.val[0];
-		max.val[0] = 180;
+		Mat temp;
+		inRange(hsv, min, Scalar(180, max.val[1], max.val[2]), temp);
+		inRange(hsv, Scalar(0, min.val[1], min.val[2]), max, out);
+		bitwise_or(temp, out, out);
 	}
-	//timings("\tcircularité : ");
-	inRange(hsv, min, max, out);
+	else {
+		inRange(hsv, min, max, out);
+	}
 	//timings("\tinRange : ");
 	erode(out, out, erode_dilate_kernel);
 	//timings("\terode : ");
@@ -164,10 +166,9 @@ int Visio::triangles(vector<Triangle>& triangles) {
 	cvtColor(src_img, src_img, CV_BGR2HSV);
 	//timings("\tColor : ");
 	if (distort == image && cam_calibrated) {
-		//timings();
 		undistort(src_img, img, CM, D);
-		nbr_of_tri = trianglesFromImg(img, triangles);
 		//timings("\tUndistort : ");
+		nbr_of_tri = trianglesFromImg(img, triangles);
 	}
 	else {
 		if (distort == image) {
@@ -480,6 +481,7 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 		transformPts(detected_pts, points_real);
 		//Calcul du nombre de polylignes
 		polyDegree(contours, degree, contours);
+		//timings("\ttransform : ");
 		//Pour chaque contour
 		for (int i=0; i < detected_size; i++) {
 			//Si c'est un triangle
@@ -506,6 +508,7 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 				}
 			}
 		}
+		//timings("\tdeduce : ");
 	}
 	//timings("Transformations : ");
 	return nb_triangles;
