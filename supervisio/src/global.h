@@ -14,8 +14,8 @@
 #define YEL_VAL_MIN 60
 #define YEL_VAL_MAX 255
 
-#define RED_HUE_MIN 105
-#define RED_HUE_MAX 140
+#define RED_HUE_MIN 170
+#define RED_HUE_MAX 10
 #define RED_SAT_MIN 80
 #define RED_SAT_MAX 255
 #define RED_VAL_MIN 60

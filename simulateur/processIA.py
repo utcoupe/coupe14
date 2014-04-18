@@ -18,11 +18,11 @@ class ProcessIA():
 	"""
 	Classe qui va lancer une IA en subprocess.
 	"""
-	def __init__(self, liste_robots):
-		self.__color = liste_robots[0]
-		self.__bigrobot = liste_robots[1]
-		self.__minirobot = liste_robots[2]
-		self.__robots = liste_robots
+	def __init__(self, color_and_robot_list):
+		self.__color = color_and_robot_list[0]
+		self.__bigrobot = color_and_robot_list[1]
+		self.__minirobot = color_and_robot_list[2]
+		self.__robots = color_and_robot_list
 		self.__hokuyo = Hokuyo(self.__robots[1:])
 		self.__communication = Communication(self.__bigrobot, self.__minirobot, self.__hokuyo, self)
 		#communication de data entre l'IA et le simu
@@ -47,9 +47,14 @@ class ProcessIA():
 		recv est bloquant, donc lancé dans un thread
 		"""
 		while True:
-			if self.__parent_conn.poll(10.0):
-				self.__parseDataIa(self.__parent_conn.recv())
-				time.sleep(0.01)
+			#try:
+			if self.__parent_conn.poll(1.0):
+				message = self.__parent_conn.recv()
+				self.__parseDataIa(message)
+			"""except EOFError:
+				print("ERREUR: except EOFError sur recv() dans processIA pour la couleur "+str(self.__color))"""
+
+
 
 	def __parseDataIa(self, data):
 		"""
