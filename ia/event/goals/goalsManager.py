@@ -34,6 +34,9 @@ class GoalsManager:
 		self.__SubProcessManager 	= SubProcessManager
 		self.__last_id_objectif_send= 0
 
+		self.__back_triangle_stack = deque()
+		self.__front_triangle_stack = deque()
+
 		data = self.__SubProcessManager.getData() #pas de self, data n'est pas stocké ici !
 		self.__our_color = data["METADATA"]["getOurColor"]
 		self.__PathFinding = PathFinding((data["FLUSSMITTEL"], data["TIBOT"], data["BIGENEMYBOT"], data["SMALLENEMYBOT"]))
@@ -75,10 +78,10 @@ class GoalsManager:
 				path = self.__getOrderTrajectoire(data, goal, 0)
 				self.__addGoal(path, goal, 0)
 
-	def goalFinishedId(self, id_objectif):
+	def goalFinishedId(self, id_objectif, end_status):
 		for objectif in self.__goto_finished_goals:
 			if objectif.getId() == id_objectif:
-				self.__finishGoal(objectif)
+				self.__finishGoal(objectif, end_status)
 			self.__queueBestGoals()
 
 	def goalGotoFinishedId(self, id_objectif):
@@ -149,7 +152,31 @@ class GoalsManager:
 		self.__goto_finished_goals.append(goal)
 		self.__logger.info('Goal ' + goal.getName() + ' is goto finished')
 
-	def __finishGoal(self, goal):
+	def __finishGoal(self, goal, end_status):
+		if end_status:
+			action_type = end_status[0]
+			color = end_status[1]
+			load_point = end_status[2]
+
+			if load_point == "BACK":
+				if action_type == "LOAD":
+					self.__back_triangle_stack.append(color)
+				elif action_type == "UNLOAD":
+					self.__back_triangle_stack.popleft()
+				else:
+					self.__logger.error("Action inconnu, action_type: "+str(action_type))
+
+			elif load_point == "FRONT":
+				if action_type == "LOAD":
+					self.__front_triangle_stack.append(color)
+				elif action_type == "UNLOAD":
+					self.__front_triangle_stack.popleft()
+				else:
+					self.__logger.error("Action inconnu, action_type: "+str(action_type))
+
+			else:
+				self.__logger.error("On a chargé une couleur inconnu color: "+str(color))
+				
 		self.__goto_finished_goals.remove(goal)
 		self.__finished_goals.append(goal)
 		self.__logger.info('Goal ' + goal.getName() + ' is finished')
