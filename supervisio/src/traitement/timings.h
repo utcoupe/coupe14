@@ -12,12 +12,13 @@ class Timings {
 		static void writeStepTime(int i, std::string str="");
 	private:
 		static Timings** instances;
-		static int nb_instances = 0, nb_max = 0;
+		static int nb_instances, nb_max;
 		Timings();
 		float igetTime();
 		float igetStepTime();
 		long start, step;
-}
+};
+
 void timings(std::string name = "");
 
 #endif
