@@ -8,5 +8,6 @@ void cmdAsc(int h);
 void cmdBras(double angle, int length, int height, int n_depot);
 void pump(bool etat);
 void callback();
+void topStop();
 
 #endif

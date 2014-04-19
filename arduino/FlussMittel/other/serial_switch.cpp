@@ -18,9 +18,11 @@
 extern Servo servoRet;
 extern AF_DCMotor motor_ascenseur;
 
+int last_id = 0;
+int next_last_id = 0;
+
 //La fonction renvoit le nombre d'octet dans ret, chaine de caractère de réponse. Si doublon, ne pas executer d'ordre mais renvoyer les données à renvoyer
 int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bool doublon){ 
-	static int last_id = 0;
 	int ret_size = 0;
 	switch(ordre){
 	case O_RET_OUVRIR:
@@ -39,11 +41,11 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		break;
 	case O_BRAS_DEPOT:
 		if (!doublon) {
-			last_id = btoi(argv);
+			next_last_id = btoi(argv);
 			double a = btoi(argv+2) / 100.0;
 			int l = btoi(argv+4);
 			int h = btoi(argv+6);
-                        int depot = btoi(argv+8);
+			int depot = btoi(argv+8);
 			cmdBras(a, l, h, depot);
 		}
 		break;
@@ -58,4 +60,8 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		return -1;//commande inconnue
 	}
 	return ret_size;
+}
+
+void setLastId() {
+	last_id = next_last_id;
 }

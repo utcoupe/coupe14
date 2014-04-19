@@ -23,6 +23,7 @@ void initPins(){
 	servoBrasDist.attach(PIN_SERVO_BRAS_DIST);
 
 	pinMode(PIN_INTERRUPT_BRAS, INPUT_PULLUP);
+	pinMode(PIN_INT_HAUT_ASC, INPUT_PULLUP);
 }
 
 unsigned long timeMillis(){

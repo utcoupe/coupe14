@@ -3,6 +3,7 @@
 #include "AccelStepper.h"
 #include "parameters.h"
 #include "DueTimer.h"
+#include "serial_switch.h"
 
 #include <math.h>
 #include <Arduino.h>
@@ -22,6 +23,13 @@ void init_act() {
 	//Stepper
 	stepperAsc.setMaxSpeed(400);
 	stepperAsc.setAcceleration(800);
+
+	stepperAsc.move(1000);
+	while(digitalRead(PIN_INT_HAUT_ASC) == 1) { //Tant qu'on est pas en haut
+		stepperAsc.run();
+	}
+	stepperAsc.setCurrentPosition(HAUTEUR_MAX / H_TO_STEP + 10);
+	attachInterrupt(PIN_INT_HAUT_ASC, topStop, FALLING);
 }
 
 void asc_int() {
@@ -91,7 +99,12 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 			//Lacher pompe, remonter
 			pump(false);
 			cmdAsc(HAUTEUR_MAX);
+			step++;
+			break;
+		case 5:
+			cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
 			step = 0;
+			setLastId();
 			break;
 	}
 }
@@ -115,4 +128,9 @@ void pump(bool etat) {
 
 void callback() {
 	cmdBras(-1,-1,-1,0);
+}
+
+void topStop() {
+	stepperAsc.stop();
+	stepperAsc.runToPosition();
 }

@@ -27,8 +27,8 @@ void setup(){
 #ifdef DEBUG
 	Serial3.begin(115200);
 #endif
-	init_protocol();
 	init_act();
+	init_protocol();
 }
 
 void loop(){
