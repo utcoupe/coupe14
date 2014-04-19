@@ -202,46 +202,50 @@ class EventManager():
 					#TODO call camera
 					data_camera = (None, 0, 0) #type (color, x, y)
 					Objet.setLastGetTriangleColor(data_camera[0])
-					arg += data_camera[1]
-					arg += data_camera[2]
+					arg.append(data_camera[1])
+					arg.append(data_camera[2])
 					self.__Communication.sendOrderAPI(address[0], "O_GET_TRIANGLE", *arg)
 
-				elif action[1] == 'STORE_TRIANGLE_IA':# arg type: (color, "FRONT" or "BACK", front drop height mm or None, back drop height mm or None)
+				elif action[1] == 'STORE_TRIANGLE_IA':# arg type: (0=RED or 1=YELLOW, 0 = FRONT or 1=BACK, front drop height mm or None, back drop height mm or None)
 					color = Objet.getLastGetTriangleColor()
 					Objet.setLastGetTriangleColor(None)
 
-					if action[2][0] == color:
-						if action[2][1] == "FRONT":
-							self.__SubProcessCommunicate.storageStatus(True, color, "FRONT")
-							arg += action[2][2]
-							self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
-						else:
-							self.__SubProcessCommunicate.storageStatus(True, color, "BACK")
-							arg += -action[2][3]
-							self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
-					else:
-						if color == "RED":
-							color = "YELLOW"
-						else:
-							color = "RED"
+					if color == "RED":
+						color = 0
+					elif color == "YELLOW":
+						color = 1
 
-						if action[2][1] == "FRONT":
-							if action[2][3] is not None:
-								self.__SubProcessCommunicate.storageStatus(True, color, "BACK")
-								arg += -action[2][3]
-								self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
-							else:
-								self.__SubProcessCommunicate.storageStatus(False, color, "BACK")
-								#TODO release triangle
-						else:
-							if action[2][2] is not None:
+					if color != None:
+						if action[2][0] == color:
+							if action[2][1] == 0:
 								self.__SubProcessCommunicate.storageStatus(True, color, "FRONT")
-								arg += action[2][2]
+								arg.append(action[2][2])
 								self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
 							else:
-								self.__SubProcessCommunicate.storageStatus(False, color, "FRONT")
-								#TODO release triangle
-
+								self.__SubProcessCommunicate.storageStatus(True, color, "BACK")
+								arg.append(-action[2][3])
+								self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
+						else:
+							if action[2][1] == "FRONT":
+								if action[2][3] is not None:
+									self.__SubProcessCommunicate.storageStatus(True, color, "BACK")
+									arg.append(-action[2][3])
+									self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
+								else:
+									self.__SubProcessCommunicate.storageStatus(False, color, "BACK")
+									#TODO release triangle
+							else:
+								if action[2][2] is not None:
+									self.__SubProcessCommunicate.storageStatus(True, color, "FRONT")
+									arg.append(action[2][2])
+									self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
+								else:
+									self.__SubProcessCommunicate.storageStatus(False, color, "FRONT")
+									#TODO release triangle
+					else:
+						self.__SubProcessCommunicate.storageStatus(False, color, "FRONT")
+						self.__Communication.sendOrderAPI(address[0], "PINGPING", *arg) #Pour avoir l'incrementation de l'id
+						
 				else:
 					#Si l'ordre a des arguments
 					if action[2] is not None:

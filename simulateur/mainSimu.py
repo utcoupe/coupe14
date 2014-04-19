@@ -90,7 +90,7 @@ if __name__ == "__main__":
 		robots_yellow = ("YELLOW", bigbotYellow, minibotYellow, bigbotRed, minibotRed)
 
 		#lancement des subProcess IA
-		processIA.ProcessIA(robots_red)
+		#processIA.ProcessIA(robots_red)
 		processIA.ProcessIA(robots_yellow)
 
 		#chargement de la map
