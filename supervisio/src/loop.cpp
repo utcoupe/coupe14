@@ -33,7 +33,18 @@ void calibration(int index) {
 		visio.saveTransformMatrix();
 }
 
+void getColor(int event, int x, int y, int, void* img_mat) {
+	if (event == EVENT_LBUTTONDOWN) {
+		Mat *img = reinterpret_cast<Mat*> (img_mat);
+		Mat hsv;
+		cvtColor(*img, hsv, CV_BGR2HSV);
+		Scalar pt(hsv.at<Vec3b>(x,y)[0],hsv.at<Vec3b>(x,y)[1],hsv.at<Vec3b>(x,y)[2]);
+		cout << x << ":" << y << " = " << pt << endl;
+	}
+}
+
 void perspectiveOnlyLoop(int index){
+	Mat frame;
 	VideoCapture cam(index);
 	 if(!cam.isOpened())  // check if we succeeded
 		return;
@@ -51,6 +62,8 @@ void perspectiveOnlyLoop(int index){
 	namedWindow("parameters2");
 	namedWindow("origin");
 	namedWindow("persp");
+
+	setMouseCallback("origin", getColor, &frame);
 
 	createTrackbar("h_min_y", "parameters", &h_min_y, 180);
 	createTrackbar("h_max_y", "parameters", &h_max_y, 180);
@@ -99,7 +112,7 @@ void perspectiveOnlyLoop(int index){
 			visio.setRedParameters(min_r, max_r);
 			visio.setBlkParameters(min_b, max_b);
 
-			Mat frame_hsv, frame;
+			Mat frame_hsv;
 			cvtColor(frame_ori, frame_hsv, CV_BGR2HSV);
 			undistort(frame_ori, frame, visio.getCM(), visio.getD());
 			warpPerspective(frame, persp, visio.getQ(), Size(3000,2000));
