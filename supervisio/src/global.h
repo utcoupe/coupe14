@@ -4,7 +4,7 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define TIMEBENCH true 
+#define TIMEBENCH false
 #define MIN_SIZE 500
 
 #define YEL_HUE_MIN 20

@@ -145,7 +145,7 @@ class OurBot():
 		self.__last_get_triangle_color = color
 
 	def setIdToReach(self, id):
-		self.__id_to_reach = id
+		self.__id_to_reach = "ANY"
 
 	def setLastIdObjectifExecuted(self, idd):
 		self.__last_id_objectif_executed = idd

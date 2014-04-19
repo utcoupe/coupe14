@@ -6,10 +6,16 @@ Ce code gère l'envoi d'actions élémentaires aux robots et traite les collisio
 import threading
 import logging
 import time
+import os
+import sys
+
+FILE_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(FILE_DIR,"."))
 
 from .constantes import *
 from .subProcessCommunicate import *
 from .collision import *
+from .visio import *
 
 class EventManager():
 	def __init__(self, Communication, Data):
@@ -32,6 +38,8 @@ class EventManager():
 		self.__last_tibot_order_finished = ID_ACTION_MAX			#id_action
 		self.__sleep_time_tibot = 0
 		self.__resume_date_tibot = 0
+
+		self.__vision = Visio('../ia/event/visio/visio', 2)
 
 		self.__SubProcessCommunicate = SubProcessCommunicate(Data)
 		self.__Collision = Collision((self.__Flussmittel, self.__Tibot, self.__BigEnemyBot, self.__SmallEnemyBot))
@@ -199,8 +207,15 @@ class EventManager():
 				arg = [action[0]]
 				
 				if action[1] == "GET_TRIANGLE_IA":
-					#TODO call camera
-					data_camera = (None, 0, 0) #type (color, x, y)
+					self.__vision.update()
+					triangle_list = self.__vision.getTriangles()
+
+					if triangle_list == []:
+						data_camera = (None, 0, 0) #type (color, x, y)
+					else:
+						triangle = triangle_list[0] #TODO, prendre le meilleur triangle
+						data_camera = (triangle.color, triangle.coord[0], triangle.coord[1])
+
 					Objet.setLastGetTriangleColor(data_camera[0])
 					arg.append(data_camera[1])
 					arg.append(data_camera[2])
@@ -232,16 +247,14 @@ class EventManager():
 									arg.append(-action[2][3])
 									self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
 								else:
-									self.__SubProcessCommunicate.storageStatus(False, color, "BACK")
-									#TODO release triangle
+									self.__SubProcessCommunicate.storageStatus(True, color, "FRONT")
 							else:
 								if action[2][2] is not None:
 									self.__SubProcessCommunicate.storageStatus(True, color, "FRONT")
 									arg.append(action[2][2])
 									self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
 								else:
-									self.__SubProcessCommunicate.storageStatus(False, color, "FRONT")
-									#TODO release triangle
+									self.__SubProcessCommunicate.storageStatus(True, color, "BACK")
 					else:
 						self.__SubProcessCommunicate.storageStatus(False, color, "FRONT")
 						self.__Communication.sendOrderAPI(address[0], "PINGPING", *arg) #Pour avoir l'incrementation de l'id
