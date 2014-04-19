@@ -37,29 +37,14 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 			servoRet.write(0);
 		}
 		break;
-	case O_MONTER_ASC:
-		if (!doublon) {
-			last_id = btoi(argv);
-			argv+=2;
-			motor_ascenseur.run(FORWARD);
-			motor_ascenseur.setSpeed(255);
-		}
-		break;
-	case O_BAISSER_ASC:
-		if (!doublon) {
-			last_id = btoi(argv);
-			argv+=2;
-			motor_ascenseur.run(BACKWARD);
-			motor_ascenseur.setSpeed(255);
-		}
-		break;
 	case O_BRAS_DEPOT:
 		if (!doublon) {
 			last_id = btoi(argv);
 			double a = btoi(argv+2) / 100.0;
 			int l = btoi(argv+4);
 			int h = btoi(argv+6);
-			cmdBras(a, l, h, true);
+                        int depot = btoi(argv+8);
+			cmdBras(a, l, h, depot);
 		}
 		break;
 	case GET_LAST_ID:

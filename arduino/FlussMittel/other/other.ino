@@ -9,13 +9,15 @@
 #include <Servo.h>
 #include <Arduino.h>
 
+#include "AccelStepper.h"
 #include "serial_decoder.h"
 #include "serial_defines.h"
 #include "compat.h"
 #include "parameters.h"
+#include "actions.h"
 
 Servo servoRet, servoBrasAngle, servoBrasDist;
-AF_DCMotor motor_ascenseur(1);
+AccelStepper stepperAsc(1, PIN_STEPPER_STEP, PIN_STEPPER_DIR);
 
 #define MAX_READ 64 
 void setup(){
@@ -25,12 +27,8 @@ void setup(){
 #ifdef DEBUG
 	Serial3.begin(115200);
 #endif
-
 	init_protocol();
-	//Moteurs :
-	motor_ascenseur.run(FORWARD);
-	motor_ascenseur.setSpeed(0); //Desactivr ascenseur
-	servoRet.write(0); //Fermer le bras
+	init_act();
 }
 
 void loop(){

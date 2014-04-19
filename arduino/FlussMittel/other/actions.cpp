@@ -1,55 +1,49 @@
 #include "actions.h"
 #include "Servo.h"
+#include "AccelStepper.h"
 #include "parameters.h"
-#include <math.h>
-#include <Arduino.h>
 #include "DueTimer.h"
 
-extern Servo servoBras, servoRet, servoBrasAngle, servoBrasDist;
+#include <math.h>
+#include <Arduino.h>
 
-static int hauteur_bras = 0; //On conserve la hauteur à tout moment. En step
-static int goal_hauteur = hauteur_bras;
+extern Servo servoBras, servoRet, servoBrasAngle, servoBrasDist;
+extern AccelStepper stepperAsc;
+
+static int goal_hauteur = 0;
 
 static bool last_tri_found = false;
 static bool got_tri = false; //True si triangle en suspension
 
 
+void init_act() {
+	//Moteurs :
+	servoRet.write(0); //Fermer le bras
+	//Stepper
+	stepperAsc.setMaxSpeed(400);
+	stepperAsc.setAcceleration(800);
+}
+
 void asc_int() {
+	stepperAsc.run();
 	if (digitalRead(PIN_INTERRUPT_BRAS) == 0) {
 		//On touche un triangle
+		stepperAsc.stop();
+		stepperAsc.runToPosition();
 		Timer8.detachInterrupt();
 		got_tri = true;
 	}
-	else if (hauteur_bras < goal_hauteur) {
-		//MONTER
-		hauteur_bras++;
-		//TODO : Vérifier sens, verifier step
-		digitalWrite(PIN_STEPPER_DIR, LOW);
-		digitalWrite(PIN_STEPPER_STEP, HIGH);
-		delayMicroseconds(DELAY_STEPPER_CONTROLER);
-		digitalWrite(PIN_STEPPER_STEP, LOW);
-	}
-	else if (hauteur_bras > goal_hauteur) {
-		//BAISSER
-		hauteur_bras--;
-		//TODO : Vérifier sens, verifier step
-		digitalWrite(PIN_STEPPER_DIR, HIGH);
-		digitalWrite(PIN_STEPPER_STEP, HIGH);
-		delayMicroseconds(DELAY_STEPPER_CONTROLER);
-		digitalWrite(PIN_STEPPER_STEP, LOW);
-	}
-	else if (hauteur_bras == goal_hauteur) {
+	else if (stepperAsc.currentPosition() == goal_hauteur) {
 		Timer8.detachInterrupt();
 		got_tri = false;
-		cmdBras(-1,-1,-1, 0);
 	}
+	cmdBras(-1,-1,-1, 0);
 }
 
-void cmdBras(double angle, int length, int height, bool n_depot) {
-
+void cmdBras(double angle, int length, int height, int n_depot) {
 	static int step = 0, l = 0, h = 0;
 	static double a = 0;
-	static bool depot = n_depot; //True si depot dans la reserve, false si a l'arreire
+	static int depot = n_depot;
 	if (height >= 0 && step != 0) { //Si nouvel ordre avant le dernier : on le vire
 		return;
 	}
@@ -67,32 +61,35 @@ void cmdBras(double angle, int length, int height, bool n_depot) {
 			cmdBrasServ(a, l);
 			//delayMicroseconds(x); //Si necessaire
 			cmdAsc(h);
-			//TODO ALLUMER POMPE
+			pump(true);
 			step++;
 			break;
-		case 2:
+		case 2: {
 			//Remonter asc
-			cmdAsc(HAUTEUR_MAX);
+			int hauteur = h + MARGE_DEPOT;
+			if (depot < 0) { //A l'arriere
+				hauteur = MAX(hauteur, ABS(depot) + MARGE_DEPOT);
+			}
+			hauteur = MIN(hauteur, HAUTEUR_MAX);
+			cmdAsc(hauteur);
 			step++;
 			break;
+			}
 		case 3:
+			//On rentre le bras
 			//Se placer au bon rangement
-			if (depot) {
+			if (depot < 0) { //Depot a l'arriere
 				cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
-				//delayMicroseconds(x); //Si necessaire
-				cmdAsc(h); //TODO HAUTEUR DEPOT VARIABLE
 			}
 			else {
 				cmdBrasServ(ANGLE_DEPOT_RET, LONGUEUR_DEPOT_RET);
-				//delayMicroseconds(x); //Si necessaire
-				cmdAsc(HAUTEUR_DEPOT_RET);
 			}
 			step++;
+			Timer8.attachInterrupt(callback).start(300000);
 			break;
 		case 4:
 			//Lacher pompe, remonter
-			//TODO LACHER POMPE
-			//TODO COMPTER TRIANGLES
+			pump(false);
 			cmdAsc(HAUTEUR_MAX);
 			step = 0;
 			break;
@@ -101,6 +98,7 @@ void cmdBras(double angle, int length, int height, bool n_depot) {
 
 void cmdAsc(int h) { //h en mm
 	goal_hauteur = h * H_TO_STEP;
+	stepperAsc.moveTo(goal_hauteur);
 	Timer8.attachInterrupt(asc_int).setFrequency(FREQUENCY_STEPPER).start();
 }
 
@@ -110,4 +108,11 @@ void cmdBrasServ(double a, int l) {
 	int theta = (a + BRAS_OFFSET_ANGLE)*180/M_PI;
 	servoBrasAngle.write(theta);
 	servoBrasDist.write(alpha);
+}
+
+void pump(bool etat) {
+}
+
+void callback() {
+	cmdBras(-1,-1,-1,0);
 }
