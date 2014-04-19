@@ -11,6 +11,7 @@
 #define BRAS_OFFSET_ANGLE 10 //Angle offset in degrees
 #define ANGLE_DEPOT 0
 #define LONGUEUR_DEPOT 0
+#define MARGE_DEPOT 30
 
 #define ANGLE_DEPOT_RET 0
 #define LONGUEUR_DEPOT_RET 0
@@ -29,7 +30,6 @@
 #define PIN_SERVO_RET 9
 
 #define PIN_INT_HAUT_ASC 22
-#define PIN_INT_BAS_ASC 23
 
 #define PIN_SERVO_BRAS_ANGLE 2
 #define PIN_SERVO_BRAS_DIST 3
@@ -51,4 +51,8 @@
 #define BINPR(x)
 #endif
 
+
+#define MIN(x,y) x>y?x:y
+#define MAX(x,y) x<y?x:y
+#define ABS(x) x<0?-x:x
 #endif

@@ -59,7 +59,6 @@ void Visio::init() {
 
 void Visio::detectColor(const Mat& img, Mat& out) {
 	Mat hsv = img;
-	//timings();
 	if (min.val[0] > max.val[0]) { //car les teintes sont circulaires
 		//Si la détection "fait le tour" de la teinte, on la décale pour rester sur l'intervale 0-180
 		Mat temp;
@@ -70,28 +69,27 @@ void Visio::detectColor(const Mat& img, Mat& out) {
 	else {
 		inRange(hsv, min, max, out);
 	}
-	//timings("\tinRange : ");
 	erode(out, out, erode_dilate_kernel);
-	//timings("\terode : ");
 	dilate(out, out, erode_dilate_kernel);
-	//timings("\tdilate : ");
 
 }
 
 void Visio::getContour(const Mat& img, vector<vector<Point> >& contours) {
 	Mat thresh;
-	//timings();
+	Timings::startTimer(3);
 	detectColor(img, thresh);
 	//timings("\tdetectColor : ");
+	Timings::writeStepTime(3, "\t\t\t\tdetectColor");
 	findContours(thresh, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-	//timings("\tfindContours : ");
+	Timings::writeStepTime(3, "\t\t\t\tfindContour");
 }
 
 //Renvoit positions et contours de la couleur détectée dans l'image en argument
 int Visio::getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, vector<vector<Point> >& detected_contours) {
-	//timings();
+	Timings::startTimer(2);
 	vector<vector<Point> > contours;
 	getContour(img, contours);
+	Timings::writeStepTime(2, "\t\t\tContours");
 	//timings("\t\tgetContour : ");
 	float x, y;
 	for(int i=0 ; i < contours.size(); i++){
@@ -103,7 +101,7 @@ int Visio::getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, ve
 			detected_contours.push_back(contours[i]);
 		}
 	}
-	//timings("\t\tMoments loop : ");
+	Timings::writeStepTime(2, "\t\t\tMoments");
 	return detected_pts.size();
 }
 
@@ -153,7 +151,7 @@ int Visio::trianglesFromImg(const Mat& img, vector<Triangle>& triangles) {
 }
 
 int Visio::triangles(vector<Triangle>& triangles) {
-	//timings();
+	Timings::startTimer(0);
 	int nbr_of_tri = 0;
 	Mat img, src_img;
 	//Hacks destiné à vider le buffer de la camera pour avoir une
@@ -162,12 +160,11 @@ int Visio::triangles(vector<Triangle>& triangles) {
 	//for(int i=0; i<6; i++) camera.grab(); //Hack provisoire
 	//camera.retrieve(img);
 	camera >> src_img;
-	//timings("\tRetrieving : ");
+	Timings::writeStepTime(0, "\tRetrieving");
 	cvtColor(src_img, src_img, CV_BGR2HSV);
-	//timings("\tColor : ");
+	Timings::writeStepTime(0, "\tConvert Color");
 	if (distort == image && cam_calibrated) {
 		undistort(src_img, img, CM, D);
-		//timings("\tUndistort : ");
 		nbr_of_tri = trianglesFromImg(img, triangles);
 	}
 	else {
@@ -177,7 +174,8 @@ int Visio::triangles(vector<Triangle>& triangles) {
 		}
 		nbr_of_tri = trianglesFromImg(src_img, triangles);
 	}
-	//timings("\tTriangles : ");
+	Timings::writeStepTime(0, "\tTriangles");
+	Timings::writeTime(0, "Total");
 	return nbr_of_tri;
 }
 
@@ -472,16 +470,15 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 	vector<Point2f> detected_pts;
 	int nb_triangles = 0, detected_size;
 	setColor(color);
-	//timings();
+	Timings::startTimer(1);
 	if ((detected_size = getDetectedPosition(img, detected_pts, contours)) > 0) {
-		//timings("\tDetection : ");
+		Timings::writeStepTime(1, "\t\tDetect position");
 		vector<Point2f> points_real;
 		vector<int> degree;
 		//Transformation perspective des points detectes
 		transformPts(detected_pts, points_real);
 		//Calcul du nombre de polylignes
 		polyDegree(contours, degree, contours);
-		//timings("\ttransform : ");
 		//Pour chaque contour
 		for (int i=0; i < detected_size; i++) {
 			//Si c'est un triangle
@@ -508,9 +505,8 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 				}
 			}
 		}
-		//timings("\tdeduce : ");
 	}
-	//timings("Transformations : ");
+	Timings::writeStepTime(1, "\t\tTransform");
 	return nb_triangles;
 }
 
