@@ -39,6 +39,8 @@ class OurBot():
 		self.__actions_en_cours = None
 		self.__last_id_objectif_executed = None
 
+		self.__last_get_triangle_color = None
+
 		#Variable pour evenManager
 		self.__id_to_reach = "ANY"
 
@@ -54,6 +56,9 @@ class OurBot():
 
 	def getName(self):
 		return self.__name
+
+	def getLastGetTriangleColor(self):
+		return self.__last_get_triangle_color
 
 	def getLastIdGlobale(self):
 		return self.maxRot(self.__last_id_executed_other, self.__last_id_executed_asserv)
@@ -135,6 +140,9 @@ class OurBot():
 
 	def __getNextIdToStack(self):
 		return self.__last_id_action_stacked.idIncrementation()
+
+	def setLastGetTriangleColor(self, color):
+		self.__last_get_triangle_color = color
 
 	def setIdToReach(self, id):
 		self.__id_to_reach = id

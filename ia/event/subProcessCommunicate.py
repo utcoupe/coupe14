@@ -60,6 +60,12 @@ class SubProcessCommunicate():
 			for id_canceled in id_canceled_list:
 				self.__subprocess_tibot.sendPacket(("canceled", id_canceled))
 
+	def storageStatus(self, executed_without_faillure, color, position):
+		if self.__Data.Flussmittel is not None:
+			self.__subprocess_flussmittel.sendPacket(("storageStatus", executed_without_faillure, color, position))
+		if self.__Data.Tibot is not None:
+			self.__subprocess_tibot.sendPacket(("storageStatus", executed_without_faillure, color, position))
+
 
 class MyProcess():
 	def __init__(self, Data, robot_name):

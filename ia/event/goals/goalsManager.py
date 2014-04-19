@@ -78,10 +78,20 @@ class GoalsManager:
 				path = self.__getOrderTrajectoire(data, goal, 0)
 				self.__addGoal(path, goal, 0)
 
-	def goalFinishedId(self, id_objectif, end_status):
+	def processStorageStatus(self, executed_without_faillure, color, position):
+		if executed_without_faillure:
+			if position == "FRONT":
+				self.__front_triangle_stack.append(color)
+			else:
+				self.__back_triangle_stack.append(color)
+		else:
+			#TODO
+			pass
+
+	def goalFinishedId(self, id_objectif):
 		for objectif in self.__goto_finished_goals:
 			if objectif.getId() == id_objectif:
-				self.__finishGoal(objectif, end_status)
+				self.__finishGoal(objectif) 
 			self.__queueBestGoals()
 
 	def goalGotoFinishedId(self, id_objectif):
@@ -153,7 +163,7 @@ class GoalsManager:
 		self.__logger.info('Goal ' + goal.getName() + ' is goto finished')
 
 	def __finishGoal(self, goal, end_status):
-		if end_status:
+		"""if end_status:
 			action_type = end_status[0]
 			color = end_status[1]
 			load_point = end_status[2]
@@ -175,7 +185,7 @@ class GoalsManager:
 					self.__logger.error("Action inconnu, action_type: "+str(action_type))
 
 			else:
-				self.__logger.error("On a chargé une couleur inconnu color: "+str(color))
+				self.__logger.error("On a chargé une couleur inconnu color: "+str(color))"""
 				
 		self.__goto_finished_goals.remove(goal)
 		self.__finished_goals.append(goal)

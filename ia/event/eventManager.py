@@ -174,38 +174,90 @@ class EventManager():
 				self.__sleep_time_tibot = last_order[2][0]
 			else:
 				self.__logger.error("Objet inconnu")
+
 		elif last_order[1] == 'GOTO_OVER':
 			self.__SubProcessCommunicate.sendObjectifGotoOver(id_objectif)
+
 		elif last_order[1] == 'END':
 			Objet.setLastIdObjectifExecuted(id_objectif)
 			self.__SubProcessCommunicate.sendObjectifOver(id_objectif)
+
 		elif last_order[1] == 'THEN' or last_order[1] == 'END_GOTO':
 			#Rien à faire
 			pass
+
 		else:
 			self.__logger.error("ordre de stop impossible")
 
-		self.__sendOrders((Objet.getAddressOther(), Objet.getAddressAsserv()), data_action)
+		self.__sendOrders((Objet.getAddressOther(), Objet.getAddressAsserv()), Objet, data_action)
 
 
-	def __sendOrders(self, address, data_action):#data_action est de type ((id_action, ordre, arguments),...)
+	def __sendOrders(self, address, Objet, data_action):#data_action est de type ((id_action, ordre, arguments),...)
 		#Si on est en jeu
 		if self.__MetaData.getInGame():
 			for action in data_action:
 				arg = [action[0]]
-				#Si l'ordre a des arguments
-				if action[2] is not None:
-					arg += action[2]
+				
+				if action[1] == "GET_TRIANGLE_IA":
+					#TODO call camera
+					data_camera = (None, 0, 0) #type (color, x, y)
+					Objet.setLastGetTriangleColor(data_camera[0])
+					arg += data_camera[1]
+					arg += data_camera[2]
+					self.__Communication.sendOrderAPI(address[0], "O_GET_TRIANGLE", *arg)
 
-				if action[1][0] == 'O':
-					self.__Communication.sendOrderAPI(address[0], action[1], *arg)
-				elif action[1][0] == 'A':
-					if action[1] == "A_GOTO_SCRIPT":#A_GOTO_SCRIPT n'existe que dans les scripts d'action elemetaire, on l'utilise pour ne pas inclure ces deplacements dans le calcul de collision
-						self.__Communication.sendOrderAPI(address[1], "A_GOTO", *arg)
+				elif action[1] == 'STORE_TRIANGLE_IA':# arg type: (color, "FRONT" or "BACK", front drop height mm or None, back drop height mm or None)
+					color = Objet.getLastGetTriangleColor()
+					Objet.setLastGetTriangleColor(None)
+
+					if action[2][0] == color:
+						if action[2][1] == "FRONT":
+							self.__SubProcessCommunicate.storageStatus(True, color, "FRONT")
+							arg += action[2][2]
+							self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
+						else:
+							self.__SubProcessCommunicate.storageStatus(True, color, "BACK")
+							arg += -action[2][3]
+							self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
 					else:
-						self.__Communication.sendOrderAPI(address[1], action[1], *arg)
+						if color == "RED":
+							color = "YELLOW"
+						else:
+							color = "RED"
+
+						if action[2][1] == "FRONT":
+							if action[2][3] is not None:
+								self.__SubProcessCommunicate.storageStatus(True, color, "BACK")
+								arg += -action[2][3]
+								self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
+							else:
+								self.__SubProcessCommunicate.storageStatus(False, color, "BACK")
+								#TODO release triangle
+						else:
+							if action[2][2] is not None:
+								self.__SubProcessCommunicate.storageStatus(True, color, "FRONT")
+								arg += action[2][2]
+								self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
+							else:
+								self.__SubProcessCommunicate.storageStatus(False, color, "FRONT")
+								#TODO release triangle
+
 				else:
-					self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
+					#Si l'ordre a des arguments
+					if action[2] is not None:
+						arg += action[2]
+
+					if action[1][0] == 'O':
+							self.__Communication.sendOrderAPI(address[0], action[1], *arg)
+
+					elif action[1][0] == 'A':
+						if action[1] == "A_GOTO_SCRIPT":#A_GOTO_SCRIPT n'existe que dans les scripts d'action elemetaire, on l'utilise pour ne pas inclure ces deplacements dans le calcul de collision
+							self.__Communication.sendOrderAPI(address[1], "A_GOTO", *arg)
+						else:
+							self.__Communication.sendOrderAPI(address[1], action[1], *arg)
+
+					else:
+						self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
 
 				self.__logger.debug(str(address) + " envoi de l'ordre: " + str(action))
 

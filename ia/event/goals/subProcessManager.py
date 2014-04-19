@@ -53,14 +53,16 @@ class SubProcessManager():
 		"""read new status and update objectif_list"""
 		etat = status[0]
 		id_objectif = status[1]
-		end_status = status[2:]
+		full_arg = status[1:]
 
 		if etat == "GOTO_OVER":
 			self.__GoalsManager.goalGotoFinishedId(id_objectif)
 		elif etat == "END":
-			self.__GoalsManager.goalFinishedId(id_objectif, end_status) #end_status = () ou end_status = ("LOAD" or "UNLOAD", RED" or "BLACK", "BACK" or "FRONT")
+			self.__GoalsManager.goalFinishedId(id_objectif)
 		elif etat == "canceled":
 			self.__GoalsManager.goalCanceledId(id_objectif)
+		elif etat == "storageStatus":
+			self.__GoalsManager.processStorageStatus(full_arg)
 
 
 def startSubprocess(connection, robot_name):

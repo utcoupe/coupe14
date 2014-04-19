@@ -31,6 +31,8 @@ void initSize()
 	ordreSize[O_RET_FERMER]=2;
 	ordreSize[O_BRAS_DEPOT]=8;
 	ordreSize[O_BRAS_RET]=8;
+	ordreSize[O_GET_TRIANGLE]=6;
+	ordreSize[O_STORE_TRIANGLE]=4;
 
 	ordreSize[GET_CAM]=0;
 	ordreSize[GET_HOKUYO]=0;
