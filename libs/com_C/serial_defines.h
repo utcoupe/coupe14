@@ -60,7 +60,7 @@ enum ordre {
 
 	O_RET_OUVRIR, //@int
 	O_RET_FERMER, //@int
-	O_BRAS_DEPOT, //@int @int @int @int
+	O_BRAS_DEPOT, //@int @int @int @int @int
 	O_BRAS_RET, //@int @int @int @int
 	O_GET_TRIANGLE, //@int @int @int
 	O_STORE_TRIANGLE, //@int @int

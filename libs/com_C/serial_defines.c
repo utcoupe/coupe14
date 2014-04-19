@@ -29,8 +29,7 @@ void initSize()
 
 	ordreSize[O_RET_OUVRIR]=2;
 	ordreSize[O_RET_FERMER]=2;
-	ordreSize[O_BRAS_DEPOT]=8;
-	ordreSize[O_BRAS_RET]=8;
+	ordreSize[O_BRAS_DEPOT]=10;
 	ordreSize[O_GET_TRIANGLE]=6;
 	ordreSize[O_STORE_TRIANGLE]=4;
 

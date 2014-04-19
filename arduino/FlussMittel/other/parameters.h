@@ -5,23 +5,25 @@
 //		PARAMETERS  //
 //////////////////////
 
-#define HAUTEUR_MAX 150//En mm
+#define HAUTEUR_MAX 114//En mm
 
-#define BRAS_OFFSET_DIST 100 //Distance in mm
-#define BRAS_OFFSET_ANGLE 10 //Angle offset in degrees
-#define ANGLE_DEPOT 0
-#define LONGUEUR_DEPOT 0
+#define BRAS_OFFSET_DIST 0 //Distance in mm
+#define BRAS_OFFSET_ANGLE 0 //Angle offset in degrees
+
 #define MARGE_DEPOT 30
 
-#define ANGLE_DEPOT_RET 0
-#define LONGUEUR_DEPOT_RET 0
-#define HAUTEUR_DEPOT_RET 0
+#define ANGLE_DEPOT M_PI/2.0
+#define LONGUEUR_DEPOT 0
+
+#define ANGLE_DEPOT_RET 2.27 // 130°
+#define LONGUEUR_DEPOT_RET 20
 
 #define L1 43//Petit bras
 #define L2 82//Grand bras
-#define H_TO_STEP 200
-#define FREQUENCY_STEPPER 10
-#define DELAY_STEPPER_CONTROLER 50
+#define H_TO_STEP 8
+#define FREQUENCY_STEPPER 1000
+#define VMAX_STEPPER 400
+#define AMAX_STEPPER 800
 
 //////////////////////
 //		PINS		//
@@ -29,14 +31,13 @@
 #define PIN_SERVO_BRAS 8
 #define PIN_SERVO_RET 9
 
-#define PIN_INT_HAUT_ASC 22
-
 #define PIN_SERVO_BRAS_ANGLE 2
 #define PIN_SERVO_BRAS_DIST 3
 
 #define PIN_STEPPER_STEP 31
 #define PIN_STEPPER_DIR 30
 #define PIN_INTERRUPT_BRAS 32 //PULLUP ICI
+#define PIN_INT_HAUT_ASC 33 //PULLUP
 
 //////////////////////
 //		DEBUG		//

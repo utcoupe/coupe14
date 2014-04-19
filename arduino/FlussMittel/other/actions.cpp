@@ -21,8 +21,8 @@ void init_act() {
 	//Moteurs :
 	servoRet.write(0); //Fermer le bras
 	//Stepper
-	stepperAsc.setMaxSpeed(400);
-	stepperAsc.setAcceleration(800);
+	stepperAsc.setMaxSpeed(VMAX_STEPPER);
+	stepperAsc.setAcceleration(AMAX_STEPPER);
 
 	stepperAsc.move(1000);
 	while(digitalRead(PIN_INT_HAUT_ASC) == 1) { //Tant qu'on est pas en haut
