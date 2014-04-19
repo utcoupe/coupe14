@@ -73,11 +73,6 @@ class PullData():
 				self.tourelle_asked = True
 
 
-		#Hokuyo Fictif
-		#TODO
-		#self.Tourelle.majPosition(generateFictionHokuyo());
-
-
 	def __readData(self):
 		orderTuple = self.Communication.readOrdersAPI() # (address, order, arguments)
 
@@ -133,7 +128,7 @@ class PullData():
 
 
 
-def generateFictionHokuyo():
+"""def generateFictionHokuyo():
 	nombreRobots = 4				#Max:4
 	centre = {"x":1500, "y":1000}	#mm
 	amplitudeX = 800				#mm
@@ -154,6 +149,6 @@ def generateFictionHokuyo():
 
 	generateFictionHokuyo.iteration += 1
 	return ret
-generateFictionHokuyo.iteration = 0
+generateFictionHokuyo.iteration = 0"""
 
 

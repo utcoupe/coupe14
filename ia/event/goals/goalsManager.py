@@ -14,7 +14,6 @@ import inspect, os
 
 
 from .goal import *
-from .goalExecution import *
 from .ElemGoal import *
 from .navigation import *
 
@@ -82,7 +81,7 @@ class GoalsManager:
 		executed_without_faillure = status[0]
 		color = status[1]
 		position = status[2]
-		
+
 		if executed_without_faillure:
 			if position == "FRONT":
 				self.__front_triangle_stack.append(color)

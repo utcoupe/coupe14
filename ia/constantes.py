@@ -25,7 +25,6 @@ PARITY_OTHER = 			"NONE"
 
 #constantes réglables:
 MAX_UNCONFIRMED_PACKET =5 # maximum 32
-EMPTY_FIFO = 			True
 TIMEOUT = 				100
 HIGH_PRIO_SPEED = 		2 #période d'execution en ms
 LOW_PRIO_SPEED = 		400 #période d'execution en ms
@@ -45,7 +44,7 @@ renvoiImmediat = 		False # fonction non terminé, ne pas activer !
 #=======================================IA========================================
 
 #====================Variables globales====================
-NUMBER_OF_ENEMY = 		2
+NUMBER_OF_ENEMY = 		0 #TODO
 
 #====================eventManager====================
 PERIODE_EVENT_MANAGER =	2
@@ -64,11 +63,9 @@ FINISHED_THRESHOLD = 	50
 #====================pullData====================
 PULL_PERIODE = 			10 #période des pull en ms
 
-#====================CAMERA====================
-SEUIL_ROUGE = 			100 #TODO
-SEUIL_JAUNE = 			100 #TODO
 
 #====================NAVIGATION================
+EMPTY_FIFO = 			True
 POINTS_PAR_CERCLE = 	8
 MARGE_PASSAGE_PATH = 	0
 MARGE_COLLISION =		-20
