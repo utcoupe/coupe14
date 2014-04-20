@@ -1,10 +1,12 @@
-#include "traitement.h"
 #include "../global.h"
+#include "traitement.h"
 #include "gui.h"
 #include "timings.h"
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/types_c.h>
+#include <thread>
+#include <mutex>
 
 /***************************************************
  *  CLASSE VISIO DE TRAITEMENT GENERAL 
@@ -13,13 +15,6 @@
  *  necessaires pour la visio UTCoupe 2014
  *
  *  Dans cette classes toutes les images sont  en HSV
- *
- *  Les fonctions timings() commentées permettent
- *  de rapidement tester la vitesse d'execution
- *  de certains bouts de code. Attention, ne pas
- *  utiliser ces fonctions dans des fonctions
- *  imbriquées, sans quoi les resultats seront faux
- *
  *
  *  Tests de vitesse du code :
  *  Les durées de transformations affines de 
@@ -38,7 +33,8 @@ Visio::Visio(VideoCapture& cam) :
 	color(red), min_size(500), distort(none),
 	chessboard_size(Size(9,6)), epsilon_poly(0.04),
 	max_diff_triangle_edge(50), camera(cam),
-	size_frame(camera.get(CV_CAP_PROP_FRAME_WIDTH), camera.get(CV_CAP_PROP_FRAME_HEIGHT)){
+	size_frame(camera.get(CV_CAP_PROP_FRAME_WIDTH), camera.get(CV_CAP_PROP_FRAME_HEIGHT)),
+	thread_update(&Visio::refreshFrame, this){
 	init();
 }
 
@@ -78,7 +74,6 @@ void Visio::getContour(const Mat& img, vector<vector<Point> >& contours) {
 	Mat thresh;
 	Timings::startTimer(3);
 	detectColor(img, thresh);
-	//timings("\tdetectColor : ");
 	Timings::writeStepTime(3, "\t\t\t\tdetectColor");
 	findContours(thresh, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 	Timings::writeStepTime(3, "\t\t\t\tfindContour");
@@ -90,7 +85,6 @@ int Visio::getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, ve
 	vector<vector<Point> > contours;
 	getContour(img, contours);
 	Timings::writeStepTime(2, "\t\t\tContours");
-	//timings("\t\tgetContour : ");
 	float x, y;
 	for(int i=0 ; i < contours.size(); i++){
 		Moments moment = moments(contours[i]);
@@ -139,14 +133,12 @@ void Visio::polyDegree(const vector<vector<Point> >& contours, vector<int>& degr
 
 int Visio::trianglesFromImg(const Mat& img, vector<Triangle>& triangles) {
 	int nb_triangles = 0;
-	//timings();
 	nb_triangles += trianglesColor(img, triangles, red);
 	nb_triangles += trianglesColor(img, triangles, yellow);
 	//triangles vus de dessus, entierement noirs, seulement si on ne detecte rien d'autre
 	if (ENABLE_BLK && nb_triangles == 0) {
 		nb_triangles += trianglesColor(img, triangles, black);
 	}
-	//timings("\tFrame : ");
 	return nb_triangles;
 }
 
@@ -154,11 +146,7 @@ int Visio::triangles(vector<Triangle>& triangles) {
 	Timings::startTimer(0);
 	int nbr_of_tri = 0;
 	Mat img, src_img;
-	//Hacks destiné à vider le buffer de la camera pour avoir une
-	//image récente. Le probleme : ces hacks prennent BEAUCOUP de temps
-	//for(int i=0; i<6; i++) camera >> img; //Hack provisoire
-	//for(int i=0; i<6; i++) camera.grab(); //Hack provisoire
-	//camera.retrieve(img);
+	frame_mutex.lock(); //Bloque le thread d'update
 	camera >> src_img;
 	Timings::writeStepTime(0, "\tRetrieving");
 	cvtColor(src_img, src_img, CV_BGR2HSV);
@@ -176,6 +164,7 @@ int Visio::triangles(vector<Triangle>& triangles) {
 	}
 	Timings::writeStepTime(0, "\tTriangles");
 	Timings::writeTime(0, "Total");
+	frame_mutex.unlock(); //Libère le thread d'update
 	return nbr_of_tri;
 }
 
@@ -217,6 +206,7 @@ bool Visio::computeTransformMatrix(const Mat &img, const vector<Point2f> real_po
 }
 
 bool Visio::camPerspective() {
+	frame_mutex.lock(); //On bloque le thread d'update
 	//TODO choix position
 	vector<Point2f> position;
 	position.push_back(Point2f(300,300));
@@ -246,10 +236,12 @@ bool Visio::camPerspective() {
 		key = waitKey(20);
 	}
 	destroyWindow("Perspective");
+	frame_mutex.unlock(); //Libère le thread d'update
 	return calibrated;
 }
 
 bool Visio::camCalibrate(int nbr_of_views) {
+	frame_mutex.lock(); //On bloque le thread d'update
 	//points reels et image pour la calibration
 	vector<vector<Point3f> > objectPoints;
 	vector<vector<Point2f> > imagePoints;
@@ -308,6 +300,7 @@ bool Visio::camCalibrate(int nbr_of_views) {
 	calibrateCamera(objectPoints, imagePoints, size_frame, CM, D, empty, empty);
 	cout << "Done !" << endl;
 	cam_calibrated = true;
+	frame_mutex.unlock(); //Libère le thread d'update
 	return true;
 }
 
@@ -601,14 +594,17 @@ void Visio::transformPts(const vector<Point>& pts_in, vector<Point2f>& pts_out) 
 
 void Visio::transformPts(const vector<Point2f>& pts_in, vector<Point2f>& pts_out) {
 	if (distort == points) {
-		//timings();
 		undistortPoints(pts_in, pts_out, CM, D, Mat(), CM);
-		//timings("\t\tUndistort : ");
 		perspectiveTransform(pts_out, pts_out, perspectiveMatrix);
-		//timings("\t\tPerspectiveTransform : ");
 	} else {
 		perspectiveTransform(pts_in, pts_out, perspectiveMatrix);
 	}
+}
+
+void Visio::refreshFrame() {
+	frame_mutex.lock();
+	camera.grab();
+	frame_mutex.unlock();
 }
 
 

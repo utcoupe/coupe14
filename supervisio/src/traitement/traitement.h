@@ -5,6 +5,8 @@
 #define TRAITEMENT_H
 
 #include <opencv2/opencv.hpp>
+#include <mutex>
+#include <thread>
 
 using namespace cv;
 using namespace std;
@@ -64,6 +66,7 @@ class Visio {
 		bool isEqui(Point2f p1, Point2f p2, Point2f p3);
 		void transformPts(const vector<Point>& pts_in, vector<Point2f>& pts_out);
 		void transformPts(const vector<Point2f>& pts_in, vector<Point2f>& pts_out);
+		void refreshFrame();
 
 		VideoCapture camera;
 		Scalar min, max;
@@ -78,6 +81,8 @@ class Visio {
 		bool trans_calibrated, cam_calibrated;
 		Color color;
 		DistortType distort;
+		mutex frame_mutex;
+		thread thread_update;
 };
 
 vector<vector<Point2f> > convertItoF(vector<vector<Point> > v);
