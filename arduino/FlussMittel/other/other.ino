@@ -5,11 +5,10 @@
  * Date : 13/10/13			*
  ****************************************/
 
-#include "AFMotor_due.h"
-#include "AccelStepper.h"
 #include <Servo.h>
 #include <Arduino.h>
 
+#include "AFMotor.h"
 #include "AccelStepper.h"
 #include "serial_decoder.h"
 #include "serial_defines.h"
@@ -18,7 +17,8 @@
 #include "actions.h"
 
 Servo servoRet, servoBrasAngle, servoBrasDist;
-AccelStepper stepperAsc(1, PIN_STEPPER_STEP, PIN_STEPPER_DIR);
+AF_Stepper stepper_motor(200, 2);
+AF_DCMotor pump_motor(1, MOTOR12_64KHZ);
 
 #define MAX_READ 64 
 void setup(){

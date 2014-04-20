@@ -4,8 +4,6 @@
  * Date : 18/12/13			*
  ****************************************/
 
-#include "AFMotor_due.h"
-
 #include <Servo.h>
 #include <Arduino.h>
 
@@ -16,7 +14,6 @@
 #include "actions.h"
 
 extern Servo servoRet;
-extern AF_DCMotor motor_ascenseur;
 
 int last_id = 0;
 int next_last_id = 0;
