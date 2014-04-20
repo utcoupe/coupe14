@@ -9,10 +9,11 @@
 
 #include <Arduino.h>
 
-extern Servo servoBras, servoRet, servoBrasAngle, servoBrasDist;
+extern Servo servoRet, servoBrasAngle, servoBrasDist;
 
 void initPins(){
 	//RETOURNEMENT
+        
 	pinMode(PIN_SERVO_RET, OUTPUT);
 	servoRet.attach(PIN_SERVO_RET);
 
@@ -21,7 +22,9 @@ void initPins(){
 	servoBrasAngle.attach(PIN_SERVO_BRAS_ANGLE);
 	pinMode(PIN_SERVO_BRAS_DIST, OUTPUT);
 	servoBrasDist.attach(PIN_SERVO_BRAS_DIST);
-
+        
+        pinMode(PIN_STEPPER_STEP, OUTPUT);
+        pinMode(PIN_STEPPER_DIR, OUTPUT);
 	pinMode(PIN_INTERRUPT_BRAS, INPUT_PULLUP);
 	pinMode(PIN_INT_HAUT_ASC, INPUT_PULLUP);
 }

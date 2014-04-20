@@ -13,7 +13,7 @@
 #define MARGE_DEPOT 30
 
 #define ANGLE_DEPOT M_PI/2.0
-#define LONGUEUR_DEPOT 0
+#define LONGUEUR_DEPOT 5
 
 #define ANGLE_DEPOT_RET 2.27 // 130°
 #define LONGUEUR_DEPOT_RET 20
@@ -21,7 +21,7 @@
 #define L1 43//Petit bras
 #define L2 82//Grand bras
 #define H_TO_STEP 8
-#define FREQUENCY_STEPPER 1000
+#define PERIOD_STEPPER 1000
 #define VMAX_STEPPER 400
 #define AMAX_STEPPER 800
 

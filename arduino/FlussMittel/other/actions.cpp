@@ -1,14 +1,14 @@
 #include "actions.h"
 #include "Servo.h"
-#include "AccelStepper.h"
 #include "parameters.h"
-#include "DueTimer.h"
 #include "serial_switch.h"
+#include "AccelStepper.h"
+#include "TimerThree.h"
 
 #include <math.h>
 #include <Arduino.h>
 
-extern Servo servoBras, servoRet, servoBrasAngle, servoBrasDist;
+extern Servo servoRet, servoBrasAngle, servoBrasDist;
 extern AccelStepper stepperAsc;
 
 static int goal_hauteur = 0;
@@ -19,30 +19,29 @@ static bool got_tri = false; //True si triangle en suspension
 
 void init_act() {
 	//Moteurs :
-	servoRet.write(0); //Fermer le bras
-	//Stepper
-	stepperAsc.setMaxSpeed(VMAX_STEPPER);
-	stepperAsc.setAcceleration(AMAX_STEPPER);
 
-	stepperAsc.move(1000);
+	servoRet.write(0); 
+	servoBrasDist.write(LONGUEUR_DEPOT);
+	servoBrasAngle.write(90);
+	stepperAsc.setAcceleration(AMAX_STEPPER);
+	stepperAsc.setMaxSpeed(VMAX_STEPPER);
+	stepperAsc.moveTo(-3000);
 	while(digitalRead(PIN_INT_HAUT_ASC) == 1) { //Tant qu'on est pas en haut
 		stepperAsc.run();
 	}
-	stepperAsc.setCurrentPosition(HAUTEUR_MAX / H_TO_STEP + 10);
 	attachInterrupt(PIN_INT_HAUT_ASC, topStop, FALLING);
 }
 
 void asc_int() {
-	stepperAsc.run();
 	if (digitalRead(PIN_INTERRUPT_BRAS) == 0) {
 		//On touche un triangle
-		stepperAsc.stop();
-		stepperAsc.runToPosition();
-		Timer8.detachInterrupt();
+		//Timer8.detachInterrupt();
+		Timer3.detachInterrupt();
 		got_tri = true;
 	}
-	else if (stepperAsc.currentPosition() == goal_hauteur) {
-		Timer8.detachInterrupt();
+	else if (-1 == goal_hauteur) {
+		//Timer8.detachInterrupt();
+		Timer3.detachInterrupt();
 		got_tri = false;
 	}
 	cmdBras(-1,-1,-1, 0);
@@ -93,7 +92,8 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 				cmdBrasServ(ANGLE_DEPOT_RET, LONGUEUR_DEPOT_RET);
 			}
 			step++;
-			Timer8.attachInterrupt(callback).start(300000);
+			//Timer8.attachInterrupt(callback).start(300000);
+			Timer3.attachInterrupt(callback, 300000);
 			break;
 		case 4:
 			//Lacher pompe, remonter
@@ -111,8 +111,8 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 
 void cmdAsc(int h) { //h en mm
 	goal_hauteur = h * H_TO_STEP;
-	stepperAsc.moveTo(goal_hauteur);
-	Timer8.attachInterrupt(asc_int).setFrequency(FREQUENCY_STEPPER).start();
+	Timer3.attachInterrupt(asc_int, PERIOD_STEPPER);
+	//Timer8.attachInterrupt(asc_int).setFrequency(FREQUENCY_STEPPER).start();
 }
 
 void cmdBrasServ(double a, int l) {
@@ -129,7 +129,6 @@ void pump(bool etat) {
 void callback() {
 	cmdBras(-1,-1,-1,0);
 }
-
 void topStop() {
 	stepperAsc.stop();
 	stepperAsc.runToPosition();

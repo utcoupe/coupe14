@@ -6,6 +6,7 @@
  ****************************************/
 
 #include "AFMotor_due.h"
+#include "AccelStepper.h"
 #include <Servo.h>
 #include <Arduino.h>
 
@@ -22,11 +23,13 @@ AccelStepper stepperAsc(1, PIN_STEPPER_STEP, PIN_STEPPER_DIR);
 #define MAX_READ 64 
 void setup(){
 	initPins();
+
 	Serial.begin(115200);
 	Serial1.begin(115200); //Forward
 #ifdef DEBUG
 	Serial3.begin(115200);
 #endif
+
 	init_act();
 	init_protocol();
 }
