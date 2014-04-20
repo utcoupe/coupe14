@@ -27,8 +27,9 @@ class ProcessIA():
 		self.__communication = Communication(self.__bigrobot, self.__minirobot, self.__hokuyo, self)
 		#communication de data entre l'IA et le simu
 		self.__parent_conn, self.__child_conn = Pipe()
-		#TODO lancer l'IA
-		self.__process = Process(target=main.startIa, args=(self.__child_conn,self.__color))
+		#lancement de l'ia
+		#self.__process = Process(target=main.startIa, args=(self.__child_conn,self.__color))
+		self.__process = Process(target=test.testIa, args=(self.__child_conn,self.__color))
 		self.__process.start()
 		time.sleep(0.1)
 		#on démarre le thread de lecture des données IA renvoyées à travers le pipe

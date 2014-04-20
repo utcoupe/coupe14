@@ -33,6 +33,7 @@ class Robot(EngineObjectPoly):
 		self.__team = team
 		self.__goals = []
 		self.__asserv = Asserv(self)
+		self.__visio = Visio(self)
 		self.__others = Others(self)
 
 
@@ -119,6 +120,8 @@ class Robot(EngineObjectPoly):
 		elif (numOrdre == PWM):
 			self.__asserv.pwm(arg[0], arg[1], arg[2], arg[3])	#!! x=pwm_l, y=pwm_r, angle=delay !!
 
+	def addOrderVisio(self):
+		self.__visio.testVisio()
 
 	def _my_velocity_func(self):
 		def f(body, gravity, damping, dt):
@@ -233,7 +236,7 @@ class Robot(EngineObjectPoly):
 					v = mm_to_px(1000) * (-1 if self.__mod_recul else 1)
 					#on clean les goals avant d'en envoyer un nouveau afin d'éviter les blocages
 					self.cleanGoals()
-					self.__asserv.goto(*px_to_mm(p[0],p[1]))
+					self.__asserv.goto(0,*px_to_mm(p[0],p[1]))
 				return True
 		return False
 

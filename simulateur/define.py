@@ -72,13 +72,8 @@ HEIGHT_MINI 	= 138
 # dimensions du gros robot
 WIDTH_GROS 		= 330
 HEIGHT_GROS 	= 265
-# dimension des palettes (buldo) du mini robot
-SIZE_PALETTE	= 120
-WIDTH_PALETTE	= 10
-# dimensions balais qui râclent la zone adverse	
-SIZE_BALAIS		= 70
-WIDTH_BALAIS	= 10
-ECART_ROBOT_BALAIS	= 0
+#données du gros robot
+LONGUEUR_BRAS	= 225
 
 #ECART_CENTRE = -65 # ecart par rapport au centre du robot
 

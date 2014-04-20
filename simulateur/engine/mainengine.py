@@ -30,6 +30,7 @@ class Engine:
 		self.physicsengine = MotorPhysic()
 		self.physicsengine.add_collision_handler(COLLTYPE_GROS_ROBOT, COLLTYPE_WALL, self.graphicsengine.draw_collision)
 		self.physicsengine.add_collision_handler(COLLTYPE_GROS_ROBOT, COLLTYPE_FEU, self.__on_collision_gros_feu)
+		self.physicsengine.add_collision_handler(COLLTYPE_BRAS, COLLTYPE_FEU, self.__on_collision_bras_feu)
 		self.physicsengine.add_collision_handler(COLLTYPE_PETIT_ROBOT, COLLTYPE_WALL, self.graphicsengine.draw_collision)
 		self.e_stop = threading.Event()
 		self.objects = []
@@ -63,6 +64,19 @@ class Engine:
 				#print('feu eteindre')
 				feu.eteindre()
 
+	def __on_collision_bras_feu(self, space, arb):
+		"""
+		Quand le bras du gros robot touche un feu
+		"""
+		bras = self.find_obj_by_shape(arb.shapes[0])
+		if not bras:
+			print("bras not found")
+		else:
+			feu = self.find_obj_by_shape(arb.shapes[1])
+			if not feu:
+				print("Feu not found")
+			else:
+				feu.eteindre()
 
 	def stop(self):
 		self.e_stop.set()

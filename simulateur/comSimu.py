@@ -78,6 +78,7 @@ class Communication():
 
 		elif (order == "O_GET_TRIANGLE"):
 			pos = ()
+			self.__bigrobot.addOrderVisio() #!!!! temporaire, pour les tests de la visio
 			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
