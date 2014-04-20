@@ -14,7 +14,6 @@ import inspect, os
 
 
 from .goal import *
-from .goalExecution import *
 from .ElemGoal import *
 from .navigation import *
 
@@ -78,7 +77,11 @@ class GoalsManager:
 				path = self.__getOrderTrajectoire(data, goal, 0)
 				self.__addGoal(path, goal, 0)
 
-	def processStorageStatus(self, executed_without_faillure, color, position):
+	def processStorageStatus(self, status):
+		executed_without_faillure = status[0]
+		color = status[1]
+		position = status[2]
+
 		if executed_without_faillure:
 			if position == "FRONT":
 				self.__front_triangle_stack.append(color)
@@ -162,7 +165,7 @@ class GoalsManager:
 		self.__goto_finished_goals.append(goal)
 		self.__logger.info('Goal ' + goal.getName() + ' is goto finished')
 
-	def __finishGoal(self, goal, end_status):
+	def __finishGoal(self, goal):
 		"""if end_status:
 			action_type = end_status[0]
 			color = end_status[1]

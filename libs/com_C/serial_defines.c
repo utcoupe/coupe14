@@ -33,6 +33,9 @@ void initSize()
 	ordreSize[O_GET_TRIANGLE]=6;
 	ordreSize[O_STORE_TRIANGLE]=4;
 
+	ordreSize[GET_TRIANGLE_IA]=0;
+	ordreSize[STORE_TRIANGLE_IA]=8;
+
 	ordreSize[GET_CAM]=0;
 	ordreSize[GET_HOKUYO]=0;
 	ordreSize[GET_LAST_ID]=0;

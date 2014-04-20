@@ -6,7 +6,9 @@
 			<order>O_RET_OUVRIR</order>
 			<order>SLEEP 300</order>
 			<order>A_PWM 50 50 200</order>
-			<order>O_RET_FERMER</order>
+			<order>GET_TRIANGLE_IA</order>
+			<order>THEN</order>
+			<order>STORE_TRIANGLE_IA 0 0 150 150</order>
 			<order>SLEEP 300</order>
 			<order>A_PWM -50 -50 100</order>
 		</orders>
@@ -17,7 +19,9 @@
 			<order>O_RET_OUVRIR</order>
 			<order>SLEEP 300</order>
 			<order>A_PWM 50 50 200</order>
-			<order>O_RET_FERMER</order>
+			<order>GET_TRIANGLE_IA</order>
+			<order>THEN</order>
+			<order>STORE_TRIANGLE_IA 0 0 150 150</order>
 			<order>SLEEP 300</order>
 			<order>A_PWM -50 -50 100</order>
 		</orders>
@@ -28,7 +32,9 @@
 			<order>O_RET_OUVRIR</order>
 			<order>SLEEP 300</order>
 			<order>A_PWM 50 50 100</order>
-			<order>O_RET_FERMER</order>
+			<order>GET_TRIANGLE_IA</order>
+			<order>THEN</order>
+			<order>STORE_TRIANGLE_IA 0 0 150 150</order>
 			<order>SLEEP 300</order>
 		</orders>
 	</elemScript>
@@ -38,7 +44,9 @@
 			<order>O_RET_OUVRIR</order>
 			<order>SLEEP 300</order>
 			<order>A_PWM 50 50 100</order>
-			<order>O_RET_FERMER</order>
+			<order>GET_TRIANGLE_IA</order>
+			<order>THEN</order>
+			<order>STORE_TRIANGLE_IA 0 0 150 150</order>
 			<order>SLEEP 300</order>
 		</orders>
 	</elemScript>

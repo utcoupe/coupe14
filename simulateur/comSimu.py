@@ -76,6 +76,21 @@ class Communication():
 			#TODO, implementer
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
+		elif (order == "O_GET_TRIANGLE"):
+			pos = ()
+			self.__bigrobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+
+		elif (order == "O_STORE_TRIANGLE"):
+			pos = ()
+			self.__bigrobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+
+		elif (order == "PINGPING"):
+			pos = ()
+			self.__bigrobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+
 		else:
 			print('Error : mauvais paramètre traitement Flussmittel other !')
 
@@ -112,6 +127,10 @@ class Communication():
 		elif (order == "A_SET_POS"):
 			pos = ()
 			#TODO ou pas ?
+			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos)
+
+		elif (order == "PINGPING"):
+			pos = ()
 			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos)
 
 		else:
@@ -177,6 +196,11 @@ class Communication():
 			#TODO, implementer
 			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
 
+		elif (order == "PINGPING"):
+			pos = ()
+			self.__minirobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
+
 		else:
 			print('Error : mauvais paramètre traitement Tibot other !')
 
@@ -212,6 +236,10 @@ class Communication():
 		elif (order == "A_SET_POS"):
 			pos = ()
 			#TODO ou pas?
+			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
+
+		elif (order == "PINGPING"):
+			pos = ()
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
 
 		else:
