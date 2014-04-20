@@ -5,8 +5,8 @@ utilise la lib opencv 2.4.7 : http://sourceforge.net/projects/opencvlibrary/file
 pour build :
 mkdir build
 cd build
-cmake .
+cmake .. -DCMAKE_BUILD_TYPE=release
 make
 
 cela produit un bin dans build/bin
-il peut ensuite etre déplacé dans bin s'il est correct
+il peut ensuite etre déplacé ou c'est necessaire

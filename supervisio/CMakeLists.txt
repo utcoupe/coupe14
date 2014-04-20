@@ -6,6 +6,7 @@ set(EXECUTABLE_OUTPUT_PATH bin/)
 set(EXEC_NAME visio)
 find_package( OpenCV REQUIRED )
 SET(CMAKE_CXX_FLAGS "-std=c++11")
+SET(CMAKE_CXX_FLAGS_TIME "-DTIMEBENCH=true")
 
 #Configurationdel'exécutable
 
