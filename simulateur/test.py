@@ -13,8 +13,8 @@ def testIa(conn, color):
 	"""
 	print('dans le testIa')
 	time.sleep(1)
-	#conn.send(("ADDR_TIBOT_ASSERV","A_GOTO",(36,800,700)))
-	time.sleep(1)
+	conn.send(("ADDR_FLUSSMITTEL_ASSERV","A_GOTO",(36,800,700)))
+	time.sleep(3)
 	conn.send(("ADDR_FLUSSMITTEL_OTHER","O_GET_TRIANGLE", (50,123)))
 
 	def __repr__(self):

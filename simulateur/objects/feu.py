@@ -38,7 +38,6 @@ class Feu(EngineObjectPoly):
 			is_extension= True
 		)
 		self.__is_down = False
-		#self.coucher_feu()
 
 	def eteindre(self):
 		"""

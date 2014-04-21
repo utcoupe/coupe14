@@ -9,6 +9,7 @@ sys.path.append(os.path.join(DIR_PATH, "..", "engine"))
 
 from define import *
 import math
+import time
 
 class GoalPWM:
 	def __init__(self, id_action, pwm, delay):
@@ -169,11 +170,12 @@ class Visio:
 		#TODO return en fonction de l'enum
 		return 3
 
-	def __zoneActionBras(self):
+	def actionBras(self):
 		"""
 		zone dans laquelle le bras du robot peut choper un triangle
+		quand il y a un triangle dans la zone, celui-ci est supprimé
 		"""
-		print('robot : ', self.__robot.x(), self.__robot.y(), self.__robot.a())
+		"""print('robot : ', self.__robot.x(), self.__robot.y(), self.__robot.a())
 		angle_rad = math.radians(self.__robot.a())
 		base_x = self.__robot.x() + math.ceil(WIDTH_GROS/2*math.cos(angle_rad) + HEIGHT_GROS/2*math.sin(angle_rad))
 		base_y = self.__robot.y() - math.ceil(HEIGHT_GROS/2*math.cos(angle_rad) + WIDTH_GROS/2*math.sin(angle_rad))
@@ -181,9 +183,10 @@ class Visio:
 		extrem_y = base_y - math.ceil(LONGUEUR_BRAS*math.cos(angle_rad))
 		hauteur_x = base_x - math.ceil(LONGUEUR_BRAS*math.cos(angle_rad))
 		hauteur_y = base_y + math.ceil(LONGUEUR_BRAS*math.sin(angle_rad))
-
-	def testVisio(self):
-		self.__zoneActionBras()
+		"""
+		self.__robot.add_bras()
+		time.sleep(0.1)
+		self.__robot.remove_bras()
 
 class Others:
 	""" Émule l'arduino dédiée aux others """

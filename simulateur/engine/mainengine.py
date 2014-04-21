@@ -62,20 +62,21 @@ class Engine:
 				print("Feu not found")
 			else:
 				#print('feu eteindre')
-				feu.eteindre()
+				pass
 
 	def __on_collision_bras_feu(self, space, arb):
 		"""
 		Quand le bras du gros robot touche un feu
 		"""
-		bras = self.find_obj_by_shape(arb.shapes[0])
-		if not bras:
+		robot = self.find_obj_by_shape(arb.shapes[0])
+		if not robot:
 			print("bras not found")
 		else:
 			feu = self.find_obj_by_shape(arb.shapes[1])
 			if not feu:
 				print("Feu not found")
 			else:
+				robot.storeFeu()
 				feu.eteindre()
 
 	def stop(self):

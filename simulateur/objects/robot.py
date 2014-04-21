@@ -120,8 +120,11 @@ class Robot(EngineObjectPoly):
 		elif (numOrdre == PWM):
 			self.__asserv.pwm(arg[0], arg[1], arg[2], arg[3])	#!! x=pwm_l, y=pwm_r, angle=delay !!
 
-	def addOrderVisio(self):
-		self.__visio.testVisio()
+	def activerVisio(self):
+		"""
+		Active la reconnaissance de triangles dans la zone de portée du bras
+		"""
+		self.__visio.actionBras()
 
 	def _my_velocity_func(self):
 		def f(body, gravity, damping, dt):
