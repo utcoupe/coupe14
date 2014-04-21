@@ -14,9 +14,10 @@
 #include "actions.h"
 
 extern Servo servoRet;
+extern bool got_tri;
 
-int last_id = 0;
-int next_last_id = 0;
+static int last_id = 0;
+static int next_last_id = 0;
 
 //La fonction renvoit le nombre d'octet dans ret, chaine de caractère de réponse. Si doublon, ne pas executer d'ordre mais renvoyer les données à renvoyer
 int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bool doublon){ 
@@ -35,6 +36,23 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 			argv+=2;
 			servoRet.write(0);
 		}
+		break;
+	case O_GET_TRIANGLE:
+		if (!doublon) {
+			next_last_id = btoi(argv);
+			int x = btoi(argv+2), y = btoi(argv+4), h = btoi(argv+6);
+			getTri(x, y, h);
+		}
+		break;			
+	case O_STORE_TRIANGLE:
+		if (!doublon) {
+			next_last_id = btoi(argv);
+			deposeTri(btoi(argv+2));
+		}
+		break;
+	case O_GET_BRAS_STATUS:
+		ret_size = 2;
+		itob((int)got_tri,ret);
 		break;
 	case O_BRAS_DEPOT:
 		if (!doublon) {
