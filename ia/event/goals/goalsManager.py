@@ -221,16 +221,25 @@ class GoalsManager:
 					self.__vision.update()
 					triangle_list = self.__vision.getTriangles()
 
-					if triangle_list == []:
+
+					#TODO remove this bypass:
+					#if triangle_list == []:
+					if False:
+
+						self.__logger.warning("On a pas vu de triangle à la position attendu, dont on va supprimer l'objectif "+str(id_objectif))
 						self.__last_camera_color = None
 						self.__deleteGoal(objectif)
 					else:
-						triangle = triangle_list[0] #TODO, prendre le meilleur triangle suivent les arg
-						data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
+						#TODO remove this bypass:
+						#triangle = triangle_list[0] #TODO, prendre le meilleur triangle suivent les arg
+						#data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
+						data_camera = ("RED", 10, 10)
+
+
 						self.__last_camera_color = data_camera[0]
-						if self.__positionReady(triangle.coord[0], triangle.coord[1]):
+						if self.__positionReady(data_camera[1], data_camera[2]):
 							script_get_triangle = deque()
-							script_get_triangle.append( ("O_GET_TRIANGLE", (triangle.coord[0], triangle.coord[1], 50),) ) #TODO remplacer 50 par hauteur
+							script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], 50),) ) #TODO remplacer 50 par hauteur
 							script_get_triangle.append( ("THEN", (),) )
 							script_get_triangle.append( ("O_GET_BRAS_STATUS", (),) )
 							script_get_triangle.append( ("THEN", (),) )
