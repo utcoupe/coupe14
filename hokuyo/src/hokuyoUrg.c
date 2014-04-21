@@ -49,7 +49,7 @@ resetHokuyoUrg(void* urg, double angleMin, double angleMax){
 	int error = urg_start_measurement((urg_t*)urg, URG_DISTANCE, URG_SCAN_INFINITY, 0);
 	if(error < 0){
 		urg_close(urg);
-		fprintf(stderr, "%s%s :: %s\n", "connection failed on restarting", PREFIX, urg_error((urg_t*)urg));
+		fprintf(stderr, "%s%s :: %s\n", "connection failed on resetting", PREFIX, urg_error((urg_t*)urg));
 		exit(EXIT_FAILURE);
 	}
 }
@@ -57,6 +57,17 @@ resetHokuyoUrg(void* urg, double angleMin, double angleMax){
 void
 closeHokuyoUrg(void* urg){
 	urg_close((urg_t*)urg);
+}
+
+void
+restartHokuyoUrg(void* urg){
+	int error = urg_start_measurement((urg_t*)urg, URG_DISTANCE, URG_SCAN_INFINITY, 0);
+	if(error < 0){
+		urg_close(urg);
+		fprintf(stderr, "%s%s :: %s\n", "connection failed on restarting", PREFIX, urg_error((urg_t*)urg));
+		exit(EXIT_FAILURE);
+	};
+	printf("%sHokuyo succesfully restarted !\n", PREFIX);
 }
 
 int
