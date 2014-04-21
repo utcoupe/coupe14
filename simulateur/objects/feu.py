@@ -38,11 +38,12 @@ class Feu(EngineObjectPoly):
 			is_extension= True
 		)
 		self.__is_down = False
-		self.coucher_feu()
 
 	def eteindre(self):
-		if (self.__is_down == False):
-			self.coucher_feu()
+		"""
+		Supprime de la map le feu concerné
+		"""
+		self.engine.objects_to_remove.append(self)
 
 	def coucher_feu(self):
 		self.add_body_extension(self.triangle)

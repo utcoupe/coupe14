@@ -9,9 +9,19 @@ sys.path.append(os.path.join(DIR_PATH, "..", "define"))
 sys.path.append(os.path.join(DIR_PATH, "..", "engine"))
 
 from define import *
+from engine.engineobject import EngineObjectPoly
 
 class BigRobot(Robot):
 	def __init__(self, *, engine, posinit, team):
+		self.bras = EngineObjectPoly(
+			engine 		= engine,
+			colltype	= COLLTYPE_BRAS,
+			offset		= mm_to_px(WIDTH_GROS/2-25, HEIGHT_GROS/2+25),
+			color		= "green",
+			poly_points = map(lambda p: mm_to_px(*p),[(0,0),(LONGUEUR_BRAS,0),(0,-LONGUEUR_BRAS)]), #taille du bras
+			is_extension= True
+		)
+
 		Robot.__init__(self,
 			engine		 		= engine,
 			team				= team,
@@ -24,6 +34,16 @@ class BigRobot(Robot):
 		)
 		self.__state_jack = 0  # jack in
 		self.body.angle = math.radians(90)
+		self.__nbrFeu = 0
+
+	def add_bras(self):
+		self.add_body_extension(self.bras)
+
+	def remove_bras(self):
+		self.remove_body_extension(self.bras)
+
+	def storeFeu(self):
+		self.__nbrFeu += 1
 
 	def getStateJack(self):
 		return self.__state_jack

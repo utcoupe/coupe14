@@ -78,11 +78,17 @@ class Communication():
 
 		elif (order == "O_GET_TRIANGLE"):
 			pos = ()
+			self.__bigrobot.activerVisio()
 			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
 		elif (order == "O_STORE_TRIANGLE"):
 			pos = ()
+			self.__bigrobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+
+		elif (order == "O_GET_BRAS_STATUS"):
+			pos = (1)
 			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
