@@ -59,13 +59,14 @@ class Robot(EngineObjectPoly):
 		return px_to_mm(self.body.position[1])
 	
 	def a(self):
-		return int(math.degrees(self.body.angle))
+		#return int(math.degrees(self.body.angle))
+		return self.body.angle
 
 	def getPosition(self):
-		return self.x(), self.y(), self.a()/180*3.14
+		return self.x(), self.y(), self.a()
 
 	def getPositionId(self):
-		return self.x(), self.y(), self.a()/180*3.14, self.__asserv.getLastIdAction()
+		return self.x(), self.y(), self.a(), self.__asserv.getLastIdAction()
 
 	def getLastIdAsserv(self):
 		return self.__asserv.getLastIdAction()
@@ -99,6 +100,11 @@ class Robot(EngineObjectPoly):
 
 	def setStop(self, value):
 		self.__stop = value
+
+	def setPosition(self, x, y, a):
+		self.body.position[0] = mm_to_px(x)
+		self.body.position[1] = mm_to_px(y)
+		self.body.angle = a
 
 	def addGoalOrder(self, numOrdre, arg):
 		"""

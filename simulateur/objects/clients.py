@@ -157,6 +157,12 @@ class Asserv:
 		"""
 		self.__robot.addGoal(GoalPWM(id_action, pwm_l, delay/1000))
 
+	def setPos(self, id_action, x, y):
+		"""
+		Positionne le robot à une position autre que sa position initiale (via mode teleport)
+		"""
+		self.__robot.setPosition(x,y)
+
 class Visio:
 	"""Émule le programme de visio"""
 
