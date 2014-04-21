@@ -203,6 +203,9 @@ class Others:
 	def getLastIdAction(self):
 		return self.__last_id_action_executed
 
+	def ejectTriangle(self):
+		self.__robot.releaseFeu()
+
 	def ping(self):
 		return "others pong"
 

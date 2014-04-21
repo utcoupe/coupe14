@@ -7,9 +7,11 @@ import os
 DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(DIR_PATH, "..", "define"))
 sys.path.append(os.path.join(DIR_PATH, "..", "engine"))
+sys.path.append(os.path.join(DIR_PATH, "..", "objects"))
 
 from define import *
 from engine.engineobject import EngineObjectPoly
+from objects import feu
 
 class BigRobot(Robot):
 	def __init__(self, *, engine, posinit, team):
@@ -35,6 +37,7 @@ class BigRobot(Robot):
 		self.__state_jack = 0  # jack in
 		self.body.angle = math.radians(90)
 		self.__nbrFeu = 0
+		self.__engine = engine
 
 	def add_bras(self):
 		self.add_body_extension(self.bras)
@@ -44,6 +47,13 @@ class BigRobot(Robot):
 
 	def storeFeu(self):
 		self.__nbrFeu += 1
+
+	def releaseFeu(self):
+		if (self.__nbrFeu > 0):
+			self.__nbrFeu -= 1
+			self.__engine.add(feu.Feu(self.__engine,mm_to_px(int(1500),int(1000)),"vert",True))
+		else:
+			print('fuck, j''ai pas de feu !')
 
 	def getStateJack(self):
 		return self.__state_jack

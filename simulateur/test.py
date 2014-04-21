@@ -16,6 +16,8 @@ def testIa(conn, color):
 	conn.send(("ADDR_FLUSSMITTEL_ASSERV","A_GOTO",(36,800,700)))
 	time.sleep(3)
 	conn.send(("ADDR_FLUSSMITTEL_OTHER","O_GET_TRIANGLE", (50,123)))
+	time.sleep(2)
+	conn.send(("ADDR_FLUSSMITTEL_OTHER","O_RET_OUVRIR", (54,1)))
 
 	def __repr__(self):
 		return "testIA"
