@@ -42,7 +42,6 @@ class GoalsManager:
 
 		self.__loadElemScript(base_dir+"/elemScripts.xml")
 		self.__loadGoals(base_dir+"/goals.xml")
-		self.__collectEnemyFinished()
 
 		self.__reverse_table = {}
 		self.__reverse_table[(0,0)] = (1,1)
@@ -73,32 +72,23 @@ class GoalsManager:
 
 	def __queueBestGoals(self):
 		if not self.__blocked_goals:
+			self.__logger.debug(str(self.__robot_name)+" Recherche d'un nouvel objectif")	
 			data = self.__SubProcessManager.getData()
 			self.__PathFinding.update(data[self.__robot_name])
 			if self.__available_goals:
 				goal = self.__available_goals[0]
 				path = self.__getOrderTrajectoire(data, goal, 0)
 				self.__addGoal(path, goal, 0)
-
-	def processGetTriangleStatus(self, status):
-		executed_without_faillure = status[0]
-		color = status[1]
-		position = status[2]
-
-		if executed_without_faillure:
-			if position == "FRONT":
-				self.__front_triangle_stack.append(color)
 			else:
-				self.__back_triangle_stack.append(color)
-		else:
-			#TODO
-			pass
+				self.__logger.warning(str(self.__robot_name)+" N'a plus aucun objectif disponible, GG !")
 
-	def goalFinishedId(self, id_objectif):
-		for objectif in self.__dynamique_finished_goals:
-			if objectif.getId() == id_objectif:
-				self.__finishGoal(objectif) 
-			self.__queueBestGoals()
+	#GOAL management from ID
+	def __blockGoalFromId(self, id_objectif):
+		"""utilisé uniquement au chargement du script initial"""
+		for goal in self.__available_goals:
+			if goal.getId() == id_objectif:
+				self.__blockGoal(goal)
+				break
 
 	def goalStepOverId(self, id_objectif):
 		for objectif in self.__blocked_goals:
@@ -116,12 +106,25 @@ class GoalsManager:
 	def goalCanceledId(self, id_objectif):
 		for objectif in self.__blocked_goals:
 			if objectif.getId() == id_objectif:
-				self.__releaseGoal(objectif)
-			self.__queueBestGoals()
+				self.__cancelGoal(objectif)
+				break
 
-	def goalDeletedId(self, id_objectif):
-		#TODO
-		pass
+	def goalFinishedId(self, id_objectif):
+		for objectif in self.__dynamique_finished_goals:
+			if objectif.getId() == id_objectif:
+				self.__finishGoal(objectif) 
+
+	#GOAL management from GOAL
+	def __tryBlockGoal(self, goal, elem_goal_id):
+		if goal in self.__available_goals:
+			self.__available_goals.remove(goal)
+			self.__blocked_goals.append(goal)
+			goal.setElemGoalLocked(goal.getElemGoal(elem_goal_id))
+			self.__logger.info('Goal ' + goal.getName() + ' is blocked')
+			return True
+		else:
+			self.__logger.warning('Goal ' + goal.getName() + " n'a pas pu être bloqué")
+			return False
 
 	def __addGoal(self, tuple_trajectoire_list, goal, elem_goal_id, prev_action=None):
 		"""Méthode pour l'ajout d'un ordre dans la file du robot"""
@@ -139,50 +142,26 @@ class GoalsManager:
 			orders.append( ("THEN", (),) )
 			orders.append( ("STEP_OVER", (),) )
 
-			#on ajoute le script d'action
-			#orders.extend(self.__elem_script[ goal.getElemGoalLocked().getIdScript() ])
-			#on ajoute un marqueur de fin
-			#orders.append( ("END", (),) )
-
 			#on envoi le tout
 			self.__SubProcessManager.sendGoal(self.__last_id_objectif_send, goal.getId(), orders)
 			self.__last_id_objectif_send = goal.getId()
 		else:
-			self.__logger.error('Unable to block ' + goal.getName())
+			#TODO, ce cas peut-il vrament arrivé ?
+			self.__logger.warning("On va rechercher un nouvel ordre")
+			self.__queueBestGoals()
 
-	def __tupleTrajectoireToDeque(self, tuple_trajectoire_list):
-		order_list = deque()
-		for tuple in tuple_trajectoire_list:
-			order_list.append(('A_GOTO', [tuple[0], tuple[1]]))
-		return order_list
-
-	def __blockGoalFromId(self, id_objectif):
-		"""utilisé uniquement au chargement du script initial"""
-		for goal in self.__available_goals:
-			if goal.getId() == id_objectif:
-				self.__blockGoal(goal)
-
-	def __tryBlockGoal(self, goal, elem_goal_id):
-		if goal in self.__available_goals:
-			self.__available_goals.remove(goal)
-			self.__blocked_goals.append(goal)
-			goal.setElemGoalLocked(goal.getElemGoal(elem_goal_id))
-			self.__logger.info('Goal ' + goal.getName() + ' is blocked')
-			return True
-		else:
-			return False
-
-	def __releaseGoal(self, goal):
+	def __cancelGoal(self, goal):
 		self.__blocked_goals.remove(goal)#On ne peut pas enlever les ordres dans self.__dynamique_finished_goals
 		self.__available_goals.append(goal)
-		self.__logger.info('Goal ' + goal.getName() + ' is released')
+		self.__logger.info('Goal ' + goal.getName() + ' has been canceled and is now released')
+		self.__queueBestGoals()
 
 
 	def __finishGoal(self, goal):		
 		self.__dynamique_finished_goals.remove(goal)
 		self.__finished_goals.append(goal)
-		print("finished")
 		self.__logger.info('Goal ' + goal.getName() + ' is finished')
+		self.__queueBestGoals()
 
 	def __deleteGoal(self, goal):
 		if goal in self.__available_goals:
@@ -194,12 +173,96 @@ class GoalsManager:
 		if goal in self.__finished_goals:
 			self.__finished_goals.remove(goal)
 
+		self.__SubProcessManager.sendDeleteGoal(goal.getId())
+		self.__logger.info('Goal ' + goal.getName() + ' is delete')
+		self.__queueBestGoals()
+
+	def __manageStepOver(self, objectif, id_objectif, skip_get_triangle=False):
+		action_list = objectif.getElemGoalLocked().getFirstElemAction()
+		if action_list:
+			if action_list[0][0] == "GET_TRIANGLE_IA":
+				if skip_get_triangle == True:
+					position = None # 1=front and -1=back
+					hauteur = None #hauteur en mm
+					nb_front_stack = len(self.__front_triangle_stack) 
+					nb_back_stack = len(self.__back_triangle_stack)
+					if self.__our_color == self.__last_camera_color:
+						if nb_front_stack < MAX_FRONT_TRIANGLE_STACK:
+							self.__front_triangle_stack.append(self.__last_camera_color)
+							position = 1
+							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE
+						else:
+							self.__logger.error("On a pas la place pour stocker ce triangle à l'avant, bolosse !")
+							#TODO dropper le triangle ou vider l'arrière
+
+					else:
+						if nb_back_stack < MAX_BACK_TRIANGLE_STACK:
+							self.__back_triangle_stack.append(self.__last_camera_color)
+							position = -1
+							hauteur = GARDE_AU_SOL + nb_back_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE
+						elif nb_front_stack < MAX_FRONT_TRIANGLE_STACK:
+							self.__front_triangle_stack.append(self.__last_camera_color)
+							position = 1
+							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE
+						else:
+							self.__logger.error("On a pas la place pour stocker ce triangle ni à l'avant ni à l'arrière, gros bolosse !")
+							#TODO dropper le triangle ou vider l'arrière
+
+					script_base = self.__elem_script[ goal.getElemGoalLocked().getIdScript() ][1:]
+					script_to_send = deque()
+					for action in script_base:
+						if action[0][0] == "STORE_TRIANGLE_IA":
+							script_to_send.append( ("O_STORE_TRIANGLE", (int(position*hauteur)),) )
+						else:
+							script_to_send.append(script)
+					self.__SubProcessManager.sendGoal(objectif.getId(), objectif.getId(), script)
+					objectif.getElemGoalLocked().removeFirstElemAction()
+				else:
+					self.__vision.update()
+					triangle_list = self.__vision.getTriangles()
+
+					if triangle_list == []:
+						self.__last_camera_color = None
+						self.__deleteGoal(objectif)
+					else:
+						triangle = triangle_list[0] #TODO, prendre le meilleur triangle suivent les arg
+						data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
+						self.__last_camera_color = data_camera[0]
+						if self.__positionReady(triangle.coord[0], triangle.coord[1]):
+							script_get_triangle = deque()
+							script_get_triangle.append( ("O_GET_TRIANGLE", (triangle.coord[0], triangle.coord[1], 50),) ) #TODO remplacer 50 par hauteur
+							script_get_triangle.append( ("THEN", (),) )
+							script_get_triangle.append( ("O_GET_BRAS_STATUS", (),) )
+							script_get_triangle.append( ("THEN", (),) )
+							self.__SubProcessManager.sendGoal(objectif.getId(), objectif.getId(), script_get_triangle)
+			else:
+				self.__SubProcessManager.sendGoal(objectif.getId(), objectif.getId(), action_list)
+				objectif.getElemGoalLocked().removeFirstElemAction()
+		else:
+			self.__logger.warning("Pb, Il y a un STEP_OVER directement suivit d'un END ?")
+
+	def __positionReady(self, x, y):
+		#TODO
+		return True
+
+	def processBrasStatus(self, status):
+		id_objectif = status[1]
+		status_fin = status[2]
+
+		if status_fin == True:
+			for objectif in self.__blocked_goals:
+				if objectif.getId() == id_objectif:
+					self.__manageStepOver(objectif, id_objectif, skip_get_triangle=True)
+		else:
+			self.__deleteGoal(objectif)
+
+
+	#TODO utiliser cette focntion ?
 	def __collectEnemyFinished(self):
 		for goal in self.__available_goals:
 			if goal.isFinished():
 				self.__logger.info('Goal ' + goal.getName() + ' has been calculated as accomplished by the enemy')
 				self.finishGoal(goal)
-
 	
 	def __loadElemScript(self, filename):
 		"""XML import of elementary scripts"""
@@ -320,81 +383,8 @@ class GoalsManager:
 
 		return path
 
-	def __manageStepOver(self, objectif, id_objectif, skip_get_triangle=False):
-		action_list = objectif.getElemGoalLocked().getFirstElemAction()
-		if action_list:
-			if action_list[0][0] == "GET_TRIANGLE_IA":
-				if skip_get_triangle == True:
-					position = None # 1=front and -1=back
-					hauteur = None #hauteur en mm
-					nb_front_stack = len(self.__front_triangle_stack) 
-					nb_back_stack = len(self.__back_triangle_stack)
-					if self.__our_color == self.__last_camera_color:
-						if nb_front_stack < MAX_FRONT_TRIANGLE_STACK:
-							self.__front_triangle_stack.append(self.__last_camera_color)
-							position = 1
-							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE
-						else:
-							self.__logger.error("On a pas la place pour stocker ce triangle à l'avant, bolosse !")
-							#TODO dropper le triangle ou vider l'arrière
-
-					else:
-						if nb_back_stack < MAX_BACK_TRIANGLE_STACK:
-							self.__back_triangle_stack.append(self.__last_camera_color)
-							position = -1
-							hauteur = GARDE_AU_SOL + nb_back_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE
-						elif nb_front_stack < MAX_FRONT_TRIANGLE_STACK:
-							self.__front_triangle_stack.append(self.__last_camera_color)
-							position = 1
-							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE
-						else:
-							self.__logger.error("On a pas la place pour stocker ce triangle ni à l'avant ni à l'arrière, gros bolosse !")
-							#TODO dropper le triangle ou vider l'arrière
-
-					script_base = self.__elem_script[ goal.getElemGoalLocked().getIdScript() ][1:]
-					script_to_send = deque()
-					for action in script_base:
-						if action[0][0] == "STORE_TRIANGLE_IA":
-							script_to_send.append( ("O_STORE_TRIANGLE", (int(position*hauteur)),) )
-						else:
-							script_to_send.append(script)
-					self.__SubProcessManager.sendGoal(objectif.getId(), objectif.getId(), script)
-					objectif.getElemGoalLocked().removeFirstElemAction()
-				else:
-					self.__vision.update()
-					triangle_list = self.__vision.getTriangles()
-
-					if triangle_list == []:
-						self.__last_camera_color = None
-						self.__deleteGoal(objectif)
-					else:
-						triangle = triangle_list[0] #TODO, prendre le meilleur triangle suivent les arg
-						data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
-						self.__last_camera_color = data_camera[0]
-						if self.__positionReady(triangle.coord[0], triangle.coord[1]):
-							script_get_triangle = deque()
-							script_get_triangle.append( ("O_GET_TRIANGLE", (triangle.coord[0], triangle.coord[1]),) )
-							script_get_triangle.append( ("THEN", (),) )
-							script_get_triangle.append( ("O_GET_BRAS_STATUS", (),) )
-							script_get_triangle.append( ("THEN", (),) )
-							self.__SubProcessManager.sendGoal(objectif.getId(), objectif.getId(), script_get_triangle)
-			else:
-				self.__SubProcessManager.sendGoal(objectif.getId(), objectif.getId(), action_list)
-				objectif.getElemGoalLocked().removeFirstElemAction()
-		else:
-			self.__logger.warning("Pb, Il y a un STEP_OVER directement suivit d'un END ?")
-
-	def __positionReady(self, x, y):
-		#TODO
-		return True
-
-	def processBrasStatus(self, status):
-		id_objectif = status[1]
-		status_fin = status[2]
-
-		if status_fin == True:
-			for objectif in self.__blocked_goals:
-				if objectif.getId() == id_objectif:
-					self.__manageStepOver(objectif, id_objectif, skip_get_triangle=True)
-		else:
-			self.__deleteGoal(objectif)
+	def __tupleTrajectoireToDeque(self, tuple_trajectoire_list):
+		order_list = deque()
+		for tuple in tuple_trajectoire_list:
+			order_list.append(('A_GOTO', [tuple[0], tuple[1]]))
+		return order_list

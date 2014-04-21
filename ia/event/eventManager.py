@@ -71,45 +71,65 @@ class EventManager():
 		"""Get new goals from objectifManager and add it to robot's goals queue"""
 		new_data_list = self.__SubProcessCommunicate.readOrders()
 		for new_data in new_data_list:
-			nom_robot, id_prev_objectif, id_objectif, action_data = new_data
 
-			if self.__Flussmittel is not None and nom_robot == self.__Flussmittel.getName():
-				robot = self.__Flussmittel
-			elif self.__Tibot is not None:
-				robot = self.__Tibot
-			else:
-				robot = None
+			if new_data[0] == "add":
+				nom_robot, id_prev_objectif, id_objectif, action_data = new_data[1]
 
-			if robot is not None:
-				action_en_cours, objectif = robot.getQueuedObjectif()
-				added = False
-
-				#Staking step_over
-				if id_prev_objectif == id_objectif: 
-					robot.addOrderStepOver(id_objectif, action_data)
-					added = True
-
-				#stacking normale
-				if objectif:
-					last_id_objectif = objectif[-1][0]
-				elif action_en_cours:
-					last_id_objectif = action_en_cours[0]
+				if self.__Flussmittel is not None and nom_robot == self.__Flussmittel.getName():
+					robot = self.__Flussmittel
+				elif self.__Tibot is not None:
+					robot = self.__Tibot
 				else:
-					last_id_objectif = robot.getLastIdObjectifExecuted()
-				
-				if last_id_objectif is not None:
-					if id_prev_objectif == last_id_objectif:
+					robot = None
+
+				if robot is not None:
+					action_en_cours, objectif = robot.getQueuedObjectif()
+					added = False
+
+					#Staking step_over
+					if id_prev_objectif == id_objectif: 
+						robot.addOrderStepOver(id_objectif, action_data)
+						added = True
+
+					#stacking normale
+					if objectif:
+						last_id_objectif = objectif[-1][0]
+					elif action_en_cours:
+						last_id_objectif = action_en_cours[0]
+					else:
+						last_id_objectif = robot.getLastIdObjectifExecuted()
+					
+					if last_id_objectif is not None:
+						if id_prev_objectif == last_id_objectif:
+							robot.addNewObjectif(id_objectif, action_data)
+							added = True
+					else:#cas spéciale du premier ordre
 						robot.addNewObjectif(id_objectif, action_data)
 						added = True
-				else:#cas spéciale du premier ordre
-					robot.addNewObjectif(id_objectif, action_data)
-					added = True
 
-				if added == False:
-					self.__logger.warning(str(nom_robot)+" On drop un nouvel ordre car il n'est pas à jour, on a reçu id_prev_objectif: " + str(id_prev_objectif) + " on attendait last_id_objectif: " + str(last_id_objectif) + " ou id_objectif_step_over "+str(id_objectif_step_over)+" action_data " + str(action_data))
-					self.__SubProcessCommunicate.sendObjectifsCanceled((id_objectif,))
+					if added == False:
+						self.__logger.warning(str(nom_robot)+" On drop un nouvel ordre car il n'est pas à jour, on a reçu id_prev_objectif: " + str(id_prev_objectif) + " on attendait last_id_objectif: " + str(last_id_objectif) + " ou des id precedant et suivant égaux, action_data " + str(action_data))
+						self.__SubProcessCommunicate.sendObjectifsCanceled((id_objectif,))
+				else:
+					self.logger.error(str(nom_robot)+" on a reçu un ordre pour un robot qui n'existe pas")
+
+			elif new_data[0] == "delete":
+				nom_robot = new_data[1]
+				id_objectif_to_remove = new_data[2]
+
+				if self.__Flussmittel is not None and nom_robot == self.__Flussmittel.getName():
+					robot = self.__Flussmittel
+				elif self.__Tibot is not None:
+					robot = self.__Tibot
+				else:
+					robot = None
+
+				if robot is not None:
+					robot.deleteObjectif(id_objectif_to_remove)
+				else:
+					self.logger.error(str(nom_robot)+" on a reçu un ordre remove pour un robot qui n'existe pas")
 			else:
-				self.logger.error(str(nom_robot)+" on a reçu un ordre pour un robot qui n'existe pas")
+				self.__logger.critical("La fonction demandé n'est pas implementé, new_data "+str(new_data))
 
 	def __checkEvent(self):
 		if self.__Tourelle is not None:
@@ -220,62 +240,6 @@ class EventManager():
 			for action in data_action:
 				arg = [action[0]]
 				
-				"""
-				if action[1] == "GET_TRIANGLE_IA": #TODO arg type (0=RED or 1=YELLOW, x, y)
-					self.__vision.update()
-					triangle_list = self.__vision.getTriangles()
-
-					if triangle_list == []:
-						Objet.setLastGetTriangleColor(None)
-						self.__SubProcessCommunicate.sendObjectifsDeleted(id_objectif)
-					else:
-						triangle = triangle_list[0] #TODO, prendre le meilleur triangle suivent les arg
-						data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
-						Objet.setLastGetTriangleColor(data_camera[0])
-
-						arg.append(data_camera[1])
-						arg.append(data_camera[2])
-						self.__Communication.sendOrderAPI(address[0], "O_GET_TRIANGLE", *arg)
-
-				elif action[1] == 'STORE_TRIANGLE_IA':# arg type: (0=RED or 1=YELLOW, 0 = FRONT or 1=BACK, front drop height mm or None, back drop height mm or None)
-					color = Objet.getLastGetTriangleColor()
-					Objet.setLastGetTriangleColor(None)
-
-					if color == "RED":
-						color = 0
-					elif color == "YELLOW":
-						color = 1
-
-					if color != None:
-						if action[2][0] == color:#Si c'est la couleur attendu
-							if action[2][1] == 0:#si on veut le deposer à l'avant
-								self.__SubProcessCommunicate.getTriangleStatus(True, color, "FRONT")
-								arg.append(action[2][2])
-								self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
-							else:
-								self.__SubProcessCommunicate.getTriangleStatus(True, color, "BACK")
-								arg.append(-action[2][3])
-								self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
-						else:
-							if action[2][1] == "FRONT":
-								if action[2][3] is not None:
-									self.__SubProcessCommunicate.getTriangleStatus(True, color, "BACK")
-									arg.append(-action[2][3])
-									self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
-								else:
-									self.__SubProcessCommunicate.getTriangleStatus(True, color, "FRONT")
-							else:
-								if action[2][2] is not None:
-									self.__SubProcessCommunicate.getTriangleStatus(True, color, "FRONT")
-									arg.append(action[2][2])
-									self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
-								else:
-									self.__SubProcessCommunicate.getTriangleStatus(True, color, "BACK")
-					else:
-						self.__SubProcessCommunicate.getTriangleStatus(False, -2, "FAIL")
-						self.__SubProcessCommunicate.sendObjectifsCanceled(id_objectif)
-						
-				else:"""
 				#Si l'ordre a des arguments
 				if action[2] is not None:
 					arg += action[2]

@@ -259,6 +259,20 @@ class OurBot():
 		return id_canceled_list
 	
 
+	def deleteObjectif(self, id_objectif):
+		if self.__objectifs:
+			first_id_objectif = self.__objectifs[0][0]
+			if first_id_objectif == id_objectif:
+				if len(self.__objectifs[0][1]) == 0:
+					self.__objectifs.pop()
+					self.setLastIdObjectifExecuted(id_objectif)
+				else:
+					self.__logger.critical("Le premier objectif correspond bien à celui demandé, mais il n'est pas vide, self.__objectifs "+str(self.__objectifs))
+			else:
+				self.__logger.critical("Le premier objectif ne corrrespond à celui attendu, self.__objectifs "+str(self.__objectifs))
+		else:
+			self.__logger.error("L'objectif d'id id_objectif "+str(id_objectif)+" n'existe déjà plus, ce cas ne devrait pas arriver, self.__objectifs "+str(self.__objectifs))
+
 	def maxRot(self, id1, id2):
 		"""Retourne le plus grand id rotationnelle"""
 		if id1 > id2:

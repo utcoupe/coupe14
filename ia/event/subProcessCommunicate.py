@@ -61,16 +61,10 @@ class SubProcessCommunicate():
 	def sendObjectifsCanceled(self, id_canceled_list):
 		if self.__Data.Flussmittel is not None:
 			for id_canceled in id_canceled_list:
-				self.__subprocess_flussmittel.sendPacket(("canceled", id_canceled))
+				self.__subprocess_flussmittel.sendPacket(("CANCELED", id_canceled))
 		if self.__Data.Tibot is not None:
 			for id_canceled in id_canceled_list:
-				self.__subprocess_tibot.sendPacket(("canceled", id_canceled))
-
-	def sendObjectifsDeleted(self, id_deleted):
-		if self.__Data.Flussmittel is not None:
-			self.__subprocess_flussmittel.sendPacket(("deleted", id_deleted))
-		if self.__Data.Tibot is not None:
-			self.__subprocess_tibot.sendPacket(("deleted", id_deleted))
+				self.__subprocess_tibot.sendPacket(("CANCELED", id_canceled))
 
 class MyProcess():
 	def __init__(self, Data, robot_name):

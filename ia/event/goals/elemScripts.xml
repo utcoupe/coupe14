@@ -13,10 +13,8 @@
 		<id_script>1</id_script>
 		<orders>
 			<order>O_RET_OUVRIR</order>
-			<order>SLEEP 300</order>
 			<order>A_PWM 50 50 200</order>
 			<order>DYNAMIQUE_OVER</order>
-			<order>SLEEP 300</order>
 			<order>A_PWM -50 -50 100</order>
 			<order>END</order>
 		</orders>
@@ -25,10 +23,8 @@
 		<id_script>2</id_script>
 		<orders>
 			<order>O_RET_OUVRIR</order>
-			<order>SLEEP 300</order>
 			<order>A_PWM 50 50 100</order>
 			<order>DYNAMIQUE_OVER</order>
-			<order>SLEEP 300</order>
 			<order>END</order>
 		</orders>
 	</elemScript>
@@ -36,10 +32,8 @@
 		<id_script>3</id_script>
 		<orders>
 			<order>O_RET_OUVRIR</order>
-			<order>SLEEP 300</order>
 			<order>A_PWM 50 50 100</order>
 			<order>DYNAMIQUE_OVER</order>
-			<order>SLEEP 300</order>
 			<order>END</order>
 		</orders>
 	</elemScript>
@@ -47,7 +41,6 @@
 		<id_script>4</id_script>
 		<orders>
 			<order>DYNAMIQUE_OVER</order>
-			<order>SLEEP 1000</order>
 			<order>END</order>
 		</orders>
 	</elemScript>

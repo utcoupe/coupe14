@@ -26,7 +26,10 @@ class SubProcessManager():
 		self.__GoalsManager = GoalsManager(self, connection, robot_name)
 
 	def sendGoal(self, id_objectif_prev, id_objectif, elem_script):
-		self.__connection.send((self.__robot_name, id_objectif_prev, id_objectif, elem_script))
+		self.__connection.send(("add", (self.__robot_name, id_objectif_prev, id_objectif, elem_script)))
+
+	def sendDeleteGoal(self, id_objectif):
+		self.__connection.send(("delete", self.__robot_name, id_objectif))
 
 	def getData(self):
 		return self.__data
@@ -62,11 +65,10 @@ class SubProcessManager():
 			self.__GoalsManager.processBrasStatus(status)
 		elif etat == "END":
 			self.__GoalsManager.goalFinishedId(id_objectif)
-		elif etat == "canceled":
+		elif etat == "CANCELED":
 			self.__GoalsManager.goalCanceledId(id_objectif)
-		elif etat == "deleted":
-			self.__GoalsManager.goalDeletedId(id_objectif)
-
+		else:
+			self.__logger.error("Status non géré status "+str(status))
 
 def startSubprocess(connection, robot_name):
 	a = SubProcessManager(connection, robot_name)
