@@ -83,6 +83,7 @@ static AFMotorController MC;
                MOTORS
 ******************************************/
 inline void initPWM1(uint8_t freq) {
+/*
 #if defined(__AVR_ATmega8__) || \
     defined(__AVR_ATmega48__) || \
     defined(__AVR_ATmega88__) || \
@@ -138,9 +139,11 @@ inline void initPWM1(uint8_t freq) {
     #if !defined(PIC32_USE_PIN9_FOR_M1_PWM) && !defined(PIC32_USE_PIN10_FOR_M1_PWM)
         pinMode(11, OUTPUT);
     #endif
+	*/
 }
 
 inline void setPWM1(uint8_t s) {
+/*
 #if defined(__AVR_ATmega8__) || \
     defined(__AVR_ATmega48__) || \
     defined(__AVR_ATmega88__) || \
@@ -172,8 +175,8 @@ inline void setPWM1(uint8_t s) {
 #else
    #error "This chip is not supported!"
 #endif
+*/
 }
-
 inline void initPWM2(uint8_t freq) {
 #if defined(__AVR_ATmega8__) || \
     defined(__AVR_ATmega48__) || \

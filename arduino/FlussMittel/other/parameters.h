@@ -5,10 +5,12 @@
 //		PARAMETERS  //
 //////////////////////
 
-#define H_TO_STEP 8
+#define H_TO_STEP 16
 
-#define HAUTEUR_MAX 114//En mm
-#define LONGUEUR_MAX 70
+#define HAUTEUR_MAX 133 //En mm
+#define HAUTEUR_MIN 15 //en mm
+#define LONGUEUR_MAX 70 
+#define MARGE_SECU_TOP 40 //En steps
 
 #define ANGLE_DIST_MAX_DEG 85
 #define ANGLE_ANGLE_MAX_DEG 130
@@ -16,7 +18,7 @@
 #define BRAS_OFFSET_DIST 0 //Distance in mm
 #define BRAS_OFFSET_ANGLE 0 //Angle offset in degrees
 
-#define MARGE_DEPOT 30
+#define MARGE_DEPOT 50
 
 #define ANGLE_RET ((110/180)*M_PI)
 
@@ -28,12 +30,14 @@
 
 #define L1 43//Petit bras
 #define L2 82//Grand bras
-#define PERIOD_STEPPER 1000
+#define PERIOD_STEPPER 600
 #define VMAX_STEPPER 600 
 #define AMAX_STEPPER 10000
 
-#define PWM_PUMP 150
+#define PWM_PUMP 255 
 
+#define DELAY_REPLI_BRAS 1000000
+#define DELAY_STOP_PUMP 500000
 //////////////////////
 //		PINS		//
 //////////////////////
@@ -49,6 +53,8 @@
 #define PIN_INT_HAUT_ASC 21 //PULLUP
 #define INT_ASC_HAUT 2
 
+#define PIN_DEBUG_LED 23
+
 //////////////////////
 //		DEBUG		//
 //////////////////////
@@ -63,7 +69,7 @@
 #endif
 
 
-#define MIN(x,y) x>y?x:y
-#define MAX(x,y) x<y?x:y
+#define MIN(x,y) x<y?x:y
+#define MAX(x,y) x>y?x:y
 #define ABS(x) x<0?-x:x
 #endif
