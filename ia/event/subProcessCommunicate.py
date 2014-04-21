@@ -46,11 +46,17 @@ class SubProcessCommunicate():
 		if self.__Data.Tibot is not None:
 			self.__subprocess_tibot.sendPacket(("END", id_objectif))
 
-	def sendObjectifGotoOver(self, id_objectif):
+	def sendObjectifStepOver(self, id_objectif):
 		if self.__Data.Flussmittel is not None:
-			self.__subprocess_flussmittel.sendPacket(("GOTO_OVER", id_objectif))
+			self.__subprocess_flussmittel.sendPacket(("STEP_OVER", id_objectif))
 		if self.__Data.Tibot is not None:
-			self.__subprocess_tibot.sendPacket(("GOTO_OVER", id_objectif))
+			self.__subprocess_tibot.sendPacket(("STEP_OVER", id_objectif))
+
+	def sendObjectifDynamiqueOver(self, id_objectif):
+		if self.__Data.Flussmittel is not None:
+			self.__subprocess_flussmittel.sendPacket(("DYNAMIQUE_OVER", id_objectif))
+		if self.__Data.Tibot is not None:
+			self.__subprocess_tibot.sendPacket(("DYNAMIQUE_OVER", id_objectif))
 
 	def sendObjectifsCanceled(self, id_canceled_list):
 		if self.__Data.Flussmittel is not None:
@@ -60,12 +66,11 @@ class SubProcessCommunicate():
 			for id_canceled in id_canceled_list:
 				self.__subprocess_tibot.sendPacket(("canceled", id_canceled))
 
-	def storageStatus(self, executed_without_faillure, color, position):
+	def sendObjectifsDeleted(self, id_deleted):
 		if self.__Data.Flussmittel is not None:
-			self.__subprocess_flussmittel.sendPacket(("storageStatus", executed_without_faillure, color, position))
+			self.__subprocess_flussmittel.sendPacket(("deleted", id_deleted))
 		if self.__Data.Tibot is not None:
-			self.__subprocess_tibot.sendPacket(("storageStatus", executed_without_faillure, color, position))
-
+			self.__subprocess_tibot.sendPacket(("deleted", id_deleted))
 
 class MyProcess():
 	def __init__(self, Data, robot_name):

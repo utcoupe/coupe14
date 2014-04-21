@@ -9,13 +9,10 @@ import time
 import os
 import sys
 
-FILE_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(FILE_DIR,"."))
 
 from .constantes import *
 from .subProcessCommunicate import *
 from .collision import *
-from .visio import *
 
 class EventManager():
 	def __init__(self, Communication, Data):
@@ -38,8 +35,6 @@ class EventManager():
 		self.__last_tibot_order_finished = ID_ACTION_MAX			#id_action
 		self.__sleep_time_tibot = 0
 		self.__resume_date_tibot = 0
-
-		self.__vision = Visio('../ia/event/visio/visio', 2)
 
 		self.__SubProcessCommunicate = SubProcessCommunicate(Data)
 		self.__Collision = Collision((self.__Flussmittel, self.__Tibot, self.__BigEnemyBot, self.__SmallEnemyBot))
@@ -87,7 +82,14 @@ class EventManager():
 
 			if robot is not None:
 				action_en_cours, objectif = robot.getQueuedObjectif()
+				added = False
 
+				#Staking step_over
+				if id_prev_objectif == id_objectif: 
+					robot.addOrderStepOver(id_objectif, action_data)
+					added = True
+
+				#stacking normale
 				if objectif:
 					last_id_objectif = objectif[-1][0]
 				elif action_en_cours:
@@ -96,12 +98,16 @@ class EventManager():
 					last_id_objectif = robot.getLastIdObjectifExecuted()
 				
 				if last_id_objectif is not None:
-					if last_id_objectif == id_prev_objectif:
+					if id_prev_objectif == last_id_objectif:
 						robot.addNewObjectif(id_objectif, action_data)
-					else:
-						self.__logger.warning(str(nom_robot)+" On drop un nouvel ordre car il n'est pas à jour, id_prev_objectif: " + str(id_prev_objectif) + " last_id_objectif: " + str(last_id_objectif) + " action_data " + str(action_data))
-				else:
+						added = True
+				else:#cas spéciale du premier ordre
 					robot.addNewObjectif(id_objectif, action_data)
+					added = True
+
+				if added == False:
+					self.__logger.warning(str(nom_robot)+" On drop un nouvel ordre car il n'est pas à jour, on a reçu id_prev_objectif: " + str(id_prev_objectif) + " on attendait last_id_objectif: " + str(last_id_objectif) + " ou id_objectif_step_over "+str(id_objectif_step_over)+" action_data " + str(action_data))
+					self.__SubProcessCommunicate.sendObjectifsCanceled((id_objectif,))
 			else:
 				self.logger.error(str(nom_robot)+" on a reçu un ordre pour un robot qui n'existe pas")
 
@@ -160,9 +166,15 @@ class EventManager():
 							self.__pushOrders(self.__Tibot, next_actions)
 
 	def __pushOrders(self, Objet, data): 
-		print(str(Objet.getName()) + " charge les actions dans eventManager: " + str(data))
 		id_objectif = data[0]
-		data_action = data[1]#data_action est de type ((id_action, ordre, arguments),...)
+		data_action_temp = data[1]#data_action est de type ((fack_id_action, ordre, arguments),...)
+
+		data_action = deque()
+		#Set vrai id
+		for action in data_action_temp:
+			data_action.append((Objet.getNextIdToStack(), action[1], action[2]))
+
+		print(str(Objet.getName()) + " charge les actions dans eventManager: " + str((id_objectif, data_action)))
 
 		last_order = data_action.pop()
 		if data_action:
@@ -174,7 +186,6 @@ class EventManager():
 			else:
 				self.__logger.error("Objet inconnu")
 
-
 		if last_order[1] == 'SLEEP':
 			if Objet is self.__Flussmittel:
 				self.__sleep_time_flussmittel = last_order[2][0]
@@ -183,12 +194,15 @@ class EventManager():
 			else:
 				self.__logger.error("Objet inconnu")
 
-		elif last_order[1] == 'GOTO_OVER':
-			self.__SubProcessCommunicate.sendObjectifGotoOver(id_objectif)
+		elif last_order[1] == 'STEP_OVER':
+			self.__SubProcessCommunicate.sendObjectifStepOver(id_objectif)
 
 		elif last_order[1] == 'END':
 			Objet.setLastIdObjectifExecuted(id_objectif)
 			self.__SubProcessCommunicate.sendObjectifOver(id_objectif)
+
+		elif last_order[1] == 'DYNAMIQUE_OVER':
+			self.__SubProcessCommunicate.sendObjectifDynamiqueOver(id_objectif)
 
 		elif last_order[1] == 'THEN' or last_order[1] == 'END_GOTO':
 			#Rien à faire
@@ -206,20 +220,22 @@ class EventManager():
 			for action in data_action:
 				arg = [action[0]]
 				
-				if action[1] == "GET_TRIANGLE_IA":
+				"""
+				if action[1] == "GET_TRIANGLE_IA": #TODO arg type (0=RED or 1=YELLOW, x, y)
 					self.__vision.update()
 					triangle_list = self.__vision.getTriangles()
 
 					if triangle_list == []:
-						data_camera = (None, 0, 0) #type (color, x, y)
+						Objet.setLastGetTriangleColor(None)
+						self.__SubProcessCommunicate.sendObjectifsDeleted(id_objectif)
 					else:
-						triangle = triangle_list[0] #TODO, prendre le meilleur triangle
-						data_camera = (triangle.color, triangle.coord[0], triangle.coord[1])
+						triangle = triangle_list[0] #TODO, prendre le meilleur triangle suivent les arg
+						data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
+						Objet.setLastGetTriangleColor(data_camera[0])
 
-					Objet.setLastGetTriangleColor(data_camera[0])
-					arg.append(data_camera[1])
-					arg.append(data_camera[2])
-					self.__Communication.sendOrderAPI(address[0], "O_GET_TRIANGLE", *arg)
+						arg.append(data_camera[1])
+						arg.append(data_camera[2])
+						self.__Communication.sendOrderAPI(address[0], "O_GET_TRIANGLE", *arg)
 
 				elif action[1] == 'STORE_TRIANGLE_IA':# arg type: (0=RED or 1=YELLOW, 0 = FRONT or 1=BACK, front drop height mm or None, back drop height mm or None)
 					color = Objet.getLastGetTriangleColor()
@@ -231,50 +247,50 @@ class EventManager():
 						color = 1
 
 					if color != None:
-						if action[2][0] == color:
-							if action[2][1] == 0:
-								self.__SubProcessCommunicate.storageStatus(True, color, "FRONT")
+						if action[2][0] == color:#Si c'est la couleur attendu
+							if action[2][1] == 0:#si on veut le deposer à l'avant
+								self.__SubProcessCommunicate.getTriangleStatus(True, color, "FRONT")
 								arg.append(action[2][2])
 								self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
 							else:
-								self.__SubProcessCommunicate.storageStatus(True, color, "BACK")
+								self.__SubProcessCommunicate.getTriangleStatus(True, color, "BACK")
 								arg.append(-action[2][3])
 								self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
 						else:
 							if action[2][1] == "FRONT":
 								if action[2][3] is not None:
-									self.__SubProcessCommunicate.storageStatus(True, color, "BACK")
+									self.__SubProcessCommunicate.getTriangleStatus(True, color, "BACK")
 									arg.append(-action[2][3])
 									self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
 								else:
-									self.__SubProcessCommunicate.storageStatus(True, color, "FRONT")
+									self.__SubProcessCommunicate.getTriangleStatus(True, color, "FRONT")
 							else:
 								if action[2][2] is not None:
-									self.__SubProcessCommunicate.storageStatus(True, color, "FRONT")
+									self.__SubProcessCommunicate.getTriangleStatus(True, color, "FRONT")
 									arg.append(action[2][2])
 									self.__Communication.sendOrderAPI(address[0], "O_STORE_TRIANGLE", *arg)
 								else:
-									self.__SubProcessCommunicate.storageStatus(True, color, "BACK")
+									self.__SubProcessCommunicate.getTriangleStatus(True, color, "BACK")
 					else:
-						self.__SubProcessCommunicate.storageStatus(False, color, "FRONT")
-						self.__Communication.sendOrderAPI(address[0], "PINGPING", *arg) #Pour avoir l'incrementation de l'id
+						self.__SubProcessCommunicate.getTriangleStatus(False, -2, "FAIL")
+						self.__SubProcessCommunicate.sendObjectifsCanceled(id_objectif)
 						
-				else:
-					#Si l'ordre a des arguments
-					if action[2] is not None:
-						arg += action[2]
+				else:"""
+				#Si l'ordre a des arguments
+				if action[2] is not None:
+					arg += action[2]
 
-					if action[1][0] == 'O':
-							self.__Communication.sendOrderAPI(address[0], action[1], *arg)
+				if action[1][0] == 'O':
+						self.__Communication.sendOrderAPI(address[0], action[1], *arg)
 
-					elif action[1][0] == 'A':
-						if action[1] == "A_GOTO_SCRIPT":#A_GOTO_SCRIPT n'existe que dans les scripts d'action elemetaire, on l'utilise pour ne pas inclure ces deplacements dans le calcul de collision
-							self.__Communication.sendOrderAPI(address[1], "A_GOTO", *arg)
-						else:
-							self.__Communication.sendOrderAPI(address[1], action[1], *arg)
-
+				elif action[1][0] == 'A':
+					if action[1] == "A_GOTO_SCRIPT":#A_GOTO_SCRIPT n'existe que dans les scripts d'action elemetaire, on l'utilise pour ne pas inclure ces deplacements dans le calcul de collision
+						self.__Communication.sendOrderAPI(address[1], "A_GOTO", *arg)
 					else:
-						self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
+						self.__Communication.sendOrderAPI(address[1], action[1], *arg)
+
+				else:
+					self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
 
 				self.__logger.debug(str(address) + " envoi de l'ordre: " + str(action))
 

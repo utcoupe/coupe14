@@ -112,24 +112,27 @@ class OurBot():
 		return data_trajectoires #type: ((id_objectif, ((x,y),(x,y),...)), (id_objectif, ((x,y),(x,y),...)), ...)
 
 	def getNextOrders(self):
-		"""retourne une liste d'action qui s'arrete sur le premier ordre bloquant trouvé (END, END_GOTO, GOTO_OVER, THEN ou SLEEP) """
+		"""retourne une liste d'action qui s'arrete sur le premier ordre bloquant trouvé (END, STEP_OVER, THEN ou SLEEP, DYNAMIQUE_OVER) """
 		if self.__objectifs:
 			objectif_en_cours = self.__objectifs.popleft()
-			order_of_objectif = objectif_en_cours[1] # type ((id_action, ordre, arguments),...)
+			order_of_objectif = objectif_en_cours[1] # order_of_objectif type ((id_action, ordre, arguments),...)
 
-			data_order = order_of_objectif.popleft() #type (id_action, ordre, arguments)
-			output_temp = deque()
-			output_temp.append(data_order)
-			while data_order[1] != 'SLEEP' and data_order[1] != 'THEN' and data_order[1] != 'END_GOTO' and data_order[1] != 'GOTO_OVER' and data_order[1] != 'END':
-				data_order = order_of_objectif.popleft()
+			if order_of_objectif:
+				data_order = order_of_objectif.popleft() #type (id_action, ordre, arguments)
+				output_temp = deque()
 				output_temp.append(data_order)
+				while data_order[1] != 'SLEEP' and data_order[1] != 'THEN' and data_order[1] != 'STEP_OVER' and data_order[1] != 'END' and data_order[1] != 'DYNAMIQUE_OVER':
+					data_order = order_of_objectif.popleft()
+					output_temp.append(data_order)
 
-			if data_order[1] != 'END':
+				if data_order[1] != 'END':
+					self.__objectifs.appendleft(objectif_en_cours)
+
+
+				self.__actions_en_cours = (objectif_en_cours[0], output_temp)# type (id_objectif, (data_order1, data_order2, ...)
+			else:#Dans le cas où on attend la suite d'un STEP_OVER
 				self.__objectifs.appendleft(objectif_en_cours)
-
-
-			self.__actions_en_cours = (objectif_en_cours[0], output_temp)# type (id_objectif, (data_order1, data_order2, ...)
-
+				self.__actions_en_cours = None
 		else:
 			self.__actions_en_cours = None
 		
@@ -138,7 +141,7 @@ class OurBot():
 	def getIdToReach(self):
 		return self.__id_to_reach
 
-	def __getNextIdToStack(self):
+	def getNextIdToStack(self):
 		return self.__last_id_action_stacked.idIncrementation()
 
 	def setLastGetTriangleColor(self, color):
@@ -172,15 +175,14 @@ class OurBot():
 		self.__positionY = y
 		self.__angle = angle
 
-	def addNewObjectif(self, id_objectif, action_data):
-		new_objectif = (id_objectif,)
+	def __castOrders(self, action_data):
 		data_objectif = deque()
 		for elm_action in action_data:
-			action = (self.__getNextIdToStack(),)
+			action = (-1,)
 			order = elm_action[0]
 			action += (order,)
 
-			if order not in ("SLEEP", "THEN", "END_GOTO", "GOTO_OVER", "END"):
+			if order not in ("SLEEP", "THEN", "STEP_OVER", "END", "DYNAMIQUE_OVER"):
 				argument_type_list = self.__arduino_constantes['ordersArguments'][order]
 				arguments_temp = ()
 				for i, argument_type in enumerate(argument_type_list):
@@ -207,8 +209,18 @@ class OurBot():
 
 			data_objectif.append(action)
 
+		return data_objectif
+
+	def addNewObjectif(self, id_objectif, action_data):
+		data_objectif = self.__castOrders(action_data)
 		self.__objectifs.append((id_objectif, data_objectif))
 		self.__logger.debug( str(self.getName()) + " new goals queued: " + str((id_objectif, data_objectif)))
+
+	def addOrderStepOver(self, id_objectif, action_data):
+		first_objectif = self.__objectifs[0]
+		first_objectif[1].extend(self.__castOrders(action_data))
+		self.__logger.debug( str(self.getName()) + " order next STEP_OVER queued: " + str(first_objectif))
+		
 
 	def removeActionBellow(self, lastIddExecuted):
 		"""enleve les actions terminé de la liste des actions en cours """

@@ -63,9 +63,7 @@ enum ordre {
 	O_BRAS_DEPOT, //@int @int @int @int @int
 	O_GET_TRIANGLE, //@int @int @int
 	O_STORE_TRIANGLE, //@int @int
-
-	GET_TRIANGLE_IA,
-	STORE_TRIANGLE_IA, //@int @int @int @int
+	O_GET_BRAS_STATUS, //@int #int
 
 	GET_CAM,	//#int #int
 	GET_HOKUYO,	//#long #int #int #int #int #int #int #int #int

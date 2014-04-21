@@ -3,14 +3,10 @@
 	<elemScript><!--script récupèration triangle rouge avec mur-->
 		<id_script>0</id_script>
 		<orders>
-			<order>O_RET_OUVRIR</order>
-			<order>SLEEP 300</order>
-			<order>A_PWM 50 50 200</order>
 			<order>GET_TRIANGLE_IA</order>
-			<order>THEN</order>
-			<order>STORE_TRIANGLE_IA 0 0 150 150</order>
-			<order>SLEEP 300</order>
-			<order>A_PWM -50 -50 100</order>
+			<order>DYNAMIQUE_OVER</order>
+			<order>STORE_TRIANGLE_IA</order>
+			<order>END</order>
 		</orders>
 	</elemScript>
 	<elemScript><!--script récupèration triangle jaune avec mur -->
@@ -19,11 +15,10 @@
 			<order>O_RET_OUVRIR</order>
 			<order>SLEEP 300</order>
 			<order>A_PWM 50 50 200</order>
-			<order>GET_TRIANGLE_IA</order>
-			<order>THEN</order>
-			<order>STORE_TRIANGLE_IA 0 0 150 150</order>
+			<order>DYNAMIQUE_OVER</order>
 			<order>SLEEP 300</order>
 			<order>A_PWM -50 -50 100</order>
+			<order>END</order>
 		</orders>
 	</elemScript>
 	<elemScript><!--script récupèration triangle rouge sans mur -->
@@ -32,10 +27,9 @@
 			<order>O_RET_OUVRIR</order>
 			<order>SLEEP 300</order>
 			<order>A_PWM 50 50 100</order>
-			<order>GET_TRIANGLE_IA</order>
-			<order>THEN</order>
-			<order>STORE_TRIANGLE_IA 0 0 150 150</order>
+			<order>DYNAMIQUE_OVER</order>
 			<order>SLEEP 300</order>
+			<order>END</order>
 		</orders>
 	</elemScript>
 	<elemScript><!--script récupèration triangle jaune sans mur -->
@@ -44,16 +38,17 @@
 			<order>O_RET_OUVRIR</order>
 			<order>SLEEP 300</order>
 			<order>A_PWM 50 50 100</order>
-			<order>GET_TRIANGLE_IA</order>
-			<order>THEN</order>
-			<order>STORE_TRIANGLE_IA 0 0 150 150</order>
+			<order>DYNAMIQUE_OVER</order>
 			<order>SLEEP 300</order>
+			<order>END</order>
 		</orders>
 	</elemScript>
 	<elemScript>
 		<id_script>4</id_script>
 		<orders>
+			<order>DYNAMIQUE_OVER</order>
 			<order>SLEEP 1000</order>
+			<order>END</order>
 		</orders>
 	</elemScript>
 </elemScripts>
