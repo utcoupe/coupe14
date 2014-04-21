@@ -30,7 +30,8 @@ void comLoop(Visio& visio) {
 			order = "";
 		}
 		else {
-			cerr << "Unexpected order : " << order << endl;
+			//cerr << "Unexpected order : " << order << endl;
+			continue;
 		}
 		cin >> order;
 	}

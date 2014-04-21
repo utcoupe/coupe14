@@ -30,11 +30,9 @@ void initSize()
 	ordreSize[O_RET_OUVRIR]=2;
 	ordreSize[O_RET_FERMER]=2;
 	ordreSize[O_BRAS_DEPOT]=10;
-	ordreSize[O_GET_TRIANGLE]=6;
+	ordreSize[O_GET_TRIANGLE]=8;
 	ordreSize[O_STORE_TRIANGLE]=4;
-
-	ordreSize[GET_TRIANGLE_IA]=0;
-	ordreSize[STORE_TRIANGLE_IA]=8;
+	ordreSize[O_GET_BRAS_STATUS]=2;
 
 	ordreSize[GET_CAM]=0;
 	ordreSize[GET_HOKUYO]=0;

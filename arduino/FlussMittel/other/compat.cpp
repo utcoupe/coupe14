@@ -11,24 +11,6 @@
 
 extern Servo servoRet, servoBrasAngle, servoBrasDist;
 
-void initPins(){
-	//RETOURNEMENT
-        
-	pinMode(PIN_SERVO_RET, OUTPUT);
-	servoRet.attach(PIN_SERVO_RET);
-
-	//BRAS
-	pinMode(PIN_SERVO_BRAS_ANGLE, OUTPUT);
-	servoBrasAngle.attach(PIN_SERVO_BRAS_ANGLE);
-	pinMode(PIN_SERVO_BRAS_DIST, OUTPUT);
-	servoBrasDist.attach(PIN_SERVO_BRAS_DIST);
-        
-        pinMode(PIN_STEPPER_STEP, OUTPUT);
-        pinMode(PIN_STEPPER_DIR, OUTPUT);
-	pinMode(PIN_INTERRUPT_BRAS, INPUT_PULLUP);
-	pinMode(PIN_INT_HAUT_ASC, INPUT_PULLUP);
-}
-
 unsigned long timeMillis(){
 	return millis();
 }
