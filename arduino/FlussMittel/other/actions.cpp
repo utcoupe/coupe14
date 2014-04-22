@@ -101,7 +101,7 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 	static unsigned long time_end = 0;
 
 	//Nouvel ordre et conditions pour "couper" l'ordre actuel
-	if (height >= 0 && ((!got_tri && step > 5) || (step == -1))) {
+	if (height >= 0 && step == -1) {
 		a = angle; l = length; h = height; depot = n_depot;
 		step = 0;
 	}
@@ -124,10 +124,12 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 			return;
 		}
 		switch(step) {
-			case 0:
+			case 0: {
 				//Lever asc
-				cmdAsc(HAUTEUR_MAX);
+				int hauteur = MAX(getCurrentHauteur() + MARGE_PREHENSION, h + MARGE_PREHENSION);
+				cmdAsc(hauteur);
 				step++;
+				}
 				break;
 			case 1:
 				//ouvrir bras, descendre asc
@@ -149,11 +151,9 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 						next_step = true;
 					}
 				} else { //Pas de triangles
-					int hauteur = HAUTEUR_MAX;
 					pump(false);
-					step=6;
-					hauteur = MIN(hauteur, HAUTEUR_MAX);
-					cmdAsc(hauteur);
+					step=5;
+					cmdAsc(HAUTEUR_MAX);
 				}
 				break;
 			case 3:
@@ -172,24 +172,19 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 				//Lacher pompe
 				pump(false);
 				if (depot > 0) { //Depot a l'avant
-					step = 7;
+					step = 6;
 				} else { //Depot a l'arriere
 					step = 5;
 				}
 				time_end = timeMicros() + (long)DELAY_STOP_PUMP*1000;
 				break;
 			case 5:
-				got_tri = false;
-				setLastId(); //Fin de depot
-				cmdAsc(HAUTEUR_MAX);
-				step++;
-				break;
-			case 6:
+				//Remise du bras au niveau du depot avant
 				cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
-				time_end = timeMicros() + 0; //Pas d'attente
+				time_end = timeMicros() + (long)DELAY_REPLI_BRAS*1000; 
 				step++;
-				break;
-			case 7:
+				//PAS DE BREAK
+			case 6:
 				got_tri = false;
 				setLastId(); //Fin de depot
 				cmdAsc(HAUTEUR_MIN); //On descend le bras pour bloquer les triangles
@@ -289,6 +284,10 @@ void criticalCmdBras(int n_theta, int n_alpha) {
 			step = -1;
 			break;
 		}
+}
+
+int getCurrentHauteur() {
+	return stepperAsc.currentPosition() / H_TO_STEP;
 }
 
 void ascInt() {

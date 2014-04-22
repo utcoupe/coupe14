@@ -32,6 +32,7 @@
 #define MARGE_SECU_TOP 40 //En steps
 
 #define MARGE_DEPOT 50
+#define MARGE_PREHENSION 20
 
 #define ANGLE_DEPOT (-(110.0/180.0)*M_PI)
 #define LONGUEUR_DEPOT 150
