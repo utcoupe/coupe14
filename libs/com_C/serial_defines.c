@@ -11,9 +11,9 @@ void initSize()
 		ordreSize[i]=SIZE_ERROR;
 
 	//DEBUTPARSE
-	//ASSERV
 	ordreSize[PINGPING_AUTO]=0;
 	ordreSize[PINGPING]=0;
+	//ASSERV
 	ordreSize[A_GOTOA]=10;
 	ordreSize[A_GOTO]=6;
 	ordreSize[A_ROT]=6;
@@ -36,6 +36,9 @@ void initSize()
 	ordreSize[O_STORE_TRIANGLE]=4;
 	ordreSize[O_GET_BRAS_STATUS]=2;
 	//TIBOT
+	ordreSize[O_TIR_FILET]=2;
+	ordreSize[O_TIR_BALLE]=4; //Combien de balles ?
+	ordreSize[O_BALAI]=4; //Quel coté ?
 
 	//GENERAL
 	ordreSize[GET_CAM]=0;
