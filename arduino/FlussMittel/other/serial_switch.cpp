@@ -54,15 +54,8 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		ret_size = 2;
 		itob((int)got_tri,ret);
 		break;
-	case O_BRAS_DEPOT:
-		if (!doublon) {
-			next_last_id = btoi(argv);
-			double a = btoi(argv+2) / 100.0;
-			int l = btoi(argv+4);
-			int h = btoi(argv+6);
-			int depot = btoi(argv+8);
-			cmdBras(a, l, h, depot);
-		}
+	case A_CLEANG:
+		stopAct();
 		break;
 	case GET_LAST_ID:
 		ret_size = 2;

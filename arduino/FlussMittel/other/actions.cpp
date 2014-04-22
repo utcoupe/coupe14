@@ -46,7 +46,7 @@ void initPins(){
 	pinMode(PIN_INT_HAUT_ASC, INPUT_PULLUP);
 }
 
-void init_act() {
+void initAct() {
 	//Moteurs :
 	pump_motor.run(FORWARD);
 	cmdBrasServ(-M_PI/4, LONGUEUR_MAX);
@@ -68,18 +68,8 @@ void init_act() {
 	//attachInterrupt(INT_ASC_HAUT, topStop, FALLING); //Commenté à cause des micro-interuptions
 }
 
-void asc_int() {
-	if ((step == 2) && digitalRead(PIN_INTERRUPT_BRAS) == 0) {
-		//On touche un triangle
-		Timer1.detachInterrupt();
-		got_tri = true;
-		next_step = true;
-	}
-	else if (stepperAsc.distanceToGo() == 0) {
-		Timer1.detachInterrupt();
-		got_tri = false;
-		next_step = true;
-	}
+void stopAct() {
+	//TODO
 }
 
 void getTri(long x, long y, int h) {
@@ -211,7 +201,7 @@ void cmdAsc(int h) { //h en mm
 	//TESTS SECU
 	goal_hauteur = h * H_TO_STEP;
 	stepperAsc.moveTo(goal_hauteur);
-	Timer1.attachInterrupt(asc_int, PERIOD_STEPPER);
+	Timer1.attachInterrupt(ascInt, PERIOD_STEPPER);
 }
 
 void cmdBrasServ(double a, int l) {
@@ -289,8 +279,18 @@ void criticalCmdBras(int n_theta, int n_alpha) {
 		}
 }
 
-int getCurrentHauteur() {
-	return stepperAsc.currentPosition() / H_TO_STEP;
+void ascInt() {
+	if ((step == 2) && digitalRead(PIN_INTERRUPT_BRAS) == 0) {
+		//On touche un triangle
+		Timer1.detachInterrupt();
+		got_tri = true;
+		next_step = true;
+	}
+	else if (stepperAsc.distanceToGo() == 0) {
+		Timer1.detachInterrupt();
+		got_tri = false;
+		next_step = true;
+	}
 }
 
 void pump(bool etat) {

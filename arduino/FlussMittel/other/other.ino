@@ -31,7 +31,7 @@ void setup(){
 	Serial3.begin(115200);
 #endif
 
-	init_act();
+	initAct();
 	init_protocol();
 }
 

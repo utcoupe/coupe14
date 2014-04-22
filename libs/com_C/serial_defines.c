@@ -11,6 +11,7 @@ void initSize()
 		ordreSize[i]=SIZE_ERROR;
 
 	//DEBUTPARSE
+	//ASSERV
 	ordreSize[PINGPING_AUTO]=0;
 	ordreSize[PINGPING]=0;
 	ordreSize[A_GOTOA]=10;
@@ -27,13 +28,16 @@ void initSize()
 	ordreSize[A_GET_POS]=0;
 	ordreSize[A_GET_POS_ID]=0;
 
+	//OTHERS
+	//FM
 	ordreSize[O_RET_OUVRIR]=2;
 	ordreSize[O_RET_FERMER]=2;
-	ordreSize[O_BRAS_DEPOT]=10;
 	ordreSize[O_GET_TRIANGLE]=8;
 	ordreSize[O_STORE_TRIANGLE]=4;
 	ordreSize[O_GET_BRAS_STATUS]=2;
+	//TIBOT
 
+	//GENERAL
 	ordreSize[GET_CAM]=0;
 	ordreSize[GET_HOKUYO]=0;
 	ordreSize[GET_LAST_ID]=0;
