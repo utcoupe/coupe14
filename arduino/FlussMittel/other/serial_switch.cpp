@@ -14,7 +14,7 @@
 #include "actions.h"
 
 extern Servo servoRet;
-extern bool got_tri;
+extern bool got_tri, use_act;
 
 static int last_id = 0;
 static int next_last_id = 0;
@@ -24,14 +24,14 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 	int ret_size = 0;
 	switch(ordre){
 	case O_RET_OUVRIR:
-		if (!doublon) {
+		if (!doublon && use_act) {
 			last_id = btoi(argv);
 			argv+=2;
 			servoRet.write(95);
 		}
 		break;
 	case O_RET_FERMER:
-		if (!doublon) {
+		if (!doublon && use_act) {
 			last_id = btoi(argv);
 			argv+=2;
 			servoRet.write(0);
@@ -54,8 +54,11 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		ret_size = 2;
 		itob((int)got_tri,ret);
 		break;
-	case A_CLEANG:
-		stopAct();
+	case PAUSE:
+		use_act = false;
+		break;
+	case RESUME:
+		use_act = true;
 		break;
 	case GET_LAST_ID:
 		ret_size = 2;

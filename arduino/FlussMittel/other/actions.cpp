@@ -10,20 +10,19 @@
 #include <math.h>
 #include <Arduino.h>
 
-extern Servo servoRet, servoBrasAngle, servoBrasDist;
-extern AF_DCMotor pump_motor;
-extern AF_Stepper stepper_motor;
+Servo servoRet, servoBrasAngle, servoBrasDist;
+AF_Stepper stepper_motor(200, 2);
+AF_DCMotor pump_motor(2, MOTOR12_64KHZ);
 //AccelStepper stepperAsc(1, PIN_STEPPER_STEP, PIN_STEPPER_DIR);
 AccelStepper stepperAsc(forwardstep, backwardstep);
 
-static int goal_hauteur = 0;
-static double current_a;
-static int current_l;
-static int step = 0;
+static int goal_hauteur = 0, step = -1, current_alpha = 0, current_theta = 0;
 static bool block_before_depot = false;
 static bool call_critical = false;
 
-volatile bool next_step= true; //Blocage entre les etapes
+bool use_act = true;
+
+volatile bool next_step = true; //Blocage entre les etapes
 volatile bool got_tri = false; //True si triangle en suspension
 
 void initPins(){
@@ -69,7 +68,7 @@ void initAct() {
 }
 
 void stopAct() {
-	//TODO
+	use_act = false;
 }
 
 void getTri(long x, long y, int h) {
@@ -86,32 +85,35 @@ void deposeTri(int dep) {
 	cmdBras(-1, -1, -1, dep);
 }
 
-void cmdBras(double angle, int length, int height, int n_depot) {
+void updateBras() {
 	stepperAsc.run();
+	if (call_critical) {
+		criticalCmdBras();
+	}
+	cmdBras();
+}
+
+void cmdBras(double angle, int length, int height, int n_depot) {
+	//Fonction de traitement
 	static int l = 0, h = 0;
 	static double a = 0;
 	static int depot = n_depot;
-	static long start = timeMicros();
+	static unsigned long time_end = 0;
 
-	//Mise à jour du depot en cours
-	if (n_depot != 0) {
-		depot = n_depot;
+	//Nouvel ordre et conditions pour "couper" l'ordre actuel
+	if (height >= 0 && ((!got_tri && step > 5) || (step == -1))) {
+		a = angle; l = length; h = height; depot = n_depot;
+		step = 0;
 	}
 
-	if (call_critical) {
-		criticalCmdBras();
+	//Mise à jour du depot en cours
+	if (n_depot != 0 && step <= 2) {
+		depot = n_depot;
 	}
 
 	//Temporisation avant etapes 4 et 5
 	if (step == 4 || step == 5) {
-		long wait_time;
-		if (step == 4) {
-			wait_time = (long)DELAY_REPLI_BRAS*1000;
-		} else {
-			wait_time = (long)DELAY_STOP_PUMP*1000;
-		}
-		long t = timeMicros();
-		if ((t - start) > wait_time) {
+		if (timeMicros() > time_end) {
 			next_step = true;
 		}
 	}
@@ -124,11 +126,8 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 		switch(step) {
 			case 0:
 				//Lever asc
-				if (height >= 0) { //-1 après la fin d'une action complete
-					a = angle; l = length; h = height; depot = n_depot;
-					cmdAsc(HAUTEUR_MAX);
-					step++;
-				}
+				cmdAsc(HAUTEUR_MAX);
+				step++;
 				break;
 			case 1:
 				//ouvrir bras, descendre asc
@@ -150,7 +149,6 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 						next_step = true;
 					}
 				} else { //Pas de triangles
-					//TODO : faut pas que ca fasse chier
 					int hauteur = HAUTEUR_MAX;
 					pump(false);
 					step=6;
@@ -168,23 +166,34 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 					cmdBrasServ(ANGLE_DEPOT_RET, LONGUEUR_DEPOT_RET);
 				}
 				step++;
-				start = timeMicros();
+				time_end = timeMicros() + (long)DELAY_REPLI_BRAS*1000;
 				break;
 			case 4:
-				//Lacher pompe, remonter
+				//Lacher pompe
 				pump(false);
-				got_tri = false;
-				step++;
-				start = timeMicros();
+				if (depot > 0) { //Depot a l'avant
+					step = 7;
+				} else { //Depot a l'arriere
+					step = 5;
+				}
+				time_end = timeMicros() + (long)DELAY_STOP_PUMP*1000;
 				break;
 			case 5:
-				cmdAsc(HAUTEUR_MAX);
+				got_tri = false;
 				setLastId(); //Fin de depot
+				cmdAsc(HAUTEUR_MAX);
 				step++;
 				break;
 			case 6:
 				cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
-				step = 0;
+				time_end = timeMicros() + 0; //Pas d'attente
+				step++;
+				break;
+			case 7:
+				got_tri = false;
+				setLastId(); //Fin de depot
+				cmdAsc(HAUTEUR_MIN); //On descend le bras pour bloquer les triangles
+				step = -1;
 				break;
 		}
 	}
@@ -226,17 +235,17 @@ void cmdBrasServ(double a, int l) {
 		alpha = 0;
 		digitalWrite(PIN_DEBUG_LED, LOW);
 	}
-	if (theta > ANGLE_INSIDE_ROBOT) {
-		//ATTENTION : on va a l'interieur du robot
+	if (theta > ANGLE_INSIDE_ROBOT || current_theta > ANGLE_INSIDE_ROBOT) {
+		//ATTENTION : on va ou viens de l'interieur du robot
 		call_critical = true;
 		criticalCmdBras(theta, alpha);
 	} else {
 		//ORDRE
 		servoBrasAngle.write(theta);
 		servoBrasDist.write(alpha);
+		current_theta = theta;
+		current_alpha = alpha;
 	}
-	current_a = a;
-	current_l = l;
 }
 
 void criticalCmdBras(int n_theta, int n_alpha) {
@@ -252,6 +261,7 @@ void criticalCmdBras(int n_theta, int n_alpha) {
 	switch (step) {
 		case 0: {
 			servoBrasDist.write(0);
+			current_alpha = 0;
 			long new_time = timeMicros();
 			if ((new_time - time) > (long)SECU_DELAY_REPLI_BRAS*1000) {
 				step++;
@@ -261,6 +271,7 @@ void criticalCmdBras(int n_theta, int n_alpha) {
 			break;
 		case 1: {
 			servoBrasAngle.write(theta);
+			current_theta = theta;
 			long new_time = timeMicros();
 			if ((new_time - time) > (long)SECU_DELAY_ROT_BRAS*1000) {
 				step++;
@@ -272,6 +283,7 @@ void criticalCmdBras(int n_theta, int n_alpha) {
 			//Cas spécial : dépot à l'arriere: on a le droit de deployer le bras
 			if (theta == ANGLE_DEPOT_RET) {
 				servoBrasDist.write(alpha);
+				current_alpha = alpha;
 			}
 			call_critical = false;
 			step = -1;
@@ -280,10 +292,12 @@ void criticalCmdBras(int n_theta, int n_alpha) {
 }
 
 void ascInt() {
-	if ((step == 2) && digitalRead(PIN_INTERRUPT_BRAS) == 0) {
+	if (digitalRead(PIN_INTERRUPT_BRAS) == 0) {
 		//On touche un triangle
 		Timer1.detachInterrupt();
-		got_tri = true;
+		if (step == 2) {
+			got_tri = true;
+		}
 		next_step = true;
 	}
 	else if (stepperAsc.distanceToGo() == 0) {

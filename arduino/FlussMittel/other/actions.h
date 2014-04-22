@@ -9,6 +9,7 @@ void deposeTri(int dep);
 void cmdBrasServ(double a, int l);
 void criticalCmdBras(int n_theta = -1, int n_alpha = -1);
 void cmdAsc(int h);
+void updateBras();
 void cmdBras(double angle = 1, int length = -1, int height = -1, int n_depot = 0);
 void ascInt();
 void pump(bool etat);
