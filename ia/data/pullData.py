@@ -115,6 +115,8 @@ class PullData():
 					system.setPositionAndId(address, arguments)
 				elif order == 'GET_LAST_ID':
 					system.setLastId(address, arguments[0])
+				elif order == 'O_GET_BRAS_STATUS':
+					system.setBrasStatus( arguments[0])
 				elif order == 'GET_HOKUYO':
 					system.majPositionHokuyo(arguments)
 				elif order == 'GET_CAM':

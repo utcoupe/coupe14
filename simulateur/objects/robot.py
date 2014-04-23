@@ -59,13 +59,14 @@ class Robot(EngineObjectPoly):
 		return px_to_mm(self.body.position[1])
 	
 	def a(self):
-		return int(math.degrees(self.body.angle))
+		#return int(math.degrees(self.body.angle))
+		return self.body.angle
 
 	def getPosition(self):
-		return self.x(), self.y(), self.a()/180*3.14
+		return self.x(), self.y(), self.a()
 
 	def getPositionId(self):
-		return self.x(), self.y(), self.a()/180*3.14, self.__asserv.getLastIdAction()
+		return self.x(), self.y(), self.a(), self.__asserv.getLastIdAction()
 
 	def getLastIdAsserv(self):
 		return self.__asserv.getLastIdAction()
@@ -99,6 +100,11 @@ class Robot(EngineObjectPoly):
 
 	def setStop(self, value):
 		self.__stop = value
+
+	def setPosition(self, x, y, a):
+		self.body.position[0] = mm_to_px(x)
+		self.body.position[1] = mm_to_px(y)
+		self.body.angle = a
 
 	def addGoalOrder(self, numOrdre, arg):
 		"""
@@ -171,14 +177,24 @@ class Robot(EngineObjectPoly):
 						self.__asserv.setLastIdAction(removed_goal.id_action)
 					else:
 						a = self.body.angle
-						v = self.__max_speed * current_goal.pwm / 255
+						v = self.__max_speed * current_goal.pwm / (255*8)
 						vx = v * math.cos(a)
 						vy = v * math.sin(a)
 						self.body._set_velocity((vx,vy))
 				elif isinstance(current_goal, GoalANGLE):
-					self.body._set_angle(current_goal.a)
-					removed_goal = self.__goals.pop(0)
-					self.__asserv.setLastIdAction(removed_goal.id_action)
+					goala = current_goal.a
+					cura = self.body.angle
+					diffrence_value = (cura - goala)
+					if (abs(diffrence_value) < 0.1):
+						self.body._set_angle(current_goal.a)
+						removed_goal = self.__goals.pop(0)
+						self.__asserv.setLastIdAction(removed_goal.id_action)
+						self.body._set_angular_velocity(0)
+					else:
+						if (goala < cura):
+							self.body._set_angular_velocity(-4)
+						else:
+							self.body._set_angular_velocity(4)
 				else:
 					raise Exception("type_goal inconnu")
 			else:

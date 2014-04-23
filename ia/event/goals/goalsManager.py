@@ -208,31 +208,42 @@ class GoalsManager:
 							self.__logger.error("On a pas la place pour stocker ce triangle ni à l'avant ni à l'arrière, gros bolosse !")
 							#TODO dropper le triangle ou vider l'arrière
 
-					script_base = self.__elem_script[ goal.getElemGoalLocked().getIdScript() ][1:]
+					script_base = action_list
 					script_to_send = deque()
 					for action in script_base:
-						if action[0][0] == "STORE_TRIANGLE_IA":
-							script_to_send.append( ("O_STORE_TRIANGLE", (int(position*hauteur)),) )
+						if action[0] == "STORE_TRIANGLE_IA":
+							script_to_send.append( ("O_STORE_TRIANGLE", (int(position*hauteur),)) )
+						elif action[0] == "GET_TRIANGLE_IA":
+							pass
 						else:
-							script_to_send.append(script)
-					self.__SubProcessManager.sendGoal(objectif.getId(), objectif.getId(), script)
+							script_to_send.append(action)
+					self.__SubProcessManager.sendGoal(objectif.getId(), objectif.getId(), script_to_send)
 					objectif.getElemGoalLocked().removeFirstElemAction()
 				else:
 					self.__vision.update()
 					triangle_list = self.__vision.getTriangles()
 
-					if triangle_list == []:
+
+					#TODO remove this bypass:
+					#if triangle_list == []:
+					if False:
+
+						self.__logger.warning("On a pas vu de triangle à la position attendu, dont on va supprimer l'objectif "+str(id_objectif))
 						self.__last_camera_color = None
 						self.__deleteGoal(objectif)
 					else:
-						triangle = triangle_list[0] #TODO, prendre le meilleur triangle suivent les arg
-						data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
+						#TODO remove this bypass:
+						#triangle = triangle_list[0] #TODO, prendre le meilleur triangle suivent les arg
+						#data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
+						data_camera = ("RED", 10, 10)
+
+
 						self.__last_camera_color = data_camera[0]
-						if self.__positionReady(triangle.coord[0], triangle.coord[1]):
+						if self.__positionReady(data_camera[1], data_camera[2]):
 							script_get_triangle = deque()
-							script_get_triangle.append( ("O_GET_TRIANGLE", (triangle.coord[0], triangle.coord[1], 50),) ) #TODO remplacer 50 par hauteur
-							script_get_triangle.append( ("THEN", (),) )
-							script_get_triangle.append( ("O_GET_BRAS_STATUS", (),) )
+							script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], 50)) ) #TODO remplacer 50 par hauteur
+							script_get_triangle.append( ("THEN", ()) )
+							script_get_triangle.append( ("O_GET_BRAS_STATUS", ()) )
 							script_get_triangle.append( ("THEN", (),) )
 							self.__SubProcessManager.sendGoal(objectif.getId(), objectif.getId(), script_get_triangle)
 			else:
@@ -245,15 +256,13 @@ class GoalsManager:
 		#TODO
 		return True
 
-	def processBrasStatus(self, status):
-		id_objectif = status[1]
-		status_fin = status[2]
-
-		if status_fin == True:
+	def processBrasStatus(self, status_fin, id_objectif):
+		if status_fin == 1:
 			for objectif in self.__blocked_goals:
 				if objectif.getId() == id_objectif:
 					self.__manageStepOver(objectif, id_objectif, skip_get_triangle=True)
 		else:
+			self.__logger.warning("La prehention du trianglé à échoué, donc on supprime l'ordre")
 			self.__deleteGoal(objectif)
 
 

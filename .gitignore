@@ -27,4 +27,6 @@ libs/cgal/partition
 libs/cgal/partition_continue
 ia/log/*.log
 ia/log/*.xml
+ia/event/goals/visio/visio
+supervisio/Makefile
 .idea/*

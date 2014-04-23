@@ -90,26 +90,26 @@ class EventManager():
 					if id_prev_objectif == id_objectif: 
 						robot.addOrderStepOver(id_objectif, action_data)
 						added = True
-
-					#stacking normale
-					if objectif:
-						last_id_objectif = objectif[-1][0]
-					elif action_en_cours:
-						last_id_objectif = action_en_cours[0]
 					else:
-						last_id_objectif = robot.getLastIdObjectifExecuted()
-					
-					if last_id_objectif is not None:
-						if id_prev_objectif == last_id_objectif:
+						#stacking normale
+						if objectif:
+							last_id_objectif = objectif[-1][0]
+						elif action_en_cours:
+							last_id_objectif = action_en_cours[0]
+						else:
+							last_id_objectif = robot.getLastIdObjectifExecuted()
+						
+						if last_id_objectif is not None:
+							if id_prev_objectif == last_id_objectif:
+								robot.addNewObjectif(id_objectif, action_data)
+								added = True
+						else:#cas spéciale du premier ordre
 							robot.addNewObjectif(id_objectif, action_data)
 							added = True
-					else:#cas spéciale du premier ordre
-						robot.addNewObjectif(id_objectif, action_data)
-						added = True
 
-					if added == False:
-						self.__logger.warning(str(nom_robot)+" On drop un nouvel ordre car il n'est pas à jour, on a reçu id_prev_objectif: " + str(id_prev_objectif) + " on attendait last_id_objectif: " + str(last_id_objectif) + " ou des id precedant et suivant égaux, action_data " + str(action_data))
-						self.__SubProcessCommunicate.sendObjectifsCanceled((id_objectif,))
+						if added == False:
+							self.__logger.warning(str(nom_robot)+" On drop un nouvel ordre car il n'est pas à jour, on a reçu id_prev_objectif: " + str(id_prev_objectif) + " on attendait last_id_objectif: " + str(last_id_objectif) + " ou des id precedant et suivant égaux, action_data " + str(action_data))
+							self.__SubProcessCommunicate.sendObjectifsCanceled((id_objectif,))
 				else:
 					self.logger.error(str(nom_robot)+" on a reçu un ordre pour un robot qui n'existe pas")
 
@@ -132,6 +132,8 @@ class EventManager():
 				self.__logger.critical("La fonction demandé n'est pas implementé, new_data "+str(new_data))
 
 	def __checkEvent(self):
+		self.__checkBrasStatus()
+
 		if self.__Tourelle is not None:
 			new_data = ()
 			if self.__SmallEnemyBot is not None:
@@ -185,6 +187,14 @@ class EventManager():
 						if next_actions is not None:
 							self.__pushOrders(self.__Tibot, next_actions)
 
+	def __checkBrasStatus(self):
+		if self.__Flussmittel is not None:
+			bras_status = self.__Flussmittel.getBrasStatus()
+			if bras_status is not None:
+				print(bras_status)
+				self.__Flussmittel.setBrasStatus(None)
+				self.__SubProcessCommunicate.sendBrasStatus(bras_status, self.__Flussmittel.getQueuedObjectif()[1][0][0])
+
 	def __pushOrders(self, Objet, data): 
 		id_objectif = data[0]
 		data_action_temp = data[1]#data_action est de type ((fack_id_action, ordre, arguments),...)
@@ -229,12 +239,12 @@ class EventManager():
 			pass
 
 		else:
-			self.__logger.error("ordre de stop impossible")
+			self.__logger.error("ordre de stop impossible, last_order"+str(last_order))
 
-		self.__sendOrders((Objet.getAddressOther(), Objet.getAddressAsserv()), Objet, data_action)
+		self.__sendOrders((Objet.getAddressOther(), Objet.getAddressAsserv()), Objet, data_action, id_objectif)
 
 
-	def __sendOrders(self, address, Objet, data_action):#data_action est de type ((id_action, ordre, arguments),...)
+	def __sendOrders(self, address, Objet, data_action, id_objectif):#data_action est de type ((id_action, ordre, arguments),...)
 		#Si on est en jeu
 		if self.__MetaData.getInGame():
 			for action in data_action:

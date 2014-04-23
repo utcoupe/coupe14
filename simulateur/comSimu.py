@@ -67,7 +67,7 @@ class Communication():
 		elif (order == "O_RET_OUVRIR"):
 			pos = ()
 			self.__bigrobot.setlastIdActionOther(args[0])
-			#TODO, implementer
+			self.__bigrobot.releaseFeu() #pour les tests
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
 		elif (order == "O_RET_FERMER"):
@@ -88,7 +88,7 @@ class Communication():
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
 		elif (order == "O_GET_BRAS_STATUS"):
-			pos = (1)
+			pos = (1,)
 			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
@@ -109,6 +109,7 @@ class Communication():
 		if (order == "A_GET_POS"):
 			pos = self.__bigrobot.getPosition()
 			fixed_pos = (pos[0], 2000-pos[1], pos[2])
+			print('getPos : ', fixed_pos)
 			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, fixed_pos)
 
 		elif (order == "GET_LAST_ID"):
@@ -132,7 +133,7 @@ class Communication():
 
 		elif (order == "A_SET_POS"):
 			pos = ()
-			#TODO ou pas ?
+			self.__bigrobot.setPosition(args[1], args[2], args[3])
 			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos)
 
 		elif (order == "PINGPING"):

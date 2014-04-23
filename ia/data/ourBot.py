@@ -31,6 +31,7 @@ class OurBot():
 		self.__angle = 0.0
 		self.__last_id_executed_other = ID_ACTION_MAX
 		self.__last_id_executed_asserv = ID_ACTION_MAX
+		self.__bras_status = None
 
 		self.__last_id_action_stacked = IdRot()
 
@@ -38,8 +39,6 @@ class OurBot():
 		self.__objectifs = deque() #((id, ((id_action, ordre, arguments), (id_action, ordre, arguments), ...)), ...)
 		self.__actions_en_cours = None
 		self.__last_id_objectif_executed = None
-
-		self.__last_get_triangle_color = None
 
 		#Variable pour evenManager
 		self.__id_to_reach = "ANY"
@@ -57,8 +56,8 @@ class OurBot():
 	def getName(self):
 		return self.__name
 
-	def getLastGetTriangleColor(self):
-		return self.__last_get_triangle_color
+	def getBrasStatus(self):
+		return self.__bras_status
 
 	def getLastIdGlobale(self):
 		return self.maxRot(self.__last_id_executed_other, self.__last_id_executed_asserv)
@@ -121,7 +120,7 @@ class OurBot():
 				data_order = order_of_objectif.popleft() #type (id_action, ordre, arguments)
 				output_temp = deque()
 				output_temp.append(data_order)
-				while data_order[1] != 'SLEEP' and data_order[1] != 'THEN' and data_order[1] != 'STEP_OVER' and data_order[1] != 'END' and data_order[1] != 'DYNAMIQUE_OVER':
+				while data_order[1] not in ('SLEEP', 'THEN', 'STEP_OVER', 'END', 'DYNAMIQUE_OVER'):
 					data_order = order_of_objectif.popleft()
 					output_temp.append(data_order)
 
@@ -144,9 +143,6 @@ class OurBot():
 	def getNextIdToStack(self):
 		return self.__last_id_action_stacked.idIncrementation()
 
-	def setLastGetTriangleColor(self, color):
-		self.__last_get_triangle_color = color
-
 	def setIdToReach(self, id):
 		self.__id_to_reach = id
 
@@ -157,11 +153,14 @@ class OurBot():
 		if address == 'ADDR_FLUSSMITTEL_OTHER' or address == 'ADDR_TIBOT_OTHER':
 			if idd != self.__last_id_executed_other:
 				self.__last_id_executed_other = idd
-				self.__logger.debug(str(address)+" changement d'id other " + str(idd))
+				self.__logger.debug(str(self.__name)+" changement d'id other " + str(idd))
 		else:
 			if idd != self.__last_id_executed_asserv:
 				self.__last_id_executed_asserv = idd
-				self.__logger.debug(str(address)+" changement d'id other " + str(idd))
+				self.__logger.debug(str(self.__name)+" changement d'id asserv " + str(idd))
+
+	def setBrasStatus(self, status): #1=success and 0=fail
+		self.__bras_status = status
 
 	#utilise les données en provenance de de l'asserv uniquement !
 	def setPositionAndId(self, address, arguments):
@@ -177,12 +176,13 @@ class OurBot():
 
 	def __castOrders(self, action_data):
 		data_objectif = deque()
+		print("action_data "+str(action_data))
 		for elm_action in action_data:
 			action = (-1,)
 			order = elm_action[0]
 			action += (order,)
 
-			if order not in ("SLEEP", "THEN", "STEP_OVER", "END", "DYNAMIQUE_OVER"):
+			if order not in ("SLEEP", "THEN", "STEP_OVER", "END", "DYNAMIQUE_OVER", "IA_GET_BRAS_STATUS"):
 				argument_type_list = self.__arduino_constantes['ordersArguments'][order]
 				arguments_temp = ()
 				for i, argument_type in enumerate(argument_type_list):
