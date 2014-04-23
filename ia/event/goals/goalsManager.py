@@ -31,7 +31,7 @@ class GoalsManager:
 		self.__finished_goals		= [] #List of finished goals
 		self.__elem_script			= {}
 		self.__SubProcessManager 	= SubProcessManager
-		self.__last_id_objectif_send= 0
+		self.__last_id_objectif_send= None
 
 		self.__back_triangle_stack = deque()
 		self.__front_triangle_stack = deque()
@@ -231,8 +231,8 @@ class GoalsManager:
 						objectif.getElemGoalLocked().removeFirstElemAction()
 
 				else:
-					self.__vision.update()
-					triangle_list = self.__vision.getTriangles()
+					#self.__vision.update()
+					#triangle_list = self.__vision.getTriangles()
 
 
 					#TODO remove this bypass:

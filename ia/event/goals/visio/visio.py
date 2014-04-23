@@ -93,6 +93,7 @@ class Visio:
 		return self._triangles
 
 	def __updateTriFromStr(self, data):
+		print("data "+str(data))
 		triangles = data.split('\n')
 		self._triangles.clear()
 		#Pour chaque triangle
