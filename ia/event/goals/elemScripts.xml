@@ -12,35 +12,36 @@
 	<elemScript><!--script récupèration triangle jaune avec mur -->
 		<id_script>1</id_script>
 		<orders>
-			<order>O_RET_OUVRIR</order>
-			<order>A_PWM 50 50 200</order>
+			<order>GET_TRIANGLE_IA</order>
 			<order>DYNAMIQUE_OVER</order>
-			<order>A_PWM -50 -50 100</order>
+			<order>STORE_TRIANGLE_IA</order>
 			<order>END</order>
 		</orders>
 	</elemScript>
 	<elemScript><!--script récupèration triangle rouge sans mur -->
 		<id_script>2</id_script>
 		<orders>
-			<order>O_RET_OUVRIR</order>
-			<order>A_PWM 50 50 100</order>
+			<order>GET_TRIANGLE_IA</order>
 			<order>DYNAMIQUE_OVER</order>
+			<order>STORE_TRIANGLE_IA</order>
 			<order>END</order>
 		</orders>
 	</elemScript>
 	<elemScript><!--script récupèration triangle jaune sans mur -->
 		<id_script>3</id_script>
 		<orders>
-			<order>O_RET_OUVRIR</order>
-			<order>A_PWM 50 50 100</order>
+			<order>GET_TRIANGLE_IA</order>
 			<order>DYNAMIQUE_OVER</order>
+			<order>STORE_TRIANGLE_IA</order>
 			<order>END</order>
 		</orders>
 	</elemScript>
 	<elemScript>
 		<id_script>4</id_script>
 		<orders>
+			<order>GET_TRIANGLE_IA</order>
 			<order>DYNAMIQUE_OVER</order>
+			<order>STORE_TRIANGLE_IA</order>
 			<order>END</order>
 		</orders>
 	</elemScript>

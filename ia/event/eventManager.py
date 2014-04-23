@@ -191,7 +191,6 @@ class EventManager():
 		if self.__Flussmittel is not None:
 			bras_status = self.__Flussmittel.getBrasStatus()
 			if bras_status is not None:
-				print(bras_status)
 				self.__Flussmittel.setBrasStatus(None)
 				self.__SubProcessCommunicate.sendBrasStatus(bras_status, self.__Flussmittel.getQueuedObjectif()[1][0][0])
 

@@ -137,10 +137,10 @@ class GoalsManager:
 
 			#on ajoute la trajectoire calculé
 			orders.extend(self.__tupleTrajectoireToDeque(tuple_trajectoire_list))
-			orders.append( ("A_ROT", (goal.getElemGoal(elem_goal_id).getPositionAndAngle()[2],),) )
+			orders.append( ("A_ROT", (goal.getElemGoal(elem_goal_id).getPositionAndAngle()[2],)) )
 			#on ajoute attend d'être arrivé pour lancer les actions
-			orders.append( ("THEN", (),) )
-			orders.append( ("STEP_OVER", (),) )
+			orders.append( ("THEN", ()) )
+			orders.append( ("STEP_OVER", ()) )
 
 			#on envoi le tout
 			self.__SubProcessManager.sendGoal(self.__last_id_objectif_send, goal.getId(), orders)
@@ -154,6 +154,7 @@ class GoalsManager:
 		self.__blocked_goals.remove(goal)#On ne peut pas enlever les ordres dans self.__dynamique_finished_goals
 		self.__available_goals.append(goal)
 		self.__logger.info('Goal ' + goal.getName() + ' has been canceled and is now released')
+		self.__SubProcessManager.sendDeleteGoal(goal.getId())
 		self.__queueBestGoals()
 
 
@@ -186,6 +187,9 @@ class GoalsManager:
 					hauteur = None #hauteur en mm
 					nb_front_stack = len(self.__front_triangle_stack) 
 					nb_back_stack = len(self.__back_triangle_stack)
+					stack_full = False
+					script_to_send = deque()
+
 					if self.__our_color == self.__last_camera_color:
 						if nb_front_stack < MAX_FRONT_TRIANGLE_STACK:
 							self.__front_triangle_stack.append(self.__last_camera_color)
@@ -193,32 +197,39 @@ class GoalsManager:
 							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE
 						else:
 							self.__logger.error("On a pas la place pour stocker ce triangle à l'avant, bolosse !")
-							#TODO dropper le triangle ou vider l'arrière
+							stack_full = True
+							#TODO reposer le triangle
+							self.__cancelGoal(objectif)
 
 					else:
-						if nb_back_stack < MAX_BACK_TRIANGLE_STACK:
+						if (nb_front_stack < MAX_FRONT_TRIANGLE_STACK) and (nb_back_stack < MAX_BACK_TRIANGLE_STACK):
 							self.__back_triangle_stack.append(self.__last_camera_color)
 							position = -1
-							hauteur = GARDE_AU_SOL + nb_back_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE
-						elif nb_front_stack < MAX_FRONT_TRIANGLE_STACK:
-							self.__front_triangle_stack.append(self.__last_camera_color)
-							position = 1
-							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE
+							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
+						elif (nb_front_stack < MAX_FRONT_TRIANGLE_STACK) and (nb_back_stack == MAX_BACK_TRIANGLE_STACK):
+							self.__back_triangle_stack.popleft()
+							script_to_send.append( ("O_RET_OUVRIR", ()) )
+							self.__back_triangle_stack.append(self.__last_camera_color)
+							position = -1
+							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
 						else:
 							self.__logger.error("On a pas la place pour stocker ce triangle ni à l'avant ni à l'arrière, gros bolosse !")
-							#TODO dropper le triangle ou vider l'arrière
+							stack_full = True
+							#TODO lacher le triangle et mettre à jour la couleur dans l'objectif
+							self.__cancelGoal(objectif)
 
-					script_base = action_list
-					script_to_send = deque()
-					for action in script_base:
-						if action[0] == "STORE_TRIANGLE_IA":
-							script_to_send.append( ("O_STORE_TRIANGLE", (int(position*hauteur),)) )
-						elif action[0] == "GET_TRIANGLE_IA":
-							pass
-						else:
-							script_to_send.append(action)
-					self.__SubProcessManager.sendGoal(objectif.getId(), objectif.getId(), script_to_send)
-					objectif.getElemGoalLocked().removeFirstElemAction()
+					if not stack_full:
+						script_base = action_list
+						for action in script_base:
+							if action[0] == "STORE_TRIANGLE_IA":
+								script_to_send.append( ("O_STORE_TRIANGLE", (int(position*hauteur),)) )
+							elif action[0] == "GET_TRIANGLE_IA":
+								pass
+							else:
+								script_to_send.append(action)
+						self.__SubProcessManager.sendGoal(objectif.getId(), objectif.getId(), script_to_send)
+						objectif.getElemGoalLocked().removeFirstElemAction()
+
 				else:
 					self.__vision.update()
 					triangle_list = self.__vision.getTriangles()
@@ -241,7 +252,7 @@ class GoalsManager:
 						self.__last_camera_color = data_camera[0]
 						if self.__positionReady(data_camera[1], data_camera[2]):
 							script_get_triangle = deque()
-							script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], 50)) ) #TODO remplacer 50 par hauteur
+							script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], HAUTEUR_TORCHE+3*HAUTEUR_TRIANGLE)) ) #TODO hauteur par triangle dans le cas des triangles au sol
 							script_get_triangle.append( ("THEN", ()) )
 							script_get_triangle.append( ("O_GET_BRAS_STATUS", ()) )
 							script_get_triangle.append( ("THEN", (),) )
