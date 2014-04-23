@@ -66,6 +66,12 @@ class SubProcessCommunicate():
 			for id_canceled in id_canceled_list:
 				self.__subprocess_tibot.sendPacket(("CANCELED", id_canceled))
 
+	def sendBrasStatus(self, etat, id_objectif):
+		if self.__Data.Flussmittel is not None:
+			self.__subprocess_flussmittel.sendPacket(("BRAS_STATUS", etat, id_objectif))
+		if self.__Data.Tibot is not None:
+			self.__subprocess_tibot.sendPacket(("BRAS_STATUS", etat, id_objectif))
+
 class MyProcess():
 	def __init__(self, Data, robot_name):
 		self.__Data = Data

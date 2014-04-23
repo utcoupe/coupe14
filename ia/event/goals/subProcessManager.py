@@ -61,8 +61,8 @@ class SubProcessManager():
 			self.__GoalsManager.goalStepOverId(id_objectif)
 		elif etat == "DYNAMIQUE_OVER":
 			self.__GoalsManager.goalDynamiqueFinishedId(id_objectif)
-		elif etat == "brasStatus":
-			self.__GoalsManager.processBrasStatus(status)
+		elif etat == "BRAS_STATUS":
+			self.__GoalsManager.processBrasStatus(status[1], status[2])
 		elif etat == "END":
 			self.__GoalsManager.goalFinishedId(id_objectif)
 		elif etat == "CANCELED":

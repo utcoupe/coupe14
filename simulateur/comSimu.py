@@ -88,7 +88,7 @@ class Communication():
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
 		elif (order == "O_GET_BRAS_STATUS"):
-			pos = (1)
+			pos = (1,)
 			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
