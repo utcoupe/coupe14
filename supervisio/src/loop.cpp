@@ -9,9 +9,13 @@
 
 using namespace cv;
 
-void communication(int index) {
+void communication(int index, string path_to_conf) {
 	VideoCapture cam(index);
-	Visio visio(cam);
+	 if(!cam.isOpened()) {  // check if we succeeded
+		cerr << "Failed to open camera" << endl;
+		return;
+	 }
+	Visio visio(cam, path_to_conf);
 	if (visio.getDistortMode() != none) {
 		cerr << "INFO : Starting visio WITH distortion correction" << endl;
 	} else {
@@ -20,12 +24,14 @@ void communication(int index) {
 	comLoop(visio);
 }
 
-void calibration(int index) {
+void calibration(int index, string path) {
 	VideoCapture cam(index);
-	 if(!cam.isOpened())  // check if we succeeded
+	 if(!cam.isOpened()) {  // check if we succeeded
+		cerr << "Failed to open camera" << endl;
 		return;
+	 }
 
-	Visio visio(cam);
+	Visio visio(cam, path);
 	visio.setChessboardSize(Size(9,6));
 	if (visio.camCalibrate(25)) 
 		visio.saveCameraMatrix();
@@ -43,13 +49,15 @@ void getColor(int event, int x, int y, int, void* img_mat) {
 	}
 }
 
-void perspectiveOnlyLoop(int index){
+void perspectiveOnlyLoop(int index, string path){
 	Mat frame;
 	VideoCapture cam(index);
-	 if(!cam.isOpened())  // check if we succeeded
+	if(!cam.isOpened()) {  // check if we succeeded
+		cerr << "Failed to open camera" << endl;
 		return;
+	}
 
-	Visio visio(cam);
+	Visio visio(cam, path);
 	visio.setChessboardSize(Size(9,6));
 
 	int size_min(5000), max_diff_triangle_edge(50);

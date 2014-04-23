@@ -63,7 +63,7 @@ class Control{
 	PID PID_Distance;
 	//interface avec les PIDs
 	void setConsigne(float consigne_left, float consigne_right); //controles puis modification (renvoie l'overflow)
-	void check_acc(float *consigne, float last);
+	void check_acc(float *consigneL, float *consigneR);
 	void check_max(float *consigne, float max = CONSIGNE_RANGE_MAX);
 	void controlPos(float e_angle, float e_dist); //goal en mm
 

@@ -53,13 +53,13 @@ void initAct() {
 	pump(true);
 	delay(1000);
 	pump(false);
-	cmdBrasServ(ANGLE_DEPOT, BRAS_OFFSET_DIST);
-	servoRet.write(0); 
-
+	cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
+	servoRet.write(180); 
 	stepperAsc.setAcceleration(AMAX_STEPPER);
 	stepperAsc.setMaxSpeed(VMAX_STEPPER);
 	stepperAsc.move(6000);
 	while(digitalRead(PIN_INT_HAUT_ASC) == 1) { //Tant qu'on est pas en haut
+		updateBras();
 		stepperAsc.run();
 	}
 	stepperAsc.setCurrentPosition(HAUTEUR_MAX*H_TO_STEP + MARGE_SECU_TOP);
@@ -104,6 +104,7 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 	if (height >= 0 && step == -1) {
 		a = angle; l = length; h = height; depot = n_depot;
 		step = 0;
+		next_step = true;
 	}
 
 	//Mise à jour du depot en cours
@@ -112,10 +113,9 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 	}
 
 	//Temporisation avant etapes 4 et 5
-	if (step == 4 || step == 5) {
-		if (timeMicros() > time_end) {
-			next_step = true;
-		}
+	if (timeMicros() > time_end && time_end != 0) {
+		next_step = true;
+		time_end = -1;
 	}
 
 	if (next_step) {
@@ -126,7 +126,7 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 		switch(step) {
 			case 0: {
 				//Lever asc
-				int hauteur = MAX(getCurrentHauteur() + MARGE_PREHENSION, h + MARGE_PREHENSION);
+				int hauteur = MIN(HAUTEUR_MAX, MAX(getCurrentHauteur() + MARGE_PREHENSION, h + MARGE_PREHENSION));
 				cmdAsc(hauteur);
 				step++;
 				}
@@ -134,7 +134,7 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 			case 1:
 				//ouvrir bras, descendre asc
 				cmdBrasServ(a, l);
-				cmdAsc(h);
+				cmdAsc(HAUTEUR_MIN);
 				pump(true);
 				step++;
 				break;
@@ -143,7 +143,11 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 				setLastId(); //Fin de préhension
 				if (got_tri) {
 					if (!block_before_depot) { //On continue
-						int hauteur = abs(depot) + MARGE_DEPOT;
+						int hauteur = MAX(getCurrentHauteur() + MARGE_PREHENSION, abs(depot) + MARGE_DEPOT);
+						if (depot < 0) {
+							hauteur = HAUTEUR_MAX;
+							servoRet.write(180);
+						}
 						step++;
 						hauteur = MIN(hauteur, HAUTEUR_MAX);
 						cmdAsc(hauteur);
@@ -161,12 +165,13 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 				//Se placer au bon rangement
 				if (depot > 0) { //Depot a l'arriere
 					cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
+					time_end = timeMicros() + (long)DELAY_REPLI_BRAS*1000;
 				}
 				else {
 					cmdBrasServ(ANGLE_DEPOT_RET, LONGUEUR_DEPOT_RET);
+					time_end = timeMicros() + (long)(DELAY_REPLI_BRAS+SECU_DELAY_ROT_BRAS)*1000;
 				}
 				step++;
-				time_end = timeMicros() + (long)DELAY_REPLI_BRAS*1000;
 				break;
 			case 4:
 				//Lacher pompe
@@ -181,12 +186,15 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 			case 5:
 				//Remise du bras au niveau du depot avant
 				cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
-				time_end = timeMicros() + (long)DELAY_REPLI_BRAS*1000; 
+				time_end = timeMicros() + (long)DELAY_REPLI_BRAS2*1000; 
 				step++;
-				//PAS DE BREAK
+				break;
 			case 6:
 				got_tri = false;
 				setLastId(); //Fin de depot
+				if (depot < 0) {
+					servoRet.write(165);
+				}
 				cmdAsc(HAUTEUR_MIN); //On descend le bras pour bloquer les triangles
 				step = -1;
 				break;
@@ -276,7 +284,7 @@ void criticalCmdBras(int n_theta, int n_alpha) {
 			break;
 		case 2:
 			//Cas spécial : dépot à l'arriere: on a le droit de deployer le bras
-			if (theta == ANGLE_DEPOT_RET) {
+			if (theta >= (ANGLE_DEPOT_RET*180/M_PI - BRAS_OFFSET_ANGLE - 10) || theta <= ANGLE_INSIDE_ROBOT) {
 				servoBrasDist.write(alpha);
 				current_alpha = alpha;
 			}
@@ -291,18 +299,21 @@ int getCurrentHauteur() {
 }
 
 void ascInt() {
-	if (digitalRead(PIN_INTERRUPT_BRAS) == 0) {
-		//On touche un triangle
-		Timer1.detachInterrupt();
+	if (stepperAsc.distanceToGo() == 0) {
 		if (step == 2) {
-			got_tri = true;
+			got_tri = false;
 		}
+		Timer1.detachInterrupt();
 		next_step = true;
 	}
-	else if (stepperAsc.distanceToGo() == 0) {
-		Timer1.detachInterrupt();
-		got_tri = false;
-		next_step = true;
+	if (digitalRead(PIN_INTERRUPT_BRAS) == 0) {
+		//On touche un triangle
+		if (step == 2 || step == -1) {
+			Timer1.detachInterrupt();
+			next_step = true;
+			got_tri = true;
+			stepperAsc.move(0);
+		}
 	}
 }
 

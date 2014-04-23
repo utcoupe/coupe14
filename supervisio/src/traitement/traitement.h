@@ -24,7 +24,7 @@ typedef struct triangle {
 
 class Visio {
 	public:
-		Visio(VideoCapture& cam);
+		Visio(VideoCapture& cam, string path_to_conf="./");
 		void detectColor(const Mat& img, Mat& out);
 		void getContour(const Mat& img, vector<vector<Point> >& contours);
 		int getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, vector<vector<Point> >& detected_contours);
@@ -81,6 +81,7 @@ class Visio {
 		bool trans_calibrated, cam_calibrated;
 		Color color;
 		DistortType distort;
+		string path_to_conf;
 		mutex frame_mutex;
 		thread thread_update;
 };

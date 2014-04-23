@@ -29,7 +29,7 @@ class ProcessIA():
 		self.__parent_conn, self.__child_conn = Pipe()
 		#lancement de l'ia
 		self.__process = Process(target=main.startIa, args=(self.__child_conn,self.__color))
-		#self.__process = Process(target=test.testIa, args=(self.__child_conn,self.__color))
+		#self.__process = Process(target=test.testIa, args=(self.__child_conn,self.__color)) #pour les tests
 		self.__process.start()
 		time.sleep(0.1)
 		#on démarre le thread de lecture des données IA renvoyées à travers le pipe

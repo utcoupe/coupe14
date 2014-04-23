@@ -21,8 +21,8 @@
 #define ANGLE_DIST_MAX 85
 #define ANGLE_ANGLE_MAX 130
 #define ANGLE_INSIDE_ROBOT 70
-#define SECU_DELAY_REPLI_BRAS 300 //ms
-#define SECU_DELAY_ROT_BRAS 300 //ms
+#define SECU_DELAY_REPLI_BRAS 200 //ms
+#define SECU_DELAY_ROT_BRAS 500 //ms
 
 //BRAS
 
@@ -31,24 +31,25 @@
 #define LONGUEUR_MAX 215 
 #define MARGE_SECU_TOP 40 //En steps
 
-#define MARGE_DEPOT 50
-#define MARGE_PREHENSION 20
+#define MARGE_DEPOT 60
+#define MARGE_PREHENSION 40
 
 #define ANGLE_DEPOT (-(110.0/180.0)*M_PI)
 #define LONGUEUR_DEPOT 150
 
-#define ANGLE_DEPOT_RET (-(130.0/180.0)*M_PI) 
-#define LONGUEUR_DEPOT_RET 165
+#define ANGLE_DEPOT_RET (-(140.0/180.0)*M_PI) 
+#define LONGUEUR_DEPOT_RET 210
 
 #define PERIOD_STEPPER 200
 #define VMAX_STEPPER 600 
 #define AMAX_STEPPER 10000
 
 #define DELAY_REPLI_BRAS 1000
+#define DELAY_REPLI_BRAS2 100
 #define DELAY_STOP_PUMP 500
 
 //RETOURNEMENT
-#define ANGLE_RET ((110/180.0)*M_PI)
+#define ANGLE_RET 70
 
 //POMPE
 #define PWM_PUMP 255
@@ -56,9 +57,9 @@
 //////////////////////
 //		PINS		//
 //////////////////////
-#define PIN_SERVO_RET 51
+#define PIN_SERVO_RET 50
 
-#define PIN_SERVO_BRAS_ANGLE 53
+#define PIN_SERVO_BRAS_ANGLE 51
 #define PIN_SERVO_BRAS_DIST 52
 
 #define PIN_STEPPER_STEP 31
@@ -84,7 +85,7 @@
 #endif
 
 
-#define MIN(x,y) x<y?x:y
-#define MAX(x,y) x>y?x:y
+#define MIN(x,y) (x<y?x:y)
+#define MAX(x,y) (x>y?x:y)
 #define ABS(x) x<0?-x:x
 #endif

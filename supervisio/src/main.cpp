@@ -10,7 +10,7 @@ using namespace cv;
 using namespace std;
 
 int main(int argc, char **argv){
-	string mode = "com";
+	string mode = "com", path = "./";
 	int index = 0;
 	if (argc > 1){
 		index = argv[1][0] - '0';
@@ -18,17 +18,20 @@ int main(int argc, char **argv){
 	if (argc > 2){
 		mode = argv[2];
 	}
+	if (argc > 3) {
+		path = argv[3]+(string)"/";
+	}
 	if (mode == "com") {
-		communication(index);
+		communication(index, path);
 	}
 	else if(mode == "param") {
-		perspectiveOnlyLoop(index);
+		perspectiveOnlyLoop(index, path);
 	}
 	else if (mode == "calib") {
-		calibration(index);
+		calibration(index, path);
 	}
 	else {
-		cout << "./visio [index] [com/param/calib]" << endl;
+		cout << "./visio [index] [com/param/calib] [path_to_config]" << endl;
 	}
 	return 0;
 }

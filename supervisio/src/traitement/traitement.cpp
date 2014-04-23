@@ -29,8 +29,8 @@ using namespace std;
  * CONSTRUCTEUR   *
  * ****************/
 
-Visio::Visio(VideoCapture& cam) : 
-	color(red), min_size(500), distort(none),
+Visio::Visio(VideoCapture& cam, string path) : 
+	color(red), min_size(500), distort(none), path_to_conf(path),
 	chessboard_size(Size(9,6)), epsilon_poly(0.04),
 	max_diff_triangle_edge(50), camera(cam),
 	size_frame(camera.get(CV_CAP_PROP_FRAME_WIDTH), camera.get(CV_CAP_PROP_FRAME_HEIGHT)),
@@ -309,7 +309,7 @@ bool Visio::camCalibrate(int nbr_of_views) {
 bool Visio::loadTransformMatrix() {
 	bool &calibrated = trans_calibrated;
 	cout << "Loading transform data" << endl;
-	FileStorage fs("calibration_persp.yml", FileStorage::READ);
+	FileStorage fs(path_to_conf+(string)"calibration_persp.yml", FileStorage::READ);
 	if (!fs.isOpened()) {
 		cerr << "ERROR : Couldn't find calibration_persp.yml" << endl;
 		return false;
@@ -323,7 +323,7 @@ bool Visio::loadTransformMatrix() {
 bool Visio::loadCameraMatrix() {
 	bool &calibrated = cam_calibrated;
 	cout << "Loading camera data" << endl;
-	FileStorage fs("calibration_camera.yml", FileStorage::READ);
+	FileStorage fs(path_to_conf+(string)"calibration_camera.yml", FileStorage::READ);
 	if (!fs.isOpened()) {
 		cerr << "ERROR : Couldn't find calibration_camera.yml" << endl;
 		return false;
@@ -342,7 +342,7 @@ void Visio::saveTransformMatrix() {
 		cerr << "ERROR : Uncalibrated trasnform" << endl;
 		return;
 	}
-	FileStorage fs("calibration_persp.yml", FileStorage::WRITE);
+	FileStorage fs(path_to_conf+(string)"calibration_persp.yml", FileStorage::WRITE);
 	fs << "Q" << perspectiveMatrix;
 	fs.release();
 }
@@ -353,7 +353,7 @@ void Visio::saveCameraMatrix() {
 		cerr << "ERROR : Uncalibrated camera" << endl;
 		return;
 	}
-	FileStorage fs("calibration_camera.yml", FileStorage::WRITE);
+	FileStorage fs(path_to_conf+(string)"calibration_camera.yml", FileStorage::WRITE);
 	fs << "D" << D;
 	fs << "CM" << CM;
 	fs << "size" << size_frame;

@@ -231,22 +231,45 @@ void Control::check_max(float *consigne, float max) {
 		*consigne = -max;
 }
 
-void Control::check_acc(float *consigne, float last)
+void Control::check_acc(float *consigneL, float *consigneR)
 {
+	static float lastL = *consigneL, lastR = *consigneR;
 	//Check MAX_ACC
-	if(*consigne > last + max_acc){
-		*consigne = last + max_acc;
+	if(*consigneL > lastL + max_acc){
+		float diff = *consigneL - (lastL + max_acc);
+		*consigneL -= diff;
+		*consigneR -= diff * (*consigneR / * consigneL);
 	}
-	else if(*consigne < last - max_acc){
-		*consigne = last - max_acc;
+	else if(*consigneL < lastL - max_acc){
+		float diff = (lastL - max_acc) - *consigneL;
+		*consigneL += diff;
+		*consigneR += diff * (*consigneR / * consigneL);
 	}
+	if(*consigneR > lastR + max_acc){
+		float diff = *consigneR - (lastR + max_acc);
+		*consigneR -= diff;
+		*consigneL -= diff * (*consigneL / * consigneR);
+	}
+	else if(*consigneR < lastR - max_acc){
+		float diff = (lastR - max_acc) - *consigneR;
+		*consigneR += diff;
+		*consigneL += diff * (*consigneL / * consigneR);
+	}
+
+	/* TODO
+	float rot_acc = (*consigneR - *consigneL) - (lastR - lastL);
+	if (rot_acc > max_rot_acc) {
+		float diff = rot_acc - max_rot_acc;
+	}
+	float r = (*consigneR - *consigneL) - (lastR
+	*/
+
+	lastR = *consigneR; lastL = *consigneL;
 }
 
 void Control::controlPos(float da, float dd)
 {
 	float consigneAngle, consigneDistance, consigneR, consigneL;
-	static float last_consigneL = 0, last_consigneR = 0;
-
 	//Asservissement en position, renvoie une consigne de vitesse
 	//Calcul des spd angulaire
 	consigneAngle = PID_Angle.compute(da); //erreur = angle à corriger pour etre en direction du goal
@@ -259,13 +282,9 @@ void Control::controlPos(float da, float dd)
 	consigneR = consigneDistance + consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
 	consigneL = consigneDistance - consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
 
-	check_acc(&consigneR, last_consigneR);
-	check_acc(&consigneL, last_consigneL);
+	check_acc(&consigneL, &consigneR);
 
 	setConsigne(consigneL, consigneR);
-
-	last_consigneR = consigneR;
-	last_consigneL = consigneL;
 }
 
 void Control::applyPwm(){
