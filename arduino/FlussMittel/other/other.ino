@@ -33,23 +33,22 @@ void setup(){
 #endif
 
 	initAct();
-	init_protocol();
+	//init_protocol();
 }
 
 void loop(){
-	/*
 	static long start = timeMillis();
 	static bool init = true, init2 = true;
 	if (init) {
-		getTri(220, -40, 20);
-		deposeTri(50);
+		getTri(250, -40, 20);
+		deposeTri(30);
 		init = false;
 	}
 	if ((timeMillis() - start) > 10000 & init2) {
 		init2 = false;
 		getTri(250, 55, 20);
-		deposeTri(80);
-	}*/
+		deposeTri(-60);
+	}
 
 	int available = Serial.available();
 	if (available > MAX_READ) {
