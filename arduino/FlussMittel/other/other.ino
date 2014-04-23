@@ -16,10 +16,11 @@
 #include "parameters.h"
 #include "actions.h"
 
-Servo servoRet, servoBrasAngle, servoBrasDist;
-AF_Stepper stepper_motor(200, 2);
-AF_DCMotor pump_motor(2, MOTOR12_64KHZ);
+extern Servo servoRet, servoBrasAngle, servoBrasDist;
+extern AF_DCMotor pump_motor;
+extern AF_Stepper stepper_motor;
 extern AccelStepper stepperAsc;
+extern bool use_act;
 
 #define MAX_READ 64 
 void setup(){
@@ -31,22 +32,25 @@ void setup(){
 	Serial3.begin(115200);
 #endif
 
-	init_act();
-	//init_protocol();
+	initAct();
+	init_protocol();
 }
 
 void loop(){
 	/*
-	servoBrasDist.write(0);
-	delay(10000);
-	servoBrasDist.write(20);
-	delay(10000);
-	servoBrasDist.write(40);
-	delay(10000);
-	servoBrasDist.write(60);
-	delay(10000);
-	servoBrasDist.write(80);
-	delay(10000);
+	static long start = timeMillis();
+	static bool init = true, init2 = true;
+	if (init) {
+		getTri(220, -40, 20);
+		deposeTri(50);
+		init = false;
+	}
+	if ((timeMillis() - start) > 10000 & init2) {
+		init2 = false;
+		getTri(250, 55, 20);
+		deposeTri(80);
+	}*/
+
 	int available = Serial.available();
 	if (available > MAX_READ) {
 		available = MAX_READ;
@@ -63,7 +67,8 @@ void loop(){
 	for(int i = 0; i < available; i++) {
 		serial_send(Serial1.read());
 	}
-	*/
-	cmdBras(-1,-1,-1,0);
-	//stepperAsc.run();
+
+	if (use_act) {
+		updateBras();
+	}
 }

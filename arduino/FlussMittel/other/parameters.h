@@ -5,39 +5,54 @@
 //		PARAMETERS  //
 //////////////////////
 
-#define H_TO_STEP 16
+//DIMENSIONS
+
+#define BRAS_OFFSET_DIST 145 //Distance in mm
+#define BRAS_OFFSET_ANGLE 30 //Angle offset in degrees
 
 #define HAUTEUR_MAX 133 //En mm
 #define HAUTEUR_MIN 15 //en mm
-#define LONGUEUR_MAX 70 
+
+#define X_BRAS 128
+#define Y_BRAS 130
+
+//SECU BRAS : en degree commande
+
+#define ANGLE_DIST_MAX 85
+#define ANGLE_ANGLE_MAX 130
+#define ANGLE_INSIDE_ROBOT 70
+#define SECU_DELAY_REPLI_BRAS 300 //ms
+#define SECU_DELAY_ROT_BRAS 300 //ms
+
+//BRAS
+
+#define H_TO_STEP 16
+
+#define LONGUEUR_MAX 215 
 #define MARGE_SECU_TOP 40 //En steps
 
-#define ANGLE_DIST_MAX_DEG 85
-#define ANGLE_ANGLE_MAX_DEG 130
-
-#define BRAS_OFFSET_DIST 0 //Distance in mm
-#define BRAS_OFFSET_ANGLE 0 //Angle offset in degrees
-
 #define MARGE_DEPOT 50
+#define MARGE_PREHENSION 20
 
-#define ANGLE_RET ((110/180)*M_PI)
+#define ANGLE_DEPOT (-(110.0/180.0)*M_PI)
+#define LONGUEUR_DEPOT 150
 
-#define ANGLE_DEPOT M_PI/2.0
-#define LONGUEUR_DEPOT 5
+#define ANGLE_DEPOT_RET (-(130.0/180.0)*M_PI) 
+#define LONGUEUR_DEPOT_RET 165
 
-#define ANGLE_DEPOT_RET ((130/180)*M_PI) 
-#define LONGUEUR_DEPOT_RET 20
-
-#define L1 43//Petit bras
-#define L2 82//Grand bras
-#define PERIOD_STEPPER 600
+#define PERIOD_STEPPER 200
 #define VMAX_STEPPER 600 
 #define AMAX_STEPPER 10000
 
-#define PWM_PUMP 255 
+#define DELAY_REPLI_BRAS 1000
+#define DELAY_STOP_PUMP 500
 
-#define DELAY_REPLI_BRAS 1000000
-#define DELAY_STOP_PUMP 500000
+//RETOURNEMENT
+#define ANGLE_RET ((110/180.0)*M_PI)
+
+//POMPE
+#define PWM_PUMP 255
+
 //////////////////////
 //		PINS		//
 //////////////////////

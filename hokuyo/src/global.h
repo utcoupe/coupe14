@@ -13,6 +13,7 @@
 #define MARKER_DETECTION_ZONE_SIZE 500/*mm*/
 #define MARKER_DETECTION_STEPS 20
 
+#define HOKUYO_WATCHDOG 150 /* ms */
 
 #define MAX_CLUSTERS 100 /*Ceux apres 100 seront abandonnés !*/
 #define MAX_AB_POINTS 15 /*Nombre de points abberants consecutifs max*/

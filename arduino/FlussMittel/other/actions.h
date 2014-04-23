@@ -2,14 +2,18 @@
 #define ACTIONS_H
 
 void initPins();
-void init_act();
-void asc_int();
+void initAct();
+void stopAct();
+void getTri(long x, long y, int h);
+void deposeTri(int dep);
 void cmdBrasServ(double a, int l);
+void criticalCmdBras(int n_theta = -1, int n_alpha = -1);
 void cmdAsc(int h);
-void cmdBras(double angle, int length, int height, int n_depot);
+void updateBras();
+void cmdBras(double angle = 1, int length = -1, int height = -1, int n_depot = 0);
 int getCurrentHauteur();
+void ascInt();
 void pump(bool etat);
-void callback();
 void topStop();
 void forwardstep();
 void backwardstep();
