@@ -134,7 +134,7 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 			case 1:
 				//ouvrir bras, descendre asc
 				cmdBrasServ(a, l);
-				cmdAsc(h);
+				cmdAsc(HAUTEUR_MIN);
 				pump(true);
 				step++;
 				break;
@@ -143,7 +143,11 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 				setLastId(); //Fin de préhension
 				if (got_tri) {
 					if (!block_before_depot) { //On continue
-						int hauteur = abs(depot) + MARGE_DEPOT;
+						int hauteur = MAX(getCurrentHauteur() + MARGE_PREHENSION, abs(depot) + MARGE_DEPOT);
+						if (depot < 0) {
+							hauteur = HAUTEUR_MAX;
+							servoRet.write(180);
+						}
 						step++;
 						hauteur = MIN(hauteur, HAUTEUR_MAX);
 						cmdAsc(hauteur);
@@ -182,12 +186,15 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 			case 5:
 				//Remise du bras au niveau du depot avant
 				cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
-				time_end = timeMicros() + (long)DELAY_REPLI_BRAS*1000; 
+				time_end = timeMicros() + (long)DELAY_REPLI_BRAS2*1000; 
 				step++;
-				//PAS DE BREAK
+				break;
 			case 6:
 				got_tri = false;
 				setLastId(); //Fin de depot
+				if (depot < 0) {
+					servoRet.write(165);
+				}
 				cmdAsc(HAUTEUR_MIN); //On descend le bras pour bloquer les triangles
 				step = -1;
 				break;
@@ -277,7 +284,7 @@ void criticalCmdBras(int n_theta, int n_alpha) {
 			break;
 		case 2:
 			//Cas spécial : dépot à l'arriere: on a le droit de deployer le bras
-			if (theta >= (ANGLE_DEPOT_RET*180/M_PI - BRAS_OFFSET_ANGLE - 10)) {
+			if (theta >= (ANGLE_DEPOT_RET*180/M_PI - BRAS_OFFSET_ANGLE - 10) || theta <= ANGLE_INSIDE_ROBOT) {
 				servoBrasDist.write(alpha);
 				current_alpha = alpha;
 			}

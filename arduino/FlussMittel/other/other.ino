@@ -38,16 +38,21 @@ void setup(){
 
 void loop(){
 	static long start = timeMillis();
-	static bool init = true, init2 = true;
+	static bool init = true, init2 = true, init3 = true;
 	if (init) {
-		getTri(250, -40, 20);
-		deposeTri(30);
+		getTri(250, 55, 60);
+		deposeTri(15);
 		init = false;
 	}
-	if ((timeMillis() - start) > 10000 & init2) {
+	if ((timeMillis() - start) > 6000 & init2) {
 		init2 = false;
-		getTri(250, 55, 20);
-		deposeTri(-60);
+		getTri(250, -40, 30);
+		deposeTri(-45);
+	}
+	if ((timeMillis() - start) > 18000 & init3) {
+		init3 = false;
+		getTri(250, 55, 30);
+		deposeTri(45);
 	}
 
 	int available = Serial.available();
