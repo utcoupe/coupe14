@@ -133,7 +133,7 @@ class Communication():
 
 		elif (order == "A_SET_POS"):
 			pos = ()
-			self.__bigrobot.setPosition(args[1], args[2], args[3])
+			self.__bigrobot.setPosition(args[0],2000-args[1], args[2])
 			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos)
 
 		elif (order == "PINGPING"):
@@ -188,7 +188,7 @@ class Communication():
 
 		elif (order == "RESET_ID"):
 			pos = ()
-			self.__bigrobot.resetIdOther()
+			self.__minirobot.resetIdOther()
 			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
 
 		elif (order == "O_RET_OUVRIR"):
@@ -232,17 +232,17 @@ class Communication():
 
 		elif (order == "A_CLEANG"):
 			pos = ()
-			self.__bigrobot.cleanGoals()
+			self.__minirobot.cleanGoals()
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
 
 		elif (order == "RESET_ID"):
 			pos = ()
-			self.__bigrobot.resetIdAsserv()
+			self.__minirobot.resetIdAsserv()
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
 
 		elif (order == "A_SET_POS"):
 			pos = ()
-			#TODO ou pas?
+			self.__minirobot.setPosition(args[0],2000-args[1], args[2])
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
 
 		elif (order == "PINGPING"):

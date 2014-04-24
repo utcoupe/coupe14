@@ -65,8 +65,11 @@ class GoalsManager:
 		self.__reverse_table[(6,0)]=(5,0)
 		self.__reverse_table[(5,0)]=(6,0)
 
-		self.__vision = Visio('../ia/event/goals/visio/visio', 0)
-		self.__last_camera_color = None
+		self.__reverse_table[(10,0)]=(10,1)
+
+		if self.__robot_name == "FLUSSMITTEL":
+			self.__vision = Visio('../ia/event/goals/visio/visio', 0)
+			self.__last_camera_color = None
 
 		self.__loadBeginScript()
 
@@ -181,7 +184,8 @@ class GoalsManager:
 	def __manageStepOver(self, objectif, id_objectif, skip_get_triangle=False):
 		action_list = objectif.getElemGoalLocked().getFirstElemAction()
 		if action_list:
-			if action_list[0][0] == "GET_TRIANGLE_IA":
+			print("self.__robot_name "+str(self.__robot_name))
+			if action_list[0][0] == "GET_TRIANGLE_IA" and self.__robot_name == "FLUSSMITTEL":#Redondant normalement
 				if skip_get_triangle == True:
 					position = None # 1=front and -1=back
 					hauteur = None #hauteur en mm
