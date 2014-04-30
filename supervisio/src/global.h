@@ -9,6 +9,11 @@
 #endif
 
 #define MIN_SIZE 500 //Attention, ici ce n'est pas la taille reelle mais la taille sur image originale
+#define USE_MASK false
+
+#define RESIZE false 
+#define RESIZEW 320
+#define RESIZEH 240
 
 #define EPSILON_POLY 0.04
 #define MAX_DIFF_TRI_EDGE 50

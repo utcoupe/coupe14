@@ -45,6 +45,13 @@ void Visio::init() {
 	erode_dilate_kernel = getStructuringElement(MORPH_ELLIPSE, Size(10,10));
 	trans_calibrated = loadTransformMatrix();
 	cam_calibrated = loadCameraMatrix();
+	if (RESIZE) {
+		size_frame = Size(RESIZEW, RESIZEH);
+	}
+	if (USE_MASK) {
+		mask = imread(path_to_conf+(string)"mask.jpg");
+		resize(mask, mask, size_frame);
+	}
 	//if (cam_calibrated) distort = image; //TRES LONG
 	if (cam_calibrated) distort = points; 
 }
@@ -145,11 +152,19 @@ int Visio::trianglesFromImg(const Mat& img, vector<Triangle>& triangles) {
 int Visio::triangles(vector<Triangle>& triangles) {
 	Timings::startTimer(0);
 	int nbr_of_tri = 0;
-	Mat img, src_img;
+	Mat img, src_img, color_img;
 	frame_mutex.lock(); //Bloque le thread d'update
 	camera >> src_img;
+	if (RESIZE) {
+		resize(src_img, src_img, size_frame);
+	}
+	if (USE_MASK) {
+		src_img.copyTo(color_img, mask);
+	} else {
+		color_img = src_img;
+	}
 	Timings::writeStepTime(0, "\tRetrieving");
-	cvtColor(src_img, src_img, CV_BGR2HSV);
+	cvtColor(color_img, color_img, CV_BGR2HSV);
 	Timings::writeStepTime(0, "\tConvert Color");
 	if (distort == image && cam_calibrated) {
 		undistort(src_img, img, CM, D);
