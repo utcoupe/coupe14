@@ -520,7 +520,7 @@ void Visio::addTriangle(const Point2f& point_real, const vector<Point2f>& contou
 		tri.angle -= 2*M_PI/3;
 	}
 	//Si le triangle est couché
-	if ((tri.size = contourArea(contour_real)) > min_down_size) {
+	if (tri.color != black && isEqui(contour_real[0], contour_real[1], contour_real[2])) {
 		tri.isDown = true;
 	}
 	else {
@@ -566,7 +566,7 @@ int Visio::deduceTrianglesFromContour(vector<Point2f>& contour_real, vector<Tria
 						}
 
 						//On ne detecte pas les triangles debout dans ce cas, ce ne serait pas assez fiable
-						tri.isDown = false;
+						tri.isDown = true;
 						tri.contour = contour_tri;
 						triangles.push_back(tri);
 						return nb_triangles;
