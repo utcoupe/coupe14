@@ -30,9 +30,9 @@ using namespace std;
  * ****************/
 
 Visio::Visio(VideoCapture& cam, string path) : 
-	color(red), min_size(500), distort(none), path_to_conf(path),
-	chessboard_size(Size(9,6)), epsilon_poly(0.04),
-	max_diff_triangle_edge(50), camera(cam),
+	color(red), min_size(MIN_SIZE), distort(none), path_to_conf(path),
+	chessboard_size(Size(9,6)), epsilon_poly(EPSILON_POLY),
+	max_diff_triangle_edge(MAX_DIFF_TRI_EDGE), camera(cam),
 	size_frame(camera.get(CV_CAP_PROP_FRAME_WIDTH), camera.get(CV_CAP_PROP_FRAME_HEIGHT)),
 	thread_update(&Visio::refreshFrame, this){
 	init();
