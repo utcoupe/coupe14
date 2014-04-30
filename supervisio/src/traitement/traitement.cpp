@@ -526,6 +526,8 @@ void Visio::addTriangle(const Point2f& point_real, const vector<Point2f>& contou
 	else {
 		tri.isDown = false;
 	}
+	Moments moment = moments(contour_real);
+	tri.size = moment.m00;
 	tri.contour = contour_real;
 	triangles.push_back(tri);
 }
