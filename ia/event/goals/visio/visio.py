@@ -37,8 +37,11 @@ class Visio:
 	def __init__(self, path_exec, index=0, big_bot=None):
 		#Parameters
 		self.__updatePeriod = 0.001  # période d'attente entre deux demandes au client
-		self.__offset_coords = (0, 0)  # changement de repère
 		self.__retry_count = 0
+		self.__hplat = 30  # hauteur des plateformes
+		self.__hcam = 300  # hauteur de la cam au sol
+		self.__xcam = 100  # distance entre cam et milieu robot
+		self.__ycam = 0  # devrait etre 0
 
 		self.__log = logging.getLogger(__name__)
 		self.path_exec = './' + path_exec
@@ -93,16 +96,19 @@ class Visio:
 		return self._triangles
 
 	def __updateTriFromStr(self, data):
-		print("data "+str(data))
-		triangles = data.split('\n')
 		self._triangles.clear()
-		#Pour chaque triangle
-		for triangle in triangles[:-1]:
-			attr = triangle.split(' ')
-			tri = Triangle(*attr)
-			self._triangles.append(tri)
-		self.__log.info("Received data from C++ : " + str(self._triangles))
+		try:
+			triangles = data.split('\n')
+			#Pour chaque triangle
+			for triangle in triangles[:-1]:
+				attr = triangle.split(' ')
+				tri = Triangle(*attr)
+				self._triangles.append(tri)
+			self.__log.info("Received data from C++ : " + str(self._triangles))
+		except:
+			self.__log.error("Error parsing string from C++ : " + str(data))
 
+		# En situation de test, big bot est None
 		if self.__big_bot is not None:
 			self.__post_processing()
 
@@ -113,9 +119,7 @@ class Visio:
 		for i in range(len(self._triangles)):
 			tri = self._triangles[i]
 			#calcul des coordonnées des triangles detectées sur la carte
-			tri.real_coords = tri.coords + self.__big_bot.getPosition()
-			#transformation des coords envoyées par le C++ en coords relatives au bras
-			tri.coords += self.__offset_coords
+			tri.real_coords = [i + j for i, j in zip(tri.coords, self.__big_bot.getPosition())]
 
 			#Traitement de la position pour modif si triangle en hauteur
 			self.__highGroundProcess(tri)
@@ -123,4 +127,29 @@ class Visio:
 	def __highGroundProcess(self, tri):
 		"""Corrige les coordonnées des triangles en hauteurs à des positions connues
 		exemple : triangle sur une plateforme de depot"""
-		pass
+		if self.__inHighGround(tri):
+			#backup
+			real_to_relative = [i - j for i, j in zip(tri.real_coords, tri.coord)]
+			#modif coords
+			tri.coords[0] = (1 - self.__hcam / self.__hplat) * tri.coords[0] \
+								+ (self.__hcam / self.__hplat) * self.__xcam
+			tri.coords[1] = (1 - self.__hcam / self.__hplat) * tri.coords[1] \
+								+ (self.__hcam / self.__hplat) * self.__ycam
+			#reconversion en reel
+			tri.real_coords = [i + j for i, j in zip(tri.coords, real_to_relative)]
+
+	def __inHighGround(self, tri):
+		#plateformes
+		if self.__p_in_circle((0, 0), 250, tri.real_coords) \
+		or self.__p_in_circle((3000, 0), 250, tri.real_coords) \
+		or self.__p_in_circle((1500, 950), 150, tri.real_coords):
+			return True
+		else:
+			return False
+
+	def __p_in_circle(self, center, radius, p):
+			# (x−p)2+(y−q)2<r2
+			if (p[0] - center[0]) ** 2 + (p[1] - center[1]) ** 2 < radius ** 2:
+				return True
+			else:
+				return False
