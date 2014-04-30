@@ -11,9 +11,10 @@ la position des triangles en hauteur"""
 
 class Triangle:
 	"""Simple structure de stockage des infos triangles"""
-	def __init__(self, coord, angle, color, isDown):
+	def __init__(self, coord, angle, size, color, isDown):
 		self.coord = [int(float(x)) for x in coord.split(':')]
 		self.angle = float(angle)
+		self.size = float(size)
 		self.color = ''
 		color = int(color)
 		if color == 0:
@@ -23,14 +24,14 @@ class Triangle:
 		elif color == 2:
 			self.color = 'BLACK'
 		self.isDown = bool(isDown)
-		self.real_coords = (-1, -1)
+		self.real_coords = (-1000, -1000)
 
 	def __repr__(self):
 		if self.isDown:
-			state = ' down '
+			state = 'down'
 		else:
-			state = ' up '
-		return str(self.coord) + ' : a=' + str(self.angle) + ' - ' + self.color + state
+			state = 'up'
+		return str(self.coord) + '\ta=' + str(self.angle) + '\t' + str(self.size) + '\t' + self.color + '\t' + state
 
 
 class Visio:

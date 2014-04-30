@@ -11,6 +11,9 @@ v = Visio('../../../../supervisio/build/bin/visio', index)
 
 while 1:
 	start = time.time()
-	print(v.update())
+	tris = v.update()
 	print("Duration : ", time.time() - start)
+	for tri in tris:
+		print(tri)
+	print()
 	time.sleep(1)
