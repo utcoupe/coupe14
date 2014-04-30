@@ -549,28 +549,10 @@ int Visio::deduceTrianglesFromContour(vector<Point2f>& contour_real, vector<Tria
 					Moments moment = moments(contour_tri);
 					if (moment.m00 > min_size) {
 						Triangle tri;
-						nb_triangles++;
 						float x = moment.m10 / moment.m00;
 						float y = moment.m01 / moment.m00;
-						tri.coords = Point2f(x,y);
-						tri.color = color;
-						//Calcule de l'angle du triangle
-						double dx = contour_tri[0].x - tri.coords.x;
-						double dy = contour_tri[0].y - tri.coords.y; 
-						tri.angle = atan2(dy, dx);
-
-						//Modulo 2*PI/3
-						while (tri.angle < 0) {
-							tri.angle += 2*M_PI/3;
-						}
-						while (tri.angle > 2*M_PI/3) {
-							tri.angle -= 2*M_PI/3;
-						}
-
-						//On ne detecte pas les triangles debout dans ce cas, ce ne serait pas assez fiable
-						tri.isDown = true;
-						tri.contour = contour_tri;
-						triangles.push_back(tri);
+						addTriangle(Point2f(x,y), contour_tri, triangles);
+						nb_triangles++;
 						return nb_triangles;
 					}
 				}
