@@ -54,7 +54,7 @@ enum ordre {
 	A_PIDD, 	//@float @float @float
 	A_GET_CODER, 	//#long #long
 	A_PWM, 	//@int @int @int @int
-	A_ACCMAX,	//@float
+	A_ACCMAX,	//@float @float
 	A_SET_POS, //@int @int @float
 	A_GET_POS,	//#int #int #float
 	A_GET_POS_ID,	//#int #int #float #int

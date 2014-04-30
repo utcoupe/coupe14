@@ -23,7 +23,7 @@ void initSize()
 	ordreSize[A_PIDD]=12;
 	ordreSize[A_PWM]=8;
 	ordreSize[A_GET_CODER]=0;
-	ordreSize[A_ACCMAX]=4;
+	ordreSize[A_ACCMAX]=8;
 	ordreSize[A_SET_POS]=8;
 	ordreSize[A_GET_POS]=0;
 	ordreSize[A_GET_POS_ID]=0;
