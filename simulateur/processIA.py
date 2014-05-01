@@ -51,6 +51,7 @@ class ProcessIA():
 			#try:
 			if self.__parent_conn.poll(1.0):
 				message = self.__parent_conn.recv()
+				print(message)
 				self.__parseDataIa(message)
 			"""except EOFError:
 				print("ERREUR: except EOFError sur recv() dans processIA pour la couleur "+str(self.__color))"""

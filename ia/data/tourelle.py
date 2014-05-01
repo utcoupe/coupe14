@@ -10,11 +10,12 @@ import logging
 
 
 class Tourelle():
-	def __init__(self, Flussmittel, Tibot, BigEnemyBot, SmallEnemyBot, communication, arduinoConstantes, address):
+	def __init__(self, Flussmittel, Tibot, BigEnemyBot, SmallEnemyBot, MetaData, communication, arduinoConstantes, address):
 		self.Flussmittel = Flussmittel
 		self.Tibot = Tibot
 		self.BigEnemyBot = BigEnemyBot
 		self.SmallEnemyBot = SmallEnemyBot
+		self.MetaData = MetaData
 		self.__communication = communication
 		self.__address = address
 		self.__logger = logging.getLogger(__name__)
@@ -122,8 +123,9 @@ class Tourelle():
 		self.__old_data.append( (timestamp, [big, small]) )
 		#self.__logger.info("real:     \tbig:"+str(big)+"\tsmall:"+str(small))
 
-		if predict:
-			self.__estimate_pos()
+		"""TODO fix __estimate_pos() 
+		if predict: 
+			self.__estimate_pos()"""
 
 		#print("DEBUG:__old_data:"+str(self.__old_data))
 		#print("debug:__old_data[-1]:"+str(self.__old_data[-1]))
@@ -146,6 +148,7 @@ class Tourelle():
 
 	def __setFormatedPosition(self, position_big_enemy, position_small_enemy):
 		"""Cette méthode ne doit être appelé qu'avec des données formatées par data/computeHokuyoData.py"""
-		#self.__logger.debug("predicted:\tbig:"+str(position_big_enemy)+"\tsmall:"+str(position_small_enemy))
-		pass
-		#TODO
+		self.__logger.debug(str(self.MetaData.getOurColor())+" ennemy position acquired :\tbig: "+str(position_big_enemy)+"\tsmall: "+str(position_small_enemy))
+
+		self.SmallEnemyBot.setPosition(position_small_enemy)
+		self.BigEnemyBot.setPosition(position_big_enemy)

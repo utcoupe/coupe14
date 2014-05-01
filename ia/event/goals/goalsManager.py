@@ -123,10 +123,10 @@ class GoalsManager:
 			self.__available_goals.remove(goal)
 			self.__blocked_goals.append(goal)
 			goal.setElemGoalLocked(goal.getElemGoal(elem_goal_id))
-			self.__logger.info('Goal ' + goal.getName() + ' is blocked')
+			self.__logger.info('Goal '+goal.getName()+' id: '+str(goal.getId())+' is blocked')
 			return True
 		else:
-			self.__logger.warning('Goal ' + goal.getName() + " n'a pas pu être bloqué")
+			self.__logger.warning('Goal '+goal.getName()+' id: '+str(goal.getId())+" n'a pas pu être bloqué")
 			return False
 
 	def __addGoal(self, tuple_trajectoire_list, goal, elem_goal_id, prev_action=None):
@@ -184,7 +184,6 @@ class GoalsManager:
 	def __manageStepOver(self, objectif, id_objectif, skip_get_triangle=False):
 		action_list = objectif.getElemGoalLocked().getFirstElemAction()
 		if action_list:
-			print("self.__robot_name "+str(self.__robot_name))
 			if action_list[0][0] == "GET_TRIANGLE_IA" and self.__robot_name == "FLUSSMITTEL":#Redondant normalement
 				if skip_get_triangle == True:
 					position = None # 1=front and -1=back
