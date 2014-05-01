@@ -93,7 +93,7 @@ class Asserv:
 		@param a rad
 		"""
 		self.__robot.addGoal(GoalPOS(id_action, *mm_to_px(x,y)))
-		self.__robot.addGoal(GoalANGLE(id_action, math.radians(a)))
+		self.__robot.addGoal(GoalANGLE(id_action, a))
 
 	def gotoar(self, id_action, x, y, a):
 		"""
@@ -103,21 +103,22 @@ class Asserv:
 		@param a rad
 		"""
 		self.__robot.addGoal(GoalPOSR(id_action, *mm_to_px(x,y)))
-		self.__robot.addGoal(GoalANGLER(id_action, math.radians(a)))
+		self.__robot.addGoal(GoalANGLER(id_action, a))
 
 	def rot(self, id_action, a):
 		"""
 		Donner l'ordre de tourner d'un angle
 		@param a rad
 		"""
-		self.__robot.addGoal(GoalANGLE(id_action, math.radians(a)))
+		print('rot : a = ', a)
+		self.__robot.addGoal(GoalANGLE(id_action, a))
 
 	def rotr(self, id_action, a):
 		"""
 		Donner l'ordre de tourner d'un angle,relativement à l'angle actuel
 		@param a rad
 		"""
-		self.__robot.addGoal(GoalANGLER(id_action, math.radians(a)))
+		self.__robot.addGoal(GoalANGLER(id_action, a))
 
 	def cleang(self):
 		"""
@@ -147,7 +148,7 @@ class Asserv:
 		@return int position y du robot
 		@return float angle du robot
 		"""
-		return self.__robot.x(), self.__robot.y(), self.__robot.a()
+		return self.__robot.getXreal(), self.__robot.getYreal(), self.__robot.getAreal()
 
 	def pwm(self, id_action, pwm_l, pwm_r, delay):
 		"""
@@ -156,12 +157,6 @@ class Asserv:
 		@param delay s
 		"""
 		self.__robot.addGoal(GoalPWM(id_action, pwm_l, delay/1000))
-
-	def setPos(self, id_action, x, y):
-		"""
-		Positionne le robot à une position autre que sa position initiale (via mode teleport)
-		"""
-		self.__robot.setPosition(x,y)
 
 class Visio:
 	"""Émule le programme de visio"""
@@ -191,7 +186,7 @@ class Visio:
 		hauteur_y = base_y + math.ceil(LONGUEUR_BRAS*math.sin(angle_rad))
 		"""
 		self.__robot.add_bras()
-		time.sleep(0.1)
+		time.sleep(1)
 		self.__robot.remove_bras()
 
 class Others:
