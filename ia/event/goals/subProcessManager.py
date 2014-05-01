@@ -50,8 +50,12 @@ class SubProcessManager():
 				self.__processStatus(new_message)
 
 	def __updateData(self, data):
-		for name in data:
-			self.__data[name] = data[name]
+		if self.__data == {}:
+			self.__data = data
+		else:
+			for robot_name in data:
+				for info_name in data[robot_name]:
+					self.__data[robot_name][info_name] = data[robot_name][info_name]
 
 	def __processStatus(self, status):
 		"""read new status and update objectif_list"""
@@ -63,7 +67,8 @@ class SubProcessManager():
 		elif etat == "DYNAMIQUE_OVER":
 			self.__GoalsManager.goalDynamiqueFinishedId(id_objectif)
 		elif etat == "BRAS_STATUS":
-			self.__GoalsManager.processBrasStatus(status[1], status[2])
+			if self.__robot_name == "FLUSSMITTEL":
+				self.__GoalsManager.processBrasStatus(status[1], status[2])
 		elif etat == "END":
 			self.__GoalsManager.goalFinishedId(id_objectif)
 		elif etat == "CANCELED":
