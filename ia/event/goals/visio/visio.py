@@ -36,7 +36,7 @@ class Triangle:
 
 
 class Visio:
-	def __init__(self, path_exec, index=0, path_config='./', big_bot=None):
+	def __init__(self, path_exec, index=0, path_config='./', big_bot=None, capture_vid=True):
 		#Parameters
 		self.__updatePeriod = 0.001  # période d'attente entre deux demandes au client
 		self.__retry_count = 0
@@ -49,9 +49,12 @@ class Visio:
 		self.path_exec = './' + path_exec
 		self.__big_bot = big_bot
 
+		if capture_vid:
+			capture_vid = 'true'
+
 		#Lancement du client
 		self.__log.info("Executing C++ program")
-		self.client = Popen([self.path_exec, str(index), 'com', path_config], stdin=PIPE, universal_newlines=True, stdout=PIPE)
+		self.client = Popen([self.path_exec, str(index), 'com', path_config, capture_vid], stdin=PIPE, universal_newlines=True, stdout=PIPE)
 		atexit.register(self.client.kill)
 		stdout = ''
 		while stdout != 'READY\n':
