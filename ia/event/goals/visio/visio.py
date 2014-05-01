@@ -110,8 +110,10 @@ class Visio:
 			self.__log.error("Error parsing string from C++ : " + str(data))
 
 		# En situation de test, big bot est None
+		"""
 		if self.__big_bot is not None:
 			self.__post_processing()
+			"""
 
 	def __post_processing(self):
 		if self.__big_bot is None:
