@@ -30,9 +30,9 @@ using namespace std;
  * ****************/
 
 Visio::Visio(VideoCapture& cam, string path) : 
-	color(red), min_size(500), distort(none), path_to_conf(path),
-	chessboard_size(Size(9,6)), epsilon_poly(0.04),
-	max_diff_triangle_edge(50), camera(cam),
+	color(red), min_size(MIN_SIZE), distort(none), path_to_conf(path),
+	chessboard_size(Size(9,6)), epsilon_poly(EPSILON_POLY),
+	max_diff_triangle_edge(MAX_DIFF_TRI_EDGE), camera(cam),
 	size_frame(camera.get(CV_CAP_PROP_FRAME_WIDTH), camera.get(CV_CAP_PROP_FRAME_HEIGHT)),
 	thread_update(&Visio::refreshFrame, this){
 	init();
@@ -45,6 +45,13 @@ void Visio::init() {
 	erode_dilate_kernel = getStructuringElement(MORPH_ELLIPSE, Size(10,10));
 	trans_calibrated = loadTransformMatrix();
 	cam_calibrated = loadCameraMatrix();
+	if (RESIZE) {
+		size_frame = Size(RESIZEW, RESIZEH);
+	}
+	if (USE_MASK) {
+		mask = imread(path_to_conf+(string)"mask.jpg");
+		resize(mask, mask, size_frame);
+	}
 	//if (cam_calibrated) distort = image; //TRES LONG
 	if (cam_calibrated) distort = points; 
 }
@@ -145,11 +152,19 @@ int Visio::trianglesFromImg(const Mat& img, vector<Triangle>& triangles) {
 int Visio::triangles(vector<Triangle>& triangles) {
 	Timings::startTimer(0);
 	int nbr_of_tri = 0;
-	Mat img, src_img;
+	Mat img, src_img, color_img;
 	frame_mutex.lock(); //Bloque le thread d'update
 	camera >> src_img;
+	if (RESIZE) {
+		resize(src_img, src_img, size_frame);
+	}
+	if (USE_MASK) {
+		src_img.copyTo(color_img, mask);
+	} else {
+		color_img = src_img;
+	}
 	Timings::writeStepTime(0, "\tRetrieving");
-	cvtColor(src_img, src_img, CV_BGR2HSV);
+	cvtColor(color_img, color_img, CV_BGR2HSV);
 	Timings::writeStepTime(0, "\tConvert Color");
 	if (distort == image && cam_calibrated) {
 		undistort(src_img, img, CM, D);
@@ -520,12 +535,14 @@ void Visio::addTriangle(const Point2f& point_real, const vector<Point2f>& contou
 		tri.angle -= 2*M_PI/3;
 	}
 	//Si le triangle est couché
-	if ((tri.size = contourArea(contour_real)) > min_down_size) {
+	if (tri.color != black && isEqui(contour_real[0], contour_real[1], contour_real[2])) {
 		tri.isDown = true;
 	}
 	else {
 		tri.isDown = false;
 	}
+	Moments moment = moments(contour_real);
+	tri.size = moment.m00;
 	tri.contour = contour_real;
 	triangles.push_back(tri);
 }
@@ -547,28 +564,10 @@ int Visio::deduceTrianglesFromContour(vector<Point2f>& contour_real, vector<Tria
 					Moments moment = moments(contour_tri);
 					if (moment.m00 > min_size) {
 						Triangle tri;
-						nb_triangles++;
 						float x = moment.m10 / moment.m00;
 						float y = moment.m01 / moment.m00;
-						tri.coords = Point2f(x,y);
-						tri.color = color;
-						//Calcule de l'angle du triangle
-						double dx = contour_tri[0].x - tri.coords.x;
-						double dy = contour_tri[0].y - tri.coords.y; 
-						tri.angle = atan2(dy, dx);
-
-						//Modulo 2*PI/3
-						while (tri.angle < 0) {
-							tri.angle += 2*M_PI/3;
-						}
-						while (tri.angle > 2*M_PI/3) {
-							tri.angle -= 2*M_PI/3;
-						}
-
-						//On ne detecte pas les triangles debout dans ce cas, ce ne serait pas assez fiable
-						tri.isDown = false;
-						tri.contour = contour_tri;
-						triangles.push_back(tri);
+						addTriangle(Point2f(x,y), contour_tri, triangles);
+						nb_triangles++;
 						return nb_triangles;
 					}
 				}

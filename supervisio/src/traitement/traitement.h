@@ -72,10 +72,9 @@ class Visio {
 		Scalar min, max;
 		Scalar yel_min, yel_max, red_min, red_max, blk_min, blk_max;
 		Size chessboard_size, size_frame;
-		Mat perspectiveMatrix, CM, D;
+		Mat perspectiveMatrix, CM, D, mask;
 		Mat erode_dilate_kernel; //kernel utilisé lors des erode/dilate
 		int min_size; //Taille minimal d'une zone de couleur valide
-		int min_down_size; //Seuil de taille au dessus duquel un triangl est considéré comme renversé
 		int max_diff_triangle_edge;
 		double epsilon_poly; //Marge d'erreur lors de l'estimation de polyligne
 		bool trans_calibrated, cam_calibrated;

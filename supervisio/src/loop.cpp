@@ -60,11 +60,11 @@ void perspectiveOnlyLoop(int index, string path){
 	Visio visio(cam, path);
 	visio.setChessboardSize(Size(9,6));
 
-	int size_min(5000), max_diff_triangle_edge(50);
+	int size_min(5000), max_diff_triangle_edge(MAX_DIFF_TRI_EDGE);
 	int h_min_y(YEL_HUE_MIN), h_max_y(YEL_HUE_MAX), s_min_y(YEL_SAT_MIN), s_max_y(YEL_SAT_MAX), v_min_y(YEL_VAL_MIN), v_max_y(YEL_VAL_MAX);
 	int h_min_r(RED_HUE_MIN), h_max_r(RED_HUE_MAX), s_min_r(RED_SAT_MIN), s_max_r(RED_SAT_MAX), v_min_r(RED_VAL_MIN), v_max_r(RED_VAL_MAX);
 	int h_min_b(BLK_HUE_MIN), h_max_b(BLK_HUE_MAX), s_min_b(BLK_SAT_MIN), s_max_b(BLK_SAT_MAX), v_min_b(BLK_VAL_MIN), v_max_b(BLK_VAL_MAX);
-	int epsilon(4), key = -1;
+	int epsilon(EPSILON_POLY*100), key = -1;
 
 	namedWindow("parameters");
 	namedWindow("parameters2");

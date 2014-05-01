@@ -23,6 +23,7 @@ Control::Control(){
 	setErrorUseI_distance(DIS_AWU);
 	max_angle = MAX_ANGLE;
 	setMaxAcc(ACC_MAX);
+	setMaxRotSpdRatio(RATIO_SPD_ROT_MAX);
 
 	value_consigne_right = 0;
 	value_consigne_left = 0;
@@ -177,6 +178,10 @@ void Control::setMaxAcc(float n_max_acc){
 	max_acc = n_max_acc / FREQ; 
 }
 
+void Control::setMaxRotSpdRatio(float n_max_rot_spd){
+	max_rot_spd_ratio = n_max_rot_spd;
+}
+
 void Control::pushPos(pos n_pos){
 	robot.pushMmPos(n_pos);
 }
@@ -234,7 +239,22 @@ void Control::check_max(float *consigne, float max) {
 void Control::check_acc(float *consigneL, float *consigneR)
 {
 	static float lastL = *consigneL, lastR = *consigneR;
+
+
+	//Check MAX ROT SPD
+	float rot = abs((*consigneR - *consigneL) / 2.0);
+	//Ratio consigne/max
+	float r = rot / CONSIGNE_RANGE_MAX;
+	if (r > 1) { //Trop rapide
+		*consigneL /= r;
+		*consigneR /= r;
+	} 
+
+
 	//Check MAX_ACC
+	//On verifie l'acceleration de chaque moteur
+	//SI elle est trop élevée, on la baisse, et on
+	//baisse aussi celle de l'autre moteur proportionellement
 	if(*consigneL > lastL + max_acc){
 		float diff = *consigneL - (lastL + max_acc);
 		*consigneL -= diff;
@@ -255,14 +275,6 @@ void Control::check_acc(float *consigneL, float *consigneR)
 		*consigneR += diff;
 		*consigneL += diff * (*consigneL / * consigneR);
 	}
-
-	/* TODO
-	float rot_acc = (*consigneR - *consigneL) - (lastR - lastL);
-	if (rot_acc > max_rot_acc) {
-		float diff = rot_acc - max_rot_acc;
-	}
-	float r = (*consigneR - *consigneL) - (lastR
-	*/
 
 	lastR = *consigneR; lastL = *consigneL;
 }
