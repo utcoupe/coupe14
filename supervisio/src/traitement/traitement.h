@@ -82,7 +82,7 @@ class Visio {
 		Mat last_image;
 		int min_size; //Taille minimal d'une zone de couleur valide
 		int max_diff_triangle_edge;
-		int grab_per_sec;
+		int cam_fps;
 		double epsilon_poly; //Marge d'erreur lors de l'estimation de polyligne
 		bool trans_calibrated, cam_calibrated;
 		bool save_video, isready;

@@ -2,7 +2,19 @@ Visio très simple pour la détection des triagles
 
 utilise la lib opencv 2.4.7 : http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.7/opencv-2.4.7.tar.gz/download
 
-pour build :
+=== Install OPENCV ===
+
+sudo apt-get install build-essential cmake libgtk2.0-dev pkg-config ffmpeg libavcodec-dev libavformat-dev libswscale-dev libdc1394-22-dev libjpeg-dev v4l-utils libv4l-dev
+cd ~/opencv
+mkdir release
+cd release
+cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local ..
+make
+sudo make install
+
+
+=== Build VISIO ===
+
 mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE=release

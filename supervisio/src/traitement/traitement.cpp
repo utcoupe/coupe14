@@ -33,7 +33,7 @@ using namespace std;
 Visio::Visio(int index, string path, bool save_vid) : camera(index), save_video(save_vid),
 	color(red), min_size(MIN_SIZE), distort(none), path_to_conf(path),
 	chessboard_size(Size(9,6)), epsilon_poly(EPSILON_POLY), isready(false),
-	max_diff_triangle_edge(MAX_DIFF_TRI_EDGE), grab_per_sec(100),
+	max_diff_triangle_edge(MAX_DIFF_TRI_EDGE), cam_fps(30),
 	size_frame(camera.get(CV_CAP_PROP_FRAME_WIDTH), camera.get(CV_CAP_PROP_FRAME_HEIGHT)){
 	frame_mutex.lock();
 	if(!camera.isOpened()) {  // check if we succeeded
@@ -67,7 +67,10 @@ void Visio::init() {
 
 void Visio::init_writer() {
 	cerr << "Saving video to : " << path_to_conf+(string)"video.avi" << endl;
-	writer = VideoWriter(path_to_conf+(string)"video.avi", CV_FOURCC('M', 'J', 'P', 'G'), 30, size_frame);
+	//int codec = CV_FOURCC('M', 'J', 'P', 'G'); //Marche
+	int codec = CV_FOURCC('D', 'I', 'V', 'X'); //Marche
+	writer = VideoWriter(path_to_conf+(string)"video.avi", codec, cam_fps,
+			Size(camera.get(CV_CAP_PROP_FRAME_WIDTH), camera.get(CV_CAP_PROP_FRAME_HEIGHT)));
 	if (!writer.isOpened()) {
 		cerr << "Failed to initialize writer, video can't be saved" << endl;
 	}
