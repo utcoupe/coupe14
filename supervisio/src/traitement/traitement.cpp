@@ -208,7 +208,7 @@ bool Visio::computeTransformMatrix(const Mat &img, const vector<Point2f> real_po
 	bool &calibrated = trans_calibrated;
 	vector<Point2f> corners, ext_corn;
 	cvtColor(img, gray, CV_BGR2GRAY);
-	pattern_found = findChessboardCorners(gray, chessboard_size, corners, CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK);
+	pattern_found = findChessboardCorners(gray, chessboard_size, corners, CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE);// + CALIB_CB_FAST_CHECK);
 	if (pattern_found) {
 		//On recupere les 4 points exterieurs de l'échiquier
 		ext_corn.push_back(corners[0]);
@@ -238,30 +238,32 @@ bool Visio::computeTransformMatrix(const Mat &img, const vector<Point2f> real_po
 bool Visio::camPerspective() {
 	//TODO choix position
 	vector<Point2f> position;
-	position.push_back(Point2f(300,300));
-	position.push_back(Point2f(300,562));
-	position.push_back(Point2f(482,300));
-	position.push_back(Point2f(482,562));
+	int xsize = 130, ysize = 210;
+	int x = 185, y = 105;
+	position.push_back(Point2f(x, y - ysize));
+	position.push_back(Point2f(x, y));
+	position.push_back(Point2f(x + xsize, y - ysize));
+	position.push_back(Point2f(x + xsize, y));
 	Mat img, undistorted_img;
 	bool calibrated = false;
 	int key = 0;
 	cout << "Starting perpective calibration" << endl;
 	namedWindow("Perspective");
-	while (!calibrated) {
+	while (!(calibrated && key == 'c')) {
 		img = getImg();
 		if (cam_calibrated) {
 			undistort(img, undistorted_img, CM, D);
+		} else {
+			cerr << "WARNING : Calibration de perspective sans calibration camera" << endl;
+			undistorted_img = img;
 		}
-		if (key == 'c') {
-			calibrated = computeTransformMatrix(undistorted_img, position, &undistorted_img);
-			key = 0;
-		}
+		calibrated = computeTransformMatrix(undistorted_img, position, &undistorted_img);
 		if (key == 'q') {
 			cerr << "WARNING : Perspective calibration failed" << endl;
 			return false;
 		}
-		putText(img, "Appuyer sur 'c' pour valider une vue", Point(10,10),1,1,Scalar(0,255,0),1);
-		putText(img, "Appuyer sur 'q' pour quiter", Point(10,30),1,1,Scalar(0,255,0),1);
+		putText(undistorted_img, "Appuyer sur 'c' pour valider une vue", Point(10,10),1,1,Scalar(0,255,0),1);
+		putText(undistorted_img, "Appuyer sur 'q' pour quiter", Point(10,30),1,1,Scalar(0,255,0),1);
 		imshow("Perspective", undistorted_img);
 		key = waitKey(20);
 	}
@@ -302,7 +304,7 @@ bool Visio::camCalibrate(int nbr_of_views) {
 		//Capture d'image
 		img = getImg();
 		cvtColor(img, gray, CV_BGR2GRAY);
-		pattern_found = findChessboardCorners(gray, chessboard_size, corners, CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK);
+		pattern_found = findChessboardCorners(gray, chessboard_size, corners, CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE);// + CALIB_CB_FAST_CHECK);
 		if (pattern_found) {
 			cornerSubPix(gray, corners, Size(11, 11), Size(-1, -1), TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
 		}

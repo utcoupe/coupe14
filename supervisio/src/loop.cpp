@@ -108,9 +108,11 @@ void perspectiveOnlyLoop(int index, string path){
 			visio.setBlkParameters(min_b, max_b);
 
 			Mat frame_hsv;
+			int xoffset = 0, yoffset = 300;
+			Mat translation = (Mat_<double>(3,3) << 1, 0, xoffset, 0, 1, yoffset, 0, 0, 1);
 			cvtColor(frame_ori, frame_hsv, CV_BGR2HSV);
 			undistort(frame_ori, frame, visio.getCM(), visio.getD());
-			warpPerspective(frame, persp, visio.getQ(), Size(1000,1000));
+			warpPerspective(frame, persp, translation*visio.getQ(), Size(1000,600));
 			visio.setColor(yellow);
 			visio.getDetectedPosition(frame_hsv, detected_pts_yel, detected_contours_yel);
 			visio.setColor(red);
@@ -127,7 +129,7 @@ void perspectiveOnlyLoop(int index, string path){
 			vector<Triangle> tri;
 			visio.trianglesFromImg(frame_hsv, tri);
 			for(int i=0; i<tri.size(); i++) {
-				string txt = intToString(tri[i].size);
+				string txt = intToString(tri[i].coords.x) + (string)"," + intToString(tri[i].coords.y) + (string)" - " + intToString(tri[i].size);
 				Scalar color;
 				if (tri[i].color == yellow) 
 					color = Scalar(0, 195, 210);
@@ -137,18 +139,20 @@ void perspectiveOnlyLoop(int index, string path){
 					color = Scalar(0,0,0);
 				}
 
-				drawObject(tri[i].coords.x, tri[i].coords.y, persp, txt, color, true);
+				drawObject(tri[i].coords.x+xoffset, tri[i].coords.y+yoffset, persp, txt, color, true);
 				 //Repr de l'angle
 				int len = 100;
 				Point2f angle(len*cos(tri[i].angle), len*sin(tri[i].angle));
-				angle += tri[i].coords;
-				line(persp, tri[i].coords, angle, c_blue, 2);
+				angle += tri[i].coords + Point2f(xoffset, yoffset);
+				line(persp, Point2f(xoffset, yoffset) + tri[i].coords, angle, c_blue, 2);
+				for (int j=0; j<tri[i].contour.size(); j++) {
+					tri[i].contour[j] = tri[i].contour[j] + Point2f(xoffset, yoffset);
+				}
 				vector<vector<Point> > t; t.push_back(convertFtoI(tri[i].contour));
 				drawContours(persp, t, -1, c_blue, 2);
 			}
 
-	//		resize(persp, persp, Size(600, 600));
-			resize(persp, persp, Size(900,900));
+			resize(persp, persp, Size(1000,600));
 			imshow("persp", persp);
 			imshow("undistort", frame);
 			imshow("origin", frame_ori);
