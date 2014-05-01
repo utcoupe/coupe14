@@ -50,8 +50,12 @@ class SubProcessManager():
 				self.__processStatus(new_message)
 
 	def __updateData(self, data):
-		for name in data:
-			self.__data[name] = data[name]
+		if self.__data == {}:
+			self.__data = data
+		else:
+			for robot_name in data:
+				for info_name in data[robot_name]:
+					self.__data[robot_name][info_name] = data[robot_name][info_name]
 
 	def __processStatus(self, status):
 		"""read new status and update objectif_list"""

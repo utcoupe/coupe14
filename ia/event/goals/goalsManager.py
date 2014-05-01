@@ -167,17 +167,26 @@ class GoalsManager:
 		self.__queueBestGoals()
 
 	def __deleteGoal(self, goal):
+		success = False
+
 		if goal in self.__available_goals:
 			self.__available_goals.remove(goal)
+			success = True
 		if goal in self.__blocked_goals:
 			self.__blocked_goals.remove(goal)
+			success = True
 		if goal in self.__dynamique_finished_goals:
 			self.__dynamique_finished_goals.remove(goal)
+			success = True
 		if goal in self.__finished_goals:
 			self.__finished_goals.remove(goal)
+			success = True
 
 		self.__SubProcessManager.sendDeleteGoal(goal.getId())
-		self.__logger.info('Goal ' + goal.getName() + ' is delete')
+		if success:
+			self.__logger.info('Goal ' + goal.getName() + ' is delete')
+		else:
+			self.__logger.error('Goal ' + goal.getName() + " can't be delete")
 		self.__queueBestGoals()
 
 	def __manageStepOver(self, objectif, id_objectif, skip_get_triangle=False):
@@ -281,7 +290,7 @@ class GoalsManager:
 			if status_fin == 1:
 				self.__manageStepOver(objectif, id_objectif, skip_get_triangle=True)
 			else:
-				self.__logger.warning("La prehention du trianglé à échoué, donc on supprime l'ordre")
+				self.__logger.warning("La prehention du trianglé à échoué, donc on supprime l'ordre"+str(id_objectif))
 				self.__deleteGoal(objectif)
 
 
