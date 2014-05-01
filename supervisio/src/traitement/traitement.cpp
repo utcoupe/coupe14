@@ -29,12 +29,16 @@ using namespace std;
  * CONSTRUCTEUR   *
  * ****************/
 
-Visio::Visio(VideoCapture& cam, string path) : 
+Visio::Visio(int index, string path) : camera(index),
 	color(red), min_size(MIN_SIZE), distort(none), path_to_conf(path),
 	chessboard_size(Size(9,6)), epsilon_poly(EPSILON_POLY),
-	max_diff_triangle_edge(MAX_DIFF_TRI_EDGE), camera(cam),
+	max_diff_triangle_edge(MAX_DIFF_TRI_EDGE), 
 	size_frame(camera.get(CV_CAP_PROP_FRAME_WIDTH), camera.get(CV_CAP_PROP_FRAME_HEIGHT)),
 	thread_update(&Visio::refreshFrame, this){
+	if(!camera.isOpened()) {  // check if we succeeded
+		cerr << "Failed to open camera" << endl;
+		return;
+	}
 	init();
 }
 
@@ -452,6 +456,14 @@ Mat Visio::getCM() {
 
 Mat Visio::getD() {
 	return D;
+}
+
+Mat Visio::getImg() {
+	Mat img;
+	frame_mutex.lock(); //Bloque le thread d'update
+	camera >> img;
+	frame_mutex.unlock();
+	return img;
 }
 
 DistortType Visio::getDistortMode() {
