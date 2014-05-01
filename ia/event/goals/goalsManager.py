@@ -36,9 +36,9 @@ class GoalsManager:
 		self.__back_triangle_stack = deque()
 		self.__front_triangle_stack = deque()
 
-		data = self.__SubProcessManager.getData() #pas de self, data n'est pas stocké ici !
-		self.__our_color = data["METADATA"]["getOurColor"]
-		self.__PathFinding = PathFinding((data["FLUSSMITTEL"], data["TIBOT"], data["BIGENEMYBOT"], data["SMALLENEMYBOT"]))
+		self.__data = self.__SubProcessManager.getData()
+		self.__our_color = self.__data["METADATA"]["getOurColor"]
+		self.__PathFinding = PathFinding((self.__data["FLUSSMITTEL"], self.__data["TIBOT"], self.__data["BIGENEMYBOT"], self.__data["SMALLENEMYBOT"]))
 
 		self.__loadElemScript(base_dir+"/elemScripts.xml")
 		self.__loadGoals(base_dir+"/goals.xml")
@@ -76,11 +76,10 @@ class GoalsManager:
 	def __queueBestGoals(self):
 		if not self.__blocked_goals:
 			self.__logger.debug(str(self.__robot_name)+" Recherche d'un nouvel objectif")	
-			data = self.__SubProcessManager.getData()
-			self.__PathFinding.update(data[self.__robot_name])
+			self.__PathFinding.update(self.__data[self.__robot_name])
 			if self.__available_goals:
 				goal = self.__available_goals[0]
-				path = self.__getOrderTrajectoire(data, goal, 0)
+				path = self.__getOrderTrajectoire(goal, 0)
 				self.__addGoal(path, goal, 0)
 			else:
 				self.__logger.warning(str(self.__robot_name)+" N'a plus aucun objectif disponible, GG !")
@@ -123,10 +122,10 @@ class GoalsManager:
 			self.__available_goals.remove(goal)
 			self.__blocked_goals.append(goal)
 			goal.setElemGoalLocked(goal.getElemGoal(elem_goal_id))
-			self.__logger.info('Goal ' + goal.getName() + ' is blocked')
+			self.__logger.info('Goal '+goal.getName()+' id: '+str(goal.getId())+' is blocked')
 			return True
 		else:
-			self.__logger.warning('Goal ' + goal.getName() + " n'a pas pu être bloqué")
+			self.__logger.warning('Goal '+goal.getName()+' id: '+str(goal.getId())+" n'a pas pu être bloqué")
 			return False
 
 	def __addGoal(self, tuple_trajectoire_list, goal, elem_goal_id, prev_action=None):
@@ -168,23 +167,31 @@ class GoalsManager:
 		self.__queueBestGoals()
 
 	def __deleteGoal(self, goal):
+		success = False
+
 		if goal in self.__available_goals:
 			self.__available_goals.remove(goal)
+			success = True
 		if goal in self.__blocked_goals:
 			self.__blocked_goals.remove(goal)
+			success = True
 		if goal in self.__dynamique_finished_goals:
 			self.__dynamique_finished_goals.remove(goal)
+			success = True
 		if goal in self.__finished_goals:
 			self.__finished_goals.remove(goal)
+			success = True
 
 		self.__SubProcessManager.sendDeleteGoal(goal.getId())
-		self.__logger.info('Goal ' + goal.getName() + ' is delete')
+		if success:
+			self.__logger.info('Goal ' + goal.getName() + ' is delete')
+		else:
+			self.__logger.error('Goal ' + goal.getName() + " can't be delete")
 		self.__queueBestGoals()
 
 	def __manageStepOver(self, objectif, id_objectif, skip_get_triangle=False):
 		action_list = objectif.getElemGoalLocked().getFirstElemAction()
 		if action_list:
-			print("self.__robot_name "+str(self.__robot_name))
 			if action_list[0][0] == "GET_TRIANGLE_IA" and self.__robot_name == "FLUSSMITTEL":#Redondant normalement
 				if skip_get_triangle == True:
 					position = None # 1=front and -1=back
@@ -272,13 +279,19 @@ class GoalsManager:
 		return True
 
 	def processBrasStatus(self, status_fin, id_objectif):
-		if status_fin == 1:
-			for objectif in self.__blocked_goals:
-				if objectif.getId() == id_objectif:
-					self.__manageStepOver(objectif, id_objectif, skip_get_triangle=True)
+		objectif = None
+		for objectif_temp in self.__blocked_goals:
+			if objectif_temp.getId() == id_objectif:
+				objectif = objectif_temp
+
+		if objectif is None:
+			self.__logger.critical("L'objectif a supprimer n'est plus dans la liste des bloqués "+str(id_objectif))
 		else:
-			self.__logger.warning("La prehention du trianglé à échoué, donc on supprime l'ordre")
-			self.__deleteGoal(objectif)
+			if status_fin == 1:
+				self.__manageStepOver(objectif, id_objectif, skip_get_triangle=True)
+			else:
+				self.__logger.warning("La prehention du trianglé à échoué, donc on supprime l'ordre"+str(id_objectif))
+				self.__deleteGoal(objectif)
 
 
 	#TODO utiliser cette focntion ?
@@ -351,8 +364,7 @@ class GoalsManager:
 		dom = parseString(fd.read())
 		fd.close()
 
-		data = self.__SubProcessManager.getData()
-		self.__PathFinding.update(data[self.__robot_name])
+		self.__PathFinding.update(self.__data[self.__robot_name])
 
 		for xml_goal in dom.getElementsByTagName('objectif'):
 			id_objectif	= int(xml_goal.getElementsByTagName('id_objectif')[0].firstChild.nodeValue)
@@ -382,7 +394,7 @@ class GoalsManager:
 			for goal in self.__available_goals:
 				if goal.getId() == id_objectif:
 					find = True
-					path = self.__getOrderTrajectoire(data, goal, elem_goal_id, position_depart_speciale)
+					path = self.__getOrderTrajectoire(goal, elem_goal_id, position_depart_speciale)
 					if path != []:
 						self.__addGoal(path, goal, elem_goal_id, prev_action=prev_action)
 					else:
@@ -392,7 +404,7 @@ class GoalsManager:
 			if not find:
 				self.__logger.error(str(self.__robot_name) + " impossible de lui ajouter le goal d'id: " + str(id_objectif))
 	
-	def __getOrderTrajectoire(self, data, goal, elem_goal_id, position_depart_speciale=None):
+	def __getOrderTrajectoire(self, goal, elem_goal_id, position_depart_speciale=None):
 		"""Il faut mettre à jour les polygones avant d'utiliser cette fonction"""
 		if position_depart_speciale is not None:
 			position_last_goal = position_depart_speciale
@@ -402,7 +414,7 @@ class GoalsManager:
 			position_last_goal = last_goal.getElemGoalLocked().getPositionAndAngle()
 			self.__logger.debug("Position from queue" + str(position_last_goal))
 		else:
-			position_last_goal = data[self.__robot_name]["getPositionAndAngle"]
+			position_last_goal = self.__data[self.__robot_name]["getPositionAndAngle"]
 			self.__logger.debug("Position from data" + str(position_last_goal))
 
 		position_to_reach = goal.getElemGoal(elem_goal_id).getPositionAndAngle()

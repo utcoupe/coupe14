@@ -44,7 +44,7 @@ renvoiImmediat = 		False # fonction non terminé, ne pas activer !
 #=======================================IA========================================
 
 #====================Variables globales====================
-NUMBER_OF_ENEMY = 		0 #TODO
+NUMBER_OF_ENEMY = 		2 #TODO
 
 #====================eventManager====================
 PERIODE_EVENT_MANAGER =	2

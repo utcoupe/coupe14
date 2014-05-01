@@ -112,8 +112,7 @@ class Communication():
 		#on traite les ordres qui nécessitent de renvoyer des informations
 		if (order == "A_GET_POS"):
 			pos = self.__bigrobot.getPosition()
-			fixed_pos = (pos[0], 2000-pos[1], pos[2])
-			print('getPos : ', fixed_pos)
+			fixed_pos = (pos[0], pos[1], pos[2])
 			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, fixed_pos)
 
 		elif (order == "GET_LAST_ID"):
@@ -122,7 +121,7 @@ class Communication():
 
 		elif (order == "A_GET_POS_ID"):
 			pos = self.__bigrobot.getPositionId()
-			pos_id = (pos[0], 2000-pos[1], pos[2], pos[3])
+			pos_id = (pos[0], pos[1], pos[2], pos[3])
 			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos_id)
 
 		elif (order == "A_CLEANG"):
@@ -137,7 +136,7 @@ class Communication():
 
 		elif (order == "A_SET_POS"):
 			pos = ()
-			self.__bigrobot.setPosition(args[0],2000-args[1], args[2])
+			self.__bigrobot.setPosition(args[0],args[1], args[2])
 			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos)
 
 		elif (order == "PINGPING"):
@@ -231,7 +230,7 @@ class Communication():
 		#on traite les ordres qui nécessitent de renvoyer des informations
 		if (order == "A_GET_POS"):
 			pos = self.__minirobot.getPosition()
-			fixed_pos = (pos[0], 2000-pos[1], pos[2])
+			fixed_pos = (pos[0], pos[1], pos[2])
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, fixed_pos)
 
 		elif (order == "GET_LAST_ID"):
@@ -240,7 +239,7 @@ class Communication():
 
 		elif (order == "A_GET_POS_ID"):
 			pos = self.__minirobot.getPositionId()
-			pos_id = (pos[0], 2000-pos[1], pos[2], pos[3])
+			pos_id = (pos[0], pos[1], pos[2], pos[3])
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos_id)
 
 		elif (order == "A_CLEANG"):
@@ -255,7 +254,7 @@ class Communication():
 
 		elif (order == "A_SET_POS"):
 			pos = ()
-			self.__minirobot.setPosition(args[0],2000-args[1], args[2])
+			self.__minirobot.setPosition(args[0], args[1], args[2])
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
 
 		elif (order == "PINGPING"):

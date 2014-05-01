@@ -281,7 +281,7 @@
 		<name>Fresque</name>
 		<type>triangle</type>
 		<concerned_robot>TIBOT</concerned_robot>
-		<x>1350</x>
+		<x>1500</x>
 		<y>1850</y>
 		<elem_goals>
 			<elem_goal>

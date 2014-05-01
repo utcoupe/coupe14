@@ -18,9 +18,9 @@ class BigRobot(Robot):
 		self.bras = EngineObjectPoly(
 			engine 		= engine,
 			colltype	= COLLTYPE_BRAS,
-			offset		= mm_to_px(WIDTH_GROS/2-25, HEIGHT_GROS/2+25),
+			offset		= mm_to_px(WIDTH_GROS/2-21, -HEIGHT_GROS/2-24),
 			color		= "green",
-			poly_points = map(lambda p: mm_to_px(*p),[(0,0),(LONGUEUR_BRAS,0),(0,-LONGUEUR_BRAS)]), #taille du bras
+			poly_points = map(lambda p: mm_to_px(*p),[(LONGUEUR_BRAS,0),(0,LONGUEUR_BRAS), (0,0)]), #taille du bras
 			is_extension= True
 		)
 
@@ -31,11 +31,10 @@ class BigRobot(Robot):
 			mass				= 10,
 			typerobot			= BIG,
 			colltype 			= COLLTYPE_GROS_ROBOT,
-			poly_points			= mm_to_px((0,0),(HEIGHT_GROS,0),(HEIGHT_GROS,WIDTH_GROS),(0,WIDTH_GROS)),
+			poly_points			= mm_to_px((0,0),(HEIGHT_GROS,0),(HEIGHT_GROS,WIDTH_GROS-95),(HEIGHT_GROS-115,WIDTH_GROS),(0,WIDTH_GROS)),
 			extension_objects	= [],
 		)
 		self.__state_jack = 0  # jack in
-		self.body.angle = math.radians(90)
 		self.__nbrFeu = 0
 		self.__engine = engine
 
