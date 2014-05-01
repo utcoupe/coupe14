@@ -67,7 +67,8 @@ class SubProcessManager():
 		elif etat == "DYNAMIQUE_OVER":
 			self.__GoalsManager.goalDynamiqueFinishedId(id_objectif)
 		elif etat == "BRAS_STATUS":
-			self.__GoalsManager.processBrasStatus(status[1], status[2])
+			if self.__robot_name == "FLUSSMITTEL":
+				self.__GoalsManager.processBrasStatus(status[1], status[2])
 		elif etat == "END":
 			self.__GoalsManager.goalFinishedId(id_objectif)
 		elif etat == "CANCELED":
