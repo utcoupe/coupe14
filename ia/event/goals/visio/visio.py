@@ -41,8 +41,8 @@ class Visio:
 		self.__retry_count = 0
 		self.__hplat = 30  # hauteur des plateformes
 		self.__hcam = 300  # hauteur de la cam au sol
-		self.__xcam = 100  # distance entre cam et milieu robot
-		self.__ycam = 0  # devrait etre 0
+		self.__xcam = 190  # distance entre cam et milieu robot
+		self.__ycam = 35  # devrait etre 0
 
 		self.__log = logging.getLogger(__name__)
 		self.path_exec = './' + path_exec
