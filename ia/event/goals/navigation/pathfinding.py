@@ -71,6 +71,7 @@ class PathFinding:
 			enable_smooth = False
 		start_time = time.time()
 		foo, bar, path = self.__ng.get_path(start, end, enable_smooth)
+		self.__log.debug("Data pathfinding: "+str(self.__flussmittel["getPosition"])+' '+str(self.__tibot["getPosition"])+' '+str(self.__big_enemy_bot["getPosition"])+' '+str(self.__small_enemy_bot["getPosition"]))
 		self.__log.info("Calcul de trajectoire en " + str((time.time() - start_time) * 1000) + "ms : " + str(path))
 		return Path(path)
 

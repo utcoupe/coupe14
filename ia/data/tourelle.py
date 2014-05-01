@@ -77,7 +77,6 @@ class Tourelle():
 		newpos = list( map(predict, zip(self.__old_data[-2][1], self.__old_data[-1][1])))
 
 		self.__old_data.append( (self.__old_data[-2][0], newpos) )
-		pass
 	
 
 
@@ -144,11 +143,8 @@ class Tourelle():
 		"""
 
 		#self.Tourelle.setFormatedPosition(position_big_enemy, position_small_enemy)
-		pass
 
 	def __setFormatedPosition(self, position_big_enemy, position_small_enemy):
 		"""Cette méthode ne doit être appelé qu'avec des données formatées par data/computeHokuyoData.py"""
-		self.__logger.debug(str(self.MetaData.getOurColor())+" ennemy position acquired :\tbig: "+str(position_big_enemy)+"\tsmall: "+str(position_small_enemy))
-
 		self.SmallEnemyBot.setPosition(position_small_enemy)
 		self.BigEnemyBot.setPosition(position_big_enemy)
