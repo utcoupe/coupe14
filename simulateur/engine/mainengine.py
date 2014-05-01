@@ -76,8 +76,8 @@ class Engine:
 			if not feu:
 				print("Feu not found")
 			else:
-				robot.storeFeu()
-				feu.eteindre()
+				robot.setFeuHit(1) #positionne un flag pour dire qu'on a touché un triangle
+				feu.eteindre() #supprime le feu de la map
 
 	def stop(self):
 		self.e_stop.set()

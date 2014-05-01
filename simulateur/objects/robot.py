@@ -33,7 +33,7 @@ class Robot(EngineObjectPoly):
 		self.__team = team
 		self.__goals = []
 		self.__asserv = Asserv(self)
-		self.__visio = Visio(self)
+		self._visio = Visio(self)
 		self.__others = Others(self)
 
 
@@ -159,12 +159,6 @@ class Robot(EngineObjectPoly):
 		elif (numOrdre == PWM):
 			self.__asserv.pwm(arg[0], arg[1], arg[2], arg[3])	#!! x=pwm_l, y=pwm_r, angle=delay !!
 
-	def activerVisio(self):
-		"""
-		Active la reconnaissance de triangles dans la zone de portée du bras
-		"""
-		self.__visio.actionBras()
-
 	def _my_velocity_func(self):
 		"""
 		Fonction qui détermine la vitesse des corps.
@@ -228,7 +222,7 @@ class Robot(EngineObjectPoly):
 						diffrence_value = difference_value_2
 					else:
 						diffrence_value = difference_value_1
-					print('goal ANGLE, current : ', cura, ' goal : ', goala, ' diff : ',diffrence_value)
+					#print('goal ANGLE, current : ', cura, ' goal : ', goala, ' diff : ',diffrence_value)
 					if (abs(diffrence_value) < 0.1):
 						self.body._set_angle(current_goal.a)
 						removed_goal = self.__goals.pop(0)

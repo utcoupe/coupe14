@@ -35,8 +35,25 @@ class BigRobot(Robot):
 			extension_objects	= [],
 		)
 		self.__state_jack = 0  # jack in
-		self.__nbrFeu = 0
+		self.__nbrFeuAvant = 0
+		self.__nbrFeuArriere = 0 #normalement à 0, 1 pour les tests
 		self.__engine = engine
+		self.__feuHit = 0
+
+	def setFeuHit(self, value):
+		self.__feuHit = value
+
+	def getFeuHit(self):
+		"""
+		feuHit fonctionne comme un flag, une fois qu'il est lu sa valeur revient par défaut
+		"""
+		return self.__feuHit
+
+	def activerVisio(self):
+		"""
+		Active la reconnaissance de triangles dans la zone de portée du bras
+		"""
+		self._visio.actionBras()
 
 	def add_bras(self):
 		self.add_body_extension(self.bras)
@@ -44,15 +61,28 @@ class BigRobot(Robot):
 	def remove_bras(self):
 		self.remove_body_extension(self.bras)
 
-	def storeFeu(self):
-		self.__nbrFeu += 1
-
-	def releaseFeu(self):
-		if (self.__nbrFeu > 0):
-			self.__nbrFeu -= 1
-			self.__engine.add(feu.Feu(self.__engine,mm_to_px(int(1500),int(1000)),"vert",True))
+	def storeFeu(self, sens):
+		if sens > 0:
+			self.__nbrFeuAvant += 1
 		else:
-			print('fuck, j''ai pas de feu !')
+			self.__nbrFeuArriere += 1
+
+	def releaseFeuArriere(self):
+		print('release feu arriere, NBR : ', self.__nbrFeuArriere)
+		if (self.__nbrFeuArriere > 0):
+			self.__nbrFeuArriere -= 1
+			self.__engine.add(feu.Feu(self.__engine,(self.__computePositionTriangle()),"vert",True))
+		else:
+			print('pas de feu stocké à arriere du robot')
 
 	def getStateJack(self):
 		return self.__state_jack
+
+	def __computePositionTriangle(self):
+		xBot = self.body.position[0]
+		yBot = self.body.position[1]
+		aBot = self.body.angle
+		dist_feu_robot = 40+55+15 #40 = distance/extrémité, 55 = taille triangle feu, 15 = distance milieu/extrémité feu
+		xFeu = (int)(xBot - math.ceil(mm_to_px(dist_feu_robot + WIDTH_GROS/2)*math.cos(aBot)))
+		yFeu = (int)(yBot - math.ceil(mm_to_px(dist_feu_robot + WIDTH_GROS/2)*math.sin(aBot)))
+		return xFeu,yFeu
