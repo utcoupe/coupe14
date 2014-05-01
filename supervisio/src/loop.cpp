@@ -9,8 +9,8 @@
 
 using namespace cv;
 
-void communication(int index, string path_to_conf) {
-	Visio visio(index, path_to_conf);
+void communication(int index, string path_to_conf, bool save) {
+	Visio visio(index, path_to_conf, save);
 	if (!visio.isCalibrated()) {
 		cerr << "ERROR : Uncalibarted" << endl;
 		return;
