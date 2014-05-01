@@ -84,6 +84,7 @@ class TimeManager():
 			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'RESET_ID', *empty_arg)
 			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressOther() , 'RESET_ID', *empty_arg)
 
+
 		if self.__Tibot is not None:
 			position_arg = self.__MetaData.getFirstPositionTibot()
 			if position_arg is None:
@@ -92,4 +93,5 @@ class TimeManager():
 			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_SET_POS', *position_arg)
 			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'RESET_ID', *empty_arg)
 			self.__Communication.sendOrderAPI(self.__Tibot.getAddressOther() , 'RESET_ID', *empty_arg)
+
 

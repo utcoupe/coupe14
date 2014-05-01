@@ -115,7 +115,6 @@ class Communication():
 		if (order == "A_GET_POS"):
 			pos = self.__bigrobot.getPosition()
 			fixed_pos = (pos[0], pos[1], pos[2])
-			print('getPos : ', fixed_pos)
 			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, fixed_pos)
 
 		elif (order == "GET_LAST_ID"):
