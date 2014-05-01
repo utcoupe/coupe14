@@ -81,7 +81,7 @@ if __name__ == "__main__":
 							  posinit = mm_to_px(70, 570),
 							  team = RED)
 		bigbotYellow = bigrobot.BigRobot(engine = engine,
-							 posinit = mm_to_px(3000-180,170),
+							 posinit = mm_to_px(3000-180,200),
 							 team = YELLOW)
 		minibotYellow = minirobot.MiniRobot(engine = engine,
 							   posinit = mm_to_px(3000-100,690),

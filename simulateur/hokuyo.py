@@ -53,8 +53,8 @@ class Hokuyo:
 		ret.append(self.__get_milli()-self.__last_time_stamp)
 
 		for i in range(taille):
-			ret.append(self.__robots[i].x())
-			ret.append(2000 - self.__robots[i].y())
+			ret.append(self.__robots[i].getXreal())
+			ret.append(self.__robots[i].getYreal())
 		return ret
 
 	def __getTimeStamp(self):

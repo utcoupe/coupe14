@@ -10,12 +10,7 @@
 using namespace cv;
 
 void communication(int index, string path_to_conf) {
-	VideoCapture cam(index);
-	 if(!cam.isOpened()) {  // check if we succeeded
-		cerr << "Failed to open camera" << endl;
-		return;
-	 }
-	Visio visio(cam, path_to_conf);
+	Visio visio(index, path_to_conf);
 	if (visio.getDistortMode() != none) {
 		cerr << "INFO : Starting visio WITH distortion correction" << endl;
 	} else {
@@ -25,13 +20,7 @@ void communication(int index, string path_to_conf) {
 }
 
 void calibration(int index, string path) {
-	VideoCapture cam(index);
-	 if(!cam.isOpened()) {  // check if we succeeded
-		cerr << "Failed to open camera" << endl;
-		return;
-	 }
-
-	Visio visio(cam, path);
+	Visio visio(index, path);
 	visio.setChessboardSize(Size(9,6));
 	if (visio.camCalibrate(25)) 
 		visio.saveCameraMatrix();
@@ -51,13 +40,7 @@ void getColor(int event, int x, int y, int, void* img_mat) {
 
 void perspectiveOnlyLoop(int index, string path){
 	Mat frame;
-	VideoCapture cam(index);
-	if(!cam.isOpened()) {  // check if we succeeded
-		cerr << "Failed to open camera" << endl;
-		return;
-	}
-
-	Visio visio(cam, path);
+	Visio visio(index, path);
 	visio.setChessboardSize(Size(9,6));
 
 	int size_min(5000), max_diff_triangle_edge(MAX_DIFF_TRI_EDGE);
@@ -100,7 +83,7 @@ void perspectiveOnlyLoop(int index, string path){
 		vector<vector<Point> > detected_contours_yel, detected_contours_red, detected_contours_blk;
 		vector<Point2f> detected_pts_yel, detected_pts_red, detected_pts_blk;
 		Mat frame_ori, persp;
-		cam >> frame_ori;
+		frame_ori = visio.getImg();
 
 		if (key == 's') {
 			visio.saveTransformMatrix();
@@ -123,7 +106,7 @@ void perspectiveOnlyLoop(int index, string path){
 			Mat frame_hsv;
 			cvtColor(frame_ori, frame_hsv, CV_BGR2HSV);
 			undistort(frame_ori, frame, visio.getCM(), visio.getD());
-			warpPerspective(frame, persp, visio.getQ(), Size(3000,2000));
+			warpPerspective(frame, persp, visio.getQ(), Size(1000,1000));
 			visio.setColor(yellow);
 			visio.getDetectedPosition(frame_hsv, detected_pts_yel, detected_contours_yel);
 			visio.setColor(red);
@@ -161,9 +144,10 @@ void perspectiveOnlyLoop(int index, string path){
 			}
 
 	//		resize(persp, persp, Size(600, 600));
-			resize(persp, persp, Size(900,600));
+			resize(persp, persp, Size(900,900));
 			imshow("persp", persp);
-			imshow("origin", frame);
+			imshow("undistort", frame);
+			imshow("origin", frame_ori);
 		}
 		key = waitKey(20);
 	}
