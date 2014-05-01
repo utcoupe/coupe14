@@ -222,7 +222,12 @@ class Robot(EngineObjectPoly):
 					self.body._set_velocity((0,0))
 					goala = current_goal.a
 					cura = self.body.angle
-					diffrence_value = (cura - goala)
+					difference_value_1 = (cura - goala)
+					difference_value_2 = (cura + goala)
+					if abs(difference_value_1) > abs(difference_value_2):
+						diffrence_value = difference_value_2
+					else:
+						diffrence_value = difference_value_1
 					print('goal ANGLE, current : ', cura, ' goal : ', goala, ' diff : ',diffrence_value)
 					if (abs(diffrence_value) < 0.1):
 						self.body._set_angle(current_goal.a)
@@ -231,11 +236,9 @@ class Robot(EngineObjectPoly):
 						self.body._set_angular_velocity(0)
 					else:
 						vitesse_angulaire = 4 #valeur choisie pour avoir vitesse angulaire simu proche du réel
-						if (goala < cura):
-							print('velocity negatif')
+						if (diffrence_value > 0):
 							self.body._set_angular_velocity(-vitesse_angulaire)
 						else:
-							print('velocity positif')
 							self.body._set_angular_velocity(vitesse_angulaire)
 				else:
 					raise Exception("type_goal inconnu")
@@ -247,7 +250,7 @@ class Robot(EngineObjectPoly):
 		# selection des teams et des robots
 		if KEYDOWN == event.type:
 			if KEY_CHANGE_TEAM == event.key:
-				self.__current_team = YELLOW
+				self.__current_team = RED
 				print("équipe rouge")
 				return True
 			elif KEY_CHANGE_ROBOT == event.key:

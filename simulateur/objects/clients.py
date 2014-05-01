@@ -186,7 +186,7 @@ class Visio:
 		hauteur_y = base_y + math.ceil(LONGUEUR_BRAS*math.sin(angle_rad))
 		"""
 		self.__robot.add_bras()
-		time.sleep(1)
+		time.sleep(0.5) #temps où le bras apparaitra
 		self.__robot.remove_bras()
 
 class Others:

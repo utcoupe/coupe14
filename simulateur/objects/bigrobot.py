@@ -18,9 +18,9 @@ class BigRobot(Robot):
 		self.bras = EngineObjectPoly(
 			engine 		= engine,
 			colltype	= COLLTYPE_BRAS,
-			offset		= mm_to_px(WIDTH_GROS/2-25, HEIGHT_GROS/2+25),
+			offset		= mm_to_px(WIDTH_GROS/2-21, -HEIGHT_GROS/2-24),
 			color		= "green",
-			poly_points = map(lambda p: mm_to_px(*p),[(0,0),(LONGUEUR_BRAS,0),(0,-LONGUEUR_BRAS)]), #taille du bras
+			poly_points = map(lambda p: mm_to_px(*p),[(LONGUEUR_BRAS,0),(0,LONGUEUR_BRAS), (0,0)]), #taille du bras
 			is_extension= True
 		)
 
