@@ -81,7 +81,7 @@ if __name__ == "__main__":
 							  posinit = mm_to_px(70, 570),
 							  team = RED)
 		bigbotYellow = bigrobot.BigRobot(engine = engine,
-							 posinit = mm_to_px(3000-180,170),
+							 posinit = mm_to_px(3000-180,200),
 							 team = YELLOW)
 		minibotYellow = minirobot.MiniRobot(engine = engine,
 							   posinit = mm_to_px(3000-100,690),
@@ -91,7 +91,7 @@ if __name__ == "__main__":
 
 		#lancement des subProcess IA
 		processIA.ProcessIA(robots_red)
-		processIA.ProcessIA(robots_yellow)
+		#processIA.ProcessIA(robots_yellow)
 
 		#chargement de la map
 		maploader.load_map("map/map.xml",engine)

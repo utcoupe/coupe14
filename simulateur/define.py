@@ -71,7 +71,7 @@ WIDTH_MINI 		= 200
 HEIGHT_MINI 	= 138
 # dimensions du gros robot
 WIDTH_GROS 		= 330
-HEIGHT_GROS 	= 265
+HEIGHT_GROS 	= 270
 #données du gros robot
 LONGUEUR_BRAS	= 225
 
