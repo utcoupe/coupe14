@@ -122,6 +122,8 @@ class Visio:
 		for i in range(len(self._triangles)):
 			tri = self._triangles[i]
 			#calcul des coordonnées des triangles detectées sur la carte
+
+			#TODO : TENIR COMPTE DE L'ANGLE DU ROBOT
 			tri.real_coords = [i + j for i, j in zip(tri.coords, self.__big_bot.getPosition())]
 
 			#Traitement de la position pour modif si triangle en hauteur
