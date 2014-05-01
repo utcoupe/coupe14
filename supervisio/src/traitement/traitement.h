@@ -57,6 +57,7 @@ class Visio {
 		Mat getCM();
 		Mat getD();
 		Mat getImg();
+		bool isCalibrated();
 		DistortType getDistortMode();
 	private:
 		void init();

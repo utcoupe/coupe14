@@ -11,6 +11,10 @@ using namespace cv;
 
 void communication(int index, string path_to_conf) {
 	Visio visio(index, path_to_conf);
+	if (!visio.isCalibrated()) {
+		cerr << "ERROR : Uncalibarted" << endl;
+		return;
+	}
 	if (visio.getDistortMode() != none) {
 		cerr << "INFO : Starting visio WITH distortion correction" << endl;
 	} else {

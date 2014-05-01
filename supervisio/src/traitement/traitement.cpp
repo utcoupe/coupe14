@@ -466,6 +466,10 @@ Mat Visio::getImg() {
 	return img;
 }
 
+bool Visio::isCalibrated() {
+	return cam_calibrated & trans_calibrated;
+}
+
 DistortType Visio::getDistortMode() {
 	return distort;
 }
