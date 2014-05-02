@@ -50,6 +50,8 @@ class Visio:
 
 		if capture_vid:
 			capture_vid = 'true'
+		else:
+			capture_vid = 'false'
 
 		#Lancement du client
 		self.__log.info("Executing C++ program")
