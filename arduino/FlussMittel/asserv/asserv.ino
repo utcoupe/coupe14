@@ -23,7 +23,7 @@ void setup(){
 	TCCR3B = (TCCR3B & 0xF8) | 0x01 ;
 	TCCR1B = (TCCR1B & 0xF8) | 0x01 ;
 	initPins();
-	Serial2.begin(115200);
+	Serial2.begin(115200, SERIAL_8O1);
 #ifdef DEBUG
 	Serial.begin(115200);
 #endif
