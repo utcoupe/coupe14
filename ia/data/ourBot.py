@@ -42,6 +42,7 @@ class OurBot():
 
 		#Variable pour evenManager
 		self.__id_to_reach = "ANY"
+		self.__fin_en_cours = False
 
 	#Getter
 	def getPosition(self):
@@ -55,6 +56,9 @@ class OurBot():
 
 	def getName(self):
 		return self.__name
+
+	def getFinEnCours(self):
+		return self.__fin_en_cours
 
 	def getBrasStatus(self):
 		return self.__bras_status
@@ -142,6 +146,9 @@ class OurBot():
 
 	def getNextIdToStack(self):
 		return self.__last_id_action_stacked.idIncrementation()
+
+	def setFinEnCours(self, booll):
+		self.__fin_en_cours = booll
 
 	def setIdToReach(self, id):
 		self.__id_to_reach = id

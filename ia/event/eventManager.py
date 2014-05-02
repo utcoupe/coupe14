@@ -162,6 +162,9 @@ class EventManager():
 				else:
 					#Si tu as attendu le SLEEP assez longtemps
 					if int(time.time()*1000) > self.__resume_date_flussmittel:
+						if self.__Flussmittel.getFinEnCours():
+							self.__Flussmittel.setFinEnCours(False)
+							self.__SubProcessCommunicate.sendObjectifOver(id_objectif)
 						next_actions = self.__Flussmittel.getNextOrders()
 						if next_actions is not None:
 							self.__pushOrders(self.__Flussmittel, next_actions)
@@ -183,6 +186,9 @@ class EventManager():
 				else:
 					#Si tu as attendu le SLEEP assez longtemps
 					if int(time.time()*1000) > self.__resume_date_tibot:
+						if self.__Tibot.getFinEnCours():
+							self.__Tibot.setFinEnCours(False)
+							self.__SubProcessCommunicate.sendObjectifOver(id_objectif)
 						next_actions = self.__Tibot.getNextOrders()
 						if next_actions is not None:
 							self.__pushOrders(self.__Tibot, next_actions)
@@ -228,7 +234,7 @@ class EventManager():
 
 		elif last_order[1] == 'END':
 			Objet.setLastIdObjectifExecuted(id_objectif)
-			self.__SubProcessCommunicate.sendObjectifOver(id_objectif)
+			Objet.setFinEnCours(True)
 
 		elif last_order[1] == 'DYNAMIQUE_OVER':
 			self.__SubProcessCommunicate.sendObjectifDynamiqueOver(id_objectif)
