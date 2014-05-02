@@ -51,14 +51,16 @@
 #define DELAY_STOP_PUMP 500
 
 //TRIANGLES BORDURES
-#define HAUTEUR_TRI_BORDURE 110
+#define HAUTEUR_TRI_BORDURE 70
+#define LONGUEUR_TRI_BORDURE 200
+#define ANGLE_REPLI_TRI (-(80/180.0)*M_PI) 
 #define ANGLE_OUVERT 0 
 
 //RETOURNEMENT
 #define ANGLE_RET 70
 
 //POMPE
-#define PWM_PUMP 255
+#define PWM_PUMP 150 
 
 //////////////////////
 //		PINS		//

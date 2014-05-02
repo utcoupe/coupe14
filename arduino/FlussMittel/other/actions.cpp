@@ -86,7 +86,8 @@ void getTriBordure() {
 }
 
 void getTriBordureRepliBras() {
-	if (action_en_cours == TriBordure && step == 2) {
+	if (action_en_cours == TriBordure && step == 3) {
+		block = false;
 		next_step = true;
 	}
 }
@@ -130,6 +131,7 @@ void cmdTriBordure() {
 	if (step == -1) {
 		step = 0;
 		next_step = true;
+		block = true;
 	}
 	//Temporisation
 	if (timeMicros() > time_end && time_end != 0) {
@@ -148,18 +150,30 @@ void cmdTriBordure() {
 				break;
 			}
 			case 1:
-				cmdBrasServ(ANGLE_OUVERT, LONGUEUR_MIN); //Pas d'attente ici, cela ne devrai pas etre la peine, sinon, implémenter time_end
-				setLastId(); //Fin de préhension
+				cmdBrasServ(ANGLE_OUVERT, LONGUEUR_TRI_BORDURE); //Pas d'attente ici, cela ne devrai pas etre la peine, sinon, implémenter time_end
 				step++;
+				next_step = true;
 				break;
 			case 2:
-				//Pour rentrer ici, next_step doit etre mis à true par la fonction getTriBordureRepliBras()
-				cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
-				time_end = timeMicros() + (long)DELAY_REPLI_BRAS*1000;
+				cmdAsc(HAUTEUR_TRI_BORDURE);
 				step++;
 				break;
-			case 3: //On abaisse le bras sur les triangles du depot
+			case 3:
+				setLastId(); //Fin de préhension
+				if (!block) {
+					//Pour rentrer ici, next_step doit etre mis à true par la fonction getTriBordureRepliBras()
+					cmdBrasServ(ANGLE_REPLI_TRI, LONGUEUR_TRI_BORDURE);
+					time_end = timeMicros() + (long)DELAY_REPLI_BRAS2*1000;
+					step++;
+				}
+				break;
+			case 4:
+				cmdAsc(HAUTEUR_MAX);
+				step++;
+				break;
+			case 5: //On abaisse le bras sur les triangles du depot
 				setLastId(); //Fin
+				cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
 				cmdAsc(HAUTEUR_GARDE_DEPOT); //On descend le bras pour bloquer les triangles
 				step = -1;
 				action_en_cours = None;
