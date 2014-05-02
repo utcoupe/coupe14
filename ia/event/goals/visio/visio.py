@@ -3,7 +3,7 @@ import logging
 from subprocess import Popen, PIPE
 import time
 import atexit
-import sys
+from math import cos, sin
 
 
 """TODO : Post-traitement des positions des triangles pour corriger
@@ -12,7 +12,7 @@ la position des triangles en hauteur"""
 
 class Triangle:
 	"""Simple structure de stockage des infos triangles"""
-	def __init__(self, coord, angle, size, color, isDown):
+	def __init__(self, coord, angle, size, color, isDown, abs_to_rel_angle):
 		self.coord = [int(float(x)) for x in coord.split(':')]
 		self.angle = float(angle)
 		self.size = float(size)
@@ -25,7 +25,6 @@ class Triangle:
 		elif color == 2:
 			self.color = 'BLACK'
 		self.isDown = bool(isDown)
-		self.real_coords = (-1000, -1000)
 
 	def __repr__(self):
 		if self.isDown:
@@ -51,6 +50,8 @@ class Visio:
 
 		if capture_vid:
 			capture_vid = 'true'
+		else:
+			capture_vid = 'false'
 
 		#Lancement du client
 		self.__log.info("Executing C++ program")
@@ -113,10 +114,12 @@ class Visio:
 			self.__log.error("Error parsing string from C++ : " + str(data))
 
 		# En situation de test, big bot est None
-		"""
-		if self.__big_bot is not None:
-			self.__post_processing()
-			"""
+		triangles = self._triangles
+		try:
+			if self.__big_bot is not None:
+				self.__post_processing()
+		except:
+			self._triangles = triangles  # si echec, on ne corrige pas
 
 	def __post_processing(self):
 		if self.__big_bot is None:
@@ -124,10 +127,16 @@ class Visio:
 
 		for i in range(len(self._triangles)):
 			tri = self._triangles[i]
-			#calcul des coordonnées des triangles detectées sur la carte
 
-			#TODO : TENIR COMPTE DE L'ANGLE DU ROBOT
-			tri.real_coords = [i + j for i, j in zip(tri.coords, self.__big_bot.getPosition())]
+			#calcul des coordonnées relatives dans le repère des coords absolues
+			robot_angle = self.__big_bot.getPositionAndAngle()[2]
+			tri.rel_in_abs = (tri.coords[0] * cos(robot_angle) - tri.coords[1] * sin(robot_angle), 
+								tri.coords[0] * sin(robot_angle) + tri.coords[1] * cos(robot_angle))
+
+			#calcul des coordonnées réelles du triangles, on le recalcule par la
+			# suite si elles sont a modifier, mais on en a besoin pour savoir
+			# s'i faut les modifier
+			tri.real_coords = [i + j for i, j in zip(tri.rel_in_abs, self.__big_bot.getPosition())]
 
 			#Traitement de la position pour modif si triangle en hauteur
 			self.__highGroundProcess(tri)
@@ -137,14 +146,13 @@ class Visio:
 		exemple : triangle sur une plateforme de depot"""
 		if self.__inHighGround(tri):
 			#backup
-			real_to_relative = [i - j for i, j in zip(tri.real_coords, tri.coord)]
 			#modif coords
 			tri.coords[0] = (1 - self.__hcam / self.__hplat) * tri.coords[0] \
 								+ (self.__hcam / self.__hplat) * self.__xcam
 			tri.coords[1] = (1 - self.__hcam / self.__hplat) * tri.coords[1] \
 								+ (self.__hcam / self.__hplat) * self.__ycam
-			#reconversion en reel
-			tri.real_coords = [i + j for i, j in zip(tri.coords, real_to_relative)]
+			#reconversion en coords reelles
+			tri.real_coords = [i + j for i, j in zip(tri.rel_in_abs, self.__big_bot.getPosition())]
 
 	def __inHighGround(self, tri):
 		#plateformes
