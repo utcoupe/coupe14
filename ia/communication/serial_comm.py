@@ -22,6 +22,9 @@ class ComSerial():
 				self.liaison = serial.Serial(name, baudrate, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE)
 			else:
 				self.__logger.critical('Parity ' + str(parity) + ' non valide');
+
+			if not self.liaison.isOpen():
+				raise Exception("Serial not opened")
 		except:
 			self.__logger.critical("Impossible d'ouvrir le port serie demandé, depuis le fichier de constantes déactivez les robots indisponibles")
 			exit()
