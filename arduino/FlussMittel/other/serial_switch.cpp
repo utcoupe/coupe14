@@ -18,6 +18,7 @@ extern bool got_tri, use_act;
 
 static int last_id = 0;
 static int next_last_id = 0;
+static const int overflow = 29999;
 
 //La fonction renvoit le nombre d'octet dans ret, chaine de caractère de réponse. Si doublon, ne pas executer d'ordre mais renvoyer les données à renvoyer
 int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bool doublon){ 
@@ -52,7 +53,20 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		break;
 	case O_GET_BRAS_STATUS:
 		ret_size = 2;
+		last_id = btoi(argv);
 		itob((int)got_tri,ret);
+		break;
+	case O_BRAS_OUVRIR:
+		if (!doublon) {
+			next_last_id = btoi(argv);
+			getTriBordure();
+		}
+		break;
+	case O_BRAS_FERMER:
+		if (!doublon) {
+			next_last_id = btoi(argv);
+			getTriBordureRepliBras();
+		}
 		break;
 	case PAUSE:
 		use_act = false;
@@ -74,5 +88,7 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 }
 
 void setLastId() {
-	last_id = next_last_id;
+	if ((next_last_id > last_id) || (last_id - next_last_id > overflow/2)) {
+		last_id = next_last_id;
+	}
 }

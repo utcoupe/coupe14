@@ -6,6 +6,7 @@
 #include "compat.h"
 #include "Servo.h"
 #include "serial_switch.h"
+#include "parameters.h"
 
 #include <Arduino.h>
 
@@ -19,15 +20,15 @@ unsigned long timeMicros(){
 }
 
 void serial_send(char data) { //Envoi d'un octet en serial, dépend de la plateforme
-	Serial.write(data);
+	SERIAL_MAIN.write(data);
 }
 
 char generic_serial_read(){
-	return Serial.read();
+	return SERIAL_MAIN.read();
 }
 
 void forward_serial_send(char c, char addr) {
 	if (addr == FORWARD_ADDR) {
-		Serial1.write(c);
+		SERIAL_FWD.write(c);
 	}
 }
