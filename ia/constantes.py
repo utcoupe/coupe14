@@ -12,7 +12,7 @@ TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux
 #====================Enable====================
 ENABLE_TOURELLE = 		True 
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
-ENABLE_TIBOT = 			True
+ENABLE_TIBOT = 			False
 
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
@@ -20,7 +20,7 @@ VITESSE_XBEE = 			57600
 PARITY_XBEE = 			"ODD"
 PORT_OTHER = 			"/dev/ttyACM0"
 VITESSE_OTHER = 		115200
-PARITY_OTHER = 			"NONE"
+PARITY_OTHER = 			"ODD"
 
 
 #constantes réglables:
@@ -69,7 +69,7 @@ EMPTY_FIFO = 			True
 POINTS_PAR_CERCLE = 	8
 MARGE_PASSAGE_PATH = 	0
 MARGE_COLLISION =		-20
-COLLISION_THRESHOLD =	300
+COLLISION_THRESHOLD =	150
 
 
 #=======================================Systemes physiques========================================

@@ -245,10 +245,12 @@ class OurBot():
 	def removeObjectifAbove(self, id_objectif):
 		"""remove all queued goal on top of id_objectif, id_objectif included"""
 		id_canceled_list = []
-
+		print("self.__actions_en_cours "+str(self.__actions_en_cours))
+		print("self.__objectifs "+str(self.__objectifs))
 		#on vide les objectifs en cours
 		if self.__actions_en_cours is not None:
 			id = self.__actions_en_cours[0]
+			print("id "+str(id))
 			if id_objectif == id:
 				self.__actions_en_cours = None
 				id_canceled_list.append(id)
@@ -258,11 +260,13 @@ class OurBot():
 			id = objectif[0]
 			if id_objectif == id:
 				removed_objectif = self.__objectifs.pop()
+				if removed_objectif[0] == id_objectif:
+					id_canceled_list.append(removed_objectif[0])
 				while removed_objectif[0] != id_objectif:
 					id_canceled_list.append(removed_objectif[0])
 					removed_objectif = self.__objectifs.pop()
 				break
-
+		print("self.__objectifs "+str(self.__objectifs))
 		return id_canceled_list
 	
 

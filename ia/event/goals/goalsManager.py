@@ -68,7 +68,7 @@ class GoalsManager:
 		self.__reverse_table[(10,0)]=(10,1)
 
 		if self.__robot_name == "FLUSSMITTEL":
-			self.__vision = Visio('../supervisio/visio', 0, '../supervisio/', self.__data["FLUSSMITTEL"])
+			self.__vision = Visio('../supervisio/build/visio', 0, '../supervisio/', self.__data["FLUSSMITTEL"])
 			self.__last_camera_color = None
 
 		self.__loadBeginScript()
@@ -207,9 +207,8 @@ class GoalsManager:
 							position = 1
 							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE
 						else:
-							self.__logger.error("On a pas la place pour stocker ce triangle à l'avant, bolosse !")
+							self.__logger.error("On a pas la place pour stocker ce triangle à l'avant, ca cas ne devrait pas arriver !")
 							stack_full = True
-							#TODO reposer le triangle
 							self.__cancelGoal(objectif)
 
 					else:
@@ -217,16 +216,15 @@ class GoalsManager:
 							self.__back_triangle_stack.append(self.__last_camera_color)
 							position = -1
 							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
-						elif (nb_front_stack < MAX_FRONT_TRIANGLE_STACK) and (nb_back_stack == MAX_BACK_TRIANGLE_STACK):
+						elif (nb_front_stack < MAX_FRONT_TRIANGLE_STACK) and (nb_back_stack >= MAX_BACK_TRIANGLE_STACK):
 							self.__back_triangle_stack.popleft()
 							script_to_send.append( ("O_RET_OUVRIR", ()) )
 							self.__back_triangle_stack.append(self.__last_camera_color)
 							position = -1
 							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
 						else:
-							self.__logger.error("On a pas la place pour stocker ce triangle ni à l'avant ni à l'arrière, gros bolosse !")
+							self.__logger.error("On a pas la place pour stocker ce triangle ni à l'avant ni à l'arrière, ce cas ne devrait pas arriver !")
 							stack_full = True
-							#TODO lacher le triangle et mettre à jour la couleur dans l'objectif
 							self.__cancelGoal(objectif)
 
 					if not stack_full:
@@ -261,13 +259,22 @@ class GoalsManager:
 
 
 						self.__last_camera_color = data_camera[0]
-						if self.__positionReady(data_camera[1], data_camera[2]):
-							script_get_triangle = deque()
-							script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], HAUTEUR_TORCHE+3*HAUTEUR_TRIANGLE)) ) #TODO hauteur par triangle dans le cas des triangles au sol
-							script_get_triangle.append( ("THEN", ()) )
-							script_get_triangle.append( ("O_GET_BRAS_STATUS", ()) )
-							script_get_triangle.append( ("THEN", (),) )
-							self.__SubProcessManager.sendGoal(objectif.getId(), objectif.getId(), script_get_triangle)
+
+						#si on aura la possibilité de le stcker
+						if len(self.__front_triangle_stack)  >= MAX_FRONT_TRIANGLE_STACK:
+							self.__logger.warning("Impossible de stocker ce triangle dans le robot, la pile de devant est pleine.")
+							#Si besoin, on change la couleur du triangle pour la prochaine fois
+							if self.__last_camera_color != objectif.getColorElemLock():
+								objectif.switchColor()
+							self.__cancelGoal(objectif)
+						else:
+							if self.__positionReady(data_camera[1], data_camera[2]):
+								script_get_triangle = deque()
+								script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], HAUTEUR_TORCHE+3*HAUTEUR_TRIANGLE)) ) #TODO hauteur par triangle dans le cas des triangles au sol
+								script_get_triangle.append( ("THEN", ()) )
+								script_get_triangle.append( ("O_GET_BRAS_STATUS", ()) )
+								script_get_triangle.append( ("THEN", (),) )
+								self.__SubProcessManager.sendGoal(objectif.getId(), objectif.getId(), script_get_triangle)
 			else:
 				self.__SubProcessManager.sendGoal(objectif.getId(), objectif.getId(), action_list)
 				objectif.getElemGoalLocked().removeFirstElemAction()
