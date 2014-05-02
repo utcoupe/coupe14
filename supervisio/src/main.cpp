@@ -12,6 +12,7 @@ using namespace std;
 int main(int argc, char **argv){
 	string mode = "com", path = "./";
 	int index = 0;
+	bool save = false;
 	if (argc > 1){
 		index = argv[1][0] - '0';
 	}
@@ -21,8 +22,13 @@ int main(int argc, char **argv){
 	if (argc > 3) {
 		path = argv[3]+(string)"/";
 	}
+	if (argc > 4) {
+		if ((string)argv[4] == "true") {
+			save = true;
+		}
+	}
 	if (mode == "com") {
-		communication(index, path);
+		communication(index, path, save);
 	}
 	else if(mode == "param") {
 		perspectiveOnlyLoop(index, path);
