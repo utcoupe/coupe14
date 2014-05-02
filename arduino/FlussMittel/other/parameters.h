@@ -70,15 +70,15 @@
 
 #define PIN_STEPPER_STEP 31
 #define PIN_STEPPER_DIR 30
-#define PIN_INTERRUPT_BRAS 18 //PULLUP ICI
-#define INT_BRAS 5
-#define PIN_INT_HAUT_ASC 19 //PULLUP
-#define INT_ASC_HAUT 4
+#define PIN_INTERRUPT_BRAS 20 //PULLUP ICI
+#define INT_BRAS 3
+#define PIN_INT_HAUT_ASC 21 //PULLUP
+#define INT_ASC_HAUT 2
 
 #define PIN_DEBUG_LED 23
 
 #define SERIAL_MAIN Serial
-#define SERIAL_FWD Serial2
+#define SERIAL_FWD Serial1
 
 //////////////////////
 //		DEBUG		//
