@@ -8,6 +8,7 @@ from math import cos, sin, pi
 from constantes import *
 import logging
 import os
+import time
 
 
 class GUI:
@@ -43,9 +44,11 @@ class GUI:
 			self.com = communication.CommunicationGlobale()
 			arduino_constantes = self.com.getConst()
 			self.Data = data.Data(self.com, arduino_constantes)
-			self.Data.startPullData()
 			self.robot_data = self.Data.dataToDico()[robot]
 			self.last_pos = self.robot_data["getPositionAndAngle"]
+			print("Wait, com is initializing")
+			time.sleep(5)
+			self.Data.startPullData()
 			#sleep ?
 		except:
 			self.last_pos = (0, 0, 0)
@@ -108,6 +111,7 @@ class GUI:
 	def resetPos(self):
 		args = (0, 0, 0.0)
 		self.com.sendOrderAPI(self.robotaddr, 'A_SET_POS', *args)
+		self.clearPath();
 
 	def drawLine(self, x1, y1, x2, y2, color='gray'):
 		args = (x1*self.x_scale+self.x_offset,
@@ -149,14 +153,13 @@ class GUI:
 		self.drawLine(self.path[0][0], self.path[0][1] - 10, self.path[0][0], self.path[0][1] + 10)
 
 	def clearPath(self):
-		for i in range(1, len(self.line)):
+		for i in range(1, len(self.lines)):
 			self.zone.delete(self.lines[i])
 
 	def looper(self):
 		try:
 			self.robot_data = self.Data.dataToDico()[self.robot]
 			new_pos = self.robot_data["getPositionAndAngle"]
-			print(self.robot_data)
 		except:
 			new_pos = (self.last_pos[0]+2, self.last_pos[1]+1, 0)
 			print("Warning : no com while drawing path")
@@ -180,6 +183,7 @@ class GUI:
 
 	def updateViz(self):
 		self.y_scale = self.x_scale * self.viz_y_scale
+		self.clearPath();
 		self.drawPath()
 
 if __name__ == '__main__':
