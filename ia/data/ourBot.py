@@ -42,6 +42,7 @@ class OurBot():
 
 		#Variable pour evenManager
 		self.__id_to_reach = "ANY"
+		self.__fin_en_cours = False
 
 	#Getter
 	def getPosition(self):
@@ -55,6 +56,9 @@ class OurBot():
 
 	def getName(self):
 		return self.__name
+
+	def getFinEnCours(self):
+		return self.__fin_en_cours
 
 	def getBrasStatus(self):
 		return self.__bras_status
@@ -142,6 +146,9 @@ class OurBot():
 
 	def getNextIdToStack(self):
 		return self.__last_id_action_stacked.idIncrementation()
+
+	def setFinEnCours(self, booll):
+		self.__fin_en_cours = booll
 
 	def setIdToReach(self, id):
 		self.__id_to_reach = id
@@ -238,10 +245,12 @@ class OurBot():
 	def removeObjectifAbove(self, id_objectif):
 		"""remove all queued goal on top of id_objectif, id_objectif included"""
 		id_canceled_list = []
-
+		print("self.__actions_en_cours "+str(self.__actions_en_cours))
+		print("self.__objectifs "+str(self.__objectifs))
 		#on vide les objectifs en cours
 		if self.__actions_en_cours is not None:
 			id = self.__actions_en_cours[0]
+			print("id "+str(id))
 			if id_objectif == id:
 				self.__actions_en_cours = None
 				id_canceled_list.append(id)
@@ -251,11 +260,13 @@ class OurBot():
 			id = objectif[0]
 			if id_objectif == id:
 				removed_objectif = self.__objectifs.pop()
+				if removed_objectif[0] == id_objectif:
+					id_canceled_list.append(removed_objectif[0])
 				while removed_objectif[0] != id_objectif:
 					id_canceled_list.append(removed_objectif[0])
 					removed_objectif = self.__objectifs.pop()
 				break
-
+		print("self.__objectifs "+str(self.__objectifs))
 		return id_canceled_list
 	
 

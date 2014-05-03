@@ -29,10 +29,12 @@
 #define H_TO_STEP 16
 
 #define LONGUEUR_MAX 215 
+#define LONGUEUR_MIN BRAS_OFFSET_DIST
 #define MARGE_SECU_TOP 40 //En steps
 
-#define MARGE_DEPOT 60
+#define MARGE_DEPOT 80
 #define MARGE_PREHENSION 40
+#define HAUTEUR_GARDE_DEPOT HAUTEUR_MIN
 
 #define ANGLE_DEPOT (-(110.0/180.0)*M_PI)
 #define LONGUEUR_DEPOT 150
@@ -47,6 +49,12 @@
 #define DELAY_REPLI_BRAS 1000
 #define DELAY_REPLI_BRAS2 100
 #define DELAY_STOP_PUMP 500
+
+//TRIANGLES BORDURES
+#define HAUTEUR_TRI_BORDURE 70
+#define LONGUEUR_TRI_BORDURE 200
+#define ANGLE_REPLI_TRI (-(80/180.0)*M_PI) 
+#define ANGLE_OUVERT 0 
 
 //RETOURNEMENT
 #define ANGLE_RET 70
@@ -70,6 +78,9 @@
 #define INT_ASC_HAUT 2
 
 #define PIN_DEBUG_LED 23
+
+#define SERIAL_MAIN Serial
+#define SERIAL_FWD Serial2
 
 //////////////////////
 //		DEBUG		//

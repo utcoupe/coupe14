@@ -7,7 +7,8 @@ try:
 except:
 	index = 0
 
-v = Visio('../../../../supervisio/build/bin/visio', index)
+v = Visio('../../../../supervisio/visio', index, '../../../../supervisio/', None, False)
+print('Visio started')
 
 while 1:
 	start = time.time()

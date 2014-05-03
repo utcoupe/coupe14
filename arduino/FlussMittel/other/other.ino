@@ -6,8 +6,7 @@
  ****************************************/
 
 #include <Servo.h>
-#include <Arduino.h>
-
+#include "Arduino.h"
 #include "AFMotor.h"
 #include "AccelStepper.h"
 #include "serial_decoder.h"
@@ -22,21 +21,24 @@ extern AF_Stepper stepper_motor;
 extern AccelStepper stepperAsc;
 extern bool use_act;
 
-#define MAX_READ 64 
+#define MAX_READ 64
 void setup(){
 	initPins();
 
-	Serial.begin(115200);
-	Serial1.begin(115200); //Forward
+	SERIAL_MAIN.begin(57600, SERIAL_8O1);
+	SERIAL_FWD.begin(57600, SERIAL_8O1); //Forward
 #ifdef DEBUG
 	Serial3.begin(115200);
 #endif
 
 	initAct();
-	//init_protocol();
+	digitalWrite(PIN_DEBUG_LED, LOW);
+	init_protocol();
+	digitalWrite(PIN_DEBUG_LED, HIGH);
 }
 
 void loop(){
+	/*
 	static long start = timeMillis();
 	static bool init = true, init2 = true, init3 = true;
 	if (init) {
@@ -44,18 +46,19 @@ void loop(){
 		deposeTri(15);
 		init = false;
 	}
-	if ((timeMillis() - start) > 6000 & init2) {
+	if ((timeMillis() - start) > 8000 & init2) {
 		init2 = false;
 		getTri(250, -40, 30);
 		deposeTri(-45);
 	}
-	if ((timeMillis() - start) > 18000 & init3) {
+	if ((timeMillis() - start) > 20000 & init3) {
 		init3 = false;
 		getTri(250, 55, 30);
 		deposeTri(45);
 	}
+*/
 
-	int available = Serial.available();
+	int available = SERIAL_MAIN.available();
 	if (available > MAX_READ) {
 		available = MAX_READ;
 	}
@@ -63,15 +66,21 @@ void loop(){
 		// recuperer l'octet courant
 		executeCmd(generic_serial_read());
 	}
-
-	available = Serial1.available();
-	if (available > MAX_READ) {
-		available = MAX_READ;
-	}
-	for(int i = 0; i < available; i++) {
-		serial_send(Serial1.read());
+	if (use_act) {
+		updateBras();
 	}
 
+	int availablefwd = SERIAL_FWD.available();
+	if (availablefwd > MAX_READ) {
+		availablefwd = MAX_READ;
+	}
+	if (availablefwd < 0) {
+		digitalWrite(PIN_DEBUG_LED, LOW);
+	}
+
+	for(int i = 0; i < availablefwd; i++) {
+		serial_send(SERIAL_FWD.read());
+	}
 	if (use_act) {
 		updateBras();
 	}

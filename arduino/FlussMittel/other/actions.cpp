@@ -10,15 +10,21 @@
 #include <math.h>
 #include <Arduino.h>
 
+
+/* /!\ NE PAS REUTILISER /!\ 
+ *
+ * Code de bourrin, dévelopé rapidement
+ * aucune flexibilité, bourré de hacks */
+
 Servo servoRet, servoBrasAngle, servoBrasDist;
 AF_Stepper stepper_motor(200, 2);
 AF_DCMotor pump_motor(2, MOTOR12_64KHZ);
-//AccelStepper stepperAsc(1, PIN_STEPPER_STEP, PIN_STEPPER_DIR);
 AccelStepper stepperAsc(forwardstep, backwardstep);
 
 static int goal_hauteur = 0, step = -1, current_alpha = 0, current_theta = 0;
-static bool block_before_depot = false;
+static bool block = false;
 static bool call_critical = false;
+static enum action action_en_cours = None;
 
 bool use_act = true;
 
@@ -71,18 +77,36 @@ void stopAct() {
 	use_act = false;
 }
 
+void getTriBordure() {
+	if (action_en_cours == None) {
+		action_en_cours = TriBordure;
+		block = true;
+		cmdTriBordure();
+	}
+}
+
+void getTriBordureRepliBras() {
+	if (action_en_cours == TriBordure && step == 3) {
+		block = false;
+		next_step = true;
+	}
+}
+
 void getTri(long x, long y, int h) {
-	block_before_depot = true;
-	next_step = true;
-	x -= X_BRAS; y -= Y_BRAS;
-	double a = atan2(y, x);
-	int l = (int)sqrt(x*x + y*y);
-	cmdBras(a, l, h);
+	if (action_en_cours == None) {
+		action_en_cours = BrasVentouse;
+		block = true;
+		x -= X_BRAS; y -= Y_BRAS;
+		double a = atan2(y, x);
+		int l = (int)sqrt(x*x + y*y);
+		cmdBrasVentouse(a, l, h);
+	}
 }
 
 void deposeTri(int dep) {
-	block_before_depot = false;
-	cmdBras(-1, -1, -1, dep);
+	next_step = true;
+	block = false;
+	cmdBrasVentouse(-1, -1, -1, dep);
 }
 
 void updateBras() {
@@ -90,10 +114,76 @@ void updateBras() {
 	if (call_critical) {
 		criticalCmdBras();
 	}
-	cmdBras();
+	switch(action_en_cours) {
+		case BrasVentouse:
+			cmdBrasVentouse();
+			break;
+		case TriBordure:
+			cmdTriBordure();
+			break;
+		default:
+			break;
+	}
 }
 
-void cmdBras(double angle, int length, int height, int n_depot) {
+void cmdTriBordure() {
+	static unsigned long time_end = 0;
+	if (step == -1) {
+		step = 0;
+		next_step = true;
+		block = true;
+	}
+	//Temporisation
+	if (timeMicros() > time_end && time_end != 0) {
+		next_step = true;
+		time_end = 0;
+	}
+	if (next_step) {
+		next_step = false;
+
+		switch(step) {
+			case 0: {
+				int hauteur_revele = getCurrentHauteur() + MARGE_PREHENSION; //On remontera toujours par rapport à la position actulle, pour eviter de pousser un triangles (petite perte pour grande securité)
+				int hauteur = MIN(HAUTEUR_MAX, MAX(hauteur_revele, HAUTEUR_TRI_BORDURE));
+				cmdAsc(hauteur);
+				step++;
+				break;
+			}
+			case 1:
+				cmdBrasServ(ANGLE_OUVERT, LONGUEUR_TRI_BORDURE); //Pas d'attente ici, cela ne devrai pas etre la peine, sinon, implémenter time_end
+				step++;
+				next_step = true;
+				break;
+			case 2:
+				cmdAsc(HAUTEUR_TRI_BORDURE);
+				step++;
+				break;
+			case 3:
+				setLastId(); //Fin de préhension
+				if (!block) {
+					//Pour rentrer ici, next_step doit etre mis à true par la fonction getTriBordureRepliBras()
+					cmdBrasServ(ANGLE_REPLI_TRI, LONGUEUR_TRI_BORDURE);
+					time_end = timeMicros() + (long)DELAY_REPLI_BRAS2*1000;
+					step++;
+				}
+				break;
+			case 4:
+				cmdAsc(HAUTEUR_MAX);
+				step++;
+				break;
+			case 5: //On abaisse le bras sur les triangles du depot
+				setLastId(); //Fin
+				cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
+				cmdAsc(HAUTEUR_GARDE_DEPOT); //On descend le bras pour bloquer les triangles
+				step = -1;
+				action_en_cours = None;
+				break;
+		}
+	}
+}
+
+
+void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 	//Fonction de traitement
 	static int l = 0, h = 0;
 	static double a = 0;
@@ -115,7 +205,7 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 	//Temporisation avant etapes 4 et 5
 	if (timeMicros() > time_end && time_end != 0) {
 		next_step = true;
-		time_end = -1;
+		time_end = 0;
 	}
 
 	if (next_step) {
@@ -142,7 +232,7 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 				//Remonter asc
 				setLastId(); //Fin de préhension
 				if (got_tri) {
-					if (!block_before_depot) { //On continue
+					if (!block) { //On continue
 						int hauteur = MAX(getCurrentHauteur() + MARGE_PREHENSION, abs(depot) + MARGE_DEPOT);
 						if (depot < 0) {
 							hauteur = HAUTEUR_MAX;
@@ -151,8 +241,6 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 						step++;
 						hauteur = MIN(hauteur, HAUTEUR_MAX);
 						cmdAsc(hauteur);
-					} else { //On a un tri mais on attends l'IA
-						next_step = true;
 					}
 				} else { //Pas de triangles
 					pump(false);
@@ -190,12 +278,13 @@ void cmdBras(double angle, int length, int height, int n_depot) {
 				step++;
 				break;
 			case 6:
-				got_tri = false;
-				setLastId(); //Fin de depot
-				if (depot < 0) {
+				if (depot < 0 && got_tri) {
 					servoRet.write(165);
 				}
-				cmdAsc(HAUTEUR_MIN); //On descend le bras pour bloquer les triangles
+				got_tri = false;
+				setLastId(); //Fin de depot
+				cmdAsc(HAUTEUR_GARDE_DEPOT); //On descend le bras pour bloquer les triangles
+				action_en_cours = None;
 				step = -1;
 				break;
 		}
@@ -302,13 +391,13 @@ void ascInt() {
 	if (stepperAsc.distanceToGo() == 0) {
 		if (step == 2) {
 			got_tri = false;
-		}
+		} 
 		Timer1.detachInterrupt();
 		next_step = true;
 	}
 	if (digitalRead(PIN_INTERRUPT_BRAS) == 0) {
 		//On touche un triangle
-		if (step == 2 || step == -1) {
+		if ((action_en_cours == BrasVentouse && step == 2) || (action_en_cours == None && step == -1)) {
 			Timer1.detachInterrupt();
 			next_step = true;
 			got_tri = true;

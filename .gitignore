@@ -29,4 +29,5 @@ ia/log/*.log
 ia/log/*.xml
 ia/event/goals/visio/visio
 supervisio/Makefile
+supervisio/*.avi
 .idea/*

@@ -8,6 +8,7 @@ using namespace std;
 
 void comLoop(Visio& visio) {
 	string order;
+	while (!visio.isReady()) {}
 	cout << "READY" << endl;
 	//On lit les ordres sur l'entrée standard
 	cin >> order;

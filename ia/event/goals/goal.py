@@ -49,7 +49,12 @@ class Goal:
 	def appendElemGoal(self, ElemGoal):
 		self.__elem_goal.append(ElemGoal)
 
+	def getColorElemLock(self):
+		return self.__elem_goal_locked.getColor()
 
+	def switchColor(self):
+		for elem_goal_temp in self.__elem_goal:
+			elem_goal_temp.switchColor()
 
 
 	"""def toXml(self):
