@@ -26,6 +26,7 @@ void setup(){
 	SERIAL_MAIN.begin(57600, SERIAL_8O1);
 #ifdef DEBUG
 	Serial.begin(115200);
+	PDEBUGLN("BOOT");
 #endif
 	digitalWrite(LED_BLOCKED, LOW); //HIGH = eteinte
 	init_protocol();
@@ -35,7 +36,7 @@ void setup(){
 }
 
 void loop(){
-	/* on note le temps de debut */
+	// on note le temps de debut 
 	timeStart = micros();
 	if (timeStart - timeLED > 60*1000000) {
 		digitalWrite(LED_MAINLOOP, HIGH);
@@ -44,7 +45,7 @@ void loop(){
 	//Action asserv
 	control.compute();
 
-	/* zone programmation libre */
+	// zone programmation libre
 	int available = SERIAL_MAIN.available();
 	if (available > MAX_READ) {
 		available = MAX_READ;
@@ -54,7 +55,7 @@ void loop(){
 		executeCmd(generic_serial_read());
 	}
 
-	/* On attend le temps qu'il faut pour boucler */
+	// On attend le temps qu'il faut pour boucler
 	long udelay = DUREE_CYCLE*1000-(micros()-timeStart);
 	if(udelay<0) {
 		timeLED = timeStart;
