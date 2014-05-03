@@ -131,7 +131,7 @@ class Robot(EngineObjectPoly):
 		self.__stop = value
 
 	def setPosition(self, x, y, a):
-		print('set pos x : ', x, ' y : ', y, ' a : ', a)
+		#print('set pos x : ', x, ' y : ', y, ' a : ', a)
 		self.setXsimu(x)
 		self.setYsimu(y)
 		self.setAsimu(a)
@@ -228,7 +228,7 @@ class Robot(EngineObjectPoly):
 						diffrence_value = difference_value_2
 					else:
 						diffrence_value = difference_value_1
-					print('goal ANGLE, current : ', cura, ' goal : ', goala, ' diff : ',diffrence_value)
+					#print('goal ANGLE, current : ', cura, ' goal : ', goala, ' diff : ',diffrence_value)
 					if (abs(diffrence_value) < 0.1):
 						self.body._set_angle(current_goal.a)
 						removed_goal = self.__goals.pop(0)

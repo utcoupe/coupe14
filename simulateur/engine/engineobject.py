@@ -75,7 +75,7 @@ class EngineObject:
 		obj.shape.collision_type = obj.collision_type
 		self.engine.add_extension(obj)
 		self.extension_objects.append(obj)
-		print("add", obj.collision_type)
+		#print("add", obj.collision_type)
 
 	def remove_body_extension(self, obj):
 		self.extension_objects.remove(obj)

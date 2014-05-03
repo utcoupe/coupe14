@@ -11,6 +11,7 @@ from xml.dom.minidom import parseString
 from collections import deque
 import sys
 import inspect, os
+import math
 
 
 from .goal import *
@@ -31,7 +32,7 @@ class GoalsManager:
 		self.__finished_goals		= [] #List of finished goals
 		self.__elem_script			= {}
 		self.__SubProcessManager 	= SubProcessManager
-		self.__last_id_objectif_send= None
+		self.__id_objectif_send = deque()
 
 		self.__back_triangle_stack = deque()
 		self.__front_triangle_stack = deque()
@@ -77,12 +78,40 @@ class GoalsManager:
 		if not self.__blocked_goals:
 			self.__logger.debug(str(self.__robot_name)+" Recherche d'un nouvel objectif")	
 			self.__PathFinding.update(self.__data[self.__robot_name])
+			best_goal = None
+			best_length = float("Inf")
+
+			#On cherche l'elem goal le plus proche par bruteforce
 			if self.__available_goals:
-				goal = self.__available_goals[0]
-				path = self.__getOrderTrajectoire(goal, 0)
-				self.__addGoal(path, goal, 0)
+				for goal in self.__available_goals:
+					nb_elem_goal = goal.getLenElemGoal()
+					for idd in range(nb_elem_goal):
+						path = self.__getOrderTrajectoire(goal, idd)
+						if path != []:
+							length = self.__pathLen(path)
+							if length < best_length:
+								best_length = length
+								best_goal = goal
+
+				if best_goal != None:
+					self.__addGoal(path, goal, 0)
+				else:
+					time.sleep(5)#TODO diminuer
+					self.__queueBestGoals()
 			else:
-				self.__logger.warning(str(self.__robot_name)+" N'a plus aucun objectif disponible, GG !")
+				self.__logger.info(str(self.__robot_name)+" N'a plus aucun objectif disponible, GG !")
+
+	def __pathLen(self, path):
+		length = 0.0
+		begin_point = (0,0)
+		if path:
+			begin_point = path[0]
+
+		for point in path:
+			length += math.sqrt( (int(point[0])-int(begin_point[0]))**2 + (int(point[1])-int(begin_point[1]))**2 )
+			begin_point = point
+
+		return length
 
 	#GOAL management from ID
 	def __blockGoalFromId(self, id_objectif):
@@ -105,10 +134,10 @@ class GoalsManager:
 				self.__dynamique_finished_goals.append(objectif)
 				break
 
-	def goalCanceledId(self, id_objectif):
+	def goalCanceledIdFromEvent(self, id_objectif):
 		for objectif in self.__blocked_goals:
 			if objectif.getId() == id_objectif:
-				self.__cancelGoal(objectif)
+				self.__cancelGoal(objectif, True)
 				break
 
 	def goalFinishedId(self, id_objectif):
@@ -121,7 +150,7 @@ class GoalsManager:
 		if goal in self.__available_goals:
 			self.__available_goals.remove(goal)
 			self.__blocked_goals.append(goal)
-			goal.setElemGoalLocked(goal.getElemGoal(elem_goal_id))
+			goal.setElemGoalLocked(goal.getElemGoalOfId(elem_goal_id))
 			self.__logger.info('Goal '+goal.getName()+' id: '+str(goal.getId())+' is blocked')
 			return True
 		else:
@@ -139,24 +168,31 @@ class GoalsManager:
 
 			#on ajoute la trajectoire calculé
 			orders.extend(self.__tupleTrajectoireToDeque(tuple_trajectoire_list))
-			orders.append( ("A_ROT", (goal.getElemGoal(elem_goal_id).getPositionAndAngle()[2],)) )
+			orders.append( ("A_ROT", (goal.getElemGoalOfId(elem_goal_id).getPositionAndAngle()[2],)) )
 			#on ajoute attend d'être arrivé pour lancer les actions
 			orders.append( ("THEN", ()) )
 			orders.append( ("STEP_OVER", ()) )
 
 			#on envoi le tout
-			self.__SubProcessManager.sendGoal(self.__last_id_objectif_send, goal.getId(), orders)
-			self.__last_id_objectif_send = goal.getId()
+			if self.__id_objectif_send:
+				prev_id = self.__id_objectif_send[-1]
+			else:
+				prev_id = None
+			self.__SubProcessManager.sendGoal(prev_id, goal.getId(), orders)
+			self.__id_objectif_send.append(goal.getId())
 		else:
 			#TODO, ce cas peut-il vrament arrivé ?
 			self.__logger.warning("On va rechercher un nouvel ordre")
 			self.__queueBestGoals()
 
-	def __cancelGoal(self, goal):
+	def __cancelGoal(self, goal, fromEvent=False):
 		self.__blocked_goals.remove(goal)#On ne peut pas enlever les ordres dans self.__dynamique_finished_goals
 		self.__available_goals.append(goal)
 		self.__logger.info('Goal ' + goal.getName() + ' has been canceled and is now released')
-		self.__SubProcessManager.sendDeleteGoal(goal.getId())
+		self.__removeLastValueOfDeque(self.__id_objectif_send, goal.getId())
+
+		if not fromEvent:
+			self.__SubProcessManager.sendDeleteGoal(goal.getId())
 		self.__queueBestGoals()
 
 
@@ -182,12 +218,31 @@ class GoalsManager:
 			self.__finished_goals.remove(goal)
 			success = True
 
+		self.__removeLastValueOfDeque(self.__id_objectif_send, goal.getId())
 		self.__SubProcessManager.sendDeleteGoal(goal.getId())
 		if success:
 			self.__logger.info('Goal ' + goal.getName() + ' is delete')
 		else:
 			self.__logger.error('Goal ' + goal.getName() + " can't be delete")
 		self.__queueBestGoals()
+
+
+	def __removeLastValueOfDeque(self, deque_list, value_to_remove):
+		removed_deque = deque()
+		find = False
+
+		while deque_list:
+			temp_value = deque_list.pop()
+			if temp_value == value_to_remove:
+				find = True
+				deque_list.extend(removed_deque)
+				break
+			else:
+				removed_deque.append(temp_value)
+
+		if find == False:
+			self.__logger.warning("Impossible de supprimer la valeur "+str(value_to_remove)+" de la liste "+str(deque))
+
 
 	def __manageStepOver(self, objectif, id_objectif, skip_get_triangle=False):
 		action_list = objectif.getElemGoalLocked().getFirstElemAction()
@@ -209,7 +264,7 @@ class GoalsManager:
 						else:
 							self.__logger.error("On a pas la place pour stocker ce triangle à l'avant, ca cas ne devrait pas arriver !")
 							stack_full = True
-							self.__cancelGoal(objectif)
+							self.__cancelGoal(objectif, False)
 
 					else:
 						if (nb_front_stack < MAX_FRONT_TRIANGLE_STACK) and (nb_back_stack < MAX_BACK_TRIANGLE_STACK):
@@ -225,7 +280,7 @@ class GoalsManager:
 						else:
 							self.__logger.error("On a pas la place pour stocker ce triangle ni à l'avant ni à l'arrière, ce cas ne devrait pas arriver !")
 							stack_full = True
-							self.__cancelGoal(objectif)
+							self.__cancelGoal(objectif, False)
 
 					if not stack_full:
 						script_base = action_list
@@ -236,7 +291,7 @@ class GoalsManager:
 								pass
 							else:
 								script_to_send.append(action)
-						self.__SubProcessManager.sendGoal(objectif.getId(), objectif.getId(), script_to_send)
+						self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_to_send)
 						objectif.getElemGoalLocked().removeFirstElemAction()
 
 				else:
@@ -266,7 +321,7 @@ class GoalsManager:
 							#Si besoin, on change la couleur du triangle pour la prochaine fois
 							if self.__last_camera_color != objectif.getColorElemLock():
 								objectif.switchColor()
-							self.__cancelGoal(objectif)
+							self.__cancelGoal(objectif, False)
 						else:
 							if self.__positionReady(data_camera[1], data_camera[2]):
 								script_get_triangle = deque()
@@ -274,9 +329,9 @@ class GoalsManager:
 								script_get_triangle.append( ("THEN", ()) )
 								script_get_triangle.append( ("O_GET_BRAS_STATUS", ()) )
 								script_get_triangle.append( ("THEN", (),) )
-								self.__SubProcessManager.sendGoal(objectif.getId(), objectif.getId(), script_get_triangle)
+								self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
 			else:
-				self.__SubProcessManager.sendGoal(objectif.getId(), objectif.getId(), action_list)
+				self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), action_list)
 				objectif.getElemGoalLocked().removeFirstElemAction()
 		else:
 			self.__logger.warning("Pb, Il y a un STEP_OVER directement suivit d'un END ?")
@@ -405,8 +460,11 @@ class GoalsManager:
 					if path != []:
 						self.__addGoal(path, goal, elem_goal_id, prev_action=prev_action)
 					else:
-						self.__logger.info(str(self.__robot_name) + " Aucun chemin disponible vers " +str(goal.getElemGoal(elem_goal_id).getPositionAndAngle())+" pour le goal d'id: " + str(id_objectif))
+						self.__logger.info(str(self.__robot_name) + " Aucun chemin disponible vers " +str(goal.getElemGoalOfId(elem_goal_id).getPositionAndAngle())+" pour le goal d'id: " + str(id_objectif))
 					break
+
+			#Pour le cas où on ne peut lui ajouter aucun objectif
+			self.__queueBestGoals()
 
 			if not find:
 				self.__logger.error(str(self.__robot_name) + " impossible de lui ajouter le goal d'id: " + str(id_objectif))
@@ -424,7 +482,7 @@ class GoalsManager:
 			position_last_goal = self.__data[self.__robot_name]["getPositionAndAngle"]
 			self.__logger.debug("Position from data" + str(position_last_goal))
 
-		position_to_reach = goal.getElemGoal(elem_goal_id).getPositionAndAngle()
+		position_to_reach = goal.getElemGoalOfId(elem_goal_id).getPositionAndAngle()
 		path = self.__PathFinding.getPath((position_last_goal[0], position_last_goal[1]), (position_to_reach[0], position_to_reach[1]), enable_smooth=True)
 
 		return path
