@@ -352,7 +352,7 @@ class GoalsManager:
 			if status_fin == 1:
 				self.__manageStepOver(objectif, id_objectif, skip_get_triangle=True)
 			else:
-				self.__logger.warning("La prehention du trianglé à échoué, donc on supprime l'ordre"+str(id_objectif))
+				self.__logger.warning("La prehention du trianglé à échoué, donc on supprime l'ordre "+str(id_objectif))
 				self.__deleteGoal(objectif)
 
 

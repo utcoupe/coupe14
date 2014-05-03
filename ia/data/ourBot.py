@@ -271,8 +271,9 @@ class OurBot():
 			first_objectif_id = self.__objectifs[0][0]
 			if first_objectif_id == id_objectif:
 				if len(self.__objectifs[0][1]) == 0:
-					self.__objectifs.pop()
+					self.__objectifs.popleft()
 					self.__actions_en_cours = None
+					self.__logger.debug("On delete l'objectif d'id "+str(id_objectif)+" qui était en step_over, il reste en attente self.__objectifs "+str(self.__objectifs))
 				else:
 					self.__logger.critical("Le premier objectif correspond bien à celui demandé, mais il n'est pas vide, self.__objectifs "+str(self.__objectifs))
 			else:

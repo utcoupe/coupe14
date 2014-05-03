@@ -111,6 +111,7 @@ class EventManager():
 				id_objectif_to_remove = new_data[2]
 
 				robot.deleteObjectifInStepOver(id_objectif_to_remove)
+				robot.setIdToReach("ANY")
 
 			else:
 				self.__logger.critical("La fonction demandé n'est pas implementé, new_data "+str(new_data))
