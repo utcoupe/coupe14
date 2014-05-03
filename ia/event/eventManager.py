@@ -132,10 +132,10 @@ class EventManager():
 
 		if self.__Tourelle is not None:
 			new_data = ()
-			if self.__SmallEnemyBot is not None:
-				new_data += (self.__SmallEnemyBot.getPosition(),)
 			if self.__BigEnemyBot is not None:
 				new_data += (self.__BigEnemyBot.getPosition(),)
+			if self.__SmallEnemyBot is not None:
+				new_data += (self.__SmallEnemyBot.getPosition(),)
 			
 			if new_data != self.__last_hokuyo_data:
 				self.__last_hokuyo_data = new_data
@@ -271,25 +271,23 @@ class EventManager():
 
 
 	def __testCollision(self):
-
-		def checkSystem(system):
-			collision_data = self.__Collision.getCollision(system)
-			if collision_data is not None:
-				distance = collision_data[1]
-				if distance < self.__MetaData.getCollisionThreshold():
-					first_id_to_remove = collision_data[0]
-					id_canceled_list = system.removeObjectifAbove(first_id_to_remove)
-					self.__logger.info("On annule les ordres: " + str(id_canceled_list) + " pour causes de collision dans " + str(distance) + " mm")
-					empty_arg = []
-					self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
-					system.setIdToReach("ANY")
-					self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
-				else:
-					self.__logger.debug("On a detecté une collision dans "+str(distance)+" mm, mais on continue")
-		
 		if self.__Flussmittel is not None:
-			checkSystem(self.__Flussmittel)
+			self.__checkSystem(self.__Flussmittel)
 		
 		if self.__Tibot is not None:
-			checkSystem(self.__Tibot)
-		
+			self.__checkSystem(self.__Tibot)
+	
+	def __checkSystem(self, system):
+		collision_data = self.__Collision.getCollision(system)
+		if collision_data is not None:
+			distance = collision_data[1]
+			if distance < self.__MetaData.getCollisionThreshold():
+				first_id_to_remove = collision_data[0]
+				id_canceled_list = system.removeObjectifAbove(first_id_to_remove)
+				self.__logger.info("On annule les ordres: " + str(id_canceled_list) + " pour causes de collision dans " + str(distance) + " mm")
+				empty_arg = []
+				self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
+				system.setIdToReach("ANY")
+				self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
+			else:
+				self.__logger.debug("On a detecté une collision dans "+str(distance)+" mm, mais on continue")

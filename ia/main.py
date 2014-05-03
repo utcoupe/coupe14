@@ -56,7 +56,7 @@ def startIa(pipe=None, ia_color="RED"):
 
 
 
-	Data = data.Data(Communication, arduino_constantes)
+	Data = data.Data(Communication, arduino_constantes, ia_color)
 	if TEST_MODE == False and ENABLE_FLUSSMITTEL == True:
 		Gpio = gpio.Gpio()
 		data.parametrerHokuyo()

@@ -91,6 +91,12 @@ HAUTEUR_TORCHE = 36
 LARGEUR_TIBOT = 		200
 LONGUEUR_TIBOT = 		150
 
+#====================ENEMYs====================
+FIRST_POSITION_BIG_RED_ENNEMY = (200, 1850)
+FIRST_POSITION_SMALL_RED_ENNEMY = (200, 1500)
+FIRST_POSITION_BIG_YELLOW_ENNEMY = (2800, 1850)
+FIRST_POSITION_SMALL_YELLOW_ENNEMY = (2800, 1500)
+
 #====================BIG ENEMY====================
 #Si un seul adversaire, on utilise les constantes de BIG ENEMY
 RAYON_BIG_ENEMY = 		200

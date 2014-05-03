@@ -7,14 +7,28 @@ from constantes import *
 from math import sqrt
 
 class EnemyBot():
-	def __init__(self, rayon):
+	def __init__(self, rayon, ia_color, name):
 		#Constants
 		self.__rayon = rayon
-
+		self.__ia_color = ia_color
+		self.__name = name #type "SMALL" ou "BIG"
 
 		#Valeurs récupérées (read-only)
-		self.__positionX = 2500#TODO, parametrage en focntion du coté où on commence
-		self.__positionY = 1500
+		if ia_color == "RED":
+			if name == "BIG":
+				self.__positionX = FIRST_POSITION_BIG_RED_ENNEMY[0]
+				self.__positionY = FIRST_POSITION_BIG_RED_ENNEMY[1]
+			else:
+				self.__positionX = FIRST_POSITION_SMALL_RED_ENNEMY[0]
+				self.__positionY = FIRST_POSITION_SMALL_RED_ENNEMY[1]
+		else:
+			if name == "BIG":
+				self.__positionX = FIRST_POSITION_BIG_YELLOW_ENNEMY[0]
+				self.__positionY = FIRST_POSITION_BIG_YELLOW_ENNEMY[1]
+			else:
+				self.__positionX = FIRST_POSITION_SMALL_YELLOW_ENNEMY[0]
+				self.__positionY = FIRST_POSITION_SMALL_YELLOW_ENNEMY[1]
+
 
 	def getPosition(self):
 		return (self.__positionX, self.__positionY)
