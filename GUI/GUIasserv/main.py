@@ -2,10 +2,12 @@ import sys
 sys.path.append('../../ia/')
 
 import communication
+import data
 from tkinter import *
 from math import cos, sin, pi
 from constantes import *
-
+import logging
+import os
 
 
 class GUI:
@@ -20,6 +22,7 @@ class GUI:
 		self.x_scale = 1 
 		self.y_scale = 1
 
+		robot = ""
 		self.viz_y_scale = 1.0
 		if ENABLE_FLUSSMITTEL and ENABLE_TIBOT:
 			print("Les deux robots sont activé : un seul doit l'être")
@@ -38,10 +41,11 @@ class GUI:
 
 		try:
 			self.com = communication.CommunicationGlobale()
-			arduino_constantes = com.getConst()
+			arduino_constantes = self.com.getConst()
 			self.Data = data.Data(self.com, arduino_constantes)
-			self.robot_data = Data.dataToDico()[robot]
-			self.last_pos = robot_data["getPositionAndAngle"]
+			self.Data.startPullData()
+			self.robot_data = self.Data.dataToDico()[robot]
+			self.last_pos = self.robot_data["getPositionAndAngle"]
 			#sleep ?
 		except:
 			self.last_pos = (0, 0, 0)
@@ -49,11 +53,11 @@ class GUI:
 
 		self.path = []
 		self.lines = []
-		robot = ""
 		self.fen = Tk()
 		self.fen.title("Asservissement " + robot)
 		self.goto_frame = Frame()
 		self.goto_e = Entry(self.goto_frame)
+		self.robot = robot
 
 		self.send_goto = Button(self.goto_frame, text="Goto", command=self.goto_handler).grid(column=1, row=0)
 		self.reset_button = Button(self.goto_frame, text="Reset", command=self.resetPos).grid(column=2, row=0)
@@ -81,7 +85,7 @@ class GUI:
 
 		self.drawRobot(*self.last_pos)
 
-		#self.resetPos()
+		self.resetPos()
 		self.fen.mainloop()
 
 	def drawRobot(self, x, y, a):
@@ -115,15 +119,16 @@ class GUI:
 
 	def goto_handler(self):
 		try:
-			self.robot_data = self.Data.dataToDico()[robot]
-			self.last_pos = robot_data["getPositionAndAngle"]
+			self.robot_data = self.Data.dataToDico()[self.robot]
+			self.last_pos = self.robot_data["getPositionAndAngle"]
 		except:
 			self.last_pos = (0, 0, 0)
+			print("Warning : no com")
 
 		self.path.append(self.last_pos)
-		self.go = (int(self.goto_e.get()), 0)
+		self.go = (0,int(self.goto_e.get()), 0)
 
-		self.x_scale = (self.widthfen - self.xoff)/(self.go[0] - self.last_pos[0])
+		self.x_scale = (self.widthfen - self.xoff)/(self.go[1] - self.last_pos[0])
 		self.y_scale = self.x_scale * self.viz_y_scale
 
 		self.x_offset = self.xoff/2 - (self.last_pos[0] * self.x_scale)
@@ -131,10 +136,9 @@ class GUI:
 
 		self.com.sendOrderAPI(self.robotaddr, 'A_GOTO', *self.go)
 
-		self.drawLine(self.last_pos[0], self.last_pos[1], *self.go)
+		self.drawLine(self.last_pos[0], self.last_pos[1], *self.go[1:])
 		self.drawLine(self.path[0][0], self.path[0][1] - 10, self.path[0][0], self.path[0][1] + 10)
 
-		#TODO draw direct line
 		self.looper()
 
 	def drawPath(self):
@@ -150,15 +154,16 @@ class GUI:
 
 	def looper(self):
 		try:
-			self.robot_data = self.Data.dataToDico()[robot]
-			new_pos = robot_data["getPositionAndAngle"]
+			self.robot_data = self.Data.dataToDico()[self.robot]
+			new_pos = self.robot_data["getPositionAndAngle"]
+			print(self.robot_data)
 		except:
 			new_pos = (self.last_pos[0]+2, self.last_pos[1]+1, 0)
+			print("Warning : no com while drawing path")
 
 		if (new_pos != self.last_pos):
 			self.drawRobot(*new_pos)
 			self.drawLine(self.last_pos[0], self.last_pos[1], new_pos[0], new_pos[1], color='red')
-			#TODO draw lines
 			self.last_pos = new_pos
 			self.path.append(self.last_pos)
 		self.fen.after(self.period, self.looper)
@@ -178,4 +183,5 @@ class GUI:
 		self.drawPath()
 
 if __name__ == '__main__':
+	logging.basicConfig(filename=os.path.join(os.path.dirname(os.path.abspath(__file__)), "log.log"), filemode='w', level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 	a = GUI()	

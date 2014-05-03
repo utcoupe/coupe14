@@ -264,24 +264,59 @@ void Control::check_rot_spd(float *consigneL, float *consigneR) {
 
 void Control::check_acc(float *consigneL, float *consigneR)
 {
-	float lastL = abs(value_consigne_right), lastR = abs(value_consigne_right);
+	float lastL = value_consigne_left, lastR = value_consigne_right;
 
 	//Check MAX_ACC
 	//On verifie l'acceleration de chaque moteur
 	//SI elle est trop élevée, on la baisse, et on
 	//baisse aussi celle de l'autre moteur proportionellement
-	float r, maxr = 1;
+	
+	/*
+	float r, diff;
+	float diffR = abs(*consigneR) - (abs(lastR) + max_acc);
+	float diffL = abs(*consigneL) - (abs(lastL) + max_acc);
+	float *bigger, *smaller;
+	if (diffL > 0 || diffR > 0) {
+		if (diffR > diffL) {
+			bigger = consigneR;
+			smaller = consigneL;
+			diff = diffR;
+		} else {
+			bigger = consigneL;
+			smaller = consigneR;
+			diff = diffL;
+		}
+		r = *smaller / *bigger;
 
-	r = abs(*consigneL) / (lastL + max_acc);
-	if (r > 1) {
-		maxr = MAX(r, maxr);
+		if (*bigger > 0) {
+			*bigger -= diff;
+		} else {
+			*bigger += diff;
+		}
+		if (*smaller > 0) {
+			*smaller -= diff * r;
+		} else {
+			*smaller += diff * r;
+		}
 	}
-	r = abs(*consigneR) / (lastR + max_acc);
-	if (r > 1) {
-		maxr = MAX(r, maxr);
+	*/
+	float diffR = abs(*consigneR) - (abs(lastR) + max_acc);
+	float diffL = abs(*consigneL) - (abs(lastL) + max_acc);
+
+	if (diffL > 0) {
+		if (*consigneL > 0) {
+			*consigneL -= diffL;
+		} else {
+			*consigneL += diffL;
+		}
 	}
-	*consigneR /= maxr;
-	*consigneL /= maxr;
+	if (diffR > 0) {
+		if (*consigneR > 0) {
+			*consigneR -= diffR;
+		} else {
+			*consigneR += diffR;
+		}
+	}
 }
 
 void Control::controlPos(float da, float dd)
