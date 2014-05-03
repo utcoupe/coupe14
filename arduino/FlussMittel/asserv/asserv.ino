@@ -23,17 +23,15 @@ void setup(){
 	TCCR3B = (TCCR3B & 0xF8) | 0x01 ;
 	TCCR1B = (TCCR1B & 0xF8) | 0x01 ;
 	initPins();
-	Serial2.begin(115200, SERIAL_8O1);
+	SERIAL_MAIN.begin(57600, SERIAL_8O1);
 #ifdef DEBUG
 	Serial.begin(115200);
 #endif
+	digitalWrite(LED_BLOCKED, LOW); //HIGH = eteinte
 	init_protocol();
+	digitalWrite(LED_BLOCKED, HIGH); //HIGH = eteinte
 	PDEBUGLN("INIT DONE");
 
-	pinMode(LED_MAINLOOP, OUTPUT);
-	pinMode(LED_BLOCKED, OUTPUT) ;
-	digitalWrite(LED_MAINLOOP, HIGH); //HIGH = eteinte
-	digitalWrite(LED_BLOCKED, HIGH); //HIGH = eteinte
 }
 
 void loop(){
@@ -47,7 +45,7 @@ void loop(){
 	control.compute();
 
 	/* zone programmation libre */
-	int available = Serial2.available();
+	int available = SERIAL_MAIN.available();
 	if (available > MAX_READ) {
 		available = MAX_READ;
 	}
