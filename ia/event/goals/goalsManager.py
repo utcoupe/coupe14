@@ -78,7 +78,7 @@ class GoalsManager:
 		if not self.__blocked_goals:
 			self.__logger.debug(str(self.__robot_name)+" Recherche d'un nouvel objectif")	
 			self.__PathFinding.update(self.__data[self.__robot_name])
-			best_goal = None
+			best_goal = ([], None, None) #type (path, id_goal, id_elem_goal)
 			best_length = float("Inf")
 
 			#On cherche l'elem goal le plus proche par bruteforce
@@ -86,15 +86,17 @@ class GoalsManager:
 				for goal in self.__available_goals:
 					nb_elem_goal = goal.getLenElemGoal()
 					for idd in range(nb_elem_goal):
+						print("on test goal "+str(goal.getId())+ " elem "+str(idd))
 						path = self.__getOrderTrajectoire(goal, idd)
 						if path != []:
 							length = self.__pathLen(path)
 							if length < best_length:
 								best_length = length
-								best_goal = goal
+								best_goal = (path, goal, idd)
 
-				if best_goal != None:
-					self.__addGoal(path, goal, 0)
+				if best_goal[1] != None:
+					self.__logger.info("On a choisi l'objectif goal_id "+str(best_goal[1])+" elem_goal_id "+str(best_goal[2])+" avec le path "+str(best_goal[0]))
+					self.__addGoal(best_goal[0], best_goal[1], best_goal[2])
 				else:
 					time.sleep(5)#TODO diminuer
 					self.__queueBestGoals()
@@ -238,9 +240,11 @@ class GoalsManager:
 				deque_list.extend(removed_deque)
 				break
 			else:
-				removed_deque.append(temp_value)
+				removed_deque.appendleft(temp_value)
 
-		if find == False:
+		if find == True:
+			self.__logger.debug("On supprime la dernièrer occurance de "+str(value_to_remove)+" il reste "+str(deque_list))
+		else:
 			self.__logger.warning("Impossible de supprimer la valeur "+str(value_to_remove)+" de la liste "+str(deque))
 
 
@@ -356,7 +360,7 @@ class GoalsManager:
 				self.__deleteGoal(objectif)
 
 
-	#TODO utiliser cette focntion ?
+	#TODO utiliser cette fonction ?
 	def __collectEnemyFinished(self):
 		for goal in self.__available_goals:
 			if goal.isFinished():
@@ -411,7 +415,7 @@ class GoalsManager:
 					duration	= int(elem_goal.getElementsByTagName('duration')[0].firstChild.nodeValue)
 					color		= str(elem_goal.getElementsByTagName('color')[0].firstChild.nodeValue)
 					id_script	= int(elem_goal.getElementsByTagName('id_script')[0].firstChild.nodeValue)
-					#TODO instancier elem_goal
+					
 					goal.appendElemGoal( ElemGoal(id, x, y, angle, points, priority, duration, color, self.__elem_script[id_script]) )
 
 	def __loadBeginScript(self):

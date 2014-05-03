@@ -106,7 +106,7 @@
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
-				<x>2600</x>
+				<x>2570</x>
 				<y>800</y>
 				<angle>1.57</angle>
 				<points>1</points>
@@ -193,7 +193,7 @@
 	</goal>
 	<goal>
 		<id>7</id>
-		<name>Triangle en bas à gauche (8), id 7</name>
+		<name>Triangle en bas à gauche d'id 7</name>
 		<type>triangle</type>
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x>900</x>
@@ -225,7 +225,7 @@
 	</goal>
 	<goal>
 		<id>8</id>
-		<name>Triangle au centre à gauche id 8</name>
+		<name>Triangle au centre à gauche d'id 8</name>
 		<type>triangle</type>
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x>400</x>
@@ -244,7 +244,7 @@
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
-				<x>400</x>
+				<x>430</x>
 				<y>800</y>
 				<angle>1.57</angle>
 				<points>1</points>
@@ -257,7 +257,7 @@
 	</goal>
 	<goal>
 		<id>9</id>
-		<name>Triangle mur centre gauche id 9</name>
+		<name>Triangle mur centre gauche d'id 9</name>
 		<type>triangle</type>
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x>15</x>
