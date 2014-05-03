@@ -28,9 +28,10 @@ def testIa(conn, color):
 	conn.send(("ADDR_FLUSSMITTEL_ASSERV","A_ROT", (54,math.radians(90))))
 	conn.send(("ADDR_FLUSSMITTEL_ASSERV","A_GOTO",(36,1100,300)))
 	#conn.send(("ADDR_FLUSSMITTEL_ASSERV","A_PWM", (54,128,128,800)))"""
-	conn.send(("ADDR_FLUSSMITTEL_ASSERV","A_SET_POS", (1500,350,math.radians(45))))
+	conn.send(("ADDR_FLUSSMITTEL_ASSERV","A_SET_POS", (2600,700,math.radians(90))))
 	time.sleep(1)
-	conn.send(("ADDR_FLUSSMITTEL_OTHER","O_RET_OUVRIR", (50,123)))
+	#conn.send(("ADDR_FLUSSMITTEL_OTHER","O_BRAS_OUVRIR", (50,)))
+	conn.send(("ADDR_FLUSSMITTEL_OTHER","O_BRAS_FERMER", (50,)))
 	time.sleep(1)
 	#conn.send(("ADDR_HOKUYO","GET_HOKUYO", (50,123)))
 
