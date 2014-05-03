@@ -12,6 +12,7 @@ sys.path.append(os.path.join(DIR_PATH, "..", "objects"))
 from define import *
 from engine.engineobject import EngineObjectPoly
 from objects import feu
+import time
 
 class BigRobot(Robot):
 	def __init__(self, *, engine, posinit, team):
@@ -20,6 +21,24 @@ class BigRobot(Robot):
 			colltype	= COLLTYPE_BRAS,
 			offset		= mm_to_px(WIDTH_GROS/2-21, -HEIGHT_GROS/2-24),
 			color		= "green",
+			poly_points = map(lambda p: mm_to_px(*p),[(LONGUEUR_BRAS,0),(0,LONGUEUR_BRAS), (0,0)]), #taille du bras
+			is_extension= True
+		)
+
+		self.bras_ouvrir = EngineObjectPoly(
+			engine 		= engine,
+			colltype	= COLLTYPE_BRAS_OUVRIR,
+			offset		= mm_to_px(WIDTH_GROS/2-21, -HEIGHT_GROS/2-24),
+			color		= "purple",
+			poly_points = map(lambda p: mm_to_px(*p),[(LONGUEUR_BRAS,0),(0,LONGUEUR_BRAS), (0,0)]), #taille du bras
+			is_extension= True
+		)
+
+		self.bras_fermer = EngineObjectPoly(
+			engine 		= engine,
+			colltype	= COLLTYPE_BRAS_FERMER,
+			offset		= mm_to_px(WIDTH_GROS/2-21, -HEIGHT_GROS/2-24),
+			color		= "blue",
 			poly_points = map(lambda p: mm_to_px(*p),[(LONGUEUR_BRAS,0),(0,LONGUEUR_BRAS), (0,0)]), #taille du bras
 			is_extension= True
 		)
@@ -53,13 +72,19 @@ class BigRobot(Robot):
 		"""
 		Active la reconnaissance de triangles dans la zone de portée du bras
 		"""
-		self._visio.actionBras()
-
-	def add_bras(self):
 		self.add_body_extension(self.bras)
-
-	def remove_bras(self):
+		time.sleep(0.5) #temps où le bras apparaitra
 		self.remove_body_extension(self.bras)
+
+	def activerBrasOuvrir(self):
+		self.add_body_extension(self.bras_ouvrir)
+		time.sleep(0.1) #temps où le bras apparaitra
+		self.remove_body_extension(self.bras_ouvrir)
+
+	def activerBrasFermer(self):
+		self.add_body_extension(self.bras_fermer)
+		time.sleep(0.1) #temps où le bras apparaitra
+		self.remove_body_extension(self.bras_fermer)
 
 	def storeFeu(self, sens):
 		if sens > 0:

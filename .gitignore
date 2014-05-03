@@ -31,3 +31,4 @@ ia/event/goals/visio/visio
 supervisio/Makefile
 supervisio/*.avi
 .idea/*
+/libs/cgal/CMakeLists.txt.bak

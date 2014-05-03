@@ -47,11 +47,13 @@ class Communication():
 		"""
 		if (order == "O_BRAS_OUVRIR"):
 			pos = ()
+			self.__bigrobot.activerBrasOuvrir()
 			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
 		elif (order == "O_BRAS_FERMER"):
 			pos = ()
+			self.__bigrobot.activerBrasFermer()
 			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
