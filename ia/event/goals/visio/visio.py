@@ -12,7 +12,7 @@ la position des triangles en hauteur"""
 
 class Triangle:
 	"""Simple structure de stockage des infos triangles"""
-	def __init__(self, coord, angle, size, color, isDown, abs_to_rel_angle):
+	def __init__(self, coord, angle, size, color, isDown):
 		self.coord = [int(float(x)) for x in coord.split(':')]
 		self.angle = float(angle)
 		self.size = float(size)
@@ -115,11 +115,13 @@ class Visio:
 
 		# En situation de test, big bot est None
 		triangles = self._triangles
+		"""
 		try:
 			if self.__big_bot is not None:
 				self.__post_processing()
 		except:
 			self._triangles = triangles  # si echec, on ne corrige pas
+			"""
 
 	def __post_processing(self):
 		if self.__big_bot is None:
