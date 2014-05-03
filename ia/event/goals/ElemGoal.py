@@ -42,3 +42,12 @@ class ElemGoal:
 
 	def getPositionAndAngle(self):
 		return (self.__x, self.__y, self.__angle)
+
+	def getColor(self):
+		return self.__color
+
+	def switchColor(self):
+		if self.__color == "RED":
+			self.__color = "YELLOW"
+		else:
+			self.__color = "RED"

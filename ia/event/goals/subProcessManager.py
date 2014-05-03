@@ -54,8 +54,9 @@ class SubProcessManager():
 			self.__data = data
 		else:
 			for robot_name in data:
-				for info_name in data[robot_name]:
-					self.__data[robot_name][info_name] = data[robot_name][info_name]
+				if data[robot_name] is not None:
+					for info_name in data[robot_name]:
+						self.__data[robot_name][info_name] = data[robot_name][info_name]
 
 	def __processStatus(self, status):
 		"""read new status and update objectif_list"""
