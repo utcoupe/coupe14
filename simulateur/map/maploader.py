@@ -21,7 +21,7 @@ def load_map(filename,engine):
 	for wall in dom.getElementsByTagName("wall"):
 		engine.add(Wall(engine,mm_to_px(int(wall.getAttribute("x1")),int(wall.getAttribute("y1"))),mm_to_px(int(wall.getAttribute("x2")),int(wall.getAttribute("y2")))))
 	for feu in dom.getElementsByTagName("feu"):
-		engine.add(Feu(engine,mm_to_px(int(feu.getAttribute("x")),int(feu.getAttribute("y"))),feu.getAttribute("orientation")))
+		engine.add(Feu(engine,mm_to_px(int(feu.getAttribute("x")),int(feu.getAttribute("y"))),feu.getAttribute("orientation"),feu.getAttribute("sens")))
 	for arbre in dom.getElementsByTagName("arbre"):
 		engine.add(Arbre(engine,mm_to_px(int(arbre.getAttribute("x")),int(arbre.getAttribute("y"))),arbre.getAttribute("orientation")))
 	for torche in dom.getElementsByTagName("torche"):

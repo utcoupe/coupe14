@@ -91,6 +91,9 @@ class Robot(EngineObjectPoly):
 		"""
 		self.body.angle = -a
 
+	def getPositionPixel(self):
+		return self.body.position[0], self.body.position[1]
+
 	def getPosition(self):
 		return self.getXreal(), self.getYreal(), self.getAreal()
 
