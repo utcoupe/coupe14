@@ -23,6 +23,7 @@ Control::Control(){
 	setErrorUseI_distance(DIS_AWU);
 	max_angle = MAX_ANGLE;
 	setMaxAcc(ACC_MAX);
+	setMaxRotSpdRatio(RATIO_SPD_ROT_MAX);
 
 	value_consigne_right = 0;
 	value_consigne_left = 0;
@@ -192,6 +193,10 @@ void Control::setMaxAcc(float n_max_acc){
 	max_acc = n_max_acc / FREQ; 
 }
 
+void Control::setMaxRotSpdRatio(float n_max_rot_spd){
+	max_rot_spd_ratio = n_max_rot_spd;
+}
+
 void Control::pushPos(pos n_pos){
 	robot.pushMmPos(n_pos);
 }
@@ -246,22 +251,52 @@ void Control::check_max(float *consigne, float max) {
 		*consigne = -max;
 }
 
-void Control::check_acc(float *consigne, float last)
+void Control::check_acc(float *consigneL, float *consigneR)
 {
+	static float lastL = *consigneL, lastR = *consigneR;
+
+
+	//Check MAX ROT SPD
+	float rot = abs((*consigneR - *consigneL) / 2.0);
+	//Ratio consigne/max
+	float r = rot / CONSIGNE_RANGE_MAX;
+	if (r > 1) { //Trop rapide
+		*consigneL /= r;
+		*consigneR /= r;
+	} 
+
+
 	//Check MAX_ACC
-	if(*consigne > last + max_acc){
-		*consigne = last + max_acc;
+	//On verifie l'acceleration de chaque moteur
+	//SI elle est trop élevée, on la baisse, et on
+	//baisse aussi celle de l'autre moteur proportionellement
+	if(*consigneL > lastL + max_acc){
+		float diff = *consigneL - (lastL + max_acc);
+		*consigneL -= diff;
+		*consigneR -= diff * (*consigneR / * consigneL);
 	}
-	else if(*consigne < last - max_acc){
-		*consigne = last - max_acc;
+	else if(*consigneL < lastL - max_acc){
+		float diff = (lastL - max_acc) - *consigneL;
+		*consigneL += diff;
+		*consigneR += diff * (*consigneR / * consigneL);
 	}
+	if(*consigneR > lastR + max_acc){
+		float diff = *consigneR - (lastR + max_acc);
+		*consigneR -= diff;
+		*consigneL -= diff * (*consigneL / * consigneR);
+	}
+	else if(*consigneR < lastR - max_acc){
+		float diff = (lastR - max_acc) - *consigneR;
+		*consigneR += diff;
+		*consigneL += diff * (*consigneL / * consigneR);
+	}
+
+	lastR = *consigneR; lastL = *consigneL;
 }
 
 void Control::controlPos(float da, float dd)
 {
 	float consigneAngle, consigneDistance, consigneR, consigneL;
-	static float last_consigneL = 0, last_consigneR = 0;
-
 	//Asservissement en position, renvoie une consigne de vitesse
 	//Calcul des spd angulaire
 	consigneAngle = PID_Angle.compute(da); //erreur = angle à corriger pour etre en direction du goal
@@ -274,13 +309,9 @@ void Control::controlPos(float da, float dd)
 	consigneR = consigneDistance + consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
 	consigneL = consigneDistance - consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
 
-	check_acc(&consigneR, last_consigneR);
-	check_acc(&consigneL, last_consigneL);
+	check_acc(&consigneL, &consigneR);
 
 	setConsigne(consigneL, consigneR);
-
-	last_consigneR = consigneR;
-	last_consigneL = consigneL;
 }
 
 void Control::applyPwm(){

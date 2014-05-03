@@ -25,6 +25,7 @@ class EngineObject:
 			posinit			= (0,0),
 			color			= "black",
 			offset			= (0,0),
+			layers			= -1,
 			extension_objects	= [],
 			is_extension	= False):
 		"""
@@ -37,6 +38,7 @@ class EngineObject:
 		@param radius (pour type=CIRCLE)
 		@param posa_posb (pour type=WALL) point A, point B
 		@param offset l'offset à appliquer aux points
+		@param layers les couches dans lesquelles se situe l'objet
 		@param extension_objects les objets à "greffer"
 		"""
 		if not issubclass(self.__class__, EngineObject):
@@ -48,6 +50,7 @@ class EngineObject:
 		self.posinit 			= posinit
 		self.color 				= color
 		self.offset 			= offset
+		self.layers				= layers
 		self.extension_objects 	= []
 		self.is_extension		= is_extension
 
@@ -110,7 +113,7 @@ class EngineObjectCircle(EngineObject):
 		return body
 	
 	def create_shape(self, body):
-		shape = self.engine.physicsengine.create_shape_circle(body, self.radius, self.offset)
+		shape = self.engine.physicsengine.create_shape_circle(body, self.radius, self.offset, self.layers)
 		return shape
 
 
@@ -125,7 +128,7 @@ class EngineObjectPoly(EngineObject):
 		return body
 	
 	def create_shape(self, body):
-		shape = self.engine.physicsengine.create_shape_poly(body, self.poly_points, self.offset)
+		shape = self.engine.physicsengine.create_shape_poly(body, self.poly_points, self.offset, self.layers)
 		return shape
 
 class EngineObjectSegment(EngineObject):
@@ -142,6 +145,6 @@ class EngineObjectSegment(EngineObject):
 	def create_shape(self, body):
 		inita = Vec(self.inita) + self.offset
 		initb = Vec(self.initb) + self.offset
-		shape = self.engine.physicsengine.create_shape_segment(body, list(inita), list(initb), self.width)
+		shape = self.engine.physicsengine.create_shape_segment(body, list(inita), list(initb), self.width, self.layers)
 		return shape
 		

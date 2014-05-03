@@ -34,6 +34,7 @@ class Control{
 	
 	void setMaxAngCurv(float n_max_ang);
 	void setMaxAcc(float n_max_acc);
+	void setMaxRotSpdRatio(float n_max_rot_spd);
 
 	//Push un goal
 	int pushGoal(int ID, int p_type, float p_data_1 = 0, float p_data_2 = 0, float p_data_3 = 0);
@@ -63,7 +64,7 @@ class Control{
 	PID PID_Distance;
 	//interface avec les PIDs
 	void setConsigne(float consigne_left, float consigne_right); //controles puis modification (renvoie l'overflow)
-	void check_acc(float *consigne, float last);
+	void check_acc(float *consigneL, float *consigneR);
 	void check_max(float *consigne, float max = CONSIGNE_RANGE_MAX);
 	void controlPos(float e_angle, float e_dist); //goal en mm
 
@@ -72,7 +73,7 @@ class Control{
 	int consigne_offset;
 	float max_angle;
 
-	float max_acc;
+	float max_acc, max_rot_spd_ratio;
 
 	//Les pwm à appliquer
 	int value_consigne_right, value_consigne_left;

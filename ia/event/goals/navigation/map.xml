@@ -3,21 +3,21 @@
 <size width="3000" height="2000" w_tiles="100" />
 
 <!-- DEPOT CENTRE -->
-<circle x="1500" y="950" rayon="150" n="8"/>
+<circle x="1500" y="950" rayon="150" n="6"/>
 
 <!-- DEPOTS -->
-<circle x="0" y="0" rayon="150" n="8"/>
-<circle x="3000" y="0" rayon="150" n="8"/>
+<circle x="0" y="0" rayon="150" n="4"/>
+<circle x="3000" y="0" rayon="150" n="4"/>
 
 <!-- ARBRES -->
-<circle x="0" y="700" rayon="150" n="8"/>
-<circle x="700" y="0" rayon="150" n="8"/>
-<circle x="2300" y="0" rayon="150" n="8"/>
-<circle x="3000" y="700" rayon="150" n="8"/>
+<circle x="0" y="700" rayon="150" n="4"/>
+<circle x="700" y="0" rayon="150" n="6"/>
+<circle x="2300" y="0" rayon="150" n="6"/>
+<circle x="3000" y="700" rayon="150" n="4"/>
 
 <!-- TORCHES -->
-<circle x="900" y="900" rayon="80" n="8"/>
-<circle x="2100" y="900" rayon="80" n="8"/>
+<circle x="900" y="900" rayon="80" n="6"/>
+<circle x="2100" y="900" rayon="80" n="6"/>
 
 
 <!-- DEPOT FRUIT ROUGE -->

@@ -6,24 +6,11 @@
 #include "compat.h"
 #include "Servo.h"
 #include "serial_switch.h"
+#include "parameters.h"
 
 #include <Arduino.h>
 
-extern Servo servoBras, servoRet, servoBrasAngle, servoBrasDist;
-
-void initPins(){
-	//RETOURNEMENT
-	pinMode(PIN_SERVO_RET, OUTPUT);
-	servoRet.attach(PIN_SERVO_RET);
-
-	//BRAS
-	pinMode(PIN_SERVO_BRAS_ANGLE, OUTPUT);
-	servoBrasAngle.attach(PIN_SERVO_BRAS_ANGLE);
-	pinMode(PIN_SERVO_BRAS_DIST, OUTPUT);
-	servoBrasDist.attach(PIN_SERVO_BRAS_DIST);
-
-	pinMode(PIN_INTERRUPT_BRAS, INPUT_PULLUP);
-}
+extern Servo servoRet, servoBrasAngle, servoBrasDist;
 
 unsigned long timeMillis(){
 	return millis();
@@ -33,15 +20,15 @@ unsigned long timeMicros(){
 }
 
 void serial_send(char data) { //Envoi d'un octet en serial, dépend de la plateforme
-	Serial.write(data);
+	SERIAL_MAIN.write(data);
 }
 
 char generic_serial_read(){
-	return Serial.read();
+	return SERIAL_MAIN.read();
 }
 
 void forward_serial_send(char c, char addr) {
 	if (addr == FORWARD_ADDR) {
-		Serial1.write(c);
+		SERIAL_FWD.write(c);
 	}
 }

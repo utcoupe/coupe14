@@ -52,7 +52,7 @@ def startIa(pipe=None, ia_color="RED"):
 
 	else:
 		logger.info("Demarrage d'une IA depuis le simuateur")
-		Communication = communication.CommSimulateur(pipe) #TODO remplacer par un emulateur de READAPI et SENDAPI en utilisant conn
+		Communication = communication.CommSimulateur(pipe) 
 
 
 

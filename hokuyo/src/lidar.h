@@ -26,6 +26,9 @@ struct lidar {
 struct lidar initLidar(enum lidarModel model, char* device, struct coord position, double orientation, double angleMin, double angleMax);
 struct lidar initLidarAndCalibrate(enum lidarModel model, char* device, struct coord position, double orientation, double angleMin, double angleMax);
 
+void restartLidar(struct lidar * l);
+void closeLidar(struct lidar * l);
+
 struct coord* getPoints(struct lidar* l);
 
 

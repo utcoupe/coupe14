@@ -6,6 +6,9 @@ Ce code gère l'envoi d'actions élémentaires aux robots et traite les collisio
 import threading
 import logging
 import time
+import os
+import sys
+
 
 from .constantes import *
 from .subProcessCommunicate import *
@@ -68,36 +71,69 @@ class EventManager():
 		"""Get new goals from objectifManager and add it to robot's goals queue"""
 		new_data_list = self.__SubProcessCommunicate.readOrders()
 		for new_data in new_data_list:
-			nom_robot, id_prev_objectif, id_objectif, action_data = new_data
 
-			if self.__Flussmittel is not None and nom_robot == self.__Flussmittel.getName():
-				robot = self.__Flussmittel
-			elif self.__Tibot is not None:
-				robot = self.__Tibot
-			else:
-				robot = None
+			if new_data[0] == "add":
+				nom_robot, id_prev_objectif, id_objectif, action_data = new_data[1]
 
-			if robot is not None:
-				action_en_cours, objectif = robot.getQueuedObjectif()
-
-				if objectif:
-					last_id_objectif = objectif[-1][0]
-				elif action_en_cours:
-					last_id_objectif = action_en_cours[0]
+				if self.__Flussmittel is not None and nom_robot == self.__Flussmittel.getName():
+					robot = self.__Flussmittel
+				elif self.__Tibot is not None:
+					robot = self.__Tibot
 				else:
-					last_id_objectif = robot.getLastIdObjectifExecuted()
-				
-				if last_id_objectif is not None:
-					if last_id_objectif == id_prev_objectif:
-						robot.addNewObjectif(id_objectif, action_data)
+					robot = None
+
+				if robot is not None:
+					action_en_cours, objectif = robot.getQueuedObjectif()
+					added = False
+
+					#Staking step_over
+					if id_prev_objectif == id_objectif: 
+						robot.addOrderStepOver(id_objectif, action_data)
+						added = True
 					else:
-						self.__logger.warning(str(nom_robot)+" On drop un nouvel ordre car il n'est pas à jour, id_prev_objectif: " + str(id_prev_objectif) + " last_id_objectif: " + str(last_id_objectif) + " action_data " + str(action_data))
+						#stacking normale
+						if objectif:
+							last_id_objectif = objectif[-1][0]
+						elif action_en_cours:
+							last_id_objectif = action_en_cours[0]
+						else:
+							last_id_objectif = robot.getLastIdObjectifExecuted()
+						
+						if last_id_objectif is not None:
+							if id_prev_objectif == last_id_objectif:
+								robot.addNewObjectif(id_objectif, action_data)
+								added = True
+						else:#cas spéciale du premier ordre
+							robot.addNewObjectif(id_objectif, action_data)
+							added = True
+
+						if added == False:
+							self.__logger.warning(str(nom_robot)+" On drop un nouvel ordre car il n'est pas à jour, on a reçu id_prev_objectif: " + str(id_prev_objectif) + " on attendait last_id_objectif: " + str(last_id_objectif) + " ou des id precedant et suivant égaux, action_data " + str(action_data))
+							self.__SubProcessCommunicate.sendObjectifsCanceled((id_objectif,))
 				else:
-					robot.addNewObjectif(id_objectif, action_data)
+					self.logger.error(str(nom_robot)+" on a reçu un ordre pour un robot qui n'existe pas")
+
+			elif new_data[0] == "delete":
+				nom_robot = new_data[1]
+				id_objectif_to_remove = new_data[2]
+
+				if self.__Flussmittel is not None and nom_robot == self.__Flussmittel.getName():
+					robot = self.__Flussmittel
+				elif self.__Tibot is not None:
+					robot = self.__Tibot
+				else:
+					robot = None
+
+				if robot is not None:
+					robot.deleteObjectif(id_objectif_to_remove)
+				else:
+					self.logger.error(str(nom_robot)+" on a reçu un ordre remove pour un robot qui n'existe pas")
 			else:
-				self.logger.error(str(nom_robot)+" on a reçu un ordre pour un robot qui n'existe pas")
+				self.__logger.critical("La fonction demandé n'est pas implementé, new_data "+str(new_data))
 
 	def __checkEvent(self):
+		self.__checkBrasStatus()
+
 		if self.__Tourelle is not None:
 			new_data = ()
 			if self.__SmallEnemyBot is not None:
@@ -126,6 +162,9 @@ class EventManager():
 				else:
 					#Si tu as attendu le SLEEP assez longtemps
 					if int(time.time()*1000) > self.__resume_date_flussmittel:
+						if self.__Flussmittel.getFinEnCours():
+							self.__Flussmittel.setFinEnCours(False)
+							self.__SubProcessCommunicate.sendObjectifOver(self.__Flussmittel.getLastIdObjectifExecuted())
 						next_actions = self.__Flussmittel.getNextOrders()
 						if next_actions is not None:
 							self.__pushOrders(self.__Flussmittel, next_actions)
@@ -147,14 +186,30 @@ class EventManager():
 				else:
 					#Si tu as attendu le SLEEP assez longtemps
 					if int(time.time()*1000) > self.__resume_date_tibot:
+						if self.__Tibot.getFinEnCours():
+							self.__Tibot.setFinEnCours(False)
+							self.__SubProcessCommunicate.sendObjectifOver(self.__Tibot.getLastIdObjectifExecuted())
 						next_actions = self.__Tibot.getNextOrders()
 						if next_actions is not None:
 							self.__pushOrders(self.__Tibot, next_actions)
 
+	def __checkBrasStatus(self):
+		if self.__Flussmittel is not None:
+			bras_status = self.__Flussmittel.getBrasStatus()
+			if bras_status is not None:
+				self.__Flussmittel.setBrasStatus(None)
+				self.__SubProcessCommunicate.sendBrasStatus(bras_status, self.__Flussmittel.getQueuedObjectif()[1][0][0])
+
 	def __pushOrders(self, Objet, data): 
-		print(str(Objet.getName()) + " charge les actions dans eventManager: " + str(data))
 		id_objectif = data[0]
-		data_action = data[1]#data_action est de type ((id_action, ordre, arguments),...)
+		data_action_temp = data[1]#data_action est de type ((fack_id_action, ordre, arguments),...)
+
+		data_action = deque()
+		#Set vrai id
+		for action in data_action_temp:
+			data_action.append((Objet.getNextIdToStack(), action[1], action[2]))
+
+		print(str(Objet.getName()) + " charge les actions dans eventManager: " + str((id_objectif, data_action)))
 
 		last_order = data_action.pop()
 		if data_action:
@@ -166,7 +221,6 @@ class EventManager():
 			else:
 				self.__logger.error("Objet inconnu")
 
-
 		if last_order[1] == 'SLEEP':
 			if Objet is self.__Flussmittel:
 				self.__sleep_time_flussmittel = last_order[2][0]
@@ -174,36 +228,46 @@ class EventManager():
 				self.__sleep_time_tibot = last_order[2][0]
 			else:
 				self.__logger.error("Objet inconnu")
-		elif last_order[1] == 'END_GOTO':
-			self.__SubProcessCommunicate.sendObjectifGotoOver(id_objectif)
+
+		elif last_order[1] == 'STEP_OVER':
+			self.__SubProcessCommunicate.sendObjectifStepOver(id_objectif)
+
 		elif last_order[1] == 'END':
 			Objet.setLastIdObjectifExecuted(id_objectif)
-			self.__SubProcessCommunicate.sendObjectifOver(id_objectif)
-		elif last_order[1] == 'THEN':
+			Objet.setFinEnCours(True)
+
+		elif last_order[1] == 'DYNAMIQUE_OVER':
+			self.__SubProcessCommunicate.sendObjectifDynamiqueOver(id_objectif)
+
+		elif last_order[1] == 'THEN' or last_order[1] == 'END_GOTO':
 			#Rien à faire
 			pass
+
 		else:
-			self.__logger.error("ordre de stop impossible")
+			self.__logger.error("ordre de stop impossible, last_order"+str(last_order))
 
-		self.__sendOrders((Objet.getAddressOther(), Objet.getAddressAsserv()), data_action)
+		self.__sendOrders((Objet.getAddressOther(), Objet.getAddressAsserv()), Objet, data_action, id_objectif)
 
 
-	def __sendOrders(self, address, data_action):#data_action est de type ((id_action, ordre, arguments),...)
+	def __sendOrders(self, address, Objet, data_action, id_objectif):#data_action est de type ((id_action, ordre, arguments),...)
 		#Si on est en jeu
 		if self.__MetaData.getInGame():
 			for action in data_action:
 				arg = [action[0]]
+				
 				#Si l'ordre a des arguments
 				if action[2] is not None:
 					arg += action[2]
 
 				if action[1][0] == 'O':
-					self.__Communication.sendOrderAPI(address[0], action[1], *arg)
+						self.__Communication.sendOrderAPI(address[0], action[1], *arg)
+
 				elif action[1][0] == 'A':
 					if action[1] == "A_GOTO_SCRIPT":#A_GOTO_SCRIPT n'existe que dans les scripts d'action elemetaire, on l'utilise pour ne pas inclure ces deplacements dans le calcul de collision
 						self.__Communication.sendOrderAPI(address[1], "A_GOTO", *arg)
 					else:
 						self.__Communication.sendOrderAPI(address[1], action[1], *arg)
+
 				else:
 					self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
 

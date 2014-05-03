@@ -6,13 +6,6 @@
 #include "compat.h"
 #include "Servo.h"
 
-extern Servo servoBras;
-
-void initPins(){
-	pinMode(PIN_SERVO_BRAS, OUTPUT);
-	servoBras.attach(PIN_SERVO_BRAS);
-}
-
 unsigned long timeMillis(){
 	return millis();
 }

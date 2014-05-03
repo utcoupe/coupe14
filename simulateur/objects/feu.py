@@ -12,7 +12,7 @@ from define import *
 from engine.engineobject import EngineObjectPoly
 
 class Feu(EngineObjectPoly):
-	def __init__(self,engine,posinit, orientation):
+	def __init__(self,engine,posinit, orientation, coucher = False):
 		if (orientation == "vert"): # |
 			points_feu = map(lambda p: mm_to_px(*p),[(0,0),(30,0),(30,140),(0,140)])
 			points_triangle = map(lambda p: mm_to_px(*p),[(0,0),(70,55),(0,140)])
@@ -26,23 +26,29 @@ class Feu(EngineObjectPoly):
 			colltype		= COLLTYPE_FEU,
 			posinit			= posinit,
 			mass			= 80,
-			poly_points		= points_feu
+			poly_points		= points_feu,
+			layers			= 2
 		)
 
 		self.triangle = EngineObjectPoly(
 			engine 		= engine,
 			colltype	= COLLTYPE_FEU,
 			offset		= offset_triangle,
-			color		= "purple",
+			color		= "red",
 			poly_points = points_triangle,
+			layers			= 2,
 			is_extension= True
 		)
 		self.__is_down = False
-		self.coucher_feu()
+		if (coucher == True):
+			self.coucher_feu()
+
 
 	def eteindre(self):
-		if (self.__is_down == False):
-			self.coucher_feu()
+		"""
+		Supprime de la map le feu concerné
+		"""
+		self.engine.objects_to_remove.append(self)
 
 	def coucher_feu(self):
 		self.add_body_extension(self.triangle)

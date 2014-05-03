@@ -5,38 +5,82 @@
 //		PARAMETERS  //
 //////////////////////
 
-#define HAUTEUR_MAX 150//En mm
+//DIMENSIONS
 
-#define BRAS_OFFSET_DIST 100 //Distance in mm
-#define BRAS_OFFSET_ANGLE 10 //Angle offset in degrees
-#define ANGLE_DEPOT 0
-#define LONGUEUR_DEPOT 0
+#define BRAS_OFFSET_DIST 145 //Distance in mm
+#define BRAS_OFFSET_ANGLE 30 //Angle offset in degrees
 
-#define ANGLE_DEPOT_RET 0
-#define LONGUEUR_DEPOT_RET 0
-#define HAUTEUR_DEPOT_RET 0
+#define HAUTEUR_MAX 133 //En mm
+#define HAUTEUR_MIN 15 //en mm
 
-#define L1 43//Petit bras
-#define L2 82//Grand bras
-#define H_TO_STEP 200
-#define FREQUENCY_STEPPER 10
-#define DELAY_STEPPER_CONTROLER 50
+#define X_BRAS 128
+#define Y_BRAS 130
+
+//SECU BRAS : en degree commande
+
+#define ANGLE_DIST_MAX 85
+#define ANGLE_ANGLE_MAX 130
+#define ANGLE_INSIDE_ROBOT 70
+#define SECU_DELAY_REPLI_BRAS 200 //ms
+#define SECU_DELAY_ROT_BRAS 500 //ms
+
+//BRAS
+
+#define H_TO_STEP 16
+
+#define LONGUEUR_MAX 215 
+#define LONGUEUR_MIN BRAS_OFFSET_DIST
+#define MARGE_SECU_TOP 40 //En steps
+
+#define MARGE_DEPOT 80
+#define MARGE_PREHENSION 40
+#define HAUTEUR_GARDE_DEPOT HAUTEUR_MIN
+
+#define ANGLE_DEPOT (-(110.0/180.0)*M_PI)
+#define LONGUEUR_DEPOT 150
+
+#define ANGLE_DEPOT_RET (-(140.0/180.0)*M_PI) 
+#define LONGUEUR_DEPOT_RET 210
+
+#define PERIOD_STEPPER 200
+#define VMAX_STEPPER 600 
+#define AMAX_STEPPER 10000
+
+#define DELAY_REPLI_BRAS 1000
+#define DELAY_REPLI_BRAS2 100
+#define DELAY_STOP_PUMP 500
+
+//TRIANGLES BORDURES
+#define HAUTEUR_TRI_BORDURE 70
+#define LONGUEUR_TRI_BORDURE 200
+#define ANGLE_REPLI_TRI (-(80/180.0)*M_PI) 
+#define ANGLE_OUVERT 0 
+
+//RETOURNEMENT
+#define ANGLE_RET 70
+
+//POMPE
+#define PWM_PUMP 255
 
 //////////////////////
 //		PINS		//
 //////////////////////
-#define PIN_SERVO_BRAS 8
-#define PIN_SERVO_RET 9
+#define PIN_SERVO_RET 50
 
-#define PIN_INT_HAUT_ASC 22
-#define PIN_INT_BAS_ASC 23
-
-#define PIN_SERVO_BRAS_ANGLE 2
-#define PIN_SERVO_BRAS_DIST 3
+#define PIN_SERVO_BRAS_ANGLE 51
+#define PIN_SERVO_BRAS_DIST 52
 
 #define PIN_STEPPER_STEP 31
 #define PIN_STEPPER_DIR 30
-#define PIN_INTERRUPT_BRAS 32 //PULLUP ICI
+#define PIN_INTERRUPT_BRAS 20 //PULLUP ICI
+#define INT_BRAS 3
+#define PIN_INT_HAUT_ASC 21 //PULLUP
+#define INT_ASC_HAUT 2
+
+#define PIN_DEBUG_LED 23
+
+#define SERIAL_MAIN Serial
+#define SERIAL_FWD Serial2
 
 //////////////////////
 //		DEBUG		//
@@ -51,4 +95,8 @@
 #define BINPR(x)
 #endif
 
+
+#define MIN(x,y) (x<y?x:y)
+#define MAX(x,y) (x>y?x:y)
+#define ABS(x) x<0?-x:x
 #endif

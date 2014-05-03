@@ -22,6 +22,7 @@ class SubProcessCommunicate():
 		if self.__Data.Tibot is not None:
 			self.__subprocess_tibot = MyProcess(self.__Data, self.__Data.Tibot.getName())
 
+		time.sleep(0.1)
 		
 	def readOrders(self):
 		"""retourne les données des subprocess"""
@@ -45,51 +46,53 @@ class SubProcessCommunicate():
 		if self.__Data.Tibot is not None:
 			self.__subprocess_tibot.sendPacket(("END", id_objectif))
 
-	def sendObjectifGotoOver(self, id_objectif):
+	def sendObjectifStepOver(self, id_objectif):
 		if self.__Data.Flussmittel is not None:
-			self.__subprocess_flussmittel.sendPacket(("END_GOTO", id_objectif))
+			self.__subprocess_flussmittel.sendPacket(("STEP_OVER", id_objectif))
 		if self.__Data.Tibot is not None:
-			self.__subprocess_tibot.sendPacket(("END_GOTO", id_objectif))
+			self.__subprocess_tibot.sendPacket(("STEP_OVER", id_objectif))
+
+	def sendObjectifDynamiqueOver(self, id_objectif):
+		if self.__Data.Flussmittel is not None:
+			self.__subprocess_flussmittel.sendPacket(("DYNAMIQUE_OVER", id_objectif))
+		if self.__Data.Tibot is not None:
+			self.__subprocess_tibot.sendPacket(("DYNAMIQUE_OVER", id_objectif))
 
 	def sendObjectifsCanceled(self, id_canceled_list):
 		if self.__Data.Flussmittel is not None:
 			for id_canceled in id_canceled_list:
-				self.__subprocess_flussmittel.sendPacket(("canceled", id_canceled))
+				self.__subprocess_flussmittel.sendPacket(("CANCELED", id_canceled))
 		if self.__Data.Tibot is not None:
 			for id_canceled in id_canceled_list:
-				self.__subprocess_tibot.sendPacket(("canceled", id_canceled))
+				self.__subprocess_tibot.sendPacket(("CANCELED", id_canceled))
 
+	def sendBrasStatus(self, etat, id_objectif):
+		if self.__Data.Flussmittel is not None:
+			self.__subprocess_flussmittel.sendPacket(("BRAS_STATUS", etat, id_objectif))
+		if self.__Data.Tibot is not None:
+			self.__subprocess_tibot.sendPacket(("BRAS_STATUS", etat, id_objectif))
 
 class MyProcess():
 	def __init__(self, Data, robot_name):
 		self.__Data = Data
 		self.__logger = logging.getLogger(__name__.split('.')[0])
-		self.__input_buffer = deque()
 
 		self.__parent_conn, self.__child_conn = Pipe()
 		self.__process = Process(target=goals.startSubprocess, args=(self.__child_conn, robot_name) )
 		self.__process.start()
-
-		time.sleep(0.1)
-
-		self.__Pull_thread = threading.Thread(target=self.__readPipe)
-		self.__Pull_thread.start()
-		
-
-		
+	
 	def readPackets(self):
-		if self.__input_buffer:
-			new_data = self.__input_buffer
-			self.__input_buffer = deque()
-			return new_data
-		else:
-			return self.__input_buffer
+		new_data = deque()
+		try:
+			while self.__parent_conn.poll():
+				new_data.append(self.__parent_conn.recv())
+		except EOFError:
+			self.__logger.error("except EOFError sur recv()")
+
+		return new_data
 
 	def sendPacket(self, packet):
 		self.__parent_conn.send(packet)
 
-	def __readPipe(self):
-		while True:
-			a = self.__parent_conn.recv()
-			self.__input_buffer.append(a)
+		
 
