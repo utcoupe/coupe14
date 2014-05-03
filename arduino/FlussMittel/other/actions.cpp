@@ -97,7 +97,6 @@ void getTri(long x, long y, int h) {
 		action_en_cours = BrasVentouse;
 		block = true;
 		x -= X_BRAS; y -= Y_BRAS;
-		//next_step = true; //TODO TEST sans
 		double a = atan2(y, x);
 		int l = (int)sqrt(x*x + y*y);
 		cmdBrasVentouse(a, l, h);
@@ -106,6 +105,7 @@ void getTri(long x, long y, int h) {
 
 void deposeTri(int dep) {
 	next_step = true;
+	block = false;
 	cmdBrasVentouse(-1, -1, -1, dep);
 }
 
@@ -241,7 +241,7 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 						step++;
 						hauteur = MIN(hauteur, HAUTEUR_MAX);
 						cmdAsc(hauteur);
-					} //TODO TEST sans else next_step=true
+					}
 				} else { //Pas de triangles
 					pump(false);
 					step=5;
@@ -278,11 +278,11 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 				step++;
 				break;
 			case 6:
-				got_tri = false;
-				setLastId(); //Fin de depot
-				if (depot < 0) {
+				if (depot < 0 && got_tri) {
 					servoRet.write(165);
 				}
+				got_tri = false;
+				setLastId(); //Fin de depot
 				cmdAsc(HAUTEUR_GARDE_DEPOT); //On descend le bras pour bloquer les triangles
 				action_en_cours = None;
 				step = -1;
@@ -391,13 +391,13 @@ void ascInt() {
 	if (stepperAsc.distanceToGo() == 0) {
 		if (step == 2) {
 			got_tri = false;
-		}
+		} 
 		Timer1.detachInterrupt();
 		next_step = true;
 	}
 	if (digitalRead(PIN_INTERRUPT_BRAS) == 0) {
 		//On touche un triangle
-		if (action_en_cours == BrasVentouse && (step == 2 || step == -1)) {
+		if ((action_en_cours == BrasVentouse && step == 2) || (action_en_cours == None && step == -1)) {
 			Timer1.detachInterrupt();
 			next_step = true;
 			got_tri = true;

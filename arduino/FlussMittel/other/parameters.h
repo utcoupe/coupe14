@@ -32,7 +32,7 @@
 #define LONGUEUR_MIN BRAS_OFFSET_DIST
 #define MARGE_SECU_TOP 40 //En steps
 
-#define MARGE_DEPOT 60
+#define MARGE_DEPOT 80
 #define MARGE_PREHENSION 40
 #define HAUTEUR_GARDE_DEPOT HAUTEUR_MIN
 
@@ -60,7 +60,7 @@
 #define ANGLE_RET 70
 
 //POMPE
-#define PWM_PUMP 150 
+#define PWM_PUMP 255
 
 //////////////////////
 //		PINS		//
@@ -80,7 +80,7 @@
 #define PIN_DEBUG_LED 23
 
 #define SERIAL_MAIN Serial
-#define SERIAL_FWD Serial1
+#define SERIAL_FWD Serial2
 
 //////////////////////
 //		DEBUG		//

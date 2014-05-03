@@ -29,7 +29,7 @@ void executeCmd(char serial_data){
 			if ((serial_data & 0xF0) == RESET){ //Si demande de reset
 				ID_attendu = 0;
 				serial_send(RESET_CONF | LOCAL_ADDR);
-				PDEBUGLN("RESET CONFIRME");
+				//PDEBUGLN("RESET CONFIRME");
 			}
 			else{
 				etape = ID_step; //Sinon le message nous est adressé

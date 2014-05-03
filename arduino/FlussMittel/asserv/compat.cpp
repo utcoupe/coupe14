@@ -8,6 +8,10 @@
 extern Control control;
 
 void initPins(){
+	pinMode(LED_MAINLOOP, OUTPUT);
+	digitalWrite(LED_MAINLOOP, HIGH); //HIGH = eteinte
+	pinMode(LED_BLOCKED, OUTPUT) ;
+	digitalWrite(LED_BLOCKED, HIGH); //HIGH = eteinte
 	//set mode des pins pour arduino
 	pinMode(PIN_ENC_LEFT_A,INPUT_PULLUP);
 	pinMode(PIN_ENC_LEFT_B,INPUT_PULLUP);
@@ -77,9 +81,10 @@ void interruptRight0{
 #endif
 
 void serial_send(char data) { //Envoi d'un octet en serial, dépend de la plateforme
-	Serial2.write(data);
+	PDEBUG(data);
+	SERIAL_MAIN.write(data);
 }
 
 char generic_serial_read(){
-	return Serial2.read();
+	return SERIAL_MAIN.read();
 }
