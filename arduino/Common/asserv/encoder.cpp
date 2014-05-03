@@ -20,7 +20,7 @@ long Encoder::getTicks(){
 	if (side == LEFT_SIDE) {
 		return -ticks;
 	}else {
-		return -ticks;
+		return ticks;
 	}
 }
 
