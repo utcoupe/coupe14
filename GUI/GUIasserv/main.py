@@ -183,7 +183,7 @@ class GUI:
 
 	def updateViz(self):
 		self.y_scale = self.x_scale * self.viz_y_scale
-		self.clearPath();
+		self.clearPath()
 		self.drawPath()
 
 if __name__ == '__main__':
