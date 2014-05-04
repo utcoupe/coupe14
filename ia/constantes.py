@@ -12,7 +12,7 @@ TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté au
 #====================Enable====================
 ENABLE_TOURELLE = 		False
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
-ENABLE_TIBOT = 			False	
+ENABLE_TIBOT = 			True
 
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
