@@ -298,81 +298,6 @@ void Control::check_acc(float *consigne, float last_consigne) {
 	}
 }
 
-void Control::check_acc(float *consigneL, float *consigneR)
-{
-	//TODO TESTER
-	static float over_consigne = 0;
-	static bool over_side = 0; //0 = left, 1 = right;
-	float lastL = value_consigne_left, lastR = value_consigne_right;
-	if (over_side == 0) {
-		lastL -= over_consigne;
-	} else {
-		lastR -= over_consigne;
-	}
-
-	//Check MAX_ACC
-	//On verifie l'acceleration de chaque moteur
-	//SI elle est trop élevée, on la baisse, et on
-	//baisse aussi celle de l'autre moteur proportionellement
-	
-	float r, big_diff, small_diff;
-	float diffR = abs(*consigneR) - (abs(lastR) + max_acc);
-	float diffL = abs(*consigneL) - (abs(lastL) + max_acc);
-	float *bigger, *smaller;
-
-	if (diffR < 0) diffR = 0;
-	if (diffL < 0) diffL = 0;
-
-	if (diffL > 0 || diffR > 0) {
-		if (diffR > diffL) {
-			bigger = consigneR;
-			smaller = consigneL;
-			small_diff = diffL;
-			big_diff = diffR;
-			over_consigne = (diffR - diffL) * (1 - (diffR / *consigneR));
-			over_side = 1;
-		} else {
-			bigger = consigneL;
-			smaller = consigneR;
-			small_diff = diffR;
-			big_diff = diffL;
-			over_consigne = (diffL - diffR) * (1 - (diffL / *consigneL));
-			over_side = 0;
-		}
-		r = *smaller / *bigger;
-
-		if (*bigger > 0) {
-			*bigger -= (big_diff - over_consigne);
-		} else {
-			*bigger += (big_diff - over_consigne);
-		}
-		if (*smaller > 0) {
-			*smaller -= small_diff;
-		} else {
-			*smaller += small_diff;
-		}
-	}
-	/*
-	float diffR = abs(*consigneR) - (abs(lastR) + max_acc);
-	float diffL = abs(*consigneL) - (abs(lastL) + max_acc);
-
-	if (diffL > 0) {
-		if (*consigneL > 0) {
-			*consigneL -= diffL;
-		} else {
-			*consigneL += diffL;
-		}
-	}
-	if (diffR > 0) {
-		if (*consigneR > 0) {
-			*consigneR -= diffR;
-		} else {
-			*consigneR += diffR;
-		}
-	}
-	*/
-}
-
 void Control::controlPos(float da, float dd)
 {
 	float consigneAngle, consigneDistance, consigneR, consigneL;
@@ -385,14 +310,13 @@ void Control::controlPos(float da, float dd)
 	check_max(&consigneAngle);
 	check_rot_spd(&consigneAngle);
 	check_rot_acc(&consigneAngle);
+
 	check_max(&consigneDistance, CONSIGNE_RANGE_MAX - abs(consigneAngle));
 	check_dist_acc(&consigneDistance);
+	PDEBUGLN();
 
 	consigneR = consigneDistance + consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
 	consigneL = consigneDistance - consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
-
-	//check_rot_spd(&consigneL, &consigneR);
-	//check_acc(&consigneL, &consigneR);
 
 	last_consigne_angle = consigneAngle;
 	last_consigne_dist= consigneDistance;

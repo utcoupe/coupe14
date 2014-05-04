@@ -43,7 +43,7 @@ class GUI:
 		try:
 			self.com = communication.CommunicationGlobale()
 			arduino_constantes = self.com.getConst()
-			self.Data = data.Data(self.com, arduino_constantes)
+			self.Data = data.Data(self.com, arduino_constantes, 'RED')
 			self.robot_data = self.Data.dataToDico()[robot]
 			self.last_pos = self.robot_data["getPositionAndAngle"]
 			print("Wait, com is initializing")
