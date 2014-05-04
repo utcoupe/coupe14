@@ -8,6 +8,8 @@ sys.path.append(os.path.join(DIR_PATH, "..", "define"))
 sys.path.append(os.path.join(DIR_PATH, "..", "engine"))
 
 from define import *
+import math
+import time
 
 class GoalPWM:
 	def __init__(self, id_action, pwm, delay):
@@ -91,7 +93,7 @@ class Asserv:
 		@param a rad
 		"""
 		self.__robot.addGoal(GoalPOS(id_action, *mm_to_px(x,y)))
-		self.__robot.addGoal(GoalANGLE(id_action, math.radians(a)))
+		self.__robot.addGoal(GoalANGLE(id_action, a))
 
 	def gotoar(self, id_action, x, y, a):
 		"""
@@ -101,21 +103,22 @@ class Asserv:
 		@param a rad
 		"""
 		self.__robot.addGoal(GoalPOSR(id_action, *mm_to_px(x,y)))
-		self.__robot.addGoal(GoalANGLER(id_action, math.radians(a)))
+		self.__robot.addGoal(GoalANGLER(id_action, a))
 
 	def rot(self, id_action, a):
 		"""
 		Donner l'ordre de tourner d'un angle
 		@param a rad
 		"""
-		self.__robot.addGoal(GoalANGLE(id_action, math.radians(a)))
+		print('rot : a = ', a)
+		self.__robot.addGoal(GoalANGLE(id_action, a))
 
 	def rotr(self, id_action, a):
 		"""
 		Donner l'ordre de tourner d'un angle,relativement à l'angle actuel
 		@param a rad
 		"""
-		self.__robot.addGoal(GoalANGLER(id_action, math.radians(a)))
+		self.__robot.addGoal(GoalANGLER(id_action, a))
 
 	def cleang(self):
 		"""
@@ -145,7 +148,7 @@ class Asserv:
 		@return int position y du robot
 		@return float angle du robot
 		"""
-		return self.__robot.x(), self.__robot.y(), self.__robot.a()
+		return self.__robot.getXreal(), self.__robot.getYreal(), self.__robot.getAreal()
 
 	def pwm(self, id_action, pwm_l, pwm_r, delay):
 		"""
@@ -168,6 +171,24 @@ class Visio:
 		#TODO return en fonction de l'enum
 		return 3
 
+	def actionBras(self):
+		"""
+		zone dans laquelle le bras du robot peut choper un triangle
+		quand il y a un triangle dans la zone, celui-ci est supprimé
+		"""
+		"""print('robot : ', self.__robot.x(), self.__robot.y(), self.__robot.a())
+		angle_rad = math.radians(self.__robot.a())
+		base_x = self.__robot.x() + math.ceil(WIDTH_GROS/2*math.cos(angle_rad) + HEIGHT_GROS/2*math.sin(angle_rad))
+		base_y = self.__robot.y() - math.ceil(HEIGHT_GROS/2*math.cos(angle_rad) + WIDTH_GROS/2*math.sin(angle_rad))
+		extrem_x = base_x + math.ceil(LONGUEUR_BRAS*math.sin(angle_rad))
+		extrem_y = base_y - math.ceil(LONGUEUR_BRAS*math.cos(angle_rad))
+		hauteur_x = base_x - math.ceil(LONGUEUR_BRAS*math.cos(angle_rad))
+		hauteur_y = base_y + math.ceil(LONGUEUR_BRAS*math.sin(angle_rad))
+		"""
+		self.__robot.add_bras()
+		time.sleep(0.5) #temps où le bras apparaitra
+		self.__robot.remove_bras()
+
 class Others:
 	""" Émule l'arduino dédiée aux others """
 	def __init__(self, robot):
@@ -182,6 +203,9 @@ class Others:
 
 	def getLastIdAction(self):
 		return self.__last_id_action_executed
+
+	def ejectTriangle(self):
+		self.__robot.releaseFeu()
 
 	def ping(self):
 		return "others pong"

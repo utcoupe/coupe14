@@ -28,9 +28,16 @@ static struct lidar l1;
 static struct color l1Color;
 #endif
 
-long startTime;
+long startTime, lastTime = 0;
 static struct coord robots[MAX_ROBOTS];
 
+
+static void catch_SIGINT(int signal){
+	printf("Closing lidar(s), please wait...\n");
+	closeLidar(&l1);
+	printf("Exitting\n");
+	exit(EXIT_SUCCESS);
+}
 
 int main(int argc, char **argv){
 	
@@ -39,22 +46,28 @@ int main(int argc, char **argv){
 		return EXIT_FAILURE;
 	}
 
-	struct coord pos1;
+	if (signal(SIGINT, catch_SIGINT) == SIG_ERR) {
+        fputs("An error occurred while setting a signal handler for SIGINT.\n", stderr);
+        return EXIT_FAILURE;
+    }
+
+	struct coord posl1;
+	posl1.y = -25;
 	if( strcmp(argv[1], "red") == 0 ){
-		pos1.x = -25;		
+		posl1.x = -25;	
 	}else{
-		pos1.x = TAILLE_TABLE_X+25;
+		posl1.x = TAILLE_TABLE_X+25;
 	}
 
-	pos1.y = -25;
+	
 
 	if (argc == 3 && strcmp(argv[2], "protocol") == 0) {
 		printf("Utilisation du protcole\n");
 		use_protocol = 1;
 	}
 
-	l1 = initLidarAndCalibrate( hokuyo_urg, "/dev/ttyACM0", pos1, PI/2, 0, PI/2);
-	//l1 = initLidar( hokuyo_urg, "/dev/ttyACM0", pos1, 0, 0, PI/2);
+	//l1 = initLidarAndCalibrate( hokuyo_urg, "/dev/ttyACM0", posl1, PI/2, 0, PI/2);
+	l1 = initLidar( hokuyo_urg, "/dev/ttyACM0", posl1, 0, 0, PI/2);
 
 
 	#ifdef SDL
@@ -72,6 +85,7 @@ int main(int argc, char **argv){
 	while(1){
 		frame();
 	}
+	catch_SIGINT(0);
 	
 }
 
@@ -79,6 +93,11 @@ void frame(){
 	long timestamp;
 	getPoints(&l1);
 	timestamp = timeMillis() - startTime;
+	printf("%li \t", timestamp-lastTime);
+	if(lastTime != 0 && timestamp-lastTime > HOKUYO_WATCHDOG){
+		printf("%s WatchDog exceeded: %li > %li\n", PREFIX, timestamp-lastTime, HOKUYO_WATCHDOG);
+		restartLidar(&l1);
+	}
 	//printf("nPoints:%i\n", l1.fm.n);
 	int nRobots = getRobots(l1.points, l1.fm.n, robots);
 	#ifdef SDL
@@ -98,5 +117,6 @@ void frame(){
 		}
 		printf("\n");
 	}
+	lastTime = timestamp;
 }
 

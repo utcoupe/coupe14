@@ -1,1 +1,1 @@
-../../Common/other/serial_types.c
+../../../libs/com_C/serial_types.c

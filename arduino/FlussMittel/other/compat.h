@@ -12,7 +12,6 @@
 #define LOCAL_ADDR ADDR_FLUSSMITTEL_OTHER //Ici l'adresse locale du client
 #define FORWARD_ADDR ADDR_FLUSSMITTEL_ASSERV
 
-void initPins();
 unsigned long timeMillis();
 unsigned long timeMicros();
 

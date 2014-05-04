@@ -30,15 +30,20 @@ class MotorPhysic:
 	def step(self, dt):
 		self.space.step(dt)
 
-
-	def create_shape_circle(self, body, radius, offset):
-		return pm.Circle(body, radius, offset)
+	def create_shape_circle(self, body, radius, offset, layers):
+		circle = pm.Circle(body, radius, offset)
+		circle.layers = layers
+		return circle
 		
-	def create_shape_poly(self, body, points, offset):
-		return pm.Poly(body, points, offset)
+	def create_shape_poly(self, body, points, offset, layers):
+		poly = pm.Poly(body, points, offset)
+		poly.layers = layers
+		return poly
 		
-	def create_shape_segment(self, body, p1, p2, width):
-		return pm.Segment(body, p1, p2, width)
+	def create_shape_segment(self, body, p1, p2, width, layers):
+		seg = pm.Segment(body, p1, p2, width)
+		seg.layers = layers
+		return seg
 
 	def create_body_circle(self, mass, posinit, radius):
 		inertia = pm.moment_for_circle(mass, 0, radius, (0,0))

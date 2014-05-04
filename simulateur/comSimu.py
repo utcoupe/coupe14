@@ -67,13 +67,38 @@ class Communication():
 		elif (order == "O_RET_OUVRIR"):
 			pos = ()
 			self.__bigrobot.setlastIdActionOther(args[0])
-			#TODO, implementer
+			self.__bigrobot.releaseFeu() #pour les tests
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
 		elif (order == "O_RET_FERMER"):
 			pos = ()
 			self.__bigrobot.setlastIdActionOther(args[0])
 			#TODO, implementer
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+
+		elif (order == "O_GET_TRIANGLE"):
+			pos = ()
+			self.__bigrobot.activerVisio()
+			self.__bigrobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+
+		elif (order == "O_STORE_TRIANGLE"):
+			pos = ()
+			self.__bigrobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+
+		elif (order == "O_GET_BRAS_STATUS"):
+			pos = (1,)
+			self.__bigrobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+
+		elif (order == "PINGPING"):
+			pos = ()
+			self.__bigrobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+
+		elif (order == "PAUSE"):
+			pos = ()
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
 		else:
@@ -87,7 +112,7 @@ class Communication():
 		#on traite les ordres qui nécessitent de renvoyer des informations
 		if (order == "A_GET_POS"):
 			pos = self.__bigrobot.getPosition()
-			fixed_pos = (pos[0], 2000-pos[1], pos[2])
+			fixed_pos = (pos[0], pos[1], pos[2])
 			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, fixed_pos)
 
 		elif (order == "GET_LAST_ID"):
@@ -96,7 +121,7 @@ class Communication():
 
 		elif (order == "A_GET_POS_ID"):
 			pos = self.__bigrobot.getPositionId()
-			pos_id = (pos[0], 2000-pos[1], pos[2], pos[3])
+			pos_id = (pos[0], pos[1], pos[2], pos[3])
 			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos_id)
 
 		elif (order == "A_CLEANG"):
@@ -111,7 +136,15 @@ class Communication():
 
 		elif (order == "A_SET_POS"):
 			pos = ()
-			#TODO ou pas ?
+			self.__bigrobot.setPosition(args[0],args[1], args[2])
+			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos)
+
+		elif (order == "PINGPING"):
+			pos = ()
+			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos)
+
+		elif (order == "PAUSE"):
+			pos = ()
 			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos)
 
 		else:
@@ -162,7 +195,7 @@ class Communication():
 
 		elif (order == "RESET_ID"):
 			pos = ()
-			self.__bigrobot.resetIdOther()
+			self.__minirobot.resetIdOther()
 			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
 
 		elif (order == "O_RET_OUVRIR"):
@@ -177,6 +210,16 @@ class Communication():
 			#TODO, implementer
 			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
 
+		elif (order == "PINGPING"):
+			pos = ()
+			self.__minirobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
+
+		elif (order == "PAUSE"):
+			pos = ()
+			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
+
+
 		else:
 			print('Error : mauvais paramètre traitement Tibot other !')
 
@@ -187,7 +230,7 @@ class Communication():
 		#on traite les ordres qui nécessitent de renvoyer des informations
 		if (order == "A_GET_POS"):
 			pos = self.__minirobot.getPosition()
-			fixed_pos = (pos[0], 2000-pos[1], pos[2])
+			fixed_pos = (pos[0], pos[1], pos[2])
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, fixed_pos)
 
 		elif (order == "GET_LAST_ID"):
@@ -196,22 +239,30 @@ class Communication():
 
 		elif (order == "A_GET_POS_ID"):
 			pos = self.__minirobot.getPositionId()
-			pos_id = (pos[0], 2000-pos[1], pos[2], pos[3])
+			pos_id = (pos[0], pos[1], pos[2], pos[3])
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos_id)
 
 		elif (order == "A_CLEANG"):
 			pos = ()
-			self.__bigrobot.cleanGoals()
+			self.__minirobot.cleanGoals()
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
 
 		elif (order == "RESET_ID"):
 			pos = ()
-			self.__bigrobot.resetIdAsserv()
+			self.__minirobot.resetIdAsserv()
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
 
 		elif (order == "A_SET_POS"):
 			pos = ()
-			#TODO ou pas?
+			self.__minirobot.setPosition(args[0], args[1], args[2])
+			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
+
+		elif (order == "PINGPING"):
+			pos = ()
+			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
+
+		elif (order == "PAUSE"):
+			pos = ()
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
 
 		else:
@@ -240,10 +291,9 @@ class Communication():
 		"""
 		Parse l'ordre envoyé à ADDR_HOKUYO
 		"""
-		if(order == GET_HOKUYO):
+		if(order == "GET_HOKUYO"):
 			data = tuple(self.__hokuyo.getHokuyo())
-			data_to_ret = (args[0],)
-			data_to_ret += data
+			data_to_ret = data
 			self.__addOrder("ADDR_HOKUYO", order, data_to_ret)
 
 	def __addOrder(self, addr, ordre, args):

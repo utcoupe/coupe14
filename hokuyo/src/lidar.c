@@ -5,6 +5,7 @@
 #include <string.h>
 #include <urg_utils.h>
 #include <math.h>
+#include <err.h>
 #include "hokuyoUrg.h"
 #include "global.h"
 #include "robot.h"
@@ -126,6 +127,18 @@ initLidar(enum lidarModel model, char* device, struct coord position, double ori
 	return l;
 }
 
+void closeLidar(struct lidar * l){
+	if(l->model == hokuyo_urg){
+		closeHokuyoUrg(l->lidarObject);
+	}
+}
+
+void restartLidar(struct lidar * l){
+	if(l->model == hokuyo_urg){
+		restartHokuyoUrg(l->lidarObject);
+	}
+}
+
 char
 invalidDistance(long d){
 	if(d > maxDistance) return 1;
@@ -157,6 +170,9 @@ invalidPointCalibration(struct coord lidar, struct coord p){
 struct coord*
 getPointsCalibrate(struct lidar* l, char calibration){
 	long* buffer = malloc(sizeof(long)*l->fm.n);
+	if( buffer == NULL ){
+		err(1, "buffer malloc");
+	}
 
 
 	getDistancesHokuyoUrg(l->lidarObject, buffer);

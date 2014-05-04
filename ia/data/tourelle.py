@@ -10,11 +10,12 @@ import logging
 
 
 class Tourelle():
-	def __init__(self, Flussmittel, Tibot, BigEnemyBot, SmallEnemyBot, communication, arduinoConstantes, address):
+	def __init__(self, Flussmittel, Tibot, BigEnemyBot, SmallEnemyBot, MetaData, communication, arduinoConstantes, address):
 		self.Flussmittel = Flussmittel
 		self.Tibot = Tibot
 		self.BigEnemyBot = BigEnemyBot
 		self.SmallEnemyBot = SmallEnemyBot
+		self.MetaData = MetaData
 		self.__communication = communication
 		self.__address = address
 		self.__logger = logging.getLogger(__name__)
@@ -29,7 +30,7 @@ class Tourelle():
 		return self.__old_data[len(self.__old_data)-1][1]
 	"""
 
-	def majPosition(self, arguments):
+	def majPositionHokuyo(self, arguments):
 		#print("debug:arguments"+str(arguments)+"\n")
 		timestamp = arguments[0]
 
@@ -60,20 +61,22 @@ class Tourelle():
 
 		#print("DEBUG:nRobots:"+str(nRobots))
 		#print("DEBUG:__old_data"+str(self.__old_data))
-
-		coeff = TOURELLE_PULL_PERIODE / (self.__old_data[-1][0] - self.__old_data[-2][0])
+		temp =(self.__old_data[-1][0] - self.__old_data[-2][0])
+		if temp != 0:
+			coeff = TOURELLE_PULL_PERIODE / temp
+		else:
+			coeff = 0
 		#print("DEBUG:coeff"+str(coeff))
 
 		def predict(pos):
 			offset = pos[0].subtract(pos[1]).multiply(-coeff)
-			self.__logger.info("offset:"+str(offset))
-			self.__logger.info("speed:"+str(Position(offset).multiply(1/TOURELLE_PULL_PERIODE)))
+			#self.__logger.info("offset:"+str(offset))
+			#self.__logger.info("speed:"+str(Position(offset).multiply(1/TOURELLE_PULL_PERIODE)))
 			return pos[1].add(offset)
 
 		newpos = list( map(predict, zip(self.__old_data[-2][1], self.__old_data[-1][1])))
 
 		self.__old_data.append( (self.__old_data[-2][0], newpos) )
-		pass
 	
 
 
@@ -117,10 +120,11 @@ class Tourelle():
 			self.__old_data.pop(-1)
 
 		self.__old_data.append( (timestamp, [big, small]) )
-		self.__logger.info("real:     \tbig:"+str(big)+"\tsmall:"+str(small))
+		#self.__logger.info("real:     \tbig:"+str(big)+"\tsmall:"+str(small))
 
-		if predict:
-			self.__estimate_pos()
+		"""TODO fix __estimate_pos() 
+		if predict: 
+			self.__estimate_pos()"""
 
 		#print("DEBUG:__old_data:"+str(self.__old_data))
 		#print("debug:__old_data[-1]:"+str(self.__old_data[-1]))
@@ -139,10 +143,8 @@ class Tourelle():
 		"""
 
 		#self.Tourelle.setFormatedPosition(position_big_enemy, position_small_enemy)
-		pass
 
 	def __setFormatedPosition(self, position_big_enemy, position_small_enemy):
 		"""Cette méthode ne doit être appelé qu'avec des données formatées par data/computeHokuyoData.py"""
-		self.__logger.info("predicted:\tbig:"+str(position_big_enemy)+"\tsmall:"+str(position_small_enemy))
-		pass
-		#TODO
+		self.SmallEnemyBot.setPosition(position_small_enemy)
+		self.BigEnemyBot.setPosition(position_big_enemy)

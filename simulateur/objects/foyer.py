@@ -19,9 +19,10 @@ class FoyerCentre(EngineObjectCircle):
 			posinit			= posinit,
 			color			= "brown",
 			mass 			= MASS_INF,
-			radius			= mm_to_px(150)
+			radius			= mm_to_px(150),
+			layers			= 1
 		)
-		self.nbFeu = 0
+		self.__nbFeu = 0
 
 	def __repr__(self):
 		return "FoyerCentre %s " % (self.posinit,)
@@ -40,7 +41,7 @@ class FoyerBord(EngineObjectPoly):
 			mass 			= MASS_INF,
 			poly_points		= points
 		)
-		self.nbFeu = 0
+		self.__nbFeu = 0
 
 	def __repr__(self):
 		return "FoyerBord %s " % (self.posinit,)

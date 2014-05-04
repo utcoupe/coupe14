@@ -108,13 +108,13 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		itob(y, ret+2);
 		ftob(a, ret+4);
 		itob(control.getLastFinishedId(), ret+8);
-		ret_size = 2;
 		ret_size = 10;
 		break;
 		}
 	case A_ACCMAX:
 		if(!doublon) {
 			control.setMaxAcc(btof(argv));
+			control.setMaxRotSpdRatio(btof(argv+4));
 		}
 		break;
 	case GET_LAST_ID: {

@@ -8,25 +8,33 @@ using namespace std;
 
 void comLoop(Visio& visio) {
 	string order;
+	while (!visio.isReady()) {}
 	cout << "READY" << endl;
 	//On lit les ordres sur l'entrée standard
 	cin >> order;
-	cerr << order << endl;
-	while (order != "END") {
+	while (order != "EXIT") {
 		if (order == "ASK_DATA") {
 			vector<Triangle> tri;
-			visio.triangles(tri);
-			for (int i=0; i<tri.size(); i++) {
-				cout << tri[i].coords.x<<":"<<tri[i].coords.y<<" "<<tri[i].angle<<" "<<tri[i].color<<" "<<tri[i].isDown << endl;
+			try {
+				visio.triangles(tri);
+				for (int i=0; i<tri.size(); i++) {
+					cout << tri[i].coords.x<<":"<<tri[i].coords.y<<" "<<tri[i].angle<<" "<<tri[i].size<<" "<<tri[i].color<<" "<<tri[i].isDown << endl;
+				}
+				cout << "END" << endl;
+			} catch (const std::exception &e) {
+				cerr << "Exception in visio.triangles() : " << e.what() << endl;
+				cout << "ERROR" << endl;
+			} catch (...) {
+				cerr << "Unknown exception in visio.triangles()" << endl;
+				cout << "ERROR" << endl;
 			}
-			cout << "END" << endl;
 			order = "";
 		}
+		else {
+			//cerr << "Unexpected order : " << order << endl;
+			continue;
+		}
 		cin >> order;
-		//}
-		/*else {
-			cerr << "ERROR : Ordre inconnu" << endl;
-		}*/
 	}
 	cout << "exit" << endl;
 

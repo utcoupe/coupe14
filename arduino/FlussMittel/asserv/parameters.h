@@ -37,6 +37,7 @@
 #define FREQ (1/(DUREE_CYCLE/1000.0))
 
 #define ACC_MAX 750 //consigne*s-2
+#define RATIO_SPD_ROT_MAX 0.5 
 
 /* CONSIGNE OFFSET
  * DEVRAIT ETRE A 0
@@ -53,7 +54,7 @@
 
 #define CONSIGNE_MAX 255
 
-#define CONSIGNE_RANGE_MAX CONSIGNE_MAX - PWM_MIN
+#define CONSIGNE_RANGE_MAX (CONSIGNE_MAX - PWM_MIN)
 
 //CONSIGNE_REACHED est la pwm en dessous de laquelle un robot peut etre considéré comme arrêté à son goal
 #define CONSIGNE_REACHED 10
@@ -64,7 +65,7 @@
 #define ENC_RIGHT_RADIUS 36.1 //REGLE PAR TEST - rayon de la roue codeuse
 #define ENTRAXE_ENC 324.5 //REGLE PAR TES - Distance entre chaque roue codeuse en mm
 
-#define ERROR_ANGLE 0.05 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
+#define ERROR_ANGLE 0.02 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
 #define ERROR_POS 10 // erreur en position (mm)  maximale pour considérer l'objectif comme atteint
 
 #define MAX_ANGLE 0.20  //~10° angle en dessous duquel on décrit une trajectoire curviligne (trop bas, le robot s'arretera constamment pour se recaler au lieu d'avancer, trop haut, les trajectoires seront très courbes voir meme fausses (overflow spd -> overflow pwm).
@@ -95,6 +96,8 @@
 #define LED_BLOCKED 23
 
 //DEFINES ARDUINO
+#define SERIAL_MAIN Serial2
+
 #define PIN_ENC_RIGHT_A 21
 #define PIN_ENC_RIGHT_B 20
 #define PIN_ENC_RIGHT_0 4 //non utilisé

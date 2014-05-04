@@ -26,7 +26,10 @@ class SubProcessManager():
 		self.__GoalsManager = GoalsManager(self, connection, robot_name)
 
 	def sendGoal(self, id_objectif_prev, id_objectif, elem_script):
-		self.__connection.send((self.__robot_name, id_objectif_prev, id_objectif, elem_script))
+		self.__connection.send(("add", (self.__robot_name, id_objectif_prev, id_objectif, elem_script)))
+
+	def sendDeleteGoal(self, id_objectif):
+		self.__connection.send(("delete", self.__robot_name, id_objectif))
 
 	def getData(self):
 		return self.__data
@@ -47,20 +50,32 @@ class SubProcessManager():
 				self.__processStatus(new_message)
 
 	def __updateData(self, data):
-		self.__data = data
+		if self.__data == {}:
+			self.__data = data
+		else:
+			for robot_name in data:
+				if data[robot_name] is not None:
+					for info_name in data[robot_name]:
+						self.__data[robot_name][info_name] = data[robot_name][info_name]
 
 	def __processStatus(self, status):
 		"""read new status and update objectif_list"""
 		etat = status[0]
 		id_objectif = status[1]
 
-		if etat == "END_GOTO":
-			self.__GoalsManager.goalGotoFinishedId(id_objectif)
+		if etat == "STEP_OVER":
+			self.__GoalsManager.goalStepOverId(id_objectif)
+		elif etat == "DYNAMIQUE_OVER":
+			self.__GoalsManager.goalDynamiqueFinishedId(id_objectif)
+		elif etat == "BRAS_STATUS":
+			if self.__robot_name == "FLUSSMITTEL":
+				self.__GoalsManager.processBrasStatus(status[1], status[2])
 		elif etat == "END":
 			self.__GoalsManager.goalFinishedId(id_objectif)
-		elif etat == "canceled":
+		elif etat == "CANCELED":
 			self.__GoalsManager.goalCanceledId(id_objectif)
-
+		else:
+			self.__logger.error("Status non géré status "+str(status))
 
 def startSubprocess(connection, robot_name):
 	a = SubProcessManager(connection, robot_name)

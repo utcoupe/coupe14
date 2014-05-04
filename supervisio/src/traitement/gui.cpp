@@ -23,9 +23,9 @@ void drawObject(int x, int y, Mat &frame, string addtxt, Scalar color, bool fill
     else 
 		line(frame,Point(x,y),Point(frame.rows,y),color,1);
 
-	string write = intToString(x)+","+intToString(y);
+	string write = ""; // = intToString(x)+","+intToString(y);
 	if (addtxt != "") {
-		write += " - " + addtxt;
+		write += addtxt;
 	}
 	int baseline;
 	Point pt(x,y+15);
