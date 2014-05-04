@@ -18,7 +18,7 @@ ENABLE_TIBOT = 			False
 PORT_XBEE = 			"/dev/ttyUSB0"
 VITESSE_XBEE = 			57600
 PARITY_XBEE = 			"ODD"
-PORT_OTHER = 			"/dev/ttyACM1"
+PORT_OTHER = 			"/dev/ttyACM0"
 VITESSE_OTHER = 		57600
 PARITY_OTHER = 			"ODD"
 

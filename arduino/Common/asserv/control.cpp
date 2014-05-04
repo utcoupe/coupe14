@@ -110,7 +110,7 @@ void Control::compute(){
 				}
 
 				//Fin de la procedure d'alignement
-				if(!aligne && abs(da) <= ERROR_ANGLE) {// && value_consigne_right < CONSIGNE_REACHED && value_consigne_left < CONSIGNE_REACHED) {
+				if(!aligne && abs(da) <= ERROR_ANGLE_TO_GO) {
 					aligne = 1;
 				}
 
@@ -124,7 +124,7 @@ void Control::compute(){
 				}
 
 				//Fin de consigne
-				if(abs(dd) <= ERROR_POS) {// && value_consigne_right < CONSIGNE_REACHED && value_consigne_left < CONSIGNE_REACHED) {
+				if(abs(dd) <= ERROR_POS) {
 					setConsigne(0, 0);
 					fifo.pushIsReached();
 				}
@@ -133,12 +133,18 @@ void Control::compute(){
 
 			case TYPE_PWM :
 			{
+				static float pwmR = 0, pwmL = 0;
 				if(!order_started){
 					start_time = now;
+					pwmR = 0; pwmL = 0;
 					order_started = true;
 				}
 				if((now - start_time)/1000.0 <= current_goal.data_3){
-					setConsigne(current_goal.data_1,current_goal.data_2);
+					float consigneR = current_goal.data_2, consigneL = current_goal.data_1;
+					check_acc(&consigneL, pwmL);
+					check_acc(&consigneR, pwmR);
+					pwmR = consigneR; pwmL = consigneL;
+					setConsigne(pwmL, pwmR);
 				}
 				else{
 					setConsigne(0,0);
