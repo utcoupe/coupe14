@@ -116,12 +116,10 @@ class GoalsManager:
 		return length
 
 	#GOAL management from ID
-	def __blockGoalFromId(self, id_objectif):
-		"""utilisé uniquement au chargement du script initial"""
-		for goal in self.__available_goals:
-			if goal.getId() == id_objectif:
-				self.__blockGoal(goal)
-				break
+	def blockGoalFromId(self, id_objectif):
+		"""utilisé uniquement quand un autre objectif manager block un goal"""
+		#osef...
+		pass
 
 	def goalStepOverId(self, id_objectif):
 		for objectif in self.__blocked_goals:
@@ -144,6 +142,10 @@ class GoalsManager:
 
 	def goalFinishedId(self, id_objectif):
 		for objectif in self.__dynamique_finished_goals:
+			if objectif.getId() == id_objectif:
+				self.__finishGoal(objectif)
+		#Dans le cas où c'est l'autre subprocess qui fait l'objectif 
+		for objectif in self.__available_goals:
 			if objectif.getId() == id_objectif:
 				self.__finishGoal(objectif) 
 
@@ -198,11 +200,16 @@ class GoalsManager:
 		self.__queueBestGoals()
 
 
-	def __finishGoal(self, goal):		
-		self.__dynamique_finished_goals.remove(goal)
-		self.__finished_goals.append(goal)
-		self.__logger.info('Goal ' + goal.getName() + ' is finished')
-		self.__queueBestGoals()
+	def __finishGoal(self, goal):
+		if goal in self.__dynamique_finished_goals:	
+			self.__dynamique_finished_goals.remove(goal)
+			self.__finished_goals.append(goal)
+			self.__logger.info('Goal ' + goal.getName() + ' is finished')
+			self.__queueBestGoals()
+		#Dans le cas où c'est l'autre robot qui à fait l'objectif
+		elif goal in self.__available_goals:
+			self.__available_goals.remove(goal)
+			self.__finished_goals.append(goal)
 
 	def __deleteGoal(self, goal):
 		success = False

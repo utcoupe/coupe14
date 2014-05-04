@@ -76,6 +76,11 @@ class EventManager():
 				nom_robot, id_prev_objectif, id_objectif, action_data = new_data[1]
 				robot = self.__getSystem(nom_robot)
 
+				if robot == self.__Flussmittel:
+					self.__SubProcessCommunicate.sendTibotGoalManagerObjectifBlocked(id_objectif)
+				else:
+					self.__SubProcessCommunicate.sendFlussmittelGoalManagerObjectifBlocked(id_objectif)
+
 				action_en_cours, objectif = robot.getQueuedObjectif()
 				added = False
 
