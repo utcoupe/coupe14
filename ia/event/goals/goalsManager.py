@@ -86,7 +86,6 @@ class GoalsManager:
 				for goal in self.__available_goals:
 					nb_elem_goal = goal.getLenElemGoal()
 					for idd in range(nb_elem_goal):
-						print("on test goal "+str(goal.getId())+ " elem "+str(idd))
 						path = self.__getOrderTrajectoire(goal, idd)
 						if path != []:
 							length = self.__pathLen(path)
@@ -118,7 +117,7 @@ class GoalsManager:
 	#GOAL management from ID
 	def blockGoalFromId(self, id_objectif):
 		"""utilisé uniquement quand un autre objectif manager block un goal"""
-		#osef...
+		#osef, il n'y aura pas d'intersection sur les objectifs !
 		pass
 
 	def goalStepOverId(self, id_objectif):

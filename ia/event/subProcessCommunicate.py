@@ -36,10 +36,12 @@ class SubProcessCommunicate():
 		return input_list
 
 	def sendFlussmittelGoalManagerObjectifBlocked(self, id_objectif):
-		self.__subprocess_flussmittel.sendPacket(("BLOCKED", id_objectif))
+		if self.__Data.Flussmittel is not None:
+			self.__subprocess_flussmittel.sendPacket(("BLOCKED", id_objectif))
 
 	def sendTibotGoalManagerObjectifBlocked(self, id_objectif):
-		self.__subprocess_tibot.sendPacket(("BLOCKED", id_objectif))
+		if self.__Data.Tibot is not None:
+			self.__subprocess_tibot.sendPacket(("BLOCKED", id_objectif))
 
 	def sendObjectifOver(self, id_objectif):
 		self.__updateSubProcessData()
