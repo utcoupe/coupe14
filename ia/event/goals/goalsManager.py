@@ -69,7 +69,7 @@ class GoalsManager:
 		self.__reverse_table[(10,0)]=(10,1)
 
 		if self.__robot_name == "FLUSSMITTEL" and TEST_MODE == False:
-			self.__vision = Visio('../supervisio/build/visio', 0, '../supervisio/', self.__data["FLUSSMITTEL"])
+			#self.__vision = Visio('../supervisio/build/visio', 0, '../supervisio/', self.__data["FLUSSMITTEL"])
 			self.__last_camera_color = None
 
 		self.__loadBeginScript()

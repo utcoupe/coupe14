@@ -26,10 +26,11 @@ PARITY_OTHER = 			"ODD"
 #constantes réglables:
 MAX_UNCONFIRMED_PACKET =2 # maximum 32
 TIMEOUT = 				200
-HIGH_PRIO_SPEED = 		2 #période d'execution en ms
+HIGH_PRIO_SPEED = 		20 #période d'execution en ms
 LOW_PRIO_SPEED = 		3000 #période d'execution en ms
-KEEP_CONTACT_TIMEOUT = 	1500
-OFF_LIGNE_TIMEOUT = 	5000
+KEEP_CONTACT_TIMEOUT = 	8000
+OFF_LIGNE_TIMEOUT = 	20000
+
 
 #Systèmes arretable:
 THREAD_ACTIF = 			True
