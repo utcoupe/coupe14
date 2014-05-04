@@ -47,7 +47,7 @@ class GUI:
 			self.robot_data = self.Data.dataToDico()[robot]
 			self.last_pos = self.robot_data["getPositionAndAngle"]
 			print("Wait, com is initializing")
-			time.sleep(5)
+			time.sleep(2)
 			self.Data.startPullData()
 			#sleep ?
 		except:
