@@ -300,42 +300,59 @@ void Control::check_acc(float *consigne, float last_consigne) {
 
 void Control::check_acc(float *consigneL, float *consigneR)
 {
+	//TODO TESTER
+	static float over_consigne = 0;
+	static bool over_side = 0; //0 = left, 1 = right;
 	float lastL = value_consigne_left, lastR = value_consigne_right;
+	if (over_side == 0) {
+		lastL -= over_consigne;
+	} else {
+		lastR -= over_consigne;
+	}
 
 	//Check MAX_ACC
 	//On verifie l'acceleration de chaque moteur
 	//SI elle est trop élevée, on la baisse, et on
 	//baisse aussi celle de l'autre moteur proportionellement
 	
-	/*
-	float r, diff;
+	float r, big_diff, small_diff;
 	float diffR = abs(*consigneR) - (abs(lastR) + max_acc);
 	float diffL = abs(*consigneL) - (abs(lastL) + max_acc);
 	float *bigger, *smaller;
+
+	if (diffR < 0) diffR = 0;
+	if (diffL < 0) diffL = 0;
+
 	if (diffL > 0 || diffR > 0) {
 		if (diffR > diffL) {
 			bigger = consigneR;
 			smaller = consigneL;
-			diff = diffR;
+			small_diff = diffL;
+			big_diff = diffR;
+			over_consigne = (diffR - diffL) * (1 - (diffR / *consigneR));
+			over_side = 1;
 		} else {
 			bigger = consigneL;
 			smaller = consigneR;
-			diff = diffL;
+			small_diff = diffR;
+			big_diff = diffL;
+			over_consigne = (diffL - diffR) * (1 - (diffL / *consigneL));
+			over_side = 0;
 		}
 		r = *smaller / *bigger;
 
 		if (*bigger > 0) {
-			*bigger -= diff;
+			*bigger -= (big_diff - over_consigne);
 		} else {
-			*bigger += diff;
+			*bigger += (big_diff - over_consigne);
 		}
 		if (*smaller > 0) {
-			*smaller -= diff * r;
+			*smaller -= small_diff;
 		} else {
-			*smaller += diff * r;
+			*smaller += small_diff;
 		}
 	}
-	*/
+	/*
 	float diffR = abs(*consigneR) - (abs(lastR) + max_acc);
 	float diffL = abs(*consigneL) - (abs(lastL) + max_acc);
 
@@ -353,6 +370,7 @@ void Control::check_acc(float *consigneL, float *consigneR)
 			*consigneR += diffR;
 		}
 	}
+	*/
 }
 
 void Control::controlPos(float da, float dd)
