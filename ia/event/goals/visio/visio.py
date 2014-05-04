@@ -168,8 +168,7 @@ class Visio:
 			return False
 
 	def __inStartZone(self, tri):
-		if self.__p_in_circle((0,1700), 400, tri.real_coords)
-		or self.__p_in_circle((3000, 1700), 400, tri.real_coords):
+		if self.__p_in_circle((0,1700), 400, tri.real_coords) or self.__p_in_circle((3000, 1700), 400, tri.real_coords):
 			return True
 		else:
 			return False
