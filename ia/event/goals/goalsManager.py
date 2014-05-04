@@ -320,7 +320,7 @@ class GoalsManager:
 						#TODO remove this bypass:
 						#triangle = triangle_list[0] #TODO, prendre le meilleur triangle suivent les arg
 						#data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
-						data_camera = ("RED", 10, 10)
+						data_camera = ("RED", 220, 0)
 
 
 						self.__last_camera_color = data_camera[0]

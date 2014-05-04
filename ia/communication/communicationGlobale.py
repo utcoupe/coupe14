@@ -84,6 +84,10 @@ class CommunicationGlobale():
 		self.mutexOrdersToSend = threading.Lock()
 		gestionThread = threading.Thread(target=self.gestion)
 		gestionThread.start()
+
+		print("DEBUG "+str(self.argumentSize))
+		print()
+		print("DEBUG 2 "+str(self.returnSize))
 		
 
 
