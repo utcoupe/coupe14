@@ -11,18 +11,19 @@
     <!-- COUPE 2014 -->
 
 	<!-- Placement des feux du côté droite (jaune) -->
-	<feu x="900" y="600" orientation="vert"/>
-	<feu x="400" y="1100" orientation=""/>
-	<feu x="900" y="1600" orientation="vert"/>
-	<feu x="15" y="800" orientation="vert"/>
-	<feu x="1300" y="1985" orientation=""/>
+    <!-- l'attribut sens permet de prendre en compte le sens des couleur du feu (couleur toujours à gauche ou en haut) -->
+	<feu x="900" y="600" orientation="vert" sens="r"/>
+	<feu x="400" y="1100" orientation="" sens="r"/>
+	<feu x="900" y="1600" orientation="vert" sens="y"/>
+	<feu x="15" y="800" orientation="vert" sens="r"/>
+	<feu x="1300" y="1985" orientation="" sens="r"/>
 
 	<!-- Placement des feux du côté droite (jaune) -->
-	<feu x="2100" y="600" orientation="vert"/>
-	<feu x="2100" y="1600" orientation="vert"/>
-	<feu x="2600" y="1100" orientation=""/>
-	<feu x="2985" y="800" orientation="vert"/>
-	<feu x="1700" y="1985" orientation=""/>
+	<feu x="2100" y="600" orientation="vert" sens="r"/>
+	<feu x="2100" y="1600" orientation="vert" sens="y"/>
+	<feu x="2600" y="1100" orientation="" sens="y"/>
+	<feu x="2985" y="800" orientation="vert" sens="r"/>
+	<feu x="1700" y="1985" orientation="" sens="y"/>
 
     <!-- Placement des arbres -->
 	<arbre x="60" y="1300" orientation="droite"/>

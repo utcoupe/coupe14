@@ -245,12 +245,9 @@ class OurBot():
 	def removeObjectifAbove(self, id_objectif):
 		"""remove all queued goal on top of id_objectif, id_objectif included"""
 		id_canceled_list = []
-		print("self.__actions_en_cours "+str(self.__actions_en_cours))
-		print("self.__objectifs "+str(self.__objectifs))
 		#on vide les objectifs en cours
 		if self.__actions_en_cours is not None:
 			id = self.__actions_en_cours[0]
-			print("id "+str(id))
 			if id_objectif == id:
 				self.__actions_en_cours = None
 				id_canceled_list.append(id)
@@ -266,21 +263,21 @@ class OurBot():
 					id_canceled_list.append(removed_objectif[0])
 					removed_objectif = self.__objectifs.pop()
 				break
-		print("self.__objectifs "+str(self.__objectifs))
 		return id_canceled_list
 	
 
-	def deleteObjectif(self, id_objectif):
+	def deleteObjectifInStepOver(self, id_objectif):
 		if self.__objectifs:
-			first_id_objectif = self.__objectifs[0][0]
-			if first_id_objectif == id_objectif:
+			first_objectif_id = self.__objectifs[0][0]
+			if first_objectif_id == id_objectif:
 				if len(self.__objectifs[0][1]) == 0:
-					self.__objectifs.pop()
-					self.setLastIdObjectifExecuted(id_objectif)
+					self.__objectifs.popleft()
+					self.__actions_en_cours = None
+					self.__logger.debug("On delete l'objectif d'id "+str(id_objectif)+" qui était en step_over, il reste en attente self.__objectifs "+str(self.__objectifs))
 				else:
 					self.__logger.critical("Le premier objectif correspond bien à celui demandé, mais il n'est pas vide, self.__objectifs "+str(self.__objectifs))
 			else:
-				self.__logger.critical("Le premier objectif ne corrrespond à celui attendu, self.__objectifs "+str(self.__objectifs))
+				self.__logger.critical("Le premier objectif ne corrrespond à celui attendu, id_objectif "+str(id_objectif)+ " self.__objectifs "+str(self.__objectifs))
 		else:
 			self.__logger.error("L'objectif d'id id_objectif "+str(id_objectif)+" n'existe déjà plus, ce cas ne devrait pas arriver, self.__objectifs "+str(self.__objectifs))
 

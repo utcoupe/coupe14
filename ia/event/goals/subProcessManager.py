@@ -28,6 +28,9 @@ class SubProcessManager():
 	def sendGoal(self, id_objectif_prev, id_objectif, elem_script):
 		self.__connection.send(("add", (self.__robot_name, id_objectif_prev, id_objectif, elem_script)))
 
+	def sendGoalStepOver(self, id_objectif_prev, id_objectif, elem_script):
+		self.__connection.send(("step", (self.__robot_name, id_objectif_prev, id_objectif, elem_script)))
+
 	def sendDeleteGoal(self, id_objectif):
 		self.__connection.send(("delete", self.__robot_name, id_objectif))
 
@@ -73,7 +76,9 @@ class SubProcessManager():
 		elif etat == "END":
 			self.__GoalsManager.goalFinishedId(id_objectif)
 		elif etat == "CANCELED":
-			self.__GoalsManager.goalCanceledId(id_objectif)
+			self.__GoalsManager.goalCanceledIdFromEvent(id_objectif)
+		elif etat == "BLOCKED":
+			self.__GoalsManager.blockGoalFromId(id_objectif)
 		else:
 			self.__logger.error("Status non géré status "+str(status))
 

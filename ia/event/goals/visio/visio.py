@@ -141,26 +141,35 @@ class Visio:
 			tri.real_coords = [i + j for i, j in zip(tri.rel_in_abs, self.__big_bot.getPosition())]
 
 			#Traitement de la position pour modif si triangle en hauteur
-			self.__highGroundProcess(tri)
+			if self.__inHighGround(tri):
+				self.__highGroundProcess(tri)
+			elif self.__inStartZone(tri):
+				self._triangles.remove(tri)
+
 
 	def __highGroundProcess(self, tri):
 		"""Corrige les coordonnées des triangles en hauteurs à des positions connues
 		exemple : triangle sur une plateforme de depot"""
-		if self.__inHighGround(tri):
-			#backup
-			#modif coords
-			tri.coords[0] = (1 - self.__hcam / self.__hplat) * tri.coords[0] \
-								+ (self.__hcam / self.__hplat) * self.__xcam
-			tri.coords[1] = (1 - self.__hcam / self.__hplat) * tri.coords[1] \
-								+ (self.__hcam / self.__hplat) * self.__ycam
-			#reconversion en coords reelles
-			tri.real_coords = [i + j for i, j in zip(tri.rel_in_abs, self.__big_bot.getPosition())]
+		#modif coords
+		tri.coords[0] = (1 - self.__hcam / self.__hplat) * tri.coords[0] \
+							+ (self.__hcam / self.__hplat) * self.__xcam
+		tri.coords[1] = (1 - self.__hcam / self.__hplat) * tri.coords[1] \
+							+ (self.__hcam / self.__hplat) * self.__ycam
+		#reconversion en coords reelles
+		tri.real_coords = [i + j for i, j in zip(tri.rel_in_abs, self.__big_bot.getPosition())]
 
 	def __inHighGround(self, tri):
 		#plateformes
 		if self.__p_in_circle((0, 0), 250, tri.real_coords) \
 		or self.__p_in_circle((3000, 0), 250, tri.real_coords) \
 		or self.__p_in_circle((1500, 950), 150, tri.real_coords):
+			return True
+		else:
+			return False
+
+	def __inStartZone(self, tri):
+		if self.__p_in_circle((0,1700), 400, tri.real_coords)
+		or self.__p_in_circle((3000, 1700), 400, tri.real_coords):
 			return True
 		else:
 			return False

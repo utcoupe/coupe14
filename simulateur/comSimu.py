@@ -47,11 +47,13 @@ class Communication():
 		"""
 		if (order == "O_BRAS_OUVRIR"):
 			pos = ()
+			self.__bigrobot.activerBrasOuvrir()
 			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
 		elif (order == "O_BRAS_FERMER"):
 			pos = ()
+			self.__bigrobot.activerBrasFermer()
 			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
@@ -67,7 +69,7 @@ class Communication():
 		elif (order == "O_RET_OUVRIR"):
 			pos = ()
 			self.__bigrobot.setlastIdActionOther(args[0])
-			self.__bigrobot.releaseFeu() #pour les tests
+			self.__bigrobot.releaseFeuArriere() #pour les tests
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
 		elif (order == "O_RET_FERMER"):
@@ -85,10 +87,12 @@ class Communication():
 		elif (order == "O_STORE_TRIANGLE"):
 			pos = ()
 			self.__bigrobot.setlastIdActionOther(args[0])
+			self.__bigrobot.storeFeu(args[1])
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
 		elif (order == "O_GET_BRAS_STATUS"):
-			pos = (1,)
+			pos = (self.__bigrobot.getFeuHit(),)
+			self.__bigrobot.setFeuHit(0) #remise à 0 du flag
 			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 

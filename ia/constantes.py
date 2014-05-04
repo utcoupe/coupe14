@@ -4,7 +4,7 @@ Ce fichier regroupe toutes les constantes de l'IA
 """
 
 
-TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
@@ -12,7 +12,7 @@ TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté au
 #====================Enable====================
 ENABLE_TOURELLE = 		False
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
-ENABLE_TIBOT = 			False
+ENABLE_TIBOT = 			True
 
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
@@ -90,6 +90,12 @@ HAUTEUR_TORCHE = 36
 #====================TIBOT====================
 LARGEUR_TIBOT = 		200
 LONGUEUR_TIBOT = 		150
+
+#====================ENEMYs====================
+FIRST_POSITION_BIG_RED_ENNEMY = (-1000, -1000)
+FIRST_POSITION_SMALL_RED_ENNEMY = (-1000, -1000)
+FIRST_POSITION_BIG_YELLOW_ENNEMY = (-1000, -1000)
+FIRST_POSITION_SMALL_YELLOW_ENNEMY = (-1000, -1000)
 
 #====================BIG ENEMY====================
 #Si un seul adversaire, on utilise les constantes de BIG ENEMY

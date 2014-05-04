@@ -110,7 +110,7 @@ class Asserv:
 		Donner l'ordre de tourner d'un angle
 		@param a rad
 		"""
-		print('rot : a = ', a)
+		#print('rot : a = ', a)
 		self.__robot.addGoal(GoalANGLE(id_action, a))
 
 	def rotr(self, id_action, a):

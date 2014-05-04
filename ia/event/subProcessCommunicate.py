@@ -23,15 +23,10 @@ class SubProcessCommunicate():
 			self.__subprocess_tibot = MyProcess(self.__Data, self.__Data.Tibot.getName())
 
 		time.sleep(0.1)
+		self.__updateSubProcessData()
 		
 	def readOrders(self):
 		"""retourne les données des subprocess"""
-		data = self.__Data.dataToDico()
-		if self.__Data.Flussmittel is not None:
-			self.__subprocess_flussmittel.sendPacket(("data", data)) #TODO: ça n'a rien à faire ici !
-		if self.__Data.Tibot is not None:
-			self.__subprocess_tibot.sendPacket(("data", data))#TODO: ça n'a rien à faire ici !
-
 		input_list = deque()
 		if self.__Data.Flussmittel is not None:
 			input_list.extend(self.__subprocess_flussmittel.readPackets())
@@ -40,25 +35,35 @@ class SubProcessCommunicate():
 
 		return input_list
 
+	def sendFlussmittelGoalManagerObjectifBlocked(self, id_objectif):
+		self.__subprocess_flussmittel.sendPacket(("BLOCKED", id_objectif))
+
+	def sendTibotGoalManagerObjectifBlocked(self, id_objectif):
+		self.__subprocess_tibot.sendPacket(("BLOCKED", id_objectif))
+
 	def sendObjectifOver(self, id_objectif):
+		self.__updateSubProcessData()
 		if self.__Data.Flussmittel is not None:
 			self.__subprocess_flussmittel.sendPacket(("END", id_objectif))
 		if self.__Data.Tibot is not None:
 			self.__subprocess_tibot.sendPacket(("END", id_objectif))
 
 	def sendObjectifStepOver(self, id_objectif):
+		self.__updateSubProcessData()
 		if self.__Data.Flussmittel is not None:
 			self.__subprocess_flussmittel.sendPacket(("STEP_OVER", id_objectif))
 		if self.__Data.Tibot is not None:
 			self.__subprocess_tibot.sendPacket(("STEP_OVER", id_objectif))
 
 	def sendObjectifDynamiqueOver(self, id_objectif):
+		self.__updateSubProcessData()
 		if self.__Data.Flussmittel is not None:
 			self.__subprocess_flussmittel.sendPacket(("DYNAMIQUE_OVER", id_objectif))
 		if self.__Data.Tibot is not None:
 			self.__subprocess_tibot.sendPacket(("DYNAMIQUE_OVER", id_objectif))
 
 	def sendObjectifsCanceled(self, id_canceled_list):
+		self.__updateSubProcessData()
 		if self.__Data.Flussmittel is not None:
 			for id_canceled in id_canceled_list:
 				self.__subprocess_flussmittel.sendPacket(("CANCELED", id_canceled))
@@ -67,10 +72,18 @@ class SubProcessCommunicate():
 				self.__subprocess_tibot.sendPacket(("CANCELED", id_canceled))
 
 	def sendBrasStatus(self, etat, id_objectif):
+		self.__updateSubProcessData()
 		if self.__Data.Flussmittel is not None:
 			self.__subprocess_flussmittel.sendPacket(("BRAS_STATUS", etat, id_objectif))
 		if self.__Data.Tibot is not None:
 			self.__subprocess_tibot.sendPacket(("BRAS_STATUS", etat, id_objectif))
+
+	def __updateSubProcessData(self):
+		data = self.__Data.dataToDico()
+		if self.__Data.Flussmittel is not None:
+			self.__subprocess_flussmittel.sendPacket(("data", data))
+		if self.__Data.Tibot is not None:
+			self.__subprocess_tibot.sendPacket(("data", data))
 
 class MyProcess():
 	def __init__(self, Data, robot_name):

@@ -74,72 +74,73 @@ class EventManager():
 
 			if new_data[0] == "add":
 				nom_robot, id_prev_objectif, id_objectif, action_data = new_data[1]
+				robot = self.__getSystem(nom_robot)
 
-				if self.__Flussmittel is not None and nom_robot == self.__Flussmittel.getName():
-					robot = self.__Flussmittel
-				elif self.__Tibot is not None:
-					robot = self.__Tibot
+				if robot == self.__Flussmittel:
+					self.__SubProcessCommunicate.sendTibotGoalManagerObjectifBlocked(id_objectif)
 				else:
-					robot = None
+					self.__SubProcessCommunicate.sendFlussmittelGoalManagerObjectifBlocked(id_objectif)
 
-				if robot is not None:
-					action_en_cours, objectif = robot.getQueuedObjectif()
-					added = False
+				action_en_cours, objectif = robot.getQueuedObjectif()
+				added = False
 
-					#Staking step_over
-					if id_prev_objectif == id_objectif: 
-						robot.addOrderStepOver(id_objectif, action_data)
+				#stacking normale
+				if objectif:
+					last_id_objectif = objectif[-1][0]
+				elif action_en_cours:
+					last_id_objectif = action_en_cours[0]
+				else:
+					last_id_objectif = robot.getLastIdObjectifExecuted()
+				
+				if last_id_objectif is not None:
+					if id_prev_objectif == last_id_objectif:
+						robot.addNewObjectif(id_objectif, action_data)
 						added = True
-					else:
-						#stacking normale
-						if objectif:
-							last_id_objectif = objectif[-1][0]
-						elif action_en_cours:
-							last_id_objectif = action_en_cours[0]
-						else:
-							last_id_objectif = robot.getLastIdObjectifExecuted()
-						
-						if last_id_objectif is not None:
-							if id_prev_objectif == last_id_objectif:
-								robot.addNewObjectif(id_objectif, action_data)
-								added = True
-						else:#cas spéciale du premier ordre
-							robot.addNewObjectif(id_objectif, action_data)
-							added = True
+				else:#cas spéciale du premier ordre
+					robot.addNewObjectif(id_objectif, action_data)
+					added = True
 
-						if added == False:
-							self.__logger.warning(str(nom_robot)+" On drop un nouvel ordre car il n'est pas à jour, on a reçu id_prev_objectif: " + str(id_prev_objectif) + " on attendait last_id_objectif: " + str(last_id_objectif) + " ou des id precedant et suivant égaux, action_data " + str(action_data))
-							self.__SubProcessCommunicate.sendObjectifsCanceled((id_objectif,))
-				else:
-					self.logger.error(str(nom_robot)+" on a reçu un ordre pour un robot qui n'existe pas")
+				if added == False:
+					self.__logger.warning(str(nom_robot)+" On drop un nouvel ordre car il n'est pas à jour, on a reçu id_prev_objectif: " + str(id_prev_objectif) + " on attendait last_id_objectif: " + str(last_id_objectif) + " action_data " + str(action_data))
+					self.__SubProcessCommunicate.sendObjectifsCanceled((id_objectif,))
+
+
+			elif new_data[0] == "step":
+				nom_robot, id_prev_objectif, id_objectif, action_data = new_data[1]
+				robot = self.__getSystem(nom_robot)
+				robot.addOrderStepOver(id_objectif, action_data)
 
 			elif new_data[0] == "delete":
 				nom_robot = new_data[1]
+				robot = self.__getSystem(nom_robot)
 				id_objectif_to_remove = new_data[2]
 
-				if self.__Flussmittel is not None and nom_robot == self.__Flussmittel.getName():
-					robot = self.__Flussmittel
-				elif self.__Tibot is not None:
-					robot = self.__Tibot
-				else:
-					robot = None
+				robot.deleteObjectifInStepOver(id_objectif_to_remove)
+				robot.setIdToReach("ANY")
 
-				if robot is not None:
-					robot.deleteObjectif(id_objectif_to_remove)
-				else:
-					self.logger.error(str(nom_robot)+" on a reçu un ordre remove pour un robot qui n'existe pas")
 			else:
 				self.__logger.critical("La fonction demandé n'est pas implementé, new_data "+str(new_data))
+
+	def __getSystem(self, nom_robot):
+		#On voit quel système est concerné
+		if self.__Flussmittel is not None and nom_robot == self.__Flussmittel.getName():
+			robot = self.__Flussmittel
+		elif self.__Tibot is not None:
+			robot = self.__Tibot
+		else:
+			robot = None
+			self.logger.critical(str(nom_robot)+" on a reçu un ordre pour un robot qui n'existe pas")
+		return robot
 
 	def __checkEvent(self):
 		self.__checkBrasStatus()
 
 		if self.__Tourelle is not None:
 			new_data = ()
-			if self.__SmallEnemyBot is not None:
-				new_data += (self.__SmallEnemyBot.getPosition(),)
 			if self.__BigEnemyBot is not None:
 				new_data += (self.__BigEnemyBot.getPosition(),)
+			if self.__SmallEnemyBot is not None:
+				new_data += (self.__SmallEnemyBot.getPosition(),)
 			
 			if new_data != self.__last_hokuyo_data:
 				self.__last_hokuyo_data = new_data
@@ -275,25 +276,23 @@ class EventManager():
 
 
 	def __testCollision(self):
-
-		def checkSystem(system):
-			collision_data = self.__Collision.getCollision(system)
-			if collision_data is not None:
-				distance = collision_data[1]
-				if distance < self.__MetaData.getCollisionThreshold():
-					first_id_to_remove = collision_data[0]
-					id_canceled_list = system.removeObjectifAbove(first_id_to_remove)
-					self.__logger.info("On annule les ordres: " + str(id_canceled_list) + " pour causes de collision dans " + str(distance) + " mm")
-					empty_arg = []
-					self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
-					system.setIdToReach("ANY")
-					self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
-				else:
-					self.__logger.debug("On a detecté une collision dans "+str(distance)+" mm, mais on continue")
-		
 		if self.__Flussmittel is not None:
-			checkSystem(self.__Flussmittel)
+			self.__checkSystem(self.__Flussmittel)
 		
 		if self.__Tibot is not None:
-			checkSystem(self.__Tibot)
-		
+			self.__checkSystem(self.__Tibot)
+	
+	def __checkSystem(self, system):
+		collision_data = self.__Collision.getCollision(system)
+		if collision_data is not None:
+			distance = collision_data[1]
+			if distance < self.__MetaData.getCollisionThreshold():
+				first_id_to_remove = collision_data[0]
+				id_canceled_list = system.removeObjectifAbove(first_id_to_remove)
+				self.__logger.info("On annule les ordres: " + str(id_canceled_list) + " pour causes de collision dans " + str(distance) + " mm")
+				empty_arg = []
+				self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
+				system.setIdToReach("ANY")
+				self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
+			else:
+				self.__logger.debug("On a detecté une collision dans "+str(distance)+" mm, mais on continue")
