@@ -236,6 +236,12 @@ void Control::resume(){
 /********** PRIVATE **********/
 
 void Control::setConsigne(float consigne_left, float consigne_right){
+	if (consigne_right == 0 && consigne_left == 0) {
+		//Pour pas casser l'asserv quand on s'arrete
+		last_consigne_angle = 0;
+		last_consigne_dist = 0;
+	}
+
 	//Tests d'overflow
 	check_max(&consigne_left);
 	check_max(&consigne_right);
@@ -260,6 +266,36 @@ void Control::check_rot_spd(float *consigneL, float *consigneR) {
 		*consigneL /= r;
 		*consigneR /= r;
 	} 
+}
+
+void Control::check_rot_spd(float *consigne) {
+	//Check MAX ROT SPD
+	float rot = abs(*consigne);
+	//Ratio consigne/max
+	float r = rot / (CONSIGNE_RANGE_MAX * max_rot_spd_ratio);
+	if (r > 1) { //Trop rapide
+		*consigne /= r;
+	} 
+}
+
+void Control::check_rot_acc(float *consigne) {
+	check_acc(consigne, last_consigne_angle);
+}
+
+void Control::check_dist_acc(float *consigne) {
+	check_acc(consigne, last_consigne_dist);
+}
+
+void Control::check_acc(float *consigne, float last_consigne) {
+	float diff = abs(*consigne) - (abs(last_consigne) + max_acc);
+
+	if (diff > 0) {
+		if (*consigne > 0) {
+			*consigne -= diff;
+		} else {
+			*consigne += diff;
+		}
+	}
 }
 
 void Control::check_acc(float *consigneL, float *consigneR)
@@ -329,14 +365,19 @@ void Control::controlPos(float da, float dd)
 	consigneDistance = PID_Distance.compute(dd); //erreur = distance au goal
 
 	check_max(&consigneAngle);
+	check_rot_spd(&consigneAngle);
+	check_rot_acc(&consigneAngle);
 	check_max(&consigneDistance, CONSIGNE_RANGE_MAX - abs(consigneAngle));
+	check_dist_acc(&consigneDistance);
 
 	consigneR = consigneDistance + consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
 	consigneL = consigneDistance - consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
 
-	check_rot_spd(&consigneL, &consigneR);
-	check_acc(&consigneL, &consigneR);
+	//check_rot_spd(&consigneL, &consigneR);
+	//check_acc(&consigneL, &consigneR);
 
+	last_consigne_angle = consigneAngle;
+	last_consigne_dist= consigneDistance;
 	setConsigne(consigneL, consigneR);
 }
 
