@@ -80,7 +80,7 @@
 #define PIN_DEBUG_LED 23
 
 #define SERIAL_MAIN Serial
-#define SERIAL_FWD Serial2
+#define SERIAL_FWD Serial1
 
 //////////////////////
 //		DEBUG		//

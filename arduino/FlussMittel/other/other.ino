@@ -57,15 +57,24 @@ void loop(){
 		deposeTri(45);
 	}
 */
+	static bool init_done = false;
+	if (!init_done) {
+		if (digitalRead(PIN_INT_HAUT_ASC) == 0) {
+			stepperAsc.setCurrentPosition(HAUTEUR_MAX*H_TO_STEP + MARGE_SECU_TOP);
+			topStop();
+			init_done = true;
+		}
+	} else {
+		int available = SERIAL_MAIN.available();
+		if (available > MAX_READ) {
+			available = MAX_READ;
+		}
+		for(int i = 0; i < available; i++) {
+			// recuperer l'octet courant
+			executeCmd(generic_serial_read());
+		}
+	}
 
-	int available = SERIAL_MAIN.available();
-	if (available > MAX_READ) {
-		available = MAX_READ;
-	}
-	for(int i = 0; i < available; i++) {
-		// recuperer l'octet courant
-		executeCmd(generic_serial_read());
-	}
 	if (use_act) {
 		updateBras();
 	}
@@ -74,13 +83,10 @@ void loop(){
 	if (availablefwd > MAX_READ) {
 		availablefwd = MAX_READ;
 	}
-	if (availablefwd < 0) {
-		digitalWrite(PIN_DEBUG_LED, LOW);
-	}
-
 	for(int i = 0; i < availablefwd; i++) {
 		serial_send(SERIAL_FWD.read());
 	}
+
 	if (use_act) {
 		updateBras();
 	}

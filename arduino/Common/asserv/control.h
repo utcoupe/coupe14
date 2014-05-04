@@ -64,7 +64,11 @@ class Control{
 	PID PID_Distance;
 	//interface avec les PIDs
 	void setConsigne(float consigne_left, float consigne_right); //controles puis modification (renvoie l'overflow)
-	void check_acc(float *consigneL, float *consigneR);
+	void check_rot_spd(float *consigneL, float *consigneR);
+	void check_rot_spd(float *consigne);
+	void check_acc(float *consigne, float last_consigne);
+	void check_dist_acc(float *consigne);
+	void check_rot_acc(float *consigne);
 	void check_max(float *consigne, float max = CONSIGNE_RANGE_MAX);
 	void controlPos(float e_angle, float e_dist); //goal en mm
 
@@ -76,7 +80,9 @@ class Control{
 	float max_acc, max_rot_spd_ratio;
 
 	//Les pwm à appliquer
-	int value_consigne_right, value_consigne_left;
+	float value_consigne_right, value_consigne_left;
+
+	float last_consigne_angle, last_consigne_dist;
 
 	int last_finished_id;
 };

@@ -14,7 +14,8 @@ class GUI:
 		self.others_addr = '1'
 		self.asserv_addr = '2'
 
-		self.serverHost = '10.42.0.52'
+		#self.serverHost = '10.42.0.52'
+		self.serverHost = '127.0.0.1'
 		self.serverPort = 2001
 
 		#init comm
