@@ -4,7 +4,7 @@ Ce fichier regroupe toutes les constantes de l'IA
 """
 
 
-TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
@@ -24,8 +24,8 @@ PARITY_OTHER = 			"ODD"
 
 
 #constantes réglables:
-MAX_UNCONFIRMED_PACKET =5 # maximum 32
-TIMEOUT = 				100
+MAX_UNCONFIRMED_PACKET =2 # maximum 32
+TIMEOUT = 				200
 HIGH_PRIO_SPEED = 		2 #période d'execution en ms
 LOW_PRIO_SPEED = 		3000 #période d'execution en ms
 KEEP_CONTACT_TIMEOUT = 	1500
