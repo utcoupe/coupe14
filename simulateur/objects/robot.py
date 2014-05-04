@@ -202,8 +202,18 @@ class Robot(EngineObjectPoly):
 						self.body._set_velocity((vx,vy))
 						if v < 0:
 							a += math.pi
-						#self.body._set_angle(a)
-						self.__goals.insert(0, GoalANGLE(0,a))
+						abot = self.body.angle
+						if a > abot:
+							diff = a - abot
+						else:
+							diff = abot - a
+						#print('différence : ', diff)
+						if (abs(diff) < 0.5):
+							#print('angle petit : ', a)
+							self.body._set_angle(a)
+						else:
+							#print('angle grand : ', a)
+							self.__goals.insert(0, GoalANGLE(0,a))
 				elif isinstance(current_goal, GoalPWM):
 					if current_goal.start == -1:
 						current_goal.start = time.time()

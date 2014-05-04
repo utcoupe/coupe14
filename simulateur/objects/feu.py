@@ -93,6 +93,9 @@ class Feu(EngineObjectPoly):
 		self.__is_down = False
 
 	def getPositionPixel(self):
+		"""
+		@return position du feu en pixel
+		"""
 		return self.body.position[0],self.body.position[1]
 
 	def eteindre(self):
@@ -103,7 +106,7 @@ class Feu(EngineObjectPoly):
 
 	def coucher(self, position_robot, type_bras):
 		"""
-		Permet de coucher le feu sur la map
+		Permet de coucher le feu sur la map (quand le bras du robot le percute)
 		@param position_robot = 'g' ou 'd' (gauche/droite)
 		@param type_bras = 'open' ou 'close'
 		"""
@@ -131,11 +134,24 @@ class Feu(EngineObjectPoly):
 					self.add_body_extension(self.triangleYellowDroite)
 		self.__is_down = True
 
+	def coucherFeuCouleur(self, color):
+		"""
+		Color le feu suivant la couleur
+		@param color couleur du feu
+		"""
+		if color == 'RED':
+			self.add_body_extension(self.triangleRedDroite)
+		else:
+			self.add_body_extension(self.triangleYellowDroite)
+
 	def lever_feu(self):
 		self.remove_body_extension(self.triangle)
 		self.__is_down = False
 
 	def getOrientation(self):
+		"""
+		@return orientation du feu
+		"""
 		return self.orientation
 
 	def __repr__(self):
