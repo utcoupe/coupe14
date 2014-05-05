@@ -6,7 +6,7 @@
 #ifndef SERIAL_SWITCH_H
 #define SERIAL_SWITCH_H
 
-#include "fast_math.h"
+#include "../fast_math.h"
 #include "compat.h"
 
 void pushCoords(struct coord *n_robots, int n, long timestamp);

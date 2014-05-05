@@ -2,7 +2,7 @@
 #define COMPAT_H
 
 #include <stdio.h>
-#include "global.h"
+#include "../global.h"
 
 #define LOCAL_ADDR ADDR_HOKUYO
 #define SERIAL_PATH "/dev/ttyUSB1"
