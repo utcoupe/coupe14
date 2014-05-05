@@ -3,6 +3,8 @@
 
 #define PREFIX "[C]: "
 
+#define CAPTURE_EACH_TIME 0 //0 pour infinity, 1 pour start measurement à chaque fois
+
 #define TAILLE_TABLE_X 3000
 #define TAILLE_TABLE_Y 2000
 #define PI 3.14159265358979323846264338327950288

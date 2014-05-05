@@ -8,17 +8,17 @@
 
 
 
-void* initHokuyoUrg(char* device, double angleMin, double angleMax);
-void resetHokuyoUrg(void* urg, double angleMin, double angleMax);
+urg_t* initHokuyoUrg(char* device, double angleMin, double angleMax);
+void resetHokuyoUrg(urg_t* urg, double angleMin, double angleMax);
 
-//void restartHokuyoUrg(void* urg);
-void closeHokuyoUrg(void* urg);
+//void restartHokuyoUrg(urg_t* urg);
+void closeHokuyoUrg(urg_t* urg);
 
 
-int getnPointsHokuyoUrg(void* urg);
-double getAngleFromIndexHokuyoUrg(void* urg, int index);
+int getnPointsHokuyoUrg(urg_t* urg);
+double getAngleFromIndexHokuyoUrg(urg_t* urg, int index);
 
-void getDistancesHokuyoUrg(void* urg, long* buffer);
+void getDistancesHokuyoUrg(urg_t* urg, long* buffer);
 
 
 
