@@ -58,7 +58,7 @@ void
 closeHokuyoUrg(void* urg){
 	urg_close((urg_t*)urg);
 }
-
+/*
 void
 restartHokuyoUrg(void* urg){
 	int error = urg_start_measurement((urg_t*)urg, URG_DISTANCE, URG_SCAN_INFINITY, 0);
@@ -69,7 +69,7 @@ restartHokuyoUrg(void* urg){
 	};
 	printf("%sHokuyo succesfully restarted !\n", PREFIX);
 }
-
+*/
 int
 getnPointsHokuyoUrg(void* urg){
 	return urg_get_distance((urg_t*)urg, NULL, NULL);

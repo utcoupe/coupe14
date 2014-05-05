@@ -133,11 +133,12 @@ void closeLidar(struct lidar * l){
 	}
 }
 
+/*
 void restartLidar(struct lidar * l){
 	if(l->model == hokuyo_urg){
 		restartHokuyoUrg(l->lidarObject);
 	}
-}
+}*/
 
 char
 invalidDistance(long d){
@@ -212,7 +213,7 @@ getPointsCalibrate(struct lidar* l, char calibration){
 	/*
 	for(int i=0; i<l->fm.n; i++){
 		printf("%i\t%ld\t%i\t%i\n", i, buffer[i], l->points[i].x, l->points[i].y);
-	}//*/
+	}*/
 	free(buffer);
 	return l->points;
 }
