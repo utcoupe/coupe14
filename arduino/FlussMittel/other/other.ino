@@ -62,6 +62,9 @@ void loop(){
 		if (digitalRead(PIN_INT_HAUT_ASC) == 0) {
 			stepperAsc.setCurrentPosition(HAUTEUR_MAX*H_TO_STEP + MARGE_SECU_TOP);
 			topStop();
+			pump(false);
+			cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
+			servoRet.write(180); 
 			init_done = true;
 		}
 	} else {
