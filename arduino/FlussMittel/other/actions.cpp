@@ -60,6 +60,14 @@ void initAct() {
 	stepperAsc.setAcceleration(AMAX_STEPPER);
 	stepperAsc.setMaxSpeed(VMAX_STEPPER);
 	stepperAsc.move(6000);
+	while (digitalRead(PIN_INT_HAUT_ASC) == 1) {
+		updateBras();
+	}
+	stepperAsc.setCurrentPosition(HAUTEUR_MAX*H_TO_STEP + MARGE_SECU_TOP);
+	topStop();
+	pump(false);
+	cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
+	servoRet.write(180); 
 	//attachInterrupt(INT_ASC_HAUT, topStop, FALLING); //Commenté à cause des micro-interuptions
 }
 

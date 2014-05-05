@@ -24,12 +24,17 @@ void setup(){
 #endif
 
 	initServos();
-	init_protocol();
+	initSize();
+	protocol_blocking_reset();
 	PDEBUGLN("INIT DONE");
 }
 
 void loop(){
-	int available = Serial2.available();
+	if (!isInitDone()) { //SI on est pas encore initilisé on envoit une demande de reset
+		protocol_send_reset();
+	}
+
+	int available = SERIAL_MAIN.available();
 	if (available > MAX_READ) {
 		available = MAX_READ;
 	}
@@ -39,11 +44,11 @@ void loop(){
 	}
 
 	//Forward des retours asserv
-	available = Serial1.available();
+	available = SERIAL_FWD.available();
 	if (available > MAX_READ) {
 		available = MAX_READ;
 	}
 	for(int i = 0; i < available; i++) {
-		serial_send(Serial1.read());
+		serial_send(SERIAL_FWD.read());
 	}
 }

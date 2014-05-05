@@ -14,15 +14,15 @@ unsigned long timeMicros(){
 }
 
 void serial_send(char data) { //Envoi d'un octet en serial, dépend de la plateforme
-	Serial2.write(data);
+	SERIAL_MAIN.write(data);
 }
 
 char generic_serial_read(){
-	return Serial2.read();
+	return SERIAL_MAIN.read();
 }
 
 void forward_serial_send(char c, char addr) {
 	if (addr == FORWARD_ADDR) {
-		Serial1.write(c);
+		SERIAL_FWD.write(c);
 	}
 }

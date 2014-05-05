@@ -33,7 +33,7 @@ void init_protocol_thread () {
 	set_interface_attribs (serial, B57600, PARENB|PARODD);  
 	set_blocking (serial, 1);                // set blocking
 	printf("Initialisation protocole\n");
-	init_protocol();
+	protocol_blocking_reset();
 	printf("Protocole pret\n");
 	pthread_mutex_init (&mutex, NULL);
 	pthread_create (&poll_ordre, NULL, poll_proto, NULL);

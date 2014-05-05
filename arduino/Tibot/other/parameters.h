@@ -9,6 +9,9 @@
 #define PIN_SERVO_BALLES2 32
 #define PIN_SERVO_BALAI 33
 
+#define SERIAL_MAIN Serial2
+#define SERIAL_FWD Serial1
+
 // PARAMETRES
 #define POS_FILET_INIT 0
 #define POS_BALLES1_INIT 0
