@@ -18,14 +18,21 @@ class CommSimulateur:
 		self.__Pull_thread.start()
 
 	def readOrdersAPI(self):
+		self.__readPipe()
+
 		if self.__input_buffer:
 			return self.__input_buffer.popleft()
 		else:
 			return -1
 
 	def __readPipe(self):
-		while True:
-			self.__input_buffer.append(self.__connection.recv())
+		try:
+			while self.__connection.poll():
+				message = self.__connection.recv()
+				self.__input_buffer.append(message)
+		except EOFError:
+			self.__logger.error("except EOFError sur recv()")
+
 
 
 	def sendOrderAPI(self, address, order, *arguments):

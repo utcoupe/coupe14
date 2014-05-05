@@ -1,9 +1,9 @@
 #include "lidar.h"
 #include "global.h"
 #include "robot.h"
-#include "compat.h"
-#include "protocole_serial.h"
-#include "serial_switch.h"
+#include "protocol/compat.h"
+#include "protocol/protocole_serial.h"
+#include "protocol/serial_switch.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,14 +28,14 @@ static struct lidar l1, l2;
 static struct color l1Color, l2Color;
 #endif
 
-long startTime;
+long startTime, lastTime = 0;
 static struct coord robots[MAX_ROBOTS];
 
 
 static void catch_SIGINT(int signal){
 	printf("Closing lidar(s), please wait...\n");
-	closeLidar(l1);
-	closeLidar(l2);
+	closeLidar(&l1);
+	closeLidar(&l2);
 	printf("Exitting\n");
 	exit(EXIT_SUCCESS);
 }
@@ -71,11 +71,10 @@ int main(int argc, char **argv){
 		use_protocol = 1;
 	}
 
-
-	//l1 = initLidarAndCalibrate( hokuyo_urg, "/dev/ttyACM0", pos1, PI/2, 0, PI/2);
+	//l1 = initLidarAndCalibrate( hokuyo_urg, "/dev/ttyACM0", posl1, PI/2, 0, PI/2);
+	//l2 = initLidarAndCalibrate( hokuyo_urg, "/dev/ttyACM1", posl2, PI/2, 0, PI);
 	l1 = initLidar( hokuyo_urg, "/dev/ttyACM0", posl1, PI/2, 0, PI/2);
 	l2 = initLidar( hokuyo_urg, "/dev/ttyACM1", posl2, PI/2, 0, PI);
-
 
 
 	#ifdef SDL
@@ -103,20 +102,25 @@ void frame(){
 	getPoints(&l1);
 	getPoints(&l2);
 	timestamp = timeMillis() - startTime;
+	printf("%li \t", timestamp-lastTime);
+	if(lastTime != 0 && timestamp-lastTime > HOKUYO_WATCHDOG){
+		printf("%s WatchDog exceeded: %li > %li\n", PREFIX, timestamp-lastTime, (long int)HOKUYO_WATCHDOG);
+		restartLidar(&l1);
+	}
 	//printf("nPoints:%i\n", l1.fm.n);
 	int nRobots = getRobots(l1.points, l1.fm.n, robots);
 	#ifdef SDL
 	blitMap();
 	blitLidar(l1.pos, l1Color);
-	//blitLidar(l2.pos, l2Color);
-	//blitRobots(robots, nRobots);
-	//blitPoints(l1.points, l1.fm.n, l1Color);
-	//blitPoints(l2.points, l2.fm.n, l2Color);
+	blitLidar(l2.pos, l2Color);
+	blitRobots(robots, nRobots);
+	blitPoints(l1.points, l1.fm.n, l1Color);
+	blitPoints(l2.points, l2.fm.n, l2Color);
 	waitScreen();
 	#endif
 	printf("%li\n", timestamp);
 	fflush(stdout);
-	/*if (use_protocol){
+	if (use_protocol){
 		pushCoords(robots, nRobots, timestamp);
 	}
 	else{
@@ -125,6 +129,7 @@ void frame(){
 			printf(";%i:%i", robots[i].x, robots[i].y);
 		}
 		printf("\n");
-	}*/
+	}
+	lastTime = timestamp;
 }
 

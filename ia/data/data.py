@@ -11,7 +11,7 @@ from .metaData import *
 from .pullData import *
 
 class Data():
-	def __init__(self, Communication, arduino_constantes):
+	def __init__(self, Communication, arduino_constantes, ia_color):
 		self.Flussmittel = None
 		self.Tibot = None
 		self.SmallEnemyBot = None
@@ -29,12 +29,12 @@ class Data():
 			self.Tibot = OurBot('TIBOT', Communication, arduino_constantes, 'ADDR_TIBOT_OTHER', 'ADDR_TIBOT_ASSERV', LARGEUR_TIBOT, LONGUEUR_TIBOT)
 
 		if NUMBER_OF_ENEMY >= 1:
-			self.SmallEnemyBot = EnemyBot(RAYON_BIG_ENEMY)
+			self.SmallEnemyBot = EnemyBot(RAYON_BIG_ENEMY, ia_color, "SMALL")
 		if NUMBER_OF_ENEMY >= 2:
-			self.BigEnemyBot = EnemyBot(RAYON_SMALL_ENEMY)
+			self.BigEnemyBot = EnemyBot(RAYON_SMALL_ENEMY, ia_color, "BIG")
 
 		if ENABLE_TOURELLE == True:
-			self.Tourelle = Tourelle(self.Flussmittel, self.Tibot,self.BigEnemyBot, self.SmallEnemyBot, Communication, arduino_constantes, 'ADDR_HOKUYO')
+			self.Tourelle = Tourelle(self.Flussmittel, self.Tibot, self.BigEnemyBot, self.SmallEnemyBot, self.MetaData,  Communication, arduino_constantes, 'ADDR_HOKUYO')
 
 		self.__PullData = PullData(Communication, (self.Flussmittel, 'ADDR_FLUSSMITTEL_OTHER', 'ADDR_FLUSSMITTEL_ASSERV'), (self.Tibot, 'ADDR_TIBOT_OTHER', 'ADDR_TIBOT_ASSERV'), self.SmallEnemyBot, self.BigEnemyBot, self.ComputeHokuyoData, (self.Tourelle, 'ADDR_HOKUYO'), PULL_PERIODE)
 

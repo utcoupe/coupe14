@@ -8,6 +8,7 @@ using namespace std;
 
 void comLoop(Visio& visio) {
 	string order;
+	while (!visio.isReady()) {}
 	cout << "READY" << endl;
 	//On lit les ordres sur l'entrée standard
 	cin >> order;
@@ -17,7 +18,7 @@ void comLoop(Visio& visio) {
 			try {
 				visio.triangles(tri);
 				for (int i=0; i<tri.size(); i++) {
-					cout << tri[i].coords.x<<":"<<tri[i].coords.y<<" "<<tri[i].angle<<" "<<tri[i].color<<" "<<tri[i].isDown << endl;
+					cout << tri[i].coords.x<<":"<<tri[i].coords.y<<" "<<tri[i].angle<<" "<<tri[i].size<<" "<<tri[i].color<<" "<<tri[i].isDown << endl;
 				}
 				cout << "END" << endl;
 			} catch (const std::exception &e) {
@@ -30,7 +31,8 @@ void comLoop(Visio& visio) {
 			order = "";
 		}
 		else {
-			cerr << "Unexpected order : " << order << endl;
+			//cerr << "Unexpected order : " << order << endl;
+			continue;
 		}
 		cin >> order;
 	}

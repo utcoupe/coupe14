@@ -32,14 +32,13 @@
 #ifndef _AFMotor_h_
 #define _AFMotor_h_
 
-#define _BV(n) (1 << n) //Pas dans la lib arduino 1.5
-
 #include <inttypes.h>
 #if defined(__AVR__)
     #include <avr/io.h>
 
     //#define MOTORDEBUG 1
 
+    #define MICROSTEPS 16                       // 8 or 16
 
     #define MOTOR12_64KHZ _BV(CS20)             // no prescale
     #define MOTOR12_8KHZ _BV(CS21)              // divide by 8
@@ -51,6 +50,8 @@
     #define MOTOR34_1KHZ _BV(CS01) | _BV(CS00)  // divide by 64
     
     #define DC_MOTOR_PWM_RATE   MOTOR34_8KHZ    // PWM rate for DC motors
+    #define STEPPER1_PWM_RATE   MOTOR12_64KHZ   // PWM rate for stepper 1
+    #define STEPPER2_PWM_RATE   MOTOR34_64KHZ   // PWM rate for stepper 2
     
 #elif defined(__PIC32MX__)
     //#define MOTORDEBUG 1
@@ -60,6 +61,8 @@
     // Either will enable PWM for M1
     //#define PIC32_USE_PIN9_FOR_M1_PWM
     //#define PIC32_USE_PIN10_FOR_M1_PWM
+
+    #define MICROSTEPS 16       // 8 or 16
 
     // For PIC32 Timers, define prescale settings by PWM frequency
     #define MOTOR12_312KHZ  0   // 1:1, actual frequency 312KHz
@@ -84,9 +87,11 @@
     
     // PWM rate for DC motors.
     #define DC_MOTOR_PWM_RATE   MOTOR34_39KHZ
+    // Note: for PIC32, both of these must be set to the same value
+    // since there's only one timebase for all 4 PWM outputs
+    #define STEPPER1_PWM_RATE   MOTOR12_39KHZ
+    #define STEPPER2_PWM_RATE   MOTOR34_39KHZ
     
-#else
-    #define DC_MOTOR_PWM_RATE   0 //Unused for arduino DUE
 #endif
 
 // Bit positions in the 74HCT595 shift register output
@@ -104,6 +109,30 @@
 #define BACKWARD 2
 #define BRAKE 3
 #define RELEASE 4
+
+// Constants that the user passes in to the stepper calls
+#define SINGLE 1
+#define DOUBLE 2
+#define INTERLEAVE 3
+#define MICROSTEP 4
+
+/*
+#define LATCH 4
+#define LATCH_DDR DDRB
+#define LATCH_PORT PORTB
+
+#define CLK_PORT PORTD
+#define CLK_DDR DDRD
+#define CLK 4
+
+#define ENABLE_PORT PORTD
+#define ENABLE_DDR DDRD
+#define ENABLE 7
+
+#define SER 0
+#define SER_DDR DDRB
+#define SER_PORT PORTB
+*/
 
 // Arduino pin names for interface to 74HCT595 latch
 #define MOTORLATCH 12
@@ -130,6 +159,21 @@ class AF_DCMotor
 
  private:
   uint8_t motornum, pwmfreq;
+};
+
+class AF_Stepper {
+ public:
+  AF_Stepper(uint16_t, uint8_t);
+  void step(uint16_t steps, uint8_t dir,  uint8_t style = SINGLE);
+  void setSpeed(uint16_t);
+  uint8_t onestep(uint8_t dir, uint8_t style);
+  void release(void);
+  uint16_t revsteps; // # steps per revolution
+  uint8_t steppernum;
+  uint32_t usperstep, steppingcounter;
+ private:
+  uint8_t currentstep;
+
 };
 
 uint8_t getlatchstate(void);

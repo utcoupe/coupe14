@@ -19,9 +19,6 @@ class Goal:
 		self.__elem_goal = []
 		self.__elem_goal_locked = None
 
-	def __eq__(self, other): 
-		return self.__dict__ == other.__dict__
-
 	def getName(self):
 		return self.__name
 
@@ -31,7 +28,10 @@ class Goal:
 	def getPosition(self):
 		return (self.__x, self.__y)
 
-	def getElemGoal(self, elem_goal_id):
+	def getLenElemGoal(self):
+		return len(self.__elem_goal)
+
+	def getElemGoalOfId(self, elem_goal_id):
 		return self.__elem_goal[elem_goal_id]
 
 	def getElemGoalLocked(self):
@@ -49,7 +49,12 @@ class Goal:
 	def appendElemGoal(self, ElemGoal):
 		self.__elem_goal.append(ElemGoal)
 
+	def getColorElemLock(self):
+		return self.__elem_goal_locked.getColor()
 
+	def switchColor(self):
+		for elem_goal_temp in self.__elem_goal:
+			elem_goal_temp.switchColor()
 
 
 	"""def toXml(self):

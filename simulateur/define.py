@@ -28,7 +28,8 @@ COLLTYPE_FRESQUE		= 8
 COLLTYPE_MAMMOUTH		= 9
 COLLTYPE_FOYER   		= 10
 COLLTYPE_BAC			= 11
-
+COLLTYPE_BRAS_OUVRIR	= 12
+COLLTYPE_BRAS_FERMER	= 13
 
 YELLOW				= 0
 RED					= 1
@@ -71,14 +72,9 @@ WIDTH_MINI 		= 200
 HEIGHT_MINI 	= 138
 # dimensions du gros robot
 WIDTH_GROS 		= 330
-HEIGHT_GROS 	= 265
-# dimension des palettes (buldo) du mini robot
-SIZE_PALETTE	= 120
-WIDTH_PALETTE	= 10
-# dimensions balais qui râclent la zone adverse	
-SIZE_BALAIS		= 70
-WIDTH_BALAIS	= 10
-ECART_ROBOT_BALAIS	= 0
+HEIGHT_GROS 	= 270
+#données du gros robot
+LONGUEUR_BRAS	= 225
 
 #ECART_CENTRE = -65 # ecart par rapport au centre du robot
 

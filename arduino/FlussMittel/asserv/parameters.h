@@ -37,6 +37,7 @@
 #define FREQ (1/(DUREE_CYCLE/1000.0))
 
 #define ACC_MAX 750 //consigne*s-2
+#define RATIO_SPD_ROT_MAX 0.5 
 
 /* CONSIGNE OFFSET
  * DEVRAIT ETRE A 0
@@ -95,6 +96,8 @@
 #define LED_BLOCKED 23
 
 //DEFINES ARDUINO
+#define SERIAL_MAIN Serial2
+
 #define PIN_ENC_RIGHT_A 21
 #define PIN_ENC_RIGHT_B 20
 #define PIN_ENC_RIGHT_0 4 //non utilisé

@@ -31,6 +31,7 @@ class OurBot():
 		self.__angle = 0.0
 		self.__last_id_executed_other = ID_ACTION_MAX
 		self.__last_id_executed_asserv = ID_ACTION_MAX
+		self.__bras_status = None
 
 		self.__last_id_action_stacked = IdRot()
 
@@ -41,6 +42,7 @@ class OurBot():
 
 		#Variable pour evenManager
 		self.__id_to_reach = "ANY"
+		self.__fin_en_cours = False
 
 	#Getter
 	def getPosition(self):
@@ -54,6 +56,12 @@ class OurBot():
 
 	def getName(self):
 		return self.__name
+
+	def getFinEnCours(self):
+		return self.__fin_en_cours
+
+	def getBrasStatus(self):
+		return self.__bras_status
 
 	def getLastIdGlobale(self):
 		return self.maxRot(self.__last_id_executed_other, self.__last_id_executed_asserv)
@@ -107,24 +115,27 @@ class OurBot():
 		return data_trajectoires #type: ((id_objectif, ((x,y),(x,y),...)), (id_objectif, ((x,y),(x,y),...)), ...)
 
 	def getNextOrders(self):
-		"""retourne une liste d'action qui s'arrete sur le premier ordre bloquant trouvé (END, END_GOTO, THEN ou SLEEP) """
+		"""retourne une liste d'action qui s'arrete sur le premier ordre bloquant trouvé (END, STEP_OVER, THEN ou SLEEP, DYNAMIQUE_OVER) """
 		if self.__objectifs:
 			objectif_en_cours = self.__objectifs.popleft()
-			order_of_objectif = objectif_en_cours[1] # type ((id_action, ordre, arguments),...)
+			order_of_objectif = objectif_en_cours[1] # order_of_objectif type ((id_action, ordre, arguments),...)
 
-			data_order = order_of_objectif.popleft() #type (id_action, ordre, arguments)
-			output_temp = deque()
-			output_temp.append(data_order)
-			while data_order[1] != 'SLEEP' and data_order[1] != 'THEN' and data_order[1] != 'END_GOTO' and data_order[1] != 'END':
-				data_order = order_of_objectif.popleft()
+			if order_of_objectif:
+				data_order = order_of_objectif.popleft() #type (id_action, ordre, arguments)
+				output_temp = deque()
 				output_temp.append(data_order)
+				while data_order[1] not in ('SLEEP', 'THEN', 'STEP_OVER', 'END', 'DYNAMIQUE_OVER'):
+					data_order = order_of_objectif.popleft()
+					output_temp.append(data_order)
 
-			if data_order[1] != 'END':
+				if data_order[1] != 'END':
+					self.__objectifs.appendleft(objectif_en_cours)
+
+
+				self.__actions_en_cours = (objectif_en_cours[0], output_temp)# type (id_objectif, (data_order1, data_order2, ...)
+			else:#Dans le cas où on attend la suite d'un STEP_OVER
 				self.__objectifs.appendleft(objectif_en_cours)
-
-
-			self.__actions_en_cours = (objectif_en_cours[0], output_temp)# type (id_objectif, (data_order1, data_order2, ...)
-
+				self.__actions_en_cours = None
 		else:
 			self.__actions_en_cours = None
 		
@@ -133,8 +144,11 @@ class OurBot():
 	def getIdToReach(self):
 		return self.__id_to_reach
 
-	def __getNextIdToStack(self):
+	def getNextIdToStack(self):
 		return self.__last_id_action_stacked.idIncrementation()
+
+	def setFinEnCours(self, booll):
+		self.__fin_en_cours = booll
 
 	def setIdToReach(self, id):
 		self.__id_to_reach = id
@@ -146,11 +160,14 @@ class OurBot():
 		if address == 'ADDR_FLUSSMITTEL_OTHER' or address == 'ADDR_TIBOT_OTHER':
 			if idd != self.__last_id_executed_other:
 				self.__last_id_executed_other = idd
-				self.__logger.debug(str(address)+" changement d'id other " + str(idd))
+				self.__logger.debug(str(self.__name)+" changement d'id other " + str(idd))
 		else:
 			if idd != self.__last_id_executed_asserv:
 				self.__last_id_executed_asserv = idd
-				self.__logger.debug(str(address)+" changement d'id other " + str(idd))
+				self.__logger.debug(str(self.__name)+" changement d'id asserv " + str(idd))
+
+	def setBrasStatus(self, status): #1=success and 0=fail
+		self.__bras_status = status
 
 	#utilise les données en provenance de de l'asserv uniquement !
 	def setPositionAndId(self, address, arguments):
@@ -164,15 +181,15 @@ class OurBot():
 		self.__positionY = y
 		self.__angle = angle
 
-	def addNewObjectif(self, id_objectif, action_data):
-		new_objectif = (id_objectif,)
+	def __castOrders(self, action_data):
 		data_objectif = deque()
+		print("action_data "+str(action_data))
 		for elm_action in action_data:
-			action = (self.__getNextIdToStack(),)
+			action = (-1,)
 			order = elm_action[0]
 			action += (order,)
 
-			if order not in ("SLEEP", "THEN", "END_GOTO", "END"):
+			if order not in ("SLEEP", "THEN", "STEP_OVER", "END", "DYNAMIQUE_OVER", "IA_GET_BRAS_STATUS"):
 				argument_type_list = self.__arduino_constantes['ordersArguments'][order]
 				arguments_temp = ()
 				for i, argument_type in enumerate(argument_type_list):
@@ -199,8 +216,18 @@ class OurBot():
 
 			data_objectif.append(action)
 
+		return data_objectif
+
+	def addNewObjectif(self, id_objectif, action_data):
+		data_objectif = self.__castOrders(action_data)
 		self.__objectifs.append((id_objectif, data_objectif))
 		self.__logger.debug( str(self.getName()) + " new goals queued: " + str((id_objectif, data_objectif)))
+
+	def addOrderStepOver(self, id_objectif, action_data):
+		first_objectif = self.__objectifs[0]
+		first_objectif[1].extend(self.__castOrders(action_data))
+		self.__logger.debug( str(self.getName()) + " order next STEP_OVER queued: " + str(first_objectif))
+		
 
 	def removeActionBellow(self, lastIddExecuted):
 		"""enleve les actions terminé de la liste des actions en cours """
@@ -218,7 +245,6 @@ class OurBot():
 	def removeObjectifAbove(self, id_objectif):
 		"""remove all queued goal on top of id_objectif, id_objectif included"""
 		id_canceled_list = []
-
 		#on vide les objectifs en cours
 		if self.__actions_en_cours is not None:
 			id = self.__actions_en_cours[0]
@@ -231,13 +257,29 @@ class OurBot():
 			id = objectif[0]
 			if id_objectif == id:
 				removed_objectif = self.__objectifs.pop()
+				if removed_objectif[0] == id_objectif:
+					id_canceled_list.append(removed_objectif[0])
 				while removed_objectif[0] != id_objectif:
 					id_canceled_list.append(removed_objectif[0])
 					removed_objectif = self.__objectifs.pop()
 				break
-
 		return id_canceled_list
 	
+
+	def deleteObjectifInStepOver(self, id_objectif):
+		if self.__objectifs:
+			first_objectif_id = self.__objectifs[0][0]
+			if first_objectif_id == id_objectif:
+				if len(self.__objectifs[0][1]) == 0:
+					self.__objectifs.popleft()
+					self.__actions_en_cours = None
+					self.__logger.debug("On delete l'objectif d'id "+str(id_objectif)+" qui était en step_over, il reste en attente self.__objectifs "+str(self.__objectifs))
+				else:
+					self.__logger.critical("Le premier objectif correspond bien à celui demandé, mais il n'est pas vide, self.__objectifs "+str(self.__objectifs))
+			else:
+				self.__logger.critical("Le premier objectif ne corrrespond à celui attendu, id_objectif "+str(id_objectif)+ " self.__objectifs "+str(self.__objectifs))
+		else:
+			self.__logger.error("L'objectif d'id id_objectif "+str(id_objectif)+" n'existe déjà plus, ce cas ne devrait pas arriver, self.__objectifs "+str(self.__objectifs))
 
 	def maxRot(self, id1, id2):
 		"""Retourne le plus grand id rotationnelle"""

@@ -1,10 +1,13 @@
-#include "traitement.h"
 #include "../global.h"
+#include "traitement.h"
 #include "gui.h"
 #include "timings.h"
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/types_c.h>
+#include <thread>
+#include <mutex>
+#include <unistd.h>
 
 /***************************************************
  *  CLASSE VISIO DE TRAITEMENT GENERAL 
@@ -13,13 +16,6 @@
  *  necessaires pour la visio UTCoupe 2014
  *
  *  Dans cette classes toutes les images sont  en HSV
- *
- *  Les fonctions timings() commentées permettent
- *  de rapidement tester la vitesse d'execution
- *  de certains bouts de code. Attention, ne pas
- *  utiliser ces fonctions dans des fonctions
- *  imbriquées, sans quoi les resultats seront faux
- *
  *
  *  Tests de vitesse du code :
  *  Les durées de transformations affines de 
@@ -34,12 +30,21 @@ using namespace std;
  * CONSTRUCTEUR   *
  * ****************/
 
-Visio::Visio(VideoCapture& cam) : 
-	color(red), min_size(500), distort(none),
-	chessboard_size(Size(9,6)), epsilon_poly(0.04),
-	max_diff_triangle_edge(50), camera(cam),
+Visio::Visio(int index, string path, bool save_vid) : camera(index), save_video(save_vid),
+	color(red), min_size(MIN_SIZE), distort(none), path_to_conf(path),
+	chessboard_size(Size(9,6)), epsilon_poly(EPSILON_POLY), isready(false),
+	max_diff_triangle_edge(MAX_DIFF_TRI_EDGE), cam_fps(30),
 	size_frame(camera.get(CV_CAP_PROP_FRAME_WIDTH), camera.get(CV_CAP_PROP_FRAME_HEIGHT)){
+	frame_mutex.lock();
+	if(!camera.isOpened()) {  // check if we succeeded
+		cerr << "Failed to open camera" << endl;
+		return;
+	}
 	init();
+	if (save_video) {
+		init_writer();
+	}
+	thread_update = thread(&Visio::refreshFrame, this);
 }
 
 void Visio::init() {
@@ -49,8 +54,26 @@ void Visio::init() {
 	erode_dilate_kernel = getStructuringElement(MORPH_ELLIPSE, Size(10,10));
 	trans_calibrated = loadTransformMatrix();
 	cam_calibrated = loadCameraMatrix();
+	if (RESIZE) {
+		size_frame = Size(RESIZEW, RESIZEH);
+	}
+	if (USE_MASK) {
+		mask = imread(path_to_conf+(string)"mask.jpg");
+		resize(mask, mask, size_frame);
+	}
 	//if (cam_calibrated) distort = image; //TRES LONG
 	if (cam_calibrated) distort = points; 
+}
+
+void Visio::init_writer() {
+	cerr << "Saving video to : " << path_to_conf+(string)"video.avi" << endl;
+	//int codec = CV_FOURCC('M', 'J', 'P', 'G'); //Marche
+	int codec = CV_FOURCC('D', 'I', 'V', 'X'); //Marche
+	writer = VideoWriter(path_to_conf+(string)"video.avi", codec, cam_fps,
+			Size(camera.get(CV_CAP_PROP_FRAME_WIDTH), camera.get(CV_CAP_PROP_FRAME_HEIGHT)));
+	if (!writer.isOpened()) {
+		cerr << "Failed to initialize writer, video can't be saved" << endl;
+	}
 }
 
 /**********
@@ -59,38 +82,36 @@ void Visio::init() {
 
 void Visio::detectColor(const Mat& img, Mat& out) {
 	Mat hsv = img;
-	//timings();
 	if (min.val[0] > max.val[0]) { //car les teintes sont circulaires
 		//Si la détection "fait le tour" de la teinte, on la décale pour rester sur l'intervale 0-180
-		add(hsv, Scalar(-max.val[0], 0, 0), hsv);
-		min.val[0] -= max.val[0];
-		max.val[0] = 180;
+		Mat temp;
+		inRange(hsv, min, Scalar(180, max.val[1], max.val[2]), temp);
+		inRange(hsv, Scalar(0, min.val[1], min.val[2]), max, out);
+		bitwise_or(temp, out, out);
 	}
-	//timings("\tcircularité : ");
-	inRange(hsv, min, max, out);
-	//timings("\tinRange : ");
+	else {
+		inRange(hsv, min, max, out);
+	}
 	erode(out, out, erode_dilate_kernel);
-	//timings("\terode : ");
 	dilate(out, out, erode_dilate_kernel);
-	//timings("\tdilate : ");
 
 }
 
 void Visio::getContour(const Mat& img, vector<vector<Point> >& contours) {
 	Mat thresh;
-	//timings();
+	Timings::startTimer(3);
 	detectColor(img, thresh);
-	//timings("\tdetectColor : ");
+	Timings::writeStepTime(3, "\t\t\t\tdetectColor");
 	findContours(thresh, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-	//timings("\tfindContours : ");
+	Timings::writeStepTime(3, "\t\t\t\tfindContour");
 }
 
 //Renvoit positions et contours de la couleur détectée dans l'image en argument
 int Visio::getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, vector<vector<Point> >& detected_contours) {
-	//timings();
+	Timings::startTimer(2);
 	vector<vector<Point> > contours;
 	getContour(img, contours);
-	//timings("\t\tgetContour : ");
+	Timings::writeStepTime(2, "\t\t\tContours");
 	float x, y;
 	for(int i=0 ; i < contours.size(); i++){
 		Moments moment = moments(contours[i]);
@@ -101,7 +122,7 @@ int Visio::getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, ve
 			detected_contours.push_back(contours[i]);
 		}
 	}
-	//timings("\t\tMoments loop : ");
+	Timings::writeStepTime(2, "\t\t\tMoments");
 	return detected_pts.size();
 }
 
@@ -139,35 +160,34 @@ void Visio::polyDegree(const vector<vector<Point> >& contours, vector<int>& degr
 
 int Visio::trianglesFromImg(const Mat& img, vector<Triangle>& triangles) {
 	int nb_triangles = 0;
-	//timings();
 	nb_triangles += trianglesColor(img, triangles, red);
 	nb_triangles += trianglesColor(img, triangles, yellow);
 	//triangles vus de dessus, entierement noirs, seulement si on ne detecte rien d'autre
 	if (ENABLE_BLK && nb_triangles == 0) {
 		nb_triangles += trianglesColor(img, triangles, black);
 	}
-	//timings("\tFrame : ");
 	return nb_triangles;
 }
 
 int Visio::triangles(vector<Triangle>& triangles) {
-	//timings();
+	Timings::startTimer(0);
 	int nbr_of_tri = 0;
-	Mat img, src_img;
-	//Hacks destiné à vider le buffer de la camera pour avoir une
-	//image récente. Le probleme : ces hacks prennent BEAUCOUP de temps
-	//for(int i=0; i<6; i++) camera >> img; //Hack provisoire
-	//for(int i=0; i<6; i++) camera.grab(); //Hack provisoire
-	//camera.retrieve(img);
-	camera >> src_img;
-	//timings("\tRetrieving : ");
-	cvtColor(src_img, src_img, CV_BGR2HSV);
-	//timings("\tColor : ");
+	Mat img, src_img, color_img;
+	src_img = getImg();
+	if (RESIZE) {
+		resize(src_img, src_img, size_frame);
+	}
+	if (USE_MASK) {
+		src_img.copyTo(color_img, mask);
+	} else {
+		color_img = src_img;
+	}
+	Timings::writeStepTime(0, "\tRetrieving");
+	cvtColor(color_img, color_img, CV_BGR2HSV);
+	Timings::writeStepTime(0, "\tConvert Color");
 	if (distort == image && cam_calibrated) {
-		//timings();
 		undistort(src_img, img, CM, D);
 		nbr_of_tri = trianglesFromImg(img, triangles);
-		//timings("\tUndistort : ");
 	}
 	else {
 		if (distort == image) {
@@ -176,7 +196,8 @@ int Visio::triangles(vector<Triangle>& triangles) {
 		}
 		nbr_of_tri = trianglesFromImg(src_img, triangles);
 	}
-	//timings("\tTriangles : ");
+	Timings::writeStepTime(0, "\tTriangles");
+	Timings::writeTime(0, "Total");
 	return nbr_of_tri;
 }
 
@@ -190,7 +211,7 @@ bool Visio::computeTransformMatrix(const Mat &img, const vector<Point2f> real_po
 	bool &calibrated = trans_calibrated;
 	vector<Point2f> corners, ext_corn;
 	cvtColor(img, gray, CV_BGR2GRAY);
-	pattern_found = findChessboardCorners(gray, chessboard_size, corners, CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK);
+	pattern_found = findChessboardCorners(gray, chessboard_size, corners, CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE);// + CALIB_CB_FAST_CHECK);
 	if (pattern_found) {
 		//On recupere les 4 points exterieurs de l'échiquier
 		ext_corn.push_back(corners[0]);
@@ -220,29 +241,32 @@ bool Visio::computeTransformMatrix(const Mat &img, const vector<Point2f> real_po
 bool Visio::camPerspective() {
 	//TODO choix position
 	vector<Point2f> position;
-	position.push_back(Point2f(300,300));
-	position.push_back(Point2f(300,562));
-	position.push_back(Point2f(482,300));
-	position.push_back(Point2f(482,562));
+	int xsize = 130, ysize = 210;
+	int x = 185, y = 105;
+	position.push_back(Point2f(x, y - ysize));
+	position.push_back(Point2f(x, y));
+	position.push_back(Point2f(x + xsize, y - ysize));
+	position.push_back(Point2f(x + xsize, y));
 	Mat img, undistorted_img;
 	bool calibrated = false;
 	int key = 0;
+	cout << "Starting perpective calibration" << endl;
 	namedWindow("Perspective");
-	while (!calibrated) {
-		camera >> img;
+	while (!(calibrated && key == 'c')) {
+		img = getImg();
 		if (cam_calibrated) {
 			undistort(img, undistorted_img, CM, D);
+		} else {
+			cerr << "WARNING : Calibration de perspective sans calibration camera" << endl;
+			undistorted_img = img;
 		}
-		if (key == 'c') {
-			calibrated = computeTransformMatrix(undistorted_img, position, &undistorted_img);
-			key = 0;
-		}
+		calibrated = computeTransformMatrix(undistorted_img, position, &undistorted_img);
 		if (key == 'q') {
 			cerr << "WARNING : Perspective calibration failed" << endl;
 			return false;
 		}
-		putText(img, "Appuyer sur 'c' pour valider une vue", Point(10,10),1,1,Scalar(0,255,0),1);
-		putText(img, "Appuyer sur 'q' pour quiter", Point(10,30),1,1,Scalar(0,255,0),1);
+		putText(undistorted_img, "Appuyer sur 'c' pour valider une vue", Point(10,10),1,1,Scalar(0,255,0),1);
+		putText(undistorted_img, "Appuyer sur 'q' pour quiter", Point(10,30),1,1,Scalar(0,255,0),1);
 		imshow("Perspective", undistorted_img);
 		key = waitKey(20);
 	}
@@ -261,7 +285,8 @@ bool Visio::camCalibrate(int nbr_of_views) {
 	{
 		obj.push_back(Point3f(j/chessboard_size.width, j%chessboard_size.width, 0.0f));
 	}
-	//Calibration caméra gauche
+	//Calibration caméra
+	cout << "Starting camera calibration" << endl;
 	namedWindow("Calibration");
 	int key = 0;
 	bool capture = false;
@@ -280,9 +305,9 @@ bool Visio::camCalibrate(int nbr_of_views) {
 			return false;
 		}
 		//Capture d'image
-		camera >> img;
+		img = getImg();
 		cvtColor(img, gray, CV_BGR2GRAY);
-		pattern_found = findChessboardCorners(gray, chessboard_size, corners, CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK);
+		pattern_found = findChessboardCorners(gray, chessboard_size, corners, CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE);// + CALIB_CB_FAST_CHECK);
 		if (pattern_found) {
 			cornerSubPix(gray, corners, Size(11, 11), Size(-1, -1), TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
 		}
@@ -317,7 +342,7 @@ bool Visio::camCalibrate(int nbr_of_views) {
 bool Visio::loadTransformMatrix() {
 	bool &calibrated = trans_calibrated;
 	cout << "Loading transform data" << endl;
-	FileStorage fs("calibration_persp.yml", FileStorage::READ);
+	FileStorage fs(path_to_conf+(string)"calibration_persp.yml", FileStorage::READ);
 	if (!fs.isOpened()) {
 		cerr << "ERROR : Couldn't find calibration_persp.yml" << endl;
 		return false;
@@ -331,7 +356,7 @@ bool Visio::loadTransformMatrix() {
 bool Visio::loadCameraMatrix() {
 	bool &calibrated = cam_calibrated;
 	cout << "Loading camera data" << endl;
-	FileStorage fs("calibration_camera.yml", FileStorage::READ);
+	FileStorage fs(path_to_conf+(string)"calibration_camera.yml", FileStorage::READ);
 	if (!fs.isOpened()) {
 		cerr << "ERROR : Couldn't find calibration_camera.yml" << endl;
 		return false;
@@ -350,7 +375,7 @@ void Visio::saveTransformMatrix() {
 		cerr << "ERROR : Uncalibrated trasnform" << endl;
 		return;
 	}
-	FileStorage fs("calibration_persp.yml", FileStorage::WRITE);
+	FileStorage fs(path_to_conf+(string)"calibration_persp.yml", FileStorage::WRITE);
 	fs << "Q" << perspectiveMatrix;
 	fs.release();
 }
@@ -361,7 +386,7 @@ void Visio::saveCameraMatrix() {
 		cerr << "ERROR : Uncalibrated camera" << endl;
 		return;
 	}
-	FileStorage fs("calibration_camera.yml", FileStorage::WRITE);
+	FileStorage fs(path_to_conf+(string)"calibration_camera.yml", FileStorage::WRITE);
 	fs << "D" << D;
 	fs << "CM" << CM;
 	fs << "size" << size_frame;
@@ -447,6 +472,22 @@ Mat Visio::getD() {
 	return D;
 }
 
+Mat Visio::getImg() {
+	Mat img;
+	frame_mutex.lock(); //Bloque le thread d'update
+	img = last_image;
+	frame_mutex.unlock();
+	return img;
+}
+
+bool Visio::isCalibrated() {
+	return cam_calibrated & trans_calibrated;
+}
+
+bool Visio::isReady() {
+	return isready;
+}
+
 DistortType Visio::getDistortMode() {
 	return distort;
 }
@@ -471,9 +512,9 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 	vector<Point2f> detected_pts;
 	int nb_triangles = 0, detected_size;
 	setColor(color);
-	//timings();
+	Timings::startTimer(1);
 	if ((detected_size = getDetectedPosition(img, detected_pts, contours)) > 0) {
-		//timings("\tDetection : ");
+		Timings::writeStepTime(1, "\t\tDetect position");
 		vector<Point2f> points_real;
 		vector<int> degree;
 		//Transformation perspective des points detectes
@@ -507,7 +548,7 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 			}
 		}
 	}
-	//timings("Transformations : ");
+	Timings::writeStepTime(1, "\t\tTransform");
 	return nb_triangles;
 }
 
@@ -528,12 +569,14 @@ void Visio::addTriangle(const Point2f& point_real, const vector<Point2f>& contou
 		tri.angle -= 2*M_PI/3;
 	}
 	//Si le triangle est couché
-	if ((tri.size = contourArea(contour_real)) > min_down_size) {
+	if (tri.color != black && isEqui(contour_real[0], contour_real[1], contour_real[2])) {
 		tri.isDown = true;
 	}
 	else {
 		tri.isDown = false;
 	}
+	Moments moment = moments(contour_real);
+	tri.size = moment.m00;
 	tri.contour = contour_real;
 	triangles.push_back(tri);
 }
@@ -555,28 +598,10 @@ int Visio::deduceTrianglesFromContour(vector<Point2f>& contour_real, vector<Tria
 					Moments moment = moments(contour_tri);
 					if (moment.m00 > min_size) {
 						Triangle tri;
-						nb_triangles++;
 						float x = moment.m10 / moment.m00;
 						float y = moment.m01 / moment.m00;
-						tri.coords = Point2f(x,y);
-						tri.color = color;
-						//Calcule de l'angle du triangle
-						double dx = contour_tri[0].x - tri.coords.x;
-						double dy = contour_tri[0].y - tri.coords.y; 
-						tri.angle = atan2(dy, dx);
-
-						//Modulo 2*PI/3
-						while (tri.angle < 0) {
-							tri.angle += 2*M_PI/3;
-						}
-						while (tri.angle > 2*M_PI/3) {
-							tri.angle -= 2*M_PI/3;
-						}
-
-						//On ne detecte pas les triangles debout dans ce cas, ce ne serait pas assez fiable
-						tri.isDown = false;
-						tri.contour = contour_tri;
-						triangles.push_back(tri);
+						addTriangle(Point2f(x,y), contour_tri, triangles);
+						nb_triangles++;
 						return nb_triangles;
 					}
 				}
@@ -602,13 +627,29 @@ void Visio::transformPts(const vector<Point>& pts_in, vector<Point2f>& pts_out) 
 
 void Visio::transformPts(const vector<Point2f>& pts_in, vector<Point2f>& pts_out) {
 	if (distort == points) {
-		//timings();
 		undistortPoints(pts_in, pts_out, CM, D, Mat(), CM);
-		//timings("\t\tUndistort : ");
 		perspectiveTransform(pts_out, pts_out, perspectiveMatrix);
-		//timings("\t\tPerspectiveTransform : ");
 	} else {
 		perspectiveTransform(pts_in, pts_out, perspectiveMatrix);
+	}
+}
+
+void Visio::refreshFrame() {
+	Mat img;
+	camera >> last_image;
+	frame_mutex.unlock();
+	isready = true;
+	while(1) {
+		camera.grab();
+		frame_mutex.lock();
+		camera.retrieve(last_image);
+		if (save_video) {
+			img = last_image;
+		}
+		frame_mutex.unlock();
+		if (save_video) {
+			writer << img;
+		}
 	}
 }
 

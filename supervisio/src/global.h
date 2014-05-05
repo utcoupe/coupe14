@@ -4,8 +4,19 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define TIMEBENCH true 
-#define MIN_SIZE 500
+#ifndef TIMEBENCH
+#define TIMEBENCH false
+#endif
+
+#define MIN_SIZE 3000 //Attention, ici ce n'est pas la taille reelle mais la taille sur image originale
+#define USE_MASK false
+
+#define RESIZE false 
+#define RESIZEW 320
+#define RESIZEH 240
+
+#define EPSILON_POLY 0.04
+#define MAX_DIFF_TRI_EDGE 50
 
 #define YEL_HUE_MIN 20
 #define YEL_HUE_MAX 40
@@ -14,8 +25,8 @@
 #define YEL_VAL_MIN 60
 #define YEL_VAL_MAX 255
 
-#define RED_HUE_MIN 105
-#define RED_HUE_MAX 140
+#define RED_HUE_MIN 170
+#define RED_HUE_MAX 10
 #define RED_SAT_MIN 80
 #define RED_SAT_MAX 255
 #define RED_VAL_MIN 60

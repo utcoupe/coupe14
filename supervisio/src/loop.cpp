@@ -9,9 +9,12 @@
 
 using namespace cv;
 
-void communication(int index) {
-	VideoCapture cam(index);
-	Visio visio(cam);
+void communication(int index, string path_to_conf, bool save) {
+	Visio visio(index, path_to_conf, save);
+	if (!visio.isCalibrated()) {
+		cerr << "ERROR : Uncalibarted" << endl;
+		return;
+	}
 	if (visio.getDistortMode() != none) {
 		cerr << "INFO : Starting visio WITH distortion correction" << endl;
 	} else {
@@ -20,12 +23,8 @@ void communication(int index) {
 	comLoop(visio);
 }
 
-void calibration(int index) {
-	VideoCapture cam(index);
-	 if(!cam.isOpened())  // check if we succeeded
-		return;
-
-	Visio visio(cam);
+void calibration(int index, string path) {
+	Visio visio(index, path);
 	visio.setChessboardSize(Size(9,6));
 	if (visio.camCalibrate(25)) 
 		visio.saveCameraMatrix();
@@ -33,24 +32,33 @@ void calibration(int index) {
 		visio.saveTransformMatrix();
 }
 
-void perspectiveOnlyLoop(int index){
-	VideoCapture cam(index);
-	 if(!cam.isOpened())  // check if we succeeded
-		return;
+void getColor(int event, int x, int y, int, void* img_mat) {
+	if (event == EVENT_LBUTTONDOWN) {
+		Mat *img = reinterpret_cast<Mat*> (img_mat);
+		Mat hsv;
+		cvtColor(*img, hsv, CV_BGR2HSV);
+		Scalar pt(hsv.at<Vec3b>(x,y)[0],hsv.at<Vec3b>(x,y)[1],hsv.at<Vec3b>(x,y)[2]);
+		cout << x << ":" << y << " = " << pt << endl;
+	}
+}
 
-	Visio visio(cam);
+void perspectiveOnlyLoop(int index, string path){
+	Mat frame;
+	Visio visio(index, path);
 	visio.setChessboardSize(Size(9,6));
 
-	int size_min(5000), max_diff_triangle_edge(50);
+	int size_min(5000), max_diff_triangle_edge(MAX_DIFF_TRI_EDGE);
 	int h_min_y(YEL_HUE_MIN), h_max_y(YEL_HUE_MAX), s_min_y(YEL_SAT_MIN), s_max_y(YEL_SAT_MAX), v_min_y(YEL_VAL_MIN), v_max_y(YEL_VAL_MAX);
 	int h_min_r(RED_HUE_MIN), h_max_r(RED_HUE_MAX), s_min_r(RED_SAT_MIN), s_max_r(RED_SAT_MAX), v_min_r(RED_VAL_MIN), v_max_r(RED_VAL_MAX);
 	int h_min_b(BLK_HUE_MIN), h_max_b(BLK_HUE_MAX), s_min_b(BLK_SAT_MIN), s_max_b(BLK_SAT_MAX), v_min_b(BLK_VAL_MIN), v_max_b(BLK_VAL_MAX);
-	int epsilon(4), key = -1;
+	int epsilon(EPSILON_POLY*100), key = -1;
 
 	namedWindow("parameters");
 	namedWindow("parameters2");
 	namedWindow("origin");
 	namedWindow("persp");
+
+	setMouseCallback("origin", getColor, &frame);
 
 	createTrackbar("h_min_y", "parameters", &h_min_y, 180);
 	createTrackbar("h_max_y", "parameters", &h_max_y, 180);
@@ -79,7 +87,7 @@ void perspectiveOnlyLoop(int index){
 		vector<vector<Point> > detected_contours_yel, detected_contours_red, detected_contours_blk;
 		vector<Point2f> detected_pts_yel, detected_pts_red, detected_pts_blk;
 		Mat frame_ori, persp;
-		cam >> frame_ori;
+		frame_ori = visio.getImg();
 
 		if (key == 's') {
 			visio.saveTransformMatrix();
@@ -99,10 +107,12 @@ void perspectiveOnlyLoop(int index){
 			visio.setRedParameters(min_r, max_r);
 			visio.setBlkParameters(min_b, max_b);
 
-			Mat frame_hsv, frame;
+			Mat frame_hsv;
+			int xoffset = 0, yoffset = 300;
+			Mat translation = (Mat_<double>(3,3) << 1, 0, xoffset, 0, 1, yoffset, 0, 0, 1);
 			cvtColor(frame_ori, frame_hsv, CV_BGR2HSV);
 			undistort(frame_ori, frame, visio.getCM(), visio.getD());
-			warpPerspective(frame, persp, visio.getQ(), Size(3000,2000));
+			warpPerspective(frame, persp, translation*visio.getQ(), Size(1000,600));
 			visio.setColor(yellow);
 			visio.getDetectedPosition(frame_hsv, detected_pts_yel, detected_contours_yel);
 			visio.setColor(red);
@@ -119,7 +129,7 @@ void perspectiveOnlyLoop(int index){
 			vector<Triangle> tri;
 			visio.trianglesFromImg(frame_hsv, tri);
 			for(int i=0; i<tri.size(); i++) {
-				string txt = intToString(tri[i].size);
+				string txt = intToString(tri[i].coords.x) + (string)"," + intToString(tri[i].coords.y) + (string)" - " + intToString(tri[i].size);
 				Scalar color;
 				if (tri[i].color == yellow) 
 					color = Scalar(0, 195, 210);
@@ -129,20 +139,23 @@ void perspectiveOnlyLoop(int index){
 					color = Scalar(0,0,0);
 				}
 
-				drawObject(tri[i].coords.x, tri[i].coords.y, persp, txt, color, true);
+				drawObject(tri[i].coords.x+xoffset, tri[i].coords.y+yoffset, persp, txt, color, true);
 				 //Repr de l'angle
 				int len = 100;
 				Point2f angle(len*cos(tri[i].angle), len*sin(tri[i].angle));
-				angle += tri[i].coords;
-				line(persp, tri[i].coords, angle, c_blue, 2);
+				angle += tri[i].coords + Point2f(xoffset, yoffset);
+				line(persp, Point2f(xoffset, yoffset) + tri[i].coords, angle, c_blue, 2);
+				for (int j=0; j<tri[i].contour.size(); j++) {
+					tri[i].contour[j] = tri[i].contour[j] + Point2f(xoffset, yoffset);
+				}
 				vector<vector<Point> > t; t.push_back(convertFtoI(tri[i].contour));
 				drawContours(persp, t, -1, c_blue, 2);
 			}
 
-	//		resize(persp, persp, Size(600, 600));
-			resize(persp, persp, Size(900,600));
+			resize(persp, persp, Size(1000,600));
 			imshow("persp", persp);
-			imshow("origin", frame);
+			imshow("undistort", frame);
+			imshow("origin", frame_ori);
 		}
 		key = waitKey(20);
 	}

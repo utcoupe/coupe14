@@ -7,10 +7,14 @@ try:
 except:
 	index = 0
 
-v = Visio('../../supervisio/build/bin/visio', index)
+v = Visio('../../../../supervisio/visio', index, '../../../../supervisio/', None, False)
+print('Visio started')
 
 while 1:
 	start = time.time()
-	print(v.update())
+	tris = v.update()
 	print("Duration : ", time.time() - start)
+	for tri in tris:
+		print(tri)
+	print()
 	time.sleep(1)

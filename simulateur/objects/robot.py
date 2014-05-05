@@ -33,6 +33,7 @@ class Robot(EngineObjectPoly):
 		self.__team = team
 		self.__goals = []
 		self.__asserv = Asserv(self)
+		self._visio = Visio(self)
 		self.__others = Others(self)
 
 
@@ -51,20 +52,53 @@ class Robot(EngineObjectPoly):
 	def init(self, engine):
 		self.__engine = engine
 
-	def x(self):
+	def getXreal(self):
+		"""
+		Renvoie la position x réelle du robot (pas celle simulée)
+		"""
 		return px_to_mm(self.body.position[0])
 	
-	def y(self):
-		return px_to_mm(self.body.position[1])
+	def getYreal(self):
+		"""
+		Renvoie la position y réelle du robot (pas celle simulée)
+		"""
+		return 2000 - px_to_mm(self.body.position[1])
 	
-	def a(self):
-		return int(math.degrees(self.body.angle))
+	def getAreal(self):
+		"""
+		Renvoie l'angle a réel du robot (pas celle simulée)
+		"""
+		return - self.body.angle
+
+	def setXsimu(self, x):
+		"""
+		Positionne la valeur de x simulée (à partir de la réelle)
+		@param x valeur en mm (réelle)
+		"""
+		self.body.position[0] = mm_to_px(x)
+
+	def setYsimu(self, y):
+		"""
+		Positionne la valeur de y simulée (à partir de la réelle)
+		@param y valeur en mm (réelle)
+		"""
+		self.body.position[1] = mm_to_px(2000 - y)
+
+	def setAsimu(self, a):
+		"""
+		Positionne la valeur de a simulée (à partir de la réelle)
+		@param a valeur en mm (réelle)
+		"""
+		self.body.angle = -a
+
+	def getPositionPixel(self):
+		return self.body.position[0], self.body.position[1]
 
 	def getPosition(self):
-		return self.x(), self.y(), self.a()/180*3.14
+		return self.getXreal(), self.getYreal(), self.getAreal()
 
 	def getPositionId(self):
-		return self.x(), self.y(), self.a()/180*3.14, self.__asserv.getLastIdAction()
+		return self.getXreal(), self.getYreal(), self.getAreal(), self.__asserv.getLastIdAction()
 
 	def getLastIdAsserv(self):
 		return self.__asserv.getLastIdAction()
@@ -99,28 +133,40 @@ class Robot(EngineObjectPoly):
 	def setStop(self, value):
 		self.__stop = value
 
+	def setPosition(self, x, y, a):
+		#print('set pos x : ', x, ' y : ', y, ' a : ', a)
+		self.setXsimu(x)
+		self.setYsimu(y)
+		self.setAsimu(a)
+
 	def addGoalOrder(self, numOrdre, arg):
 		"""
 		Méthode appelée depuis communication pour ajouter un goal au robot
+		Lors des appel aux commandes de l'asserv, il faut passer en paramètre
+		les coordonnées en simulé, pas en réel.
 		@param numOrdre int définit dans define
+		@param args x, y ou a en réel
 		"""
 		if (numOrdre == GOTO):
 			self.__asserv.goto(arg[0], arg[1],2000-arg[2])
 		elif (numOrdre == GOTOA):
-			self.__asserv.gotoa(arg[0], arg[1],2000-arg[2],-arg[3]/3.14*180)
+			self.__asserv.gotoa(arg[0], arg[1],2000-arg[2],-arg[3])
 		elif (numOrdre == GOTOAR):
-			self.__asserv.gotoar(arg[0], arg[1],2000-arg[2],-arg[3]/3.14*180)
+			self.__asserv.gotoar(arg[0], arg[1],2000-arg[2],-arg[3])
 		elif (numOrdre == GOTOR):
 			self.__asserv.gotor(arg[0], arg[1],2000-arg[2])
 		elif (numOrdre == ROT):
-			self.__asserv.rot(arg[0], -arg[1]/3.14*180)
+			self.__asserv.rot(arg[0], -arg[1])
 		elif (numOrdre == ROTR):
-			self.__asserv.rotr(arg[0], -arg[1]/3.14*180)
+			self.__asserv.rotr(arg[0], -arg[1])
 		elif (numOrdre == PWM):
 			self.__asserv.pwm(arg[0], arg[1], arg[2], arg[3])	#!! x=pwm_l, y=pwm_r, angle=delay !!
 
-
 	def _my_velocity_func(self):
+		"""
+		Fonction qui détermine la vitesse des corps.
+		Tous les traitements se font avec les coordonnées du simulateur (pas les réelles)
+		"""
 		def f(body, gravity, damping, dt):
 			self.body._set_torque(0)
 			self.body._set_angular_velocity(0)
@@ -165,14 +211,32 @@ class Robot(EngineObjectPoly):
 						self.__asserv.setLastIdAction(removed_goal.id_action)
 					else:
 						a = self.body.angle
-						v = self.__max_speed * current_goal.pwm / 255
+						v = self.__max_speed * current_goal.pwm / (255*8)
 						vx = v * math.cos(a)
 						vy = v * math.sin(a)
 						self.body._set_velocity((vx,vy))
 				elif isinstance(current_goal, GoalANGLE):
-					self.body._set_angle(current_goal.a)
-					removed_goal = self.__goals.pop(0)
-					self.__asserv.setLastIdAction(removed_goal.id_action)
+					self.body._set_velocity((0,0))
+					goala = current_goal.a
+					cura = self.body.angle
+					difference_value_1 = (cura - goala)
+					difference_value_2 = (cura + goala)
+					if abs(difference_value_1) > abs(difference_value_2):
+						diffrence_value = difference_value_2
+					else:
+						diffrence_value = difference_value_1
+					#print('goal ANGLE, current : ', cura, ' goal : ', goala, ' diff : ',diffrence_value)
+					if (abs(diffrence_value) < 0.1):
+						self.body._set_angle(current_goal.a)
+						removed_goal = self.__goals.pop(0)
+						self.__asserv.setLastIdAction(removed_goal.id_action)
+						self.body._set_angular_velocity(0)
+					else:
+						vitesse_angulaire = 4 #valeur choisie pour avoir vitesse angulaire simu proche du réel
+						if (diffrence_value > 0):
+							self.body._set_angular_velocity(-vitesse_angulaire)
+						else:
+							self.body._set_angular_velocity(vitesse_angulaire)
 				else:
 					raise Exception("type_goal inconnu")
 			else:
@@ -183,7 +247,7 @@ class Robot(EngineObjectPoly):
 		# selection des teams et des robots
 		if KEYDOWN == event.type:
 			if KEY_CHANGE_TEAM == event.key:
-				self.__current_team = YELLOW
+				self.__current_team = RED
 				print("équipe rouge")
 				return True
 			elif KEY_CHANGE_ROBOT == event.key:
@@ -233,7 +297,7 @@ class Robot(EngineObjectPoly):
 					v = mm_to_px(1000) * (-1 if self.__mod_recul else 1)
 					#on clean les goals avant d'en envoyer un nouveau afin d'éviter les blocages
 					self.cleanGoals()
-					self.__asserv.goto(*px_to_mm(p[0],p[1]))
+					self.__asserv.goto(0,*px_to_mm(p[0],p[1]))
 				return True
 		return False
 

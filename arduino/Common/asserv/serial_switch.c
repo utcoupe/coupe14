@@ -115,6 +115,7 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 	case A_ACCMAX:
 		if(!doublon) {
 			control.setMaxAcc(btof(argv));
+			control.setMaxRotSpdRatio(btof(argv+4));
 		}
 		break;
 	case GET_LAST_ID: {

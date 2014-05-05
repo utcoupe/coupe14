@@ -233,7 +233,7 @@ class CommunicationGlobale():
 		self.mutexOrdersToSend.acquire()
 		for packet in self.ordersToSend:
 			if packet[0] != address:
-				remainOrdersToSend.appendleft(packet)
+				remainOrdersToSend.append(packet)
 			else:
 				self.__logger.critical("drop de l'ordre %s par l'arduino %s suite à un reset", self.orders[ packet[1]], self.address[ packet[0]])
 		self.ordersToSend = remainOrdersToSend
@@ -501,7 +501,7 @@ class CommunicationGlobale():
 					self.__logger.debug("Envoi normal a l'arduino %s de l'ordre %s d'id %s", self.address[address], self.orders[order], idd)
 					self.sendMessage(address, chaineTemp)
 				else:
-					remainOrdersToSend.appendleft(packet)
+					remainOrdersToSend.append(packet)
 
 			self.ordersToSend = remainOrdersToSend
 			self.mutexOrdersToSend.release()

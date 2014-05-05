@@ -63,8 +63,12 @@ class TimeManager():
 
 		for i in range(1):#TODO augmenter le nombre de stop ?
 			if self.__Flussmittel is not None:
+				self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressOther(), 'PAUSE', *empty_arg)
+				self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'PAUSE', *empty_arg)
 				self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_CLEANG', *empty_arg)
 			if self.__Tibot is not None:
+				self.__Communication.sendOrderAPI(self.__Tibot.getAddressOther(), 'PAUSE', *empty_arg)
+				self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'PAUSE', *empty_arg)
 				self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_CLEANG', *empty_arg)
 			time.sleep(0.05)
 
@@ -80,6 +84,7 @@ class TimeManager():
 			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'RESET_ID', *empty_arg)
 			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressOther() , 'RESET_ID', *empty_arg)
 
+
 		if self.__Tibot is not None:
 			position_arg = self.__MetaData.getFirstPositionTibot()
 			if position_arg is None:
@@ -88,4 +93,5 @@ class TimeManager():
 			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_SET_POS', *position_arg)
 			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'RESET_ID', *empty_arg)
 			self.__Communication.sendOrderAPI(self.__Tibot.getAddressOther() , 'RESET_ID', *empty_arg)
+
 

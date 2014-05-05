@@ -37,6 +37,7 @@
 #define FREQ (1/(DUREE_CYCLE/1000.0))
 
 #define ACC_MAX 100 //consigne*s-2
+#define RATIO_SPD_ROT_MAX 0.5 
 
 /* CONSIGNE OFFSET
  * DEVRAIT ETRE A 0

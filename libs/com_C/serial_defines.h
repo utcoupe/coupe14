@@ -44,6 +44,7 @@ enum ordre {
 	//DEBUTPARSE
 	PINGPING_AUTO,
 	PINGPING, 	
+	//ASSERVS
 	A_GOTOA, 	//@int @int @int @float
 	A_GOTO, 	//@int @int @int
 	A_ROT, 		//@int @float
@@ -53,16 +54,27 @@ enum ordre {
 	A_PIDD, 	//@float @float @float
 	A_GET_CODER, 	//#long #long
 	A_PWM, 	//@int @int @int @int
-	A_ACCMAX,	//@float
+	A_ACCMAX,	//@float @float
 	A_SET_POS, //@int @int @float
 	A_GET_POS,	//#int #int #float
 	A_GET_POS_ID,	//#int #int #float #int
 
+	//OTHERS
+	//FM
 	O_RET_OUVRIR, //@int
 	O_RET_FERMER, //@int
-	O_BRAS_DEPOT, //@int @int @int @int
-	O_BRAS_RET, //@int @int @int @int
+	O_GET_TRIANGLE, //@int @int @int @int
+	O_STORE_TRIANGLE, //@int @int
+	O_GET_BRAS_STATUS, //@int #int
+	O_BRAS_OUVRIR, //@int
+	O_BRAS_FERMER, //@int
 
+	//TIBOT
+	O_TIR_BALLE, //@int @int
+	O_TIR_FILET, //@int
+	O_BALAI, //@int @int
+
+	//GENERAL
 	GET_CAM,	//#int #int
 	GET_HOKUYO,	//#long #int #int #int #int #int #int #int #int
 	GET_LAST_ID, //#int

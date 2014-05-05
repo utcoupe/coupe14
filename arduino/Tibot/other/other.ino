@@ -9,35 +9,26 @@
 
 #include "serial_decoder.h"
 #include "serial_defines.h"
+#include "serial_switch.h"
 #include "compat.h"
 #include "parameters.h"
 
-Servo servoBras;
-
 #define MAX_READ 64 
 void setup(){
-	pinMode(16,OUTPUT);
-	digitalWrite(16, HIGH);
 	initPins();
+
 	Serial2.begin(57600, SERIAL_8O1);
 	Serial1.begin(57600, SERIAL_8O1); //Forward
 #ifdef DEBUG
 	Serial.begin(115200, SERIAL_8N1);
 #endif
-	PDEBUGLN("serial ok");
-	digitalWrite(16, LOW); //LED eteinte pendant attente protocole
+
+	initServos();
 	init_protocol();
 	PDEBUGLN("INIT DONE");
-	// LED qui n'en est pas une
 }
 
 void loop(){
-
-	/* La del est allumee pendant le traitement */
-	digitalWrite(16, HIGH);
-
-
-	/* zone programmation libre */
 	int available = Serial2.available();
 	if (available > MAX_READ) {
 		available = MAX_READ;
@@ -55,10 +46,4 @@ void loop(){
 	for(int i = 0; i < available; i++) {
 		serial_send(Serial1.read());
 	}
-
-	/* fin zone de programmation libre */
-	
-	/* On eteint la del */
-	digitalWrite(16, LOW);
-	
 }

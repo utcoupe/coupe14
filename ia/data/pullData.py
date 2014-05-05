@@ -73,11 +73,6 @@ class PullData():
 				self.tourelle_asked = True
 
 
-		#Hokuyo Fictif
-		#TODO
-		#self.Tourelle.majPosition(generateFictionHokuyo());
-
-
 	def __readData(self):
 		orderTuple = self.Communication.readOrdersAPI() # (address, order, arguments)
 
@@ -120,8 +115,10 @@ class PullData():
 					system.setPositionAndId(address, arguments)
 				elif order == 'GET_LAST_ID':
 					system.setLastId(address, arguments[0])
+				elif order == 'O_GET_BRAS_STATUS':
+					system.setBrasStatus( arguments[0])
 				elif order == 'GET_HOKUYO':
-					system.majPosition(arguments)
+					system.majPositionHokuyo(arguments)
 				elif order == 'GET_CAM':
 					system.majCam(arguments)
 				elif order == 'A_GOTO':
@@ -133,7 +130,7 @@ class PullData():
 
 
 
-def generateFictionHokuyo():
+"""def generateFictionHokuyo():
 	nombreRobots = 4				#Max:4
 	centre = {"x":1500, "y":1000}	#mm
 	amplitudeX = 800				#mm
@@ -154,6 +151,6 @@ def generateFictionHokuyo():
 
 	generateFictionHokuyo.iteration += 1
 	return ret
-generateFictionHokuyo.iteration = 0
+generateFictionHokuyo.iteration = 0"""
 
 
