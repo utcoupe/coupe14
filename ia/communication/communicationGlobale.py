@@ -83,8 +83,7 @@ class CommunicationGlobale():
 		self.mutexOrdersToRead = threading.Lock()
 		self.mutexOrdersToSend = threading.Lock()
 		gestionThread = threading.Thread(target=self.gestion)
-		gestionThread.start()
-		
+		gestionThread.start()		
 
 
 	def getConst(self):
@@ -596,7 +595,7 @@ class CommunicationGlobale():
 
 	def sendOrderAPI(self, address, order, *arguments):
 		""""api d'envoie d'ordres avec verification des parametres, retourne -1 en cas d'erreur, sinon 0"""
-		
+
 		if self.empty_fifo == True and order != self.orders['PINGPING_AUTO']:
 			self.empty_fifo = False 
 			self.timeStartProcessing = int(time.time()*1000)

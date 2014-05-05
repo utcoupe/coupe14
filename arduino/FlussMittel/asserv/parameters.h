@@ -36,8 +36,8 @@
 #define DUREE_CYCLE 5 //période de calcul, en ms
 #define FREQ (1/(DUREE_CYCLE/1000.0))
 
-#define ACC_MAX 750 //consigne*s-2
-#define RATIO_SPD_ROT_MAX 0.5 
+#define ACC_MAX 1000 //consigne*s-2
+#define RATIO_SPD_ROT_MAX 1 
 
 /* CONSIGNE OFFSET
  * DEVRAIT ETRE A 0
@@ -50,11 +50,11 @@
  * envoyer des consignes en pwm au robot
  * partant de 0 et en augmentant progressivement
  * dès que le robot avance, la pwm min est trouvée */
-#define PWM_MIN 10
+#define PWM_MIN 8
 
 #define CONSIGNE_MAX 255
 
-#define CONSIGNE_RANGE_MAX CONSIGNE_MAX - PWM_MIN
+#define CONSIGNE_RANGE_MAX (CONSIGNE_MAX - PWM_MIN)
 
 //CONSIGNE_REACHED est la pwm en dessous de laquelle un robot peut etre considéré comme arrêté à son goal
 #define CONSIGNE_REACHED 10
@@ -65,11 +65,12 @@
 #define ENC_RIGHT_RADIUS 36.1 //REGLE PAR TEST - rayon de la roue codeuse
 #define ENTRAXE_ENC 324.5 //REGLE PAR TES - Distance entre chaque roue codeuse en mm
 
-#define ERROR_ANGLE 0.05 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
-#define ERROR_POS 10 // erreur en position (mm)  maximale pour considérer l'objectif comme atteint
+#define ERROR_ANGLE 0.02 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
+#define ERROR_ANGLE_TO_GO 0.1 //erreur en angle(radians) maximale avant de partir en cas de GOTO
+#define ERROR_POS 5 // erreur en position (mm)  maximale pour considérer l'objectif comme atteint
 
 #define MAX_ANGLE 0.20  //~10° angle en dessous duquel on décrit une trajectoire curviligne (trop bas, le robot s'arretera constamment pour se recaler au lieu d'avancer, trop haut, les trajectoires seront très courbes voir meme fausses (overflow spd -> overflow pwm).
-#define SIN_MIN_ASSERV_ANGLE 20
+#define D_MIN_ASSERV_ANGLE 20
 
 //Intégrales et dérivée sont calculée avec un intervalle de temps en SECONDES
 //Ne modifier que le nombre, laisser les DUREE_CYCLE
@@ -80,9 +81,9 @@
 #define ANG_D 40 //a regler par incrementation
 #define ANG_AWU 0
 
-#define DIS_P 2 //spd = P * E_dis(mm)
+#define DIS_P 3.5 //spd = P * E_dis(mm)
 #define DIS_I 0 //spd = I * I_dis(mm * s)
-#define DIS_D 0.5 //a regler par incrementation
+#define DIS_D 0.3 //a regler par incrementation
 #define DIS_AWU 0
 
 //BLOCAGE

@@ -14,9 +14,7 @@ class CommSimulateur:
 		self.__connection = pipe
 		self.__input_buffer = deque()
 
-		self.__Pull_thread = threading.Thread(target=self.__readPipe)
-		self.__Pull_thread.start()
-
+		
 	def readOrdersAPI(self):
 		self.__readPipe()
 
@@ -26,12 +24,10 @@ class CommSimulateur:
 			return -1
 
 	def __readPipe(self):
-		try:
-			while self.__connection.poll():
-				message = self.__connection.recv()
-				self.__input_buffer.append(message)
-		except EOFError:
-			self.__logger.error("except EOFError sur recv()")
+		while self.__connection.poll():
+			message = self.__connection.recv()
+			self.__input_buffer.append(message)
+
 
 
 

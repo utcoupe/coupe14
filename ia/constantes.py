@@ -4,7 +4,7 @@ Ce fichier regroupe toutes les constantes de l'IA
 """
 
 
-TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
@@ -12,7 +12,7 @@ TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux
 #====================Enable====================
 ENABLE_TOURELLE = 		False
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
-ENABLE_TIBOT = 			True
+ENABLE_TIBOT = 			False
 
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
@@ -24,12 +24,13 @@ PARITY_OTHER = 			"ODD"
 
 
 #constantes réglables:
-MAX_UNCONFIRMED_PACKET =5 # maximum 32
-TIMEOUT = 				100
-HIGH_PRIO_SPEED = 		2 #période d'execution en ms
+MAX_UNCONFIRMED_PACKET =2 # maximum 32
+TIMEOUT = 				200
+HIGH_PRIO_SPEED = 		20 #période d'execution en ms
 LOW_PRIO_SPEED = 		3000 #période d'execution en ms
-KEEP_CONTACT_TIMEOUT = 	1500
-OFF_LIGNE_TIMEOUT = 	5000
+KEEP_CONTACT_TIMEOUT = 	8000
+OFF_LIGNE_TIMEOUT = 	20000
+
 
 #Systèmes arretable:
 THREAD_ACTIF = 			True

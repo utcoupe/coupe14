@@ -68,6 +68,9 @@ void Control::compute(){
 			case TYPE_ANG :
 			{
 				float da = (current_goal.data_1 - current_pos.angle);
+				
+				//da = moduloPI(da);//Commenter pour multi-tour
+
 				if(abs(da) <= ERROR_ANGLE){
 					setConsigne(0, 0);
 					fifo.pushIsReached();
@@ -84,11 +87,18 @@ void Control::compute(){
 				float goal_a = atan2(dy, dx);
 				float da = (goal_a - current_pos.angle);
 				float dd = sqrt(pow(dx, 2.0)+pow(dy, 2.0));//erreur en distance
-				float d = dd * cos(da);
+				float d = dd * cos(da); //Distance adjacente
+				float dop = dd * sin(da); //Distance opposée
 				static char aligne = 0;
 
+				//Commenter pour multi-tour
 				da = moduloPI(da);
 
+				if (dop < ERROR_POS && dd < D_MIN_ASSERV_ANGLE) { //"Zone" de précision TODO
+					da = 0;
+				}
+
+				//Init ordre
 				if (!order_started) {
 					if(abs(da) < max_angle) {
 						aligne = 1;
@@ -98,18 +108,23 @@ void Control::compute(){
 					}
 					order_started = true;
 				}
-				if(!aligne && abs(da) <= ERROR_ANGLE) {// && value_consigne_right < CONSIGNE_REACHED && value_consigne_left < CONSIGNE_REACHED) {
+
+				//Fin de la procedure d'alignement
+				if(!aligne && abs(da) <= ERROR_ANGLE_TO_GO) {
 					aligne = 1;
 				}
 
+				//En cours d'alignement
 				if(!aligne) {//On tourne sur place avant de se déplacer
 					controlPos(da, 0);
 				}
+				//En cours de déplacement
 				else {
 					controlPos(da, d + current_goal.data_3);//erreur en dist = dist au point + dist additionelle
 				}
 
-				if(abs(dd) <= ERROR_POS) {// && value_consigne_right < CONSIGNE_REACHED && value_consigne_left < CONSIGNE_REACHED) {
+				//Fin de consigne
+				if(abs(dd) <= ERROR_POS) {
 					setConsigne(0, 0);
 					fifo.pushIsReached();
 				}
@@ -118,12 +133,18 @@ void Control::compute(){
 
 			case TYPE_PWM :
 			{
+				static float pwmR = 0, pwmL = 0;
 				if(!order_started){
 					start_time = now;
+					pwmR = 0; pwmL = 0;
 					order_started = true;
 				}
 				if((now - start_time)/1000.0 <= current_goal.data_3){
-					setConsigne(current_goal.data_1,current_goal.data_2);
+					float consigneR = current_goal.data_2, consigneL = current_goal.data_1;
+					check_acc(&consigneL, pwmL);
+					check_acc(&consigneR, pwmR);
+					pwmR = consigneR; pwmL = consigneL;
+					setConsigne(pwmL, pwmR);
 				}
 				else{
 					setConsigne(0,0);
@@ -221,12 +242,18 @@ void Control::resume(){
 /********** PRIVATE **********/
 
 void Control::setConsigne(float consigne_left, float consigne_right){
+	if (consigne_right == 0 && consigne_left == 0) {
+		//Pour pas casser l'asserv quand on s'arrete
+		last_consigne_angle = 0;
+		last_consigne_dist = 0;
+	}
+
 	//Tests d'overflow
 	check_max(&consigne_left);
 	check_max(&consigne_right);
 	
-	value_consigne_right = (int)consigne_right;
-	value_consigne_left = (int)consigne_left;
+	value_consigne_right = consigne_right;
+	value_consigne_left = consigne_left;
 }
 
 void Control::check_max(float *consigne, float max) {
@@ -236,47 +263,45 @@ void Control::check_max(float *consigne, float max) {
 		*consigne = -max;
 }
 
-void Control::check_acc(float *consigneL, float *consigneR)
-{
-	static float lastL = *consigneL, lastR = *consigneR;
-
-
+void Control::check_rot_spd(float *consigneL, float *consigneR) {
 	//Check MAX ROT SPD
 	float rot = abs((*consigneR - *consigneL) / 2.0);
 	//Ratio consigne/max
-	float r = rot / CONSIGNE_RANGE_MAX;
+	float r = rot / (CONSIGNE_RANGE_MAX * max_rot_spd_ratio);
 	if (r > 1) { //Trop rapide
 		*consigneL /= r;
 		*consigneR /= r;
 	} 
+}
 
+void Control::check_rot_spd(float *consigne) {
+	//Check MAX ROT SPD
+	float rot = abs(*consigne);
+	//Ratio consigne/max
+	float r = rot / (CONSIGNE_RANGE_MAX * max_rot_spd_ratio);
+	if (r > 1) { //Trop rapide
+		*consigne /= r;
+	} 
+}
 
-	//Check MAX_ACC
-	//On verifie l'acceleration de chaque moteur
-	//SI elle est trop élevée, on la baisse, et on
-	//baisse aussi celle de l'autre moteur proportionellement
-	if(*consigneL > lastL + max_acc){
-		float diff = *consigneL - (lastL + max_acc);
-		*consigneL -= diff;
-		*consigneR -= diff * (*consigneR / * consigneL);
-	}
-	else if(*consigneL < lastL - max_acc){
-		float diff = (lastL - max_acc) - *consigneL;
-		*consigneL += diff;
-		*consigneR += diff * (*consigneR / * consigneL);
-	}
-	if(*consigneR > lastR + max_acc){
-		float diff = *consigneR - (lastR + max_acc);
-		*consigneR -= diff;
-		*consigneL -= diff * (*consigneL / * consigneR);
-	}
-	else if(*consigneR < lastR - max_acc){
-		float diff = (lastR - max_acc) - *consigneR;
-		*consigneR += diff;
-		*consigneL += diff * (*consigneL / * consigneR);
-	}
+void Control::check_rot_acc(float *consigne) {
+	check_acc(consigne, last_consigne_angle);
+}
 
-	lastR = *consigneR; lastL = *consigneL;
+void Control::check_dist_acc(float *consigne) {
+	check_acc(consigne, last_consigne_dist);
+}
+
+void Control::check_acc(float *consigne, float last_consigne) {
+	float diff = abs(*consigne) - (abs(last_consigne) + max_acc);
+
+	if (diff > 0) {
+		if (*consigne > 0) {
+			*consigne -= diff;
+		} else {
+			*consigne += diff;
+		}
+	}
 }
 
 void Control::controlPos(float da, float dd)
@@ -289,19 +314,24 @@ void Control::controlPos(float da, float dd)
 	consigneDistance = PID_Distance.compute(dd); //erreur = distance au goal
 
 	check_max(&consigneAngle);
-	check_max(&consigneDistance, CONSIGNE_MAX - abs(consigneAngle));
+	check_rot_spd(&consigneAngle);
+	check_rot_acc(&consigneAngle);
+
+	check_max(&consigneDistance, CONSIGNE_RANGE_MAX - abs(consigneAngle));
+	check_dist_acc(&consigneDistance);
+	PDEBUGLN();
 
 	consigneR = consigneDistance + consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
 	consigneL = consigneDistance - consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
 
-	check_acc(&consigneL, &consigneR);
-
+	last_consigne_angle = consigneAngle;
+	last_consigne_dist= consigneDistance;
 	setConsigne(consigneL, consigneR);
 }
 
 void Control::applyPwm(){
-	set_pwm_left(value_consigne_left);
-	set_pwm_right(value_consigne_right);
+	set_pwm_left((int)value_consigne_left);
+	set_pwm_right((int)value_consigne_right);
 }
 
 int Control::getLastFinishedId() {

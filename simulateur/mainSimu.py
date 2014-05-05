@@ -20,8 +20,6 @@ Pour la version 2013, nous avons utilisé le nouveau protocole de communication 
 
 """
 
-#test de modif
-#test modif fixe
 
 import sys
 import os
@@ -90,7 +88,7 @@ if __name__ == "__main__":
 		robots_yellow = ("YELLOW", bigbotYellow, minibotYellow, bigbotRed, minibotRed)
 
 		#lancement des subProcess IA
-		processIA.ProcessIA(robots_red)
+		#processIA.ProcessIA(robots_red)
 		processIA.ProcessIA(robots_yellow)
 
 		#chargement de la map

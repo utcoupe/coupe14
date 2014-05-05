@@ -31,7 +31,7 @@ def startIa(pipe=None, ia_color="RED"):
 
 	if pipe == None:
 		logger.info("Demarrage d'une IA normal")
-		time.sleep(2) # on attend que les communications s'établissent
+		time.sleep(5) # on attend que les communications s'établissent
 
 		if TEST_MODE == False:
 			#On teste si les systèmes demandés sont bien en lignes
@@ -57,22 +57,14 @@ def startIa(pipe=None, ia_color="RED"):
 
 
 	Data = data.Data(Communication, arduino_constantes, ia_color)
-	if TEST_MODE == False and ENABLE_FLUSSMITTEL == True:
-		Gpio = gpio.Gpio()
-		data.parametrerHokuyo()
-		data.parametrerIa(Data.MetaData, ia_color)
-	else:
-		data.parametrerHokuyo()
-		data.parametrerIa(Data.MetaData, ia_color)#TODO, remove ia_color
+
+	data.parametrerHokuyo()
+	data.parametrerIa(Data.MetaData, ia_color)#TODO, remove ia_color
 
 	TimeManager = event.TimeManager(Communication, Data)
 	EventManager = event.EventManager(Communication, Data)
 
-
-	TimeManager.startMatch()#TODO, remove
-	if TEST_MODE == False and ENABLE_FLUSSMITTEL == True:
-		while Gpio.getJack() != 1: #TODO à verifier
-			pass
+	#TODO attendre le jack
 	TimeManager.startMatch()
 
 #si on lance l'IA via le main.py

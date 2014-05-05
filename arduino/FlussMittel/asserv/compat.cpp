@@ -81,7 +81,6 @@ void interruptRight0{
 #endif
 
 void serial_send(char data) { //Envoi d'un octet en serial, dépend de la plateforme
-	PDEBUG(data);
 	SERIAL_MAIN.write(data);
 }
 

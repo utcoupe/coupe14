@@ -69,7 +69,7 @@ class GoalsManager:
 		self.__reverse_table[(10,0)]=(10,1)
 
 		if self.__robot_name == "FLUSSMITTEL" and TEST_MODE == False:
-			self.__vision = Visio('../supervisio/build/visio', 0, '../supervisio/', self.__data["FLUSSMITTEL"])
+			#self.__vision = Visio('../supervisio/build/visio', 0, '../supervisio/', self.__data["FLUSSMITTEL"])
 			self.__last_camera_color = None
 
 		self.__loadBeginScript()
@@ -86,7 +86,6 @@ class GoalsManager:
 				for goal in self.__available_goals:
 					nb_elem_goal = goal.getLenElemGoal()
 					for idd in range(nb_elem_goal):
-						print("on test goal "+str(goal.getId())+ " elem "+str(idd))
 						path = self.__getOrderTrajectoire(goal, idd)
 						if path != []:
 							length = self.__pathLen(path)
@@ -118,7 +117,7 @@ class GoalsManager:
 	#GOAL management from ID
 	def blockGoalFromId(self, id_objectif):
 		"""utilisé uniquement quand un autre objectif manager block un goal"""
-		#osef...
+		#osef, il n'y aura pas d'intersection sur les objectifs !
 		pass
 
 	def goalStepOverId(self, id_objectif):
@@ -321,7 +320,7 @@ class GoalsManager:
 						#TODO remove this bypass:
 						#triangle = triangle_list[0] #TODO, prendre le meilleur triangle suivent les arg
 						#data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
-						data_camera = ("RED", 10, 10)
+						data_camera = ("RED", 220, 0)
 
 
 						self.__last_camera_color = data_camera[0]

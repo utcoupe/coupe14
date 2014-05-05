@@ -59,8 +59,8 @@ def parseConstante():
 	relativePath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../libs/com_C/")
 
 	reEnum = re.compile("\s*(?P<constante>\w*)(\s*=\s*(?P<value>.*))?,")
-	reArguments = re.compile("\s*(?P<constante>\w*)(\s*=\s*(?P<value>.*))?,(\s*//(?P<arg>(@\w*\s*)*))?.*\n")
-	reReturn = re.compile("\s*(?P<constante>\w*)(\s*=\s*(?P<value>.*))?,(\s*//(?P<arg>(#\w*\s*)*))?.*\n")
+	reArguments = re.compile("\s*(?P<constante>\w*)(\s*=\s*(?P<value>.*))?,(\s*//)?(?P<arg>(@\w*\s*)*)?.*\n")
+	reReturn = re.compile("\s*(?P<constante>\w*)(\s*=\s*(?P<value>.*))?,(\s*//)?((@\w*\s*)*)?(?P<arg>(#\w*\s*)*)?.*\n")
 	reArrayC = re.compile("\s*ordreSize\[(?P<constante>\w*)\](\s*=\s*(?P<value>.*))?;")
 
 

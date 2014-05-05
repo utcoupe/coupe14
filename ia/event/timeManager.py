@@ -61,16 +61,18 @@ class TimeManager():
 	def __broadcastStopOrder(self):
 		empty_arg = []
 
-		for i in range(1):#TODO augmenter le nombre de stop ?
-			if self.__Flussmittel is not None:
-				self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressOther(), 'PAUSE', *empty_arg)
-				self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'PAUSE', *empty_arg)
-				self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_CLEANG', *empty_arg)
-			if self.__Tibot is not None:
-				self.__Communication.sendOrderAPI(self.__Tibot.getAddressOther(), 'PAUSE', *empty_arg)
-				self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'PAUSE', *empty_arg)
-				self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_CLEANG', *empty_arg)
-			time.sleep(0.05)
+		if self.__Flussmittel is not None:
+			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressOther(), 'PAUSE', *empty_arg)
+			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'PAUSE', *empty_arg)
+			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_CLEANG', *empty_arg)
+			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressOther(), 'RESUME', *empty_arg)
+			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'RESUME', *empty_arg)
+		if self.__Tibot is not None:
+			self.__Communication.sendOrderAPI(self.__Tibot.getAddressOther(), 'PAUSE', *empty_arg)
+			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'PAUSE', *empty_arg)
+			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_CLEANG', *empty_arg)
+			self.__Communication.sendOrderAPI(self.__Tibot.getAddressOther(), 'RESUME', *empty_arg)
+			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'RESUME', *empty_arg)
 
 	def __sendResetBot(self):
 		empty_arg = []

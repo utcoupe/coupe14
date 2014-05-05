@@ -77,26 +77,41 @@ class BigRobot(Robot):
 		self.remove_body_extension(self.bras)
 
 	def activerBrasOuvrir(self):
+		"""
+		Simule le bras qui sort avec un BRAS_OUVRIR
+		"""
 		self.add_body_extension(self.bras_ouvrir)
 		time.sleep(0.1) #temps où le bras apparaitra
 		self.remove_body_extension(self.bras_ouvrir)
 
 	def activerBrasFermer(self):
+		"""
+		Simule le bras qui rentre avec un BRAS_FERMER
+		"""
 		self.add_body_extension(self.bras_fermer)
 		time.sleep(0.1) #temps où le bras apparaitra
 		self.remove_body_extension(self.bras_fermer)
 
 	def storeFeu(self, sens):
+		"""
+		Stock un feu dans le robot
+		@param sens int
+		"""
 		if sens > 0:
 			self.__nbrFeuAvant += 1
 		else:
 			self.__nbrFeuArriere += 1
 
 	def releaseFeuArriere(self):
-		print('release feu arriere, NBR : ', self.__nbrFeuArriere)
+		"""
+		Ejecte un feu à l'arrière du robot
+		"""
+		#print('release feu arriere, NBR : ', self.__nbrFeuArriere)
 		if (self.__nbrFeuArriere > 0):
 			self.__nbrFeuArriere -= 1
-			self.__engine.add(feu.Feu(self.__engine,(self.__computePositionTriangle()),"vert",True))
+			new_feu = feu.Feu(self.__engine,(self.__computePositionTriangle()),"vert",True)
+			self.__engine.add(new_feu)
+			new_feu.coucherFeuCouleur(self.getTeam()) #pour donner la bonne couleur au feu
 		else:
 			print('pas de feu stocké à arriere du robot')
 
@@ -104,6 +119,9 @@ class BigRobot(Robot):
 		return self.__state_jack
 
 	def __computePositionTriangle(self):
+		"""
+		Calcule la position où éjecter le triangle derrière le robot
+		"""
 		xBot = self.body.position[0]
 		yBot = self.body.position[1]
 		aBot = self.body.angle
