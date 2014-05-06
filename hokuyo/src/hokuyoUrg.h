@@ -11,7 +11,7 @@
 urg_t* initHokuyoUrg(char* device, double angleMin, double angleMax);
 void resetHokuyoUrg(urg_t* urg, double angleMin, double angleMax);
 
-//void restartHokuyoUrg(urg_t* urg);
+void restartHokuyoUrg(urg_t* urg);
 void closeHokuyoUrg(urg_t* urg);
 
 

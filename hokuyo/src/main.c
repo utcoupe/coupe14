@@ -9,14 +9,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <sys/time.h>
 
 
 #ifdef SDL
 #include "gui.h"
 #endif
-
-
-
 
 
 void frame();
@@ -34,10 +32,36 @@ static struct coord robots[MAX_ROBOTS];
 
 static void catch_SIGINT(int signal){
 	printf("Closing lidar(s), please wait...\n");
+	struct itimerval it_val; //removing timer
+	it_val.it_value.tv_sec = 0;
+	it_val.it_value.tv_usec = 0;	
+	it_val.it_interval.tv_sec = 0;
+	it_val.it_interval.tv_usec = 0;
+	if (setitimer(ITIMER_REAL, &it_val, NULL) == -1) {
+		perror("error calling setitimer()");
+	}
 	closeLidar(&l1);
 	closeLidar(&l2);
 	printf("Exitting\n");
 	exit(EXIT_SUCCESS);
+}
+
+static void catch_SIGALRM(int signal){
+	printf("Restarting Lidars...\n");
+	restartLidar(&l1);
+	restartLidar(&l2);
+}
+
+void resetTimer(){
+	struct itimerval it_val;
+	it_val.it_value.tv_sec = HOKUYO_WATCHDOG/1000;
+	it_val.it_value.tv_usec = (HOKUYO_WATCHDOG*1000) % 1000000;	
+	it_val.it_interval.tv_sec = 0;
+	it_val.it_interval.tv_usec = 0;
+	if (setitimer(ITIMER_REAL, &it_val, NULL) == -1) {
+		perror("error calling setitimer()");
+		exit(1);
+	}
 }
 
 int main(int argc, char **argv){
@@ -49,6 +73,11 @@ int main(int argc, char **argv){
 
 	if (signal(SIGINT, catch_SIGINT) == SIG_ERR) {
         fputs("An error occurred while setting a signal handler for SIGINT.\n", stderr);
+        return EXIT_FAILURE;
+    }
+
+    if (signal(SIGALRM, catch_SIGALRM) == SIG_ERR) {
+        fputs("An error occurred while setting a signal handler for SIGALRM.\n", stderr);
         return EXIT_FAILURE;
     }
 
@@ -97,16 +126,13 @@ int main(int argc, char **argv){
 }
 
 void frame(){
+	resetTimer();
 	long timestamp;
 	getPoints(&l1);
 	getPoints(&l2);
 	timestamp = timeMillis() - startTime;
 
-	printf("Time since last measurement : %lims\n", timestamp-lastTime);
-	if(lastTime != 0 && timestamp-lastTime > HOKUYO_WATCHDOG){
-		printf("%s WatchDog exceeded: %li > %li\n", PREFIX, timestamp-lastTime, (long int)HOKUYO_WATCHDOG);
-		//restartLidar(&l1);
-	}
+	//printf("Time since last measurement : %lims\n", timestamp-lastTime);
 	//printf("nPoints:%i\n", l1.fm.n);
 	int nRobots = getRobots(l1.points, l1.fm.n, robots);
 	#ifdef SDL

@@ -3,7 +3,6 @@
 
 #define PREFIX "[C]: "
 
-#define CAPTURE_EACH_TIME 0 //0 pour infinity, 1 pour start measurement à chaque fois
 
 #define TAILLE_TABLE_X 3000
 #define TAILLE_TABLE_Y 2000
@@ -15,7 +14,7 @@
 #define MARKER_DETECTION_ZONE_SIZE 500/*mm*/
 #define MARKER_DETECTION_STEPS 20
 
-#define HOKUYO_WATCHDOG 150 /* ms */
+#define HOKUYO_WATCHDOG 120 /* ms */
 
 #define MAX_CLUSTERS 100 /*Ceux apres 100 seront abandonnés !*/
 #define MAX_AB_POINTS 15 /*Nombre de points abberants consecutifs max*/

@@ -133,12 +133,12 @@ void closeLidar(struct lidar * l){
 	}
 }
 
-/*
+
 void restartLidar(struct lidar * l){
 	if(l->model == hokuyo_urg){
 		restartHokuyoUrg(l->lidarObject);
 	}
-}*/
+}
 
 char
 invalidDistance(long d){
