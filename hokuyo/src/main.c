@@ -95,7 +95,7 @@ void frame(){
 	timestamp = timeMillis() - startTime;
 	printf("%li \t", timestamp-lastTime);
 	if(lastTime != 0 && timestamp-lastTime > HOKUYO_WATCHDOG){
-		printf("%s WatchDog exceeded: %li > %li\n", PREFIX, timestamp-lastTime, HOKUYO_WATCHDOG);
+		printf("%s WatchDog exceeded: %li > %li\n", PREFIX, timestamp-lastTime, (long int)HOKUYO_WATCHDOG);
 		restartLidar(&l1);
 	}
 	//printf("nPoints:%i\n", l1.fm.n);
