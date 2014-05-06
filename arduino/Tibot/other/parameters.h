@@ -4,23 +4,23 @@
 #define DEBUG
 
 // PINS
-#define PIN_SERVO_FILET 30
-#define PIN_SERVO_BALLES1 31
-#define PIN_SERVO_BALLES2 32
-#define PIN_SERVO_BALAI 33
+#define PIN_SERVO_FILET 42
+#define PIN_SERVO_BALLES1 30
+#define PIN_SERVO_BALLES2 38
+#define PIN_SERVO_BALAI 34
 
 #define SERIAL_MAIN Serial1
 #define SERIAL_FWD Serial2
 
 // PARAMETRES
-#define POS_FILET_INIT 0
-#define POS_BALLES1_INIT 0
-#define POS_BALLES2_INIT 0
-#define POS_BALAI_INIT 90
+#define POS_FILET_INIT 30 
+#define POS_BALLES1_INIT 4
+#define POS_BALLES2_INIT 4 
+#define POS_BALAI_INIT 80 
 
-#define POS_TIR_FILET 90
+#define POS_TIR_FILET 4 
 #define POS_BALAI_R 0
-#define POS_BALAI_L 180
+#define POS_BALAI_L 140
 #define PAS_PAR_TIR 10
 
 #define LEFT -1
