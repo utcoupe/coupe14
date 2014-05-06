@@ -68,8 +68,8 @@ class GoalsManager:
 
 		self.__reverse_table[(10,0)]=(10,1)
 
-		if self.__robot_name == "FLUSSMITTEL" and TEST_MODE == False:
-			#self.__vision = Visio('../supervisio/build/visio', 0, '../supervisio/', self.__data["FLUSSMITTEL"])
+		if self.__robot_name == "FLUSSMITTEL":
+			self.__vision = Visio('../supervisio/visio', 0, '../supervisio/', self.__data["FLUSSMITTEL"], False)
 			self.__last_camera_color = None
 
 		self.__loadBeginScript()
@@ -305,22 +305,17 @@ class GoalsManager:
 						objectif.getElemGoalLocked().removeFirstElemAction()
 
 				else:
-					#self.__vision.update()
-					#triangle_list = self.__vision.getTriangles()
+					self.__vision.update()
+					triangle_list = self.__vision.getTriangles()
 
-
-					#TODO remove this bypass:
-					#if triangle_list == []:
-					if False:
-
+					if triangle_list == []:
 						self.__logger.warning("On a pas vu de triangle à la position attendu, dont on va supprimer l'objectif "+str(id_objectif))
 						self.__last_camera_color = None
 						self.__deleteGoal(objectif)
 					else:
-						#TODO remove this bypass:
-						#triangle = triangle_list[0] #TODO, prendre le meilleur triangle suivent les arg
-						#data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
-						data_camera = ("RED", 220, 0)
+						triangle = triangle_list[0] #TODO, prendre le meilleur triangle suivent les arg
+						data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
+						#data_camera = ("RED", 220, 0) #test
 
 
 						self.__last_camera_color = data_camera[0]
