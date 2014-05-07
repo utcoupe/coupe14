@@ -159,7 +159,7 @@ void cmdTriBordure(int hauteur_ouverture) {
 				step++;
 				break;
 			case 3:
-				setLastId(); //Fin de préhension
+				setLastId(); 
 				if (!block) {
 					//Pour rentrer ici, next_step doit etre mis à true par la fonction getTriBordureRepliBras()
 					cmdBrasServ(ANGLE_REPLI_TRI, LONGUEUR_TRI_BORDURE);

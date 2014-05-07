@@ -33,12 +33,10 @@ def gui(com):
 				if order == 'k':# arret d'urgence
 					com.sendOrderAPI(5, 'A_CLEANG', *arguments)
 				elif order == 'a':# arret d'urgence
-					arguments = [1000, 500]
-					com.sendOrderAPI(2, 'A_GOTO', *arguments)
-					arguments = [1000, -500]
-					com.sendOrderAPI(2, 'A_GOTO', *arguments)
-					arguments = [0, 0, 0.0]
-					com.sendOrderAPI(2, 'A_GOTOA', *arguments)
+					arguments = [0, 1000, 0]
+					com.sendOrderAPI(5, 'A_GOTO', *arguments)
+					arguments = [0, 0, 0, 0.0]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)
 				elif order == 'c':
 					com.sendOrderAPI(5, 'A_GET_CODER', *arguments)
 				elif order == 'p':
@@ -48,8 +46,17 @@ def gui(com):
 					com.sendOrderAPI(5, 'A_SET_POS', *arguments)
 
 				elif order == 's':
-					for a in range(1000):
-						arguments = []
+					arguments = [0, 1000, 0, 1.57]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)
+					time.sleep(3.5)
+					arguments = [0, 6]
+					com.sendOrderAPI(4, 'O_TIR_BALLE', *arguments)
+					time.sleep(1)
+					arguments = [0, 3.14]
+					com.sendOrderAPI(5, 'A_ROT', *arguments)
+					time.sleep(2)
+					arguments = [1]
+					com.sendOrderAPI(5, 'O_TIR_FILET', *arguments)
 
 				elif order in com.orders:
 					if isinstance(order, (int)):
