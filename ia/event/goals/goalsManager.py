@@ -309,10 +309,18 @@ class GoalsManager:
 						objectif.getElemGoalLocked().removeFirstElemAction()
 
 				else:
-					self.__vision.update()
-					triangle_list = self.__vision.getTriangles()
+					limite_essai_viso = 5
+					triangle_find = False
+					triangle_list = []
+					while limite_essai_viso != 0 and triangle_find == False:
+						limite_essai_viso -= 1
+						self.__vision.update()
+						triangle_list = self.__vision.getTriangles()
+						if triangle_list != []:
+							triangle_find = True
+							break
 
-					if triangle_list == []:
+					if triangle_find == False:
 						self.__logger.warning("On a pas vu de triangle à la position attendu, dont on va supprimer l'objectif "+str(id_objectif))
 						self.__last_camera_color = None
 						self.__deleteGoal(objectif)
@@ -455,7 +463,6 @@ class GoalsManager:
 						position_depart_speciale = (int(arguments[0]), int(arguments[1]), float(arguments[2]))
 					else:
 						position_depart_speciale = (3000 - int(arguments[0]), int(arguments[1]), float(arguments[2])-1.57)
-						print(float(arguments[2])-1.57)
 				elif order == "A_GOTO" and self.__our_color == "YELLOW":
 					arg = (3000 - int(arguments[0]), int(arguments[1]))
 					prev_action.append((order, arg))
