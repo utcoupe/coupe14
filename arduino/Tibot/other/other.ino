@@ -12,6 +12,7 @@
 #include "serial_switch.h"
 #include "compat.h"
 #include "parameters.h"
+#include "actions.h"
 
 #define MAX_READ 64 
 void setup(){
