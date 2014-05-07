@@ -94,7 +94,7 @@ class GoalsManager:
 								best_goal = (path, goal, idd)
 
 				if best_goal[1] != None:
-					self.__logger.info("On a choisi l'objectif goal_id "+str(best_goal[1])+" elem_goal_id "+str(best_goal[2])+" avec le path "+str(best_goal[0]))
+					self.__logger.info("On a choisi l'objectif goal_id "+str(best_goal[1].getId())+" elem_goal_id "+str(best_goal[2])+" avec le path "+str(best_goal[0]))
 					self.__addGoal(best_goal[0], best_goal[1], best_goal[2])
 				else:
 					time.sleep(5)#TODO diminuer
@@ -174,7 +174,10 @@ class GoalsManager:
 			orders.append( ("A_ROT", (goal.getElemGoalOfId(elem_goal_id).getPositionAndAngle()[2],)) )
 			#on ajoute attend d'être arrivé pour lancer les actions
 			orders.append( ("THEN", ()) )
-			orders.append( ("STEP_OVER", ()) )
+			
+			first_action_elem = goal.getElemGoalLocked().getFirstElemAction()
+			orders.extend(first_action_elem)
+			goal.getElemGoalLocked().removeFirstElemAction()
 
 			#on envoi le tout
 			if self.__id_objectif_send:
@@ -193,6 +196,7 @@ class GoalsManager:
 		self.__available_goals.append(goal)
 		self.__logger.info('Goal ' + goal.getName() + ' has been canceled and is now released')
 		self.__removeLastValueOfDeque(self.__id_objectif_send, goal.getId())
+		goal.getElemGoalLocked().resetElemAction()
 
 		if not fromEvent:
 			self.__SubProcessManager.sendDeleteGoal(goal.getId())
@@ -450,9 +454,13 @@ class GoalsManager:
 					if self.__our_color == "RED":
 						position_depart_speciale = (int(arguments[0]), int(arguments[1]), float(arguments[2]))
 					else:
-						position_depart_speciale = (3000 - int(arguments[0]), int(arguments[1]), float(arguments[2]))
+						position_depart_speciale = (3000 - int(arguments[0]), int(arguments[1]), float(arguments[2])-1.57)
+						print(float(arguments[2])-1.57)
 				elif order == "A_GOTO" and self.__our_color == "YELLOW":
 					arg = (3000 - int(arguments[0]), int(arguments[1]))
+					prev_action.append((order, arg))
+				elif order == "A_GOTOA" and self.__our_color == "YELLOW":
+					arg = (3000 - int(arguments[0]), int(arguments[1]), float(arguments[2])-1.57)
 					prev_action.append((order, arg))
 				else:
 					prev_action.append((order, arguments))

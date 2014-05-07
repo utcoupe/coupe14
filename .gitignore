@@ -30,5 +30,6 @@ ia/log/*.xml
 ia/event/goals/visio/visio
 supervisio/Makefile
 supervisio/*.avi
+supervisio/visio
 .idea/*
 /libs/cgal/CMakeLists.txt.bak

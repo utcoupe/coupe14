@@ -45,9 +45,16 @@ class Communication():
 		"""
 		Parse l'ordre envoyé à ADDR_FLUSSMITTEL_OTHER
 		"""
-		if (order == "O_BRAS_OUVRIR"):
+		if (order == "O_BRAS_OUVRIR_BAS"):
 			pos = ()
 			self.__bigrobot.activerBrasOuvrir()
+			self.__bigrobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+
+		elif (order == "O_BRAS_OUVRIR_HAUT"):
+			pos = ()
+			#TODO ouvrir le bras sans toucher les triangles
+			#self.__bigrobot.activerBrasOuvrir()
 			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
