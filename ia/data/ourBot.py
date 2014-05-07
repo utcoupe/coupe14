@@ -183,7 +183,6 @@ class OurBot():
 
 	def __castOrders(self, action_data):
 		data_objectif = deque()
-		print("action_data "+str(action_data))
 		for elm_action in action_data:
 			action = (-1,)
 			order = elm_action[0]
