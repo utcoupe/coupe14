@@ -4,6 +4,7 @@
 		<id_script>0</id_script>
 		<orders>
 			<order>O_BRAS_OUVRIR_HAUT</order>
+			<order>THEN</order>
 			<order>O_BRAS_FERMER</order>
 			<order>STEP_OVER</order>
 			<order>GET_TRIANGLE_IA</order>
@@ -16,6 +17,7 @@
 		<id_script>1</id_script>
 		<orders>
 			<order>O_BRAS_OUVRIR_HAUT</order>
+			<order>THEN</order>
 			<order>O_BRAS_FERMER</order>
 			<order>STEP_OVER</order>
 			<order>GET_TRIANGLE_IA</order>
@@ -28,6 +30,7 @@
 		<id_script>2</id_script>
 		<orders>
 			<order>O_BRAS_OUVRIR_HAUT</order>
+			<order>THEN</order>
 			<order>O_BRAS_FERMER</order>
 			<order>STEP_OVER</order>
 			<order>GET_TRIANGLE_IA</order>
@@ -40,6 +43,7 @@
 		<id_script>3</id_script>
 		<orders>
 			<order>O_BRAS_OUVRIR_HAUT</order>
+			<order>THEN</order>
 			<order>O_BRAS_FERMER</order>
 			<order>STEP_OVER</order>
 			<order>GET_TRIANGLE_IA</order>
