@@ -10,6 +10,8 @@ def gui(com):
 	dic = com.getConst()
 	ordersArguments = dic['ordersArguments']
 	arguments = []
+	last_ordre = ''
+	last_arg = []
 
 	while 1:
 		try:
@@ -18,6 +20,9 @@ def gui(com):
 			arguments = []
 			order = str(input("Entre le nom ou le numéro d'un ordre:\n"))
 			if order:
+				if order == '.':
+					arguments = last_arg
+					order = last_ordre
 				if order[0] == 'A':
 					address = 5
 				elif order[0] == 'O':
@@ -42,10 +47,8 @@ def gui(com):
 					com.sendOrderAPI(5, 'A_RESET_POS', *arguments)
 
 				elif order == 's':
-
 					for a in range(1000):
 						arguments = []
-
 
 				elif order in com.orders:
 					if isinstance(order, (int)):
@@ -63,5 +66,7 @@ def gui(com):
 					com.sendOrderAPI(address, order, *arguments)	
 				else:
 					print("L'ordre n'a pas été trouvé dans les fichiers arduino")
+			last_ordre = order
+			last_arg = arguments
 		except:
 			pass
