@@ -21,17 +21,14 @@ Control control;
 void setup(){
 	TCCR3B = (TCCR3B & 0xF8) | 0x01 ; //PWM FREQUENCY
 	initPins();
+	initSize();
 	Serial2.begin(57600, SERIAL_8O1);
 #ifdef DEBUG
 	Serial.begin(115200, SERIAL_8N1);
 #endif
-	PDEBUGLN("serial ok");
-	init_protocol();
+	PDEBUGLN("BOOT");
+	protocol_blocking_reset();
 	PDEBUGLN("INIT DONE");
-	pinMode(LED_MAINLOOP, OUTPUT);
-	pinMode(LED_BLOCKED, OUTPUT) ;
-	digitalWrite(LED_MAINLOOP, HIGH); //HIGH = eteinte
-	digitalWrite(LED_BLOCKED, HIGH); //HIGH = eteinte
 }
 
 void loop(){

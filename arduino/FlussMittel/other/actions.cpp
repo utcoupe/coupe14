@@ -60,6 +60,14 @@ void initAct() {
 	stepperAsc.setAcceleration(AMAX_STEPPER);
 	stepperAsc.setMaxSpeed(VMAX_STEPPER);
 	stepperAsc.move(6000);
+	while (digitalRead(PIN_INT_HAUT_ASC) == 1) {
+		updateBras();
+	}
+	stepperAsc.setCurrentPosition(HAUTEUR_MAX*H_TO_STEP + MARGE_SECU_TOP);
+	topStop();
+	pump(false);
+	cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
+	servoRet.write(180); 
 	//attachInterrupt(INT_ASC_HAUT, topStop, FALLING); //Commenté à cause des micro-interuptions
 }
 
@@ -67,11 +75,11 @@ void stopAct() {
 	use_act = false;
 }
 
-void getTriBordure() {
+void getTriBordure(int hauteur_ouverture) {
 	if (action_en_cours == None) {
 		action_en_cours = TriBordure;
 		block = true;
-		cmdTriBordure();
+		cmdTriBordure(hauteur_ouverture);
 	}
 }
 
@@ -116,9 +124,11 @@ void updateBras() {
 	}
 }
 
-void cmdTriBordure() {
+void cmdTriBordure(int hauteur_ouverture) {
 	static unsigned long time_end = 0;
-	if (step == -1) {
+	static int h_ouverture = 0;
+	if (step == -1) { //Debut
+		h_ouverture = hauteur_ouverture;
 		step = 0;
 		next_step = true;
 		block = true;
@@ -134,7 +144,7 @@ void cmdTriBordure() {
 		switch(step) {
 			case 0: {
 				int hauteur_revele = getCurrentHauteur() + MARGE_PREHENSION; //On remontera toujours par rapport à la position actulle, pour eviter de pousser un triangles (petite perte pour grande securité)
-				int hauteur = MIN(HAUTEUR_MAX, MAX(hauteur_revele, HAUTEUR_TRI_BORDURE));
+				int hauteur = MIN(HAUTEUR_MAX, MAX(hauteur_revele, MAX(HAUTEUR_TRI_BORDURE, h_ouverture)));
 				cmdAsc(hauteur);
 				step++;
 				break;
