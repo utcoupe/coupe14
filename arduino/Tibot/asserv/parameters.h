@@ -26,9 +26,9 @@
  * 
  * OPTIONS : '1' - '2 - '4' */
 
-#define ENCODER_EVAL 1
+#define ENCODER_EVAL 2
 
-#define FIXED_POINT_PRECISION 100 //The robot's position is stocked with a precision of 1/FIXED_POINT_PRECISION ticks
+#define FIXED_POINT_PRECISION 1000 //The robot's position is stocked with a precision of 1/FIXED_POINT_PRECISION ticks
 
 #define GESTION_3EME_FIL false
 
@@ -59,15 +59,15 @@
 //CONSIGNE_REACHED est la pwm en dessous de laquelle un robot peut etre considéré comme arrêté à son goal
 #define CONSIGNE_REACHED 0
 
-#define ENC_RESOLUTION 500 //resolution du codeur
+#define ENC_RESOLUTION 1024 //resolution du codeur
 
-#define ENC_LEFT_RADIUS 34 //rayon de la roue codeuse
-#define ENC_RIGHT_RADIUS 34 //rayon de la roue codeuse
-#define ENTRAXE_ENC 130.0 // Distance entre chaque roue codeuse en mm
+#define ENC_LEFT_RADIUS 36.2 //rayon de la roue codeuse
+#define ENC_RIGHT_RADIUS 36.2 //rayon de la roue codeuse
+#define ENTRAXE_ENC 189.83 // Distance entre chaque roue codeuse en mm
 
-#define ERROR_ANGLE 0.02 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
+#define ERROR_ANGLE 0.04 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
 #define ERROR_ANGLE_TO_GO 0.1 //erreur en angle(radians) maximale avant d'avancer
-#define ERROR_POS 10 // erreur en position (mm)  maximale pour considérer l'objectif comme atteint
+#define ERROR_POS 15 // erreur en position (mm)  maximale pour considérer l'objectif comme atteint
 
 #define MAX_ANGLE 0.20  //~10° angle en dessous duquel on décrit une trajectoire curviligne (trop bas, le robot s'arretera constamment pour se recaler au lieu d'avancer, trop haut, les trajectoires seront très courbes voir meme fausses (overflow spd -> overflow pwm).
 #define ERREUR_MARCHE_ARRIERE PI
