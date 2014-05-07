@@ -33,9 +33,7 @@
 	<elemScript><!--script récupèration triangle rouge sans mur -->
 		<id_script>2</id_script>
 		<orders>
-			<order>O_BRAS_OUVRIR_HAUT</order>
-			<order>THEN</order>
-			<order>O_BRAS_FERMER</order>
+			<order>O_BRAS_OUVRIR_BAS</order>
 			<order>THEN</order>
 			<order>SLEEP 1000</order>
 			<order>STEP_OVER</order>
@@ -48,9 +46,7 @@
 	<elemScript><!--script récupèration triangle jaune sans mur -->
 		<id_script>3</id_script>
 		<orders>
-			<order>O_BRAS_OUVRIR_HAUT</order>
-			<order>THEN</order>
-			<order>O_BRAS_FERMER</order>
+			<order>O_BRAS_OUVRIR_BAS</order>
 			<order>THEN</order>
 			<order>SLEEP 1000</order>
 			<order>STEP_OVER</order>
