@@ -13,6 +13,9 @@
 #define SERIAL_FWD Serial2
 
 // PARAMETRES
+
+#define RETOUR_SERVO 1000// ms
+
 #define POS_FILET_INIT 30 
 #define POS_BALLES_R0 4
 #define POS_BALLES_L0 23 
@@ -23,13 +26,14 @@
 #define POS_BALLES_R3 25
 #define POS_BALLES_L3 3
 
-#define POS_BALAI_INIT 80 
+#define POS_BALAI_INIT 70 
 
 #define POS_TIR_FILET 4 
 #define POS_BALAI_R 0
 #define POS_BALAI_L 140
 
 #define LEFT -1
+#define MIDDLE 0
 #define RIGHT 1
 
 

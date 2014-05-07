@@ -52,4 +52,6 @@ void loop(){
 	for(int i = 0; i < available; i++) {
 		serial_send(SERIAL_FWD.read());
 	}
+
+	retourServo(); //Pour "ranger" les servo quand il faut
 }
