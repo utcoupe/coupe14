@@ -76,7 +76,7 @@
 				<id>1</id>
 				<x>2750</x>
 				<y>1420</y>
-				<angle>0.0</angle>
+				<angle>0.61</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -161,7 +161,7 @@
 				<id>0</id>
 				<x>1920</x>
 				<y>250</y>
-				<angle>-1.57</angle>
+				<angle>-2.18</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -182,7 +182,7 @@
 				<id>1</id>
 				<x>1520</x>
 				<y>250</y>
-				<angle>-1.57</angle>
+				<angle>-2.18</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -267,7 +267,7 @@
 				<id>0</id>
 				<x>250</x>
 				<y>950</y>
-				<angle>3.14</angle>
+				<angle>2.53</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
