@@ -309,7 +309,7 @@ class GoalsManager:
 						objectif.getElemGoalLocked().removeFirstElemAction()
 
 				else:
-					limite_essai_viso = 3
+					limite_essai_viso = 5
 					triangle_find = False
 					triangle_list = []
 					while limite_essai_viso != 0 and triangle_find == False:
@@ -320,7 +320,7 @@ class GoalsManager:
 							triangle_find = True
 							break
 
-					if triangle_find == True:
+					if triangle_find == False:
 						self.__logger.warning("On a pas vu de triangle à la position attendu, dont on va supprimer l'objectif "+str(id_objectif))
 						self.__last_camera_color = None
 						self.__deleteGoal(objectif)
