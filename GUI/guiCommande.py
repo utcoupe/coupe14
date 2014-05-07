@@ -37,14 +37,15 @@ def gui(com):
 					com.sendOrderAPI(2, 'A_GOTO', *arguments)
 					arguments = [1000, -500]
 					com.sendOrderAPI(2, 'A_GOTO', *arguments)
-					arguments = [0, 0, 0]
+					arguments = [0, 0, 0.0]
 					com.sendOrderAPI(2, 'A_GOTOA', *arguments)
 				elif order == 'c':
 					com.sendOrderAPI(5, 'A_GET_CODER', *arguments)
 				elif order == 'p':
 					com.sendOrderAPI(5, 'A_GET_POS', *arguments)
 				elif order == 'r':
-					com.sendOrderAPI(5, 'A_RESET_POS', *arguments)
+					arguments = [0, 0, 0.0]
+					com.sendOrderAPI(5, 'A_SET_POS', *arguments)
 
 				elif order == 's':
 					for a in range(1000):
