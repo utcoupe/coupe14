@@ -15,7 +15,7 @@ void retourServo(Servo *servo, int pos, int delay) {
 	static servoQueue tab[12];
 	static int inQueue = 0;
 	if (servo != 0) { //Commande
-		if (inQueue > 12) {
+		if (inQueue >= 12) {
 			return;
 		}
 		struct servoQueue s;
@@ -78,6 +78,7 @@ void tirBalles(int nbr) {
 				angle_to_go_R = POS_BALLES_R0;
 		}
 	} 
+	tirs = tirs % 6; //N'arrivera pas en match, mais utile en test
 	servoBallesR.write(angle_to_go_R);
 	servoBallesL.write(angle_to_go_L);
 	retourServo(&servoBallesR, POS_BALLES_R0);
