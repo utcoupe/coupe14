@@ -23,13 +23,14 @@ void setup(){
 	TCCR3B = (TCCR3B & 0xF8) | 0x01 ;
 	TCCR1B = (TCCR1B & 0xF8) | 0x01 ;
 	initPins();
+	initSize();
 	SERIAL_MAIN.begin(57600, SERIAL_8O1);
 #ifdef DEBUG
 	Serial.begin(115200);
 	PDEBUGLN("BOOT");
 #endif
 	digitalWrite(LED_BLOCKED, LOW); //HIGH = eteinte
-	init_protocol();
+	protocol_blocking_reset();
 	digitalWrite(LED_BLOCKED, HIGH); //HIGH = eteinte
 	PDEBUGLN("INIT DONE");
 

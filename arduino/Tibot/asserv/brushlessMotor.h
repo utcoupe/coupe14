@@ -20,18 +20,18 @@
 #define MOTOR_RIGHT 2
 
 //Pins codeurs liés à la shield
-#define PIN_ENC_LEFT_A 20
-#define PIN_ENC_LEFT_B 21
+#define PIN_ENC_LEFT_A 19
+#define PIN_ENC_LEFT_B 18
 #define PIN_ENC_LEFT_0 0
-#define PIN_ENC_RIGHT_A 18
-#define PIN_ENC_RIGHT_B 19
+#define PIN_ENC_RIGHT_A 20
+#define PIN_ENC_RIGHT_B 21
 #define PIN_ENC_RIGHT_0 0
 
-#define INTERRUPT_ENC_LEFT_A 3
-#define INTERRUPT_ENC_LEFT_B 2
+#define INTERRUPT_ENC_LEFT_A 4
+#define INTERRUPT_ENC_LEFT_B 5
 #define INTERRUPT_ENC_LEFT_0 0
-#define INTERRUPT_ENC_RIGHT_A 5
-#define INTERRUPT_ENC_RIGHT_B 4
+#define INTERRUPT_ENC_RIGHT_A 3
+#define INTERRUPT_ENC_RIGHT_B 2
 #define INTERRUPT_ENC_RIGHT_0 1
 
 

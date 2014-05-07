@@ -65,7 +65,8 @@
 #define ENC_RIGHT_RADIUS 34 //rayon de la roue codeuse
 #define ENTRAXE_ENC 130.0 // Distance entre chaque roue codeuse en mm
 
-#define ERROR_ANGLE 0.00 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
+#define ERROR_ANGLE 0.02 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
+#define ERROR_ANGLE_TO_GO 0.1 //erreur en angle(radians) maximale avant d'avancer
 #define ERROR_POS 10 // erreur en position (mm)  maximale pour considérer l'objectif comme atteint
 
 #define MAX_ANGLE 0.20  //~10° angle en dessous duquel on décrit une trajectoire curviligne (trop bas, le robot s'arretera constamment pour se recaler au lieu d'avancer, trop haut, les trajectoires seront très courbes voir meme fausses (overflow spd -> overflow pwm).

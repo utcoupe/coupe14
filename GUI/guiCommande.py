@@ -19,9 +19,9 @@ def gui(com):
 			order = str(input("Entre le nom ou le numéro d'un ordre:\n"))
 			if order:
 				if order[0] == 'A':
-					address = 2
+					address = 5
 				elif order[0] == 'O':
-					address = 1
+					address = 4
 				elif order == 'GET_HOKUYO':
 					address = 6
 

@@ -66,7 +66,8 @@ enum ordre {
 	O_GET_TRIANGLE, //@int @int @int @int
 	O_STORE_TRIANGLE, //@int @int
 	O_GET_BRAS_STATUS, //@int #int
-	O_BRAS_OUVRIR, //@int
+	O_BRAS_OUVRIR_BAS, //@int
+	O_BRAS_OUVRIR_HAUT, //@int
 	O_BRAS_FERMER, //@int
 
 	//TIBOT
