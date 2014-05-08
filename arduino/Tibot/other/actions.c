@@ -12,7 +12,7 @@ struct servoQueue {
 };
 
 void retourServo(Servo *servo, int pos, int delay) {
-	static servoQueue tab[12];
+	static struct servoQueue tab[12];
 	static int inQueue = 0;
 	if (servo != 0) { //Commande
 		if (inQueue >= 12) {
