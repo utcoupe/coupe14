@@ -10,7 +10,7 @@
 #define BRAS_OFFSET_DIST 145 //Distance in mm
 #define BRAS_OFFSET_ANGLE 30 //Angle offset in degrees
 
-#define HAUTEUR_MAX 133 //En mm
+#define HAUTEUR_MAX 128 //En mm
 #define HAUTEUR_MIN 15 //en mm
 
 #define X_BRAS 128
@@ -46,6 +46,7 @@
 #define VMAX_STEPPER 600 
 #define AMAX_STEPPER 10000
 
+#define DELAY_SERVO_PUSH 500
 #define DELAY_REPLI_BRAS 1000
 #define DELAY_REPLI_BRAS2 100
 #define DELAY_STOP_PUMP 500
