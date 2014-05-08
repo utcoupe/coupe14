@@ -220,6 +220,21 @@ class Communication():
 		elif (order == "RESUME"):
 			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
+		elif (order == "O_TIR_BALLE"):
+			#args : nbr de balles à tirer
+			self.__minirobot.setlastIdActionOther(args[0])
+			pos = (self.__minirobot.getLastIdOther(),)
+			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
+
+		elif (order == "O_TIR_FILET"):
+			self.__minirobot.setlastIdActionOther(args[0])
+			pos = (self.__minirobot.getLastIdOther(),)
+			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
+
+		elif (order == "O_BALAI"):
+			self.__minirobot.setlastIdActionOther(args[0])
+			pos = (self.__minirobot.getLastIdOther(),)
+			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
 
 		else:
 			print('Error : mauvais paramètre traitement Tibot other ! order '+str(order)+" args "+str(args))
