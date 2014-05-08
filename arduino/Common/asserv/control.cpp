@@ -69,7 +69,7 @@ void Control::compute(){
 			{
 				float da = (current_goal.data_1 - current_pos.angle);
 				
-				//da = moduloPI(da);//Commenter pour multi-tour
+				da = moduloPI(da);//Commenter pour multi-tour
 
 				if(abs(da) <= ERROR_ANGLE){
 					setConsigne(0, 0);
@@ -88,13 +88,13 @@ void Control::compute(){
 				float da = (goal_a - current_pos.angle);
 				float dd = sqrt(pow(dx, 2.0)+pow(dy, 2.0));//erreur en distance
 				float d = dd * cos(da); //Distance adjacente
-				float dop = dd * sin(da); //Distance opposée
 				static char aligne = 0;
 
 				//Commenter pour multi-tour
 				da = moduloPI(da);
 
-				if (dop < ERROR_POS && dd < ERROR_POS) { //"Zone" de précision TODO
+				if (dd < ERROR_POS) { //"Zone" d'arrivée
+					fifo.pushIsReached();
 					da = 0;
 				}
 
@@ -121,11 +121,6 @@ void Control::compute(){
 				//En cours de déplacement
 				else {
 					controlPos(da, d + current_goal.data_3);//erreur en dist = dist au point + dist additionelle
-				}
-
-				//Fin de consigne
-				if(abs(d) <= ERROR_POS && da == 0) {
-					fifo.pushIsReached();
 				}
 				break;
 			}
