@@ -69,7 +69,7 @@ void Control::compute(){
 			{
 				float da = (current_goal.data_1 - current_pos.angle);
 				
-				//da = moduloPI(da);//Commenter pour multi-tour
+				da = moduloTwoPI(da);//Commenter pour multi-tour
 
 				if(abs(da) <= ERROR_ANGLE){
 					setConsigne(0, 0);
@@ -88,13 +88,13 @@ void Control::compute(){
 				float da = (goal_a - current_pos.angle);
 				float dd = sqrt(pow(dx, 2.0)+pow(dy, 2.0));//erreur en distance
 				float d = dd * cos(da); //Distance adjacente
-				float dop = dd * sin(da); //Distance opposée
 				static char aligne = 0;
 
 				//Commenter pour multi-tour
 				da = moduloPI(da);
 
-				if (dop < ERROR_POS && dd < ERROR_POS) { //"Zone" de précision TODO
+				if (dd < ERROR_POS) { //"Zone" d'arrivée
+					fifo.pushIsReached();
 					da = 0;
 				}
 
@@ -122,30 +122,25 @@ void Control::compute(){
 				else {
 					controlPos(da, d + current_goal.data_3);//erreur en dist = dist au point + dist additionelle
 				}
-
-				//Fin de consigne
-				if(abs(d) <= ERROR_POS && da == 0) {
-					fifo.pushIsReached();
-				}
 				break;
 			}
 
 			case TYPE_PWM :
 			{
 				static float pwmR = 0, pwmL = 0;
-				if(!order_started){
+				if (!order_started){
 					start_time = now;
 					pwmR = 0; pwmL = 0;
 					order_started = true;
 				}
-				if((now - start_time)/1000.0 <= current_goal.data_3){
+				if ((now - start_time)/1000.0 <= current_goal.data_3){
 					float consigneR = current_goal.data_2, consigneL = current_goal.data_1;
 					check_acc(&consigneL, pwmL);
 					check_acc(&consigneR, pwmR);
 					pwmR = consigneR; pwmL = consigneL;
 					setConsigne(pwmL, pwmR);
 				}
-				else{
+				else {
 					setConsigne(0,0);
 					fifo.pushIsReached();
 				}

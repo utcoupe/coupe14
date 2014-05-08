@@ -65,7 +65,7 @@
 #define ENC_RIGHT_RADIUS 36.1 //REGLE PAR TEST - rayon de la roue codeuse
 #define ENTRAXE_ENC 324.5 //REGLE PAR TES - Distance entre chaque roue codeuse en mm
 
-#define ERROR_ANGLE 0.03 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
+#define ERROR_ANGLE 0.02 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
 #define ERROR_ANGLE_TO_GO 0.1 //erreur en angle(radians) maximale avant de partir en cas de GOTO
 #define ERROR_POS 10 // erreur en position (mm)  maximale pour considérer l'objectif comme atteint
 
@@ -76,9 +76,9 @@
 //Ne modifier que le nombre, laisser les DUREE_CYCLE
 
 //Le "I" devrait etre faible (ou nul), le "D" est à régler progressivement pour éviter le dépassement
-#define ANG_P 180 //spd = P * E_ang(rad)
+#define ANG_P 1000 //spd = P * E_ang(rad)
 #define ANG_I 0 //spd = I * I_ang(rad * s)
-#define ANG_D 40 //a regler par incrementation
+#define ANG_D 150 //a regler par incrementation
 #define ANG_AWU 0
 
 #define DIS_P 3.5 //spd = P * E_dis(mm)
