@@ -85,7 +85,7 @@
 
 #define DIS_P 0.5 //spd = P * E_dis(mm)
 #define DIS_I 0 //spd = I * I_dis(mm * s)
-#define DIS_D 0.12 //a regler par incrementation
+#define DIS_D 0.11 //a regler par incrementation
 #define DIS_AWU 0 //Anti-windup, en mm
 
 //BLOCAGE

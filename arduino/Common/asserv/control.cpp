@@ -69,7 +69,7 @@ void Control::compute(){
 			{
 				float da = (current_goal.data_1 - current_pos.angle);
 				
-				da = moduloPI(da);//Commenter pour multi-tour
+				da = moduloTwoPI(da);//Commenter pour multi-tour
 
 				if(abs(da) <= ERROR_ANGLE){
 					setConsigne(0, 0);
@@ -128,19 +128,19 @@ void Control::compute(){
 			case TYPE_PWM :
 			{
 				static float pwmR = 0, pwmL = 0;
-				if(!order_started){
+				if (!order_started){
 					start_time = now;
 					pwmR = 0; pwmL = 0;
 					order_started = true;
 				}
-				if((now - start_time)/1000.0 <= current_goal.data_3){
+				if ((now - start_time)/1000.0 <= current_goal.data_3){
 					float consigneR = current_goal.data_2, consigneL = current_goal.data_1;
 					check_acc(&consigneL, pwmL);
 					check_acc(&consigneR, pwmR);
 					pwmR = consigneR; pwmL = consigneL;
 					setConsigne(pwmL, pwmR);
 				}
-				else{
+				else {
 					setConsigne(0,0);
 					fifo.pushIsReached();
 				}
