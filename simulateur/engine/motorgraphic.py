@@ -20,7 +20,6 @@ from .engineobject import CIRCLE, POLY, WALL
 
 class MotorGraphic():	
 	def __init__(self):
-		print("IN : Cstr MotorGraphic")
 		pg.init()
 		self.screen = pg.display.set_mode(mm_to_px(3000, 2000))
 		self.clock = pg.time.Clock()
@@ -29,7 +28,6 @@ class MotorGraphic():
 		self.collisions_to_draw = []
 		self.map_img = pg.image.load("map/map.bmp")
 		self.map_img=pg.transform.scale(self.map_img,(self.screen.get_width(),self.screen.get_height()))
-		print("OUT : Cstr MotorGraphic")
 
 	def draw_obj(self, obj):
 		#print("IN : MotorGraphic::draw_obj")
@@ -147,7 +145,6 @@ class MotorGraphic():
 			self._add_extension(o)
 
 	def remove(self, obj):
-		#print("IN : MotorGraphic::remove")
 		if obj.is_extension:
 			self.remove_extension(obj)
 		else:

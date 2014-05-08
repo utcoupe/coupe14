@@ -44,6 +44,7 @@ class GoalsManager:
 		self.__loadElemScript(base_dir+"/elemScripts.xml")
 		self.__loadGoals(base_dir+"/goals.xml")
 
+		#Permet de faire une symétrie pour les ordres dans le cas où on commence en jaune
 		self.__reverse_table = {}
 		self.__reverse_table[(0,0)] = (1,1)
 		self.__reverse_table[(1,1)] = (0,0)
@@ -67,6 +68,14 @@ class GoalsManager:
 		self.__reverse_table[(5,0)]=(6,0)
 
 		self.__reverse_table[(10,0)]=(10,1)
+
+		self.__reverse_table[(11,0)]=(12,0)
+		self.__reverse_table[(11,1)]=(12,1)
+		self.__reverse_table[(12,0)]=(11,0)
+		self.__reverse_table[(12,1)]=(11,1)
+
+		self.__reverse_table[(13,0)]=(13,1)
+		self.__reverse_table[(13,1)]=(13,0)
 
 		if self.__robot_name == "FLUSSMITTEL":
 			self.__vision = Visio('../supervisio/visio', 0, '../supervisio/', self.__data["FLUSSMITTEL"], False)
@@ -460,9 +469,12 @@ class GoalsManager:
 				arguments = raw_order[1:]
 				if order == "MYPOSITION_INFO":
 					if self.__our_color == "RED":
-						position_depart_speciale = (int(arguments[0]), int(arguments[1]), float(arguments[2]))
+						position_depart_speciale = (int(arguments[0]), int(arguments[1]))
 					else:
-						position_depart_speciale = (3000 - int(arguments[0]), int(arguments[1]), float(arguments[2])-1.57)
+						position_depart_speciale = (3000 - int(arguments[0]), int(arguments[1]))
+				elif order == "O_BALAI" and self.__our_color == "YELLOW":
+					arg = (int(arguments[0]) * -1,)
+					prev_action.append((order, arg))
 				elif order == "A_GOTO" and self.__our_color == "YELLOW":
 					arg = (3000 - int(arguments[0]), int(arguments[1]))
 					prev_action.append((order, arg))
