@@ -10,7 +10,7 @@
 #define BRAS_OFFSET_DIST 145 //Distance in mm
 #define BRAS_OFFSET_ANGLE 30 //Angle offset in degrees
 
-#define HAUTEUR_MAX 133 //En mm
+#define HAUTEUR_MAX 128 //En mm
 #define HAUTEUR_MIN 15 //en mm
 
 #define X_BRAS 128

@@ -304,9 +304,6 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 				break;
 			case 2: 
 				//Remonter asc
-				if (block) {
-					setLastId(); //Fin de préhension
-				}
 				if (got_tri) {
 					if (!block) { //On continue
 						int hauteur = MAX(getCurrentHauteur() + MARGE_PREHENSION, abs(depot) + MARGE_DEPOT);
@@ -317,6 +314,8 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 						step++;
 						hauteur = MIN(hauteur, HAUTEUR_MAX);
 						cmdAsc(hauteur);
+					} else {
+						setLastId(); //Fin de préhension
 					}
 				} else { //Pas de triangles
 					pump(false);
