@@ -12,7 +12,7 @@ using namespace cv;
 void communication(int index, string path_to_conf, bool save) {
 	Visio visio(index, path_to_conf, save);
 	if (!visio.isCalibrated()) {
-		cerr << "ERROR : Uncalibarted" << endl;
+		cerr << "ERROR : Uncalibrated" << endl;
 		return;
 	}
 	if (visio.getDistortMode() != none) {
@@ -27,9 +27,9 @@ void calibration(int index, string path) {
 	Visio visio(index, path);
 	visio.setChessboardSize(Size(9,6));
 	if (visio.camCalibrate(25)) 
-		visio.saveCameraMatrix();
+		visio.saveCameraMatrix("new_calibration_camera.yml");
 	if (visio.camPerspective())
-		visio.saveTransformMatrix();
+		visio.savePerspectiveMatrix("new_perspective_matrix.yml");
 }
 
 void getColor(int event, int x, int y, int, void* img_mat) {
@@ -45,9 +45,11 @@ void getColor(int event, int x, int y, int, void* img_mat) {
 void perspectiveOnlyLoop(int index, string path){
 	Mat frame;
 	Visio visio(index, path);
+	visio.loadParams(DEFAULT_PARAMS_FILENAME);
+	visio.loadPerspectiveMatrix(DEFAULT_PERSPECTIVE_MATRIX_FILENAME);
 	visio.setChessboardSize(Size(9,6));
 
-	int size_min(5000), max_diff_triangle_edge(MAX_DIFF_TRI_EDGE);
+	int size_min(3000), real_size_min(5000), max_diff_triangle_edge(MAX_DIFF_TRI_EDGE);
 	int h_min_y(YEL_HUE_MIN), h_max_y(YEL_HUE_MAX), s_min_y(YEL_SAT_MIN), s_max_y(YEL_SAT_MAX), v_min_y(YEL_VAL_MIN), v_max_y(YEL_VAL_MAX);
 	int h_min_r(RED_HUE_MIN), h_max_r(RED_HUE_MAX), s_min_r(RED_SAT_MIN), s_max_r(RED_SAT_MAX), v_min_r(RED_VAL_MIN), v_max_r(RED_VAL_MAX);
 	int h_min_b(BLK_HUE_MIN), h_max_b(BLK_HUE_MAX), s_min_b(BLK_SAT_MIN), s_max_b(BLK_SAT_MAX), v_min_b(BLK_VAL_MIN), v_max_b(BLK_VAL_MAX);
@@ -81,6 +83,7 @@ void perspectiveOnlyLoop(int index, string path){
 	createTrackbar("epsilon", "parameters2", &epsilon, 100);
 	createTrackbar("is equi", "parameters2", &max_diff_triangle_edge, 100);
 	createTrackbar("size_min", "parameters2", &size_min, 20000);
+	createTrackbar("real_size_min", "parameters2", &real_size_min, 20000);
 
 	Scalar c_red(0,0,255), c_blue(255, 0, 0), c_yel(0,110,130);
 	for(;;) { //int i=0; i>=0; i++) {
@@ -90,10 +93,10 @@ void perspectiveOnlyLoop(int index, string path){
 		frame_ori = visio.getImg();
 
 		if (key == 's') {
-			visio.saveTransformMatrix();
+			visio.saveParams("new_params.h");
 		}
 		if (key == 'l') {
-			visio.loadTransformMatrix();
+			visio.loadParams("params.h");
 		}
 		
 		else {
@@ -101,6 +104,7 @@ void perspectiveOnlyLoop(int index, string path){
 			Scalar min_y(h_min_y,s_min_y,v_min_y), max_y(h_max_y,s_max_y,v_max_y);
 			Scalar min_b(h_min_b,s_min_b,v_min_b), max_b(h_max_b,s_max_b,v_max_b);
 			visio.setMinSize(size_min);
+			visio.setRealMinSize(real_size_min);
 			visio.setMaxDiffTriangleEdget(max_diff_triangle_edge);
 			visio.setEpsilonPoly(epsilon/100.0);
 			visio.setYelParameters(min_y, max_y);
