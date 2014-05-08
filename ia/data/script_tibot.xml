@@ -1,8 +1,26 @@
 <?xml version="1.0" ?>
 <objectifs>
 	<objectif>
+		<id_objectif>11</id_objectif>
+		<elem_goal_id>0</elem_goal_id>
+		<prev_actions>
+		</prev_actions>
+	</objectif>
+	<objectif>
 		<id_objectif>10</id_objectif>
 		<elem_goal_id>0</elem_goal_id>
+		<prev_actions>
+		</prev_actions>
+	</objectif>
+	<objectif>
+		<id_objectif>12</id_objectif>
+		<elem_goal_id>1</elem_goal_id>
+		<prev_actions>
+		</prev_actions>
+	</objectif>
+	<objectif>
+		<id_objectif>13</id_objectif>
+		<elem_goal_id>1</elem_goal_id>
 		<prev_actions>
 		</prev_actions>
 	</objectif>
