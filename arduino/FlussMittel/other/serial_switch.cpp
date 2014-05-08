@@ -59,13 +59,13 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 	case O_BRAS_OUVRIR_BAS:
 		if (!doublon) {
 			next_last_id = btoi(argv);
-			getTriBordure();
+			getTriPush();
 		}
 		break;
 	case O_BRAS_OUVRIR_HAUT:
 		if (!doublon) {
 			next_last_id = btoi(argv);
-			getTriBordure(HAUTEUR_MAX);
+			getTriBordure();
 		}
 		break;
 	case O_BRAS_FERMER:

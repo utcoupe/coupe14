@@ -279,7 +279,7 @@
 	<goal>
 		<id>10</id>
 		<name>Fresque</name>
-		<type>triangle</type>
+		<type>Fresque</type>
 		<concerned_robot>TIBOT</concerned_robot>
 		<x>1500</x>
 		<y>1850</y>
@@ -305,6 +305,102 @@
 				<duration>1</duration>
 				<color>NONE</color>
 				<id_script>4</id_script>
+			</elem_goal>
+		</elem_goals>
+	</goal>
+	<goal>
+		<id>11</id>
+		<name>BALLES GAUCHE</name>
+		<type>BALLES</type>
+		<concerned_robot>TIBOT</concerned_robot>
+		<x>750</x>
+		<y>1540</y>
+		<elem_goals>
+			<elem_goal>
+				<id>0</id>
+				<x>750</x>
+				<y>1540</y>
+				<angle>0.0</angle>
+				<points>6</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<color>NONE</color>
+				<id_script>5</id_script>
+			</elem_goal>
+			<elem_goal>
+				<id>1</id>
+				<x>750</x>
+				<y>1540</y>
+				<angle>0.0</angle>
+				<points>6</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<color>NONE</color>
+				<id_script>6</id_script>
+			</elem_goal>
+		</elem_goals>
+	</goal>
+	<goal>
+		<id>12</id>
+		<name>BALLES DROITE</name>
+		<type>BALLES</type>
+		<concerned_robot>TIBOT</concerned_robot>
+		<x>2250</x>
+		<y>1540</y>
+		<elem_goals>
+			<elem_goal>
+				<id>0</id>
+				<x>2250</x>
+				<y>1540</y>
+				<angle>0.0</angle>
+				<points>6</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<color>NONE</color>
+				<id_script>5</id_script>
+			</elem_goal>
+			<elem_goal>
+				<id>1</id>
+				<x>2250</x>
+				<y>1540</y>
+				<angle>0.0</angle>
+				<points>6</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<color>NONE</color>
+				<id_script>6</id_script>
+			</elem_goal>
+		</elem_goals>
+	</goal>
+	<goal>
+		<id>13</id>
+		<name>TIR_FILET</name>
+		<type>FILET</type>
+		<concerned_robot>TIBOT</concerned_robot>
+		<x>750</x>
+		<y>1540</y>
+		<elem_goals>
+			<elem_goal>
+				<id>0</id>
+				<x>750</x>
+				<y>1540</y>
+				<angle>1.57</angle>
+				<points>6</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<color>NONE</color>
+				<id_script>7</id_script>
+			</elem_goal>
+			<elem_goal>
+				<id>1</id>
+				<x>2250</x>
+				<y>1540</y>
+				<angle>1.57</angle>
+				<points>6</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<color>NONE</color>
+				<id_script>7</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>

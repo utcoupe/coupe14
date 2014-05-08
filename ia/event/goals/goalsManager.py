@@ -44,6 +44,7 @@ class GoalsManager:
 		self.__loadElemScript(base_dir+"/elemScripts.xml")
 		self.__loadGoals(base_dir+"/goals.xml")
 
+		#Permet de faire une symétrie pour les ordres dans le cas où on commence en jaune
 		self.__reverse_table = {}
 		self.__reverse_table[(0,0)] = (1,1)
 		self.__reverse_table[(1,1)] = (0,0)
@@ -67,6 +68,14 @@ class GoalsManager:
 		self.__reverse_table[(5,0)]=(6,0)
 
 		self.__reverse_table[(10,0)]=(10,1)
+
+		self.__reverse_table[(11,0)]=(12,0)
+		self.__reverse_table[(11,1)]=(12,1)
+		self.__reverse_table[(12,0)]=(11,0)
+		self.__reverse_table[(12,1)]=(11,1)
+
+		self.__reverse_table[(13,0)]=(13,1)
+		self.__reverse_table[(13,1)]=(13,0)
 
 		if self.__robot_name == "FLUSSMITTEL":
 			self.__vision = Visio('../supervisio/visio', 0, '../supervisio/', self.__data["FLUSSMITTEL"], False)

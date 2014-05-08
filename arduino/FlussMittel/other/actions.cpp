@@ -75,11 +75,28 @@ void stopAct() {
 	use_act = false;
 }
 
-void getTriBordure(int hauteur_ouverture) {
-	if (action_en_cours == None) {
+bool readyForNext() {
+	if (action_en_cours == None) 
+		return true;
+	if (action_en_cours == TriPush && step > 4)
+		return true;
+	return false;
+}
+
+void getTriPush() {
+	if (readyForNext()) {
+		action_en_cours = TriPush;
+		step = -1;
+		cmdTriPush();
+	}
+}
+
+void getTriBordure() {
+	if (readyForNext()) {
 		action_en_cours = TriBordure;
+		step = -1;
 		block = true;
-		cmdTriBordure(hauteur_ouverture);
+		cmdTriBordure();
 	}
 }
 
@@ -91,8 +108,9 @@ void getTriBordureRepliBras() {
 }
 
 void getTri(long x, long y, int h) {
-	if (action_en_cours == None) {
+	if (readyForNext()) {
 		action_en_cours = BrasVentouse;
+		step = -1;
 		block = true;
 		x -= X_BRAS; y -= Y_BRAS;
 		double a = atan2(y, x);
@@ -119,16 +137,72 @@ void updateBras() {
 		case TriBordure:
 			cmdTriBordure();
 			break;
+		case TriPush:
+			cmdTriPush();
+			break;
 		default:
 			break;
 	}
 }
 
-void cmdTriBordure(int hauteur_ouverture) {
+void cmdTriPush() {
 	static unsigned long time_end = 0;
-	static int h_ouverture = 0;
+	static int hauteur_revele;
 	if (step == -1) { //Debut
-		h_ouverture = hauteur_ouverture;
+		step = 0;
+		next_step = true;
+	}
+	//Temporisation
+	if (timeMicros() > time_end && time_end != 0) {
+		next_step = true;
+		time_end = 0;
+	}
+	if (next_step) {
+		next_step = false;
+
+		switch(step) {
+			case 0: {
+				hauteur_revele = getCurrentHauteur() + MARGE_PREHENSION; //On remontera toujours par rapport à la position actulle, pour eviter de pousser un triangles (petite perte pour grande securité)
+				int hauteur = MIN(HAUTEUR_MAX, MAX(hauteur_revele, HAUTEUR_TRI_BORDURE));
+				cmdAsc(hauteur);
+				step++;
+				break;
+			}
+			case 1:
+				cmdBrasServ(ANGLE_REPLI_TRI, LONGUEUR_MIN); //Pas d'attente ici, cela ne devrai pas etre la peine, sinon, implémenter time_end
+				step++;
+				next_step = true;
+				break;
+			case 2:
+				cmdAsc(HAUTEUR_TRI_BORDURE);
+				step++;
+				break;
+			case 3:
+				//Pour rentrer ici, next_step doit etre mis à true par la fonction getTriBordureRepliBras()
+				cmdBrasServ(ANGLE_OUVERT, LONGUEUR_MIN);
+				time_end = timeMicros() + (long)DELAY_SERVO_PUSH*1000;
+				step++;
+				break;
+			case 4:
+				cmdAsc(hauteur_revele);
+				cmdBrasServ(ANGLE_REPLI_TRI, LONGUEUR_MIN); //Pas d'attente ici, cela ne devrai pas etre la peine, sinon, implémenter time_end
+				step++;
+				setLastId(); 
+				break;
+			case 5: //On abaisse le bras sur les triangles du depot
+				cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
+				cmdAsc(HAUTEUR_GARDE_DEPOT); //On descend le bras pour bloquer les triangles
+				step = -1;
+				action_en_cours = None;
+				break;
+		}
+	}
+}
+
+void cmdTriBordure() {
+	static unsigned long time_end = 0;
+	static int hauteur_revele;
+	if (step == -1) { //Debut
 		step = 0;
 		next_step = true;
 		block = true;
@@ -143,8 +217,8 @@ void cmdTriBordure(int hauteur_ouverture) {
 
 		switch(step) {
 			case 0: {
-				int hauteur_revele = getCurrentHauteur() + MARGE_PREHENSION; //On remontera toujours par rapport à la position actulle, pour eviter de pousser un triangles (petite perte pour grande securité)
-				int hauteur = MIN(HAUTEUR_MAX, MAX(hauteur_revele, MAX(HAUTEUR_TRI_BORDURE, h_ouverture)));
+				hauteur_revele = getCurrentHauteur() + MARGE_PREHENSION; //On remontera toujours par rapport à la position actulle, pour eviter de pousser un triangles (petite perte pour grande securité)
+				int hauteur = MIN(HAUTEUR_MAX, MAX(hauteur_revele, HAUTEUR_TRI_BORDURE));
 				cmdAsc(hauteur);
 				step++;
 				break;
@@ -230,7 +304,6 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 				break;
 			case 2: 
 				//Remonter asc
-				setLastId(); //Fin de préhension
 				if (got_tri) {
 					if (!block) { //On continue
 						int hauteur = MAX(getCurrentHauteur() + MARGE_PREHENSION, abs(depot) + MARGE_DEPOT);
@@ -241,6 +314,8 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 						step++;
 						hauteur = MIN(hauteur, HAUTEUR_MAX);
 						cmdAsc(hauteur);
+					} else {
+						setLastId(); //Fin de préhension
 					}
 				} else { //Pas de triangles
 					pump(false);
@@ -389,7 +464,7 @@ int getCurrentHauteur() {
 
 void ascInt() {
 	if (stepperAsc.distanceToGo() == 0) {
-		if (step == 2) {
+		if (step == 2 && action_en_cours == BrasVentouse) {
 			got_tri = false;
 		} 
 		Timer1.detachInterrupt();

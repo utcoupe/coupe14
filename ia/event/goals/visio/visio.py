@@ -56,6 +56,7 @@ class Visio:
 		#Lancement du client
 		self.__log.info("Executing C++ program")
 		self.client = Popen([self.path_exec, str(index), 'com', path_config, capture_vid], stdin=PIPE, universal_newlines=True, stdout=PIPE)
+		self.__log.info("C++ Program executed, waiting till program is ready")
 		atexit.register(self.client.kill)
 		stdout = ''
 		while stdout != 'READY\n':
