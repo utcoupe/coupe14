@@ -469,9 +469,12 @@ class GoalsManager:
 				arguments = raw_order[1:]
 				if order == "MYPOSITION_INFO":
 					if self.__our_color == "RED":
-						position_depart_speciale = (int(arguments[0]), int(arguments[1]), float(arguments[2]))
+						position_depart_speciale = (int(arguments[0]), int(arguments[1]))
 					else:
-						position_depart_speciale = (3000 - int(arguments[0]), int(arguments[1]), float(arguments[2])-1.57)
+						position_depart_speciale = (3000 - int(arguments[0]), int(arguments[1]))
+				elif order == "O_BALAI" and self.__our_color == "YELLOW":
+					arg = (int(arguments[0]) * -1,)
+					prev_action.append((order, arg))
 				elif order == "A_GOTO" and self.__our_color == "YELLOW":
 					arg = (3000 - int(arguments[0]), int(arguments[1]))
 					prev_action.append((order, arg))
