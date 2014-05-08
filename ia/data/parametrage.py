@@ -18,6 +18,6 @@ def parametrerIa(MetaData, color):
 		MetaData.setFirstPositionTibot([200, 1500, 0.0])#TODO
 	elif color == "YELLOW":
 		MetaData.setFirstPositionFlussmittel([2800, 1850, -1.55]) #TODO, utiliser des constantes
-		MetaData.setFirstPositionTibot([2800, 1500, 3.14])#TODO
+		MetaData.setFirstPositionTibot([2800, 1500, 0.0])#TODO
 	else:
 		logger.error("Aucun couleur n'a été défini, notre couleur: " + str(color))

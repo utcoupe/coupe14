@@ -288,7 +288,7 @@
 				<id>0</id>
 				<x>1350</x>
 				<y>1850</y>
-				<angle>1.57</angle>
+				<angle>-1.57</angle>
 				<points>6</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -299,7 +299,7 @@
 				<id>1</id>
 				<x>1650</x>
 				<y>1850</y>
-				<angle>1.57</angle>
+				<angle>-1.57</angle>
 				<points>6</points>
 				<priority>1</priority>
 				<duration>1</duration>
