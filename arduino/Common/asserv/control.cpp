@@ -94,7 +94,7 @@ void Control::compute(){
 				//Commenter pour multi-tour
 				da = moduloPI(da);
 
-				if (dop < ERROR_POS && dd < D_MIN_ASSERV_ANGLE) { //"Zone" de précision TODO
+				if (dop < ERROR_POS && dd < ERROR_POS) { //"Zone" de précision TODO
 					da = 0;
 				}
 
@@ -124,8 +124,7 @@ void Control::compute(){
 				}
 
 				//Fin de consigne
-				if(abs(dd) <= ERROR_POS) {
-					setConsigne(0, 0);
+				if(abs(d) <= ERROR_POS && da == 0) {
 					fifo.pushIsReached();
 				}
 				break;
