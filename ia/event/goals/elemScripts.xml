@@ -90,6 +90,8 @@
 		<orders>
 			<order>DYNAMIQUE_OVER</order>
 			<order>O_TIR_FILET</order>
+			<order>SLEEP 500</order>
+			<order>A_GOTOA 193 1542 -0.42203</order>
 			<order>END</order>
 		</orders>
 	</elemScript>
