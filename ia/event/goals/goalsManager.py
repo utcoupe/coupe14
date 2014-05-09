@@ -216,7 +216,7 @@ class GoalsManager:
 		if goal in self.__dynamique_finished_goals:	
 			self.__dynamique_finished_goals.remove(goal)
 			self.__finished_goals.append(goal)
-			self.__logger.info('Goal ' + goal.getName() + " d'id "+goal.getId()+" is finished")
+			self.__logger.info('Goal ' + str(goal.getName()) + " d'id "+str(goal.getId())+" is finished")
 			self.__queueBestGoals()
 		#Dans le cas où c'est l'autre robot qui à fait l'objectif
 		elif goal in self.__available_goals:

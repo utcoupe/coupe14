@@ -28,6 +28,7 @@ class EventManager():
 
 		self.__last_hokuyo_data = None
 		self.__tibot_locked = False
+		self.__filet_fired = False
 
 		self.__last_flussmittel_order_finished = ID_ACTION_MAX	#id_action
 		self.__sleep_time_flussmittel = 0
@@ -65,8 +66,10 @@ class EventManager():
 		#Pendant la funny action
 		while self.__MetaData.getInFunnyAction() == True:
 			self.__majObjectif() #TODO faire une fonction dédiée ?
-			empty_arg = ()
-			self.__Communication.sendOrderAPI("ADDR_TIBOT_OTHER", "O_TIR_FILET", *empty_arg)
+			if self.__filet_fired == False:
+				empty_arg = [42,]
+				self.__Communication.sendOrderAPI("ADDR_TIBOT_OTHER", "O_TIR_FILET", *empty_arg)
+				self.__filet_fired = True
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
 	def __majObjectif(self):

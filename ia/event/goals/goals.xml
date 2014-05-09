@@ -383,7 +383,7 @@
 			<elem_goal>
 				<id>0</id>
 				<x>380</x>
-				<y>1580</y>
+				<y>1560</y>
 				<angle>-2.355</angle>
 				<points>6</points>
 				<priority>1</priority>
@@ -394,8 +394,8 @@
 			<elem_goal>
 				<id>1</id>
 				<x>2620</x>
-				<y>1580</y>
-				<angle>0.7854</angle>
+				<y>1560</y>
+				<angle>-0.7854</angle>
 				<points>6</points>
 				<priority>1</priority>
 				<duration>1</duration>
