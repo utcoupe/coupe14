@@ -97,7 +97,6 @@
 		<id_script>7</id_script>
 		<orders>
 			<order>DYNAMIQUE_OVER</order>
-			<order>O_TIR_FILET</order>
 			<order>FUNNY_ACTION_LOCK</order>
 			<order>END</order>
 		</orders>
