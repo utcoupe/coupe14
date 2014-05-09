@@ -70,7 +70,13 @@
 		<orders>
 			<order>DYNAMIQUE_OVER</order>
 			<order>SLEEP 500</order>
-			<order>O_TIR_BALLE 4</order>
+			<order>O_TIR_BALLE 1</order>
+			<order>THEN</order>
+			<order>O_TIR_BALLE 1</order>
+			<order>THEN</order>
+			<order>O_TIR_BALLE 1</order>
+			<order>THEN</order>
+			<order>O_TIR_BALLE 1</order>
 			<order>SLEEP 500</order>
 			<order>END</order>
 		</orders>
@@ -80,7 +86,9 @@
 		<orders>
 			<order>DYNAMIQUE_OVER</order>
 			<order>SLEEP 500</order>
-			<order>O_TIR_BALLE 2</order>
+			<order>O_TIR_BALLE 1</order>
+			<order>THEN</order>
+			<order>O_TIR_BALLE 1</order>
 			<order>SLEEP 500</order>
 			<order>END</order>
 		</orders>
@@ -89,7 +97,7 @@
 		<id_script>7</id_script>
 		<orders>
 			<order>DYNAMIQUE_OVER</order>
-			<order>O_TIR_FILET</order>
+			<order>FUNNY_ACTION_LOCK</order>
 			<order>END</order>
 		</orders>
 	</elemScript>

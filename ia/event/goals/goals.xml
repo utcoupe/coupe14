@@ -321,7 +321,7 @@
 				<x>800</x>
 				<y>1540</y>
 				<angle>3.14</angle>
-				<points>6</points>
+				<points>4</points>
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>NONE</color>
@@ -332,7 +332,7 @@
 				<x>800</x>
 				<y>1540</y>
 				<angle>3.14</angle>
-				<points>6</points>
+				<points>2</points>
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>NONE</color>
@@ -353,7 +353,7 @@
 				<x>2200</x>
 				<y>1540</y>
 				<angle>3.14</angle>
-				<points>6</points>
+				<points>4</points>
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>NONE</color>
@@ -364,7 +364,7 @@
 				<x>2200</x>
 				<y>1540</y>
 				<angle>3.14</angle>
-				<points>6</points>
+				<points>2</points>
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>NONE</color>
@@ -382,9 +382,9 @@
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x>1100</x>
-				<y>1550</y>
-				<angle>-0.90</angle>
+				<x>380</x>
+				<y>1580</y>
+				<angle>-2.355</angle>
 				<points>6</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -393,9 +393,9 @@
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
-				<x>2250</x>
-				<y>1540</y>
-				<angle>-1.57</angle>
+				<x>2620</x>
+				<y>1580</y>
+				<angle>0.7854</angle>
 				<points>6</points>
 				<priority>1</priority>
 				<duration>1</duration>
