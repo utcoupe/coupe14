@@ -79,14 +79,21 @@ OUR_ROBOTS_VISIBLE_TOURELLE = True 	#True si une balise visible par l'hokuyo est
 TOURELLE_PULL_PERIODE = 100 		#ms
 
 #====================Flussmittel====================
-LARGEUR_FLUSSMITTEL = 	330
-LONGUEUR_FLUSSMITTEL = 	260
+LARGEUR_FLUSSMITTEL = 	330 # ok car centré en largeur
+LONGUEUR_FLUSSMITTEL = 	340 # = 2 fois la distance entre le centre de rotation et le côté le plus loin
 MAX_FRONT_TRIANGLE_STACK = 3
 MAX_BACK_TRIANGLE_STACK = 1
 GARDE_AU_SOL = 16
 HAUTEUR_TRIANGLE = 30
 MARGE_DROP_TRIANGLE = 0
 HAUTEUR_TORCHE = 36
+# TODO mesures avec précision
+ANGLE_MIN = radians(-50)
+ANGLE_MAX = radians(0)
+OUVERTURE_BRAS_MIN = 150
+OUVERTURE_BRAS_MAX = 220
+CENTRE_BRAS_X = 125
+CENTRE_BRAS_Y = 140
 
 #====================TIBOT====================
 LARGEUR_TIBOT = 		200
