@@ -382,9 +382,9 @@
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x>750</x>
-				<y>1540</y>
-				<angle>-1.57</angle>
+				<x>1100</x>
+				<y>1550</y>
+				<angle>-0.785</angle>
 				<points>6</points>
 				<priority>1</priority>
 				<duration>1</duration>
