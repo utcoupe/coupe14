@@ -232,6 +232,12 @@ class Communication():
 			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
 
 		elif (order == "O_BALAI"):
+			"""
+			arg :
+			0 = bras au milieu
+			1 : bras à droite des fresques
+			-1 : bras à gauche des fresques
+			"""
 			self.__minirobot.setlastIdActionOther(args[0])
 			pos = (self.__minirobot.getLastIdOther(),)
 			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
