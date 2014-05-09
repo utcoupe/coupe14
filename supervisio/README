@@ -21,4 +21,4 @@ cmake .. -DCMAKE_BUILD_TYPE=release
 make
 
 cela produit un bin dans build/bin
-il peut ensuite etre déplace dans build/
+il peut ensuite etre déplace dans supervisio/
