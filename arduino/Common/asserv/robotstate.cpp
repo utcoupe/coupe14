@@ -93,30 +93,26 @@ void RobotState::blocked_management() {
 	static float time = 0, timer_led = 0;
 	static bool last_block = false;
 
-	if (getRemainingGoals() == 0) {
-		blocked = false;
-	} else {
-		time += DUREE_CYCLE;
-		if (time > PERIOD_BLOCKED) {
-			bool local_block;
-			int dx = current_pos.x - last_pos.x;
-			int dy = current_pos.y - last_pos.y;
-			float da = current_pos.angle - last_pos.angle; //delta angle
-			int dd2 = dx*dx + dy*dy; //Delta distrance carré
-			//On ajoute la distance parcourue par l'angle à la distance "droite"
-			dd2 += da*da*ENTRAXE_ENC*ENTRAXE_ENC; //Tout est au carré pour eviter les sqrt
+	time += DUREE_CYCLE;
+	if (time > PERIOD_BLOCKED) {
+		bool local_block;
+		int dx = current_pos.x - last_pos.x;
+		int dy = current_pos.y - last_pos.y;
+		float da = current_pos.angle - last_pos.angle; //delta angle
+		int dd2 = dx*dx + dy*dy; //Delta distrance carré
+		//On ajoute la distance parcourue par l'angle à la distance "droite"
+		dd2 += da*da*ENTRAXE_ENC*ENTRAXE_ENC; //Tout est au carré pour eviter les sqrt
 
-			//Si on a pas assez bougé
-			if (dd2 < MIN_DIST_BLOCKED*MIN_DIST_BLOCKED) {
-				local_block = true;
-			} else {
-				local_block = false;
-			}
-			blocked = local_block & last_block; //Evite les faux positifs
-			last_block = local_block;
-			last_pos = current_pos;
-			time = 0; //Remise à 0
+		//Si on a pas assez bougé
+		if (dd2 < MIN_DIST_BLOCKED*MIN_DIST_BLOCKED) {
+			local_block = true;
+		} else {
+			local_block = false;
 		}
+		blocked = local_block & last_block; //Evite les faux positifs
+		last_block = local_block;
+		last_pos = current_pos;
+		time = 0; //Remise à 0
 	}
 	if (blocked) {
 		digitalWrite(LED_BLOCKED, LOW); //Allume la led blocage 2s

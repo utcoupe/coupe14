@@ -40,6 +40,7 @@ class Control{
 	int pushGoal(int ID, int p_type, float p_data_1 = 0, float p_data_2 = 0, float p_data_3 = 0);
 	void nextGoal(); //va au goal suivant
 	void clearGoals();
+	int getRemainingGoals();
 
 	//Toutes les positions sont renvoyée en mm, toutes les vitess en mm/ms = m/s
 	void pushPos(pos n_pos); 

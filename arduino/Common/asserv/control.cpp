@@ -40,11 +40,12 @@ void Control::compute(){
 	robot.update();
 
 	if(fifo.isPaused() || current_goal.type == NO_GOAL){
-		value_consigne_right = 0;
-		value_consigne_left = 0;
+		robot.clearBlocked();
+		setConsigne(0, 0);
 	}
 	else{
 		if (current_goal.isReached) {
+			robot.clearBlocked();
 			last_finished_id = current_goal.ID;
 			if (fifo.getRemainingGoals() > 1){//Si le but est atteint et que ce n'est pas le dernier, on passe au suivant
 				current_goal = fifo.gotoNext();

@@ -95,13 +95,7 @@ void Fifo::pushIsReached(){
 }
 
 int Fifo::getRemainingGoals(){
-	int ret = nbrGoals;
-	if (current_goal != 0) {
-		if (current_goal->isReached) {
-			ret--;
-		}
-	}
-	return ret;
+	return nbrGoals;
 }
 
 struct goal Fifo::getCurrentGoal(){
