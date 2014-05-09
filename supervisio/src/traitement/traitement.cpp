@@ -31,10 +31,19 @@ using namespace std;
  * ****************/
 
 Visio::Visio(int index, string path, bool save_vid) : camera(index), save_video(save_vid),
-	color(red), min_size(MIN_SIZE), distort(none), path_to_conf(path),
-	chessboard_size(Size(9,6)), epsilon_poly(EPSILON_POLY), isready(false),
-	max_diff_triangle_edge(MAX_DIFF_TRI_EDGE), cam_fps(30),
-	size_frame(camera.get(CV_CAP_PROP_FRAME_WIDTH), camera.get(CV_CAP_PROP_FRAME_HEIGHT)){
+	//Genral
+	calib_cam_filename(DEFAULT_CAMERA_MATRIX_FILENAME), calib_detection_filename(DEFAULT_PARAMS_FILENAME), 
+	calib_transform_matrix_filename(DEFAULT_PERSPECTIVE_MATRIX_FILENAME), mask_name("mask.jpg"),
+	color(red), distort(none), path_to_conf(path), chessboard_size(Size(9,6)), isready(false),
+
+	//Params par defaut
+	min_size(MIN_SIZE), real_min_size(MIN_REAL_SIZE), epsilon_poly(EPSILON_POLY), max_diff_triangle_edge(MAX_DIFF_TRI_EDGE), 
+
+	//Options
+	use_mask(USE_MASK), use_resize(RESIZE), resize_w(RESIZEW), resize_h(RESIZEH),
+
+	//param cam
+	cam_fps(CAM_FPS), size_frame(camera.get(CV_CAP_PROP_FRAME_WIDTH), camera.get(CV_CAP_PROP_FRAME_HEIGHT)){
 	frame_mutex.lock();
 	if(!camera.isOpened()) {  // check if we succeeded
 		cerr << "Failed to open camera" << endl;
@@ -52,13 +61,14 @@ void Visio::init() {
 	setYelParameters(Scalar(YEL_HUE_MIN, YEL_SAT_MIN, YEL_VAL_MIN), Scalar(YEL_HUE_MAX, YEL_SAT_MAX, YEL_VAL_MAX));
 	setBlkParameters(Scalar(BLK_HUE_MIN, BLK_SAT_MIN, BLK_VAL_MIN), Scalar(BLK_HUE_MAX, BLK_SAT_MAX, BLK_VAL_MAX));
 	erode_dilate_kernel = getStructuringElement(MORPH_ELLIPSE, Size(10,10));
-	trans_calibrated = loadTransformMatrix();
-	cam_calibrated = loadCameraMatrix();
-	if (RESIZE) {
-		size_frame = Size(RESIZEW, RESIZEH);
+	trans_calibrated = loadPerspectiveMatrix(calib_transform_matrix_filename);
+	cam_calibrated = loadCameraMatrix(calib_cam_filename);
+	loadParams(calib_detection_filename);
+	if (use_resize) {
+		size_frame = Size(resize_w, resize_h);
 	}
-	if (USE_MASK) {
-		mask = imread(path_to_conf+(string)"mask.jpg");
+	if (use_mask) {
+		mask = imread(path_to_conf+mask_name);
 		resize(mask, mask, size_frame);
 	}
 	//if (cam_calibrated) distort = image; //TRES LONG
@@ -208,7 +218,6 @@ int Visio::triangles(vector<Triangle>& triangles) {
 bool Visio::computeTransformMatrix(const Mat &img, const vector<Point2f> real_positions, Mat *out) {
 	Mat gray;
 	bool pattern_found = false;
-	bool &calibrated = trans_calibrated;
 	vector<Point2f> corners, ext_corn;
 	cvtColor(img, gray, CV_BGR2GRAY);
 	pattern_found = findChessboardCorners(gray, chessboard_size, corners, CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE);// + CALIB_CB_FAST_CHECK);
@@ -220,7 +229,7 @@ bool Visio::computeTransformMatrix(const Mat &img, const vector<Point2f> real_po
 		ext_corn.push_back(corners[chessboard_size.height - 1 + (chessboard_size.width - 1)*(chessboard_size.height)]);
 		cornerSubPix(gray, ext_corn, Size(11, 11), Size(-1, -1), TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
 		perspectiveMatrix = getPerspectiveTransform(ext_corn, real_positions);
-		calibrated = true;
+		trans_calibrated = true;
 		if (out != 0) { //La matrice ou existe
 			for(int i=0; i<4; i++) {
 				drawObject(ext_corn[i].x, ext_corn[i].y, *out, intToString(i));
@@ -230,12 +239,12 @@ bool Visio::computeTransformMatrix(const Mat &img, const vector<Point2f> real_po
 	}
 	else {
 		perspectiveMatrix =  Mat::eye(3, 3, CV_64F);
-		calibrated = false;
+		trans_calibrated = false;
 		if (out != 0) { //La matrice ou existe
 			drawChessboardCorners(*out, chessboard_size, corners, pattern_found);
 		}
 	}
-	return calibrated;
+	return trans_calibrated;
 }
 
 bool Visio::camPerspective() {
@@ -339,57 +348,93 @@ bool Visio::camCalibrate(int nbr_of_views) {
 
 //FILE MANAGER
 
-bool Visio::loadTransformMatrix() {
-	bool &calibrated = trans_calibrated;
-	cout << "Loading transform data" << endl;
-	FileStorage fs(path_to_conf+(string)"calibration_persp.yml", FileStorage::READ);
+bool Visio::loadPerspectiveMatrix(string filename) {
+	cout << "Loading transform matrix" << endl;
+	FileStorage fs(path_to_conf+filename, FileStorage::READ);
 	if (!fs.isOpened()) {
-		cerr << "ERROR : Couldn't find calibration_persp.yml" << endl;
+		cerr << "ERROR : Couldn't find " << filename << endl;
 		return false;
 	}
 	fs["Q"] >> perspectiveMatrix;
 	fs.release();
-	calibrated = true;
+	trans_calibrated = true;
 	return true;
 }
 
-bool Visio::loadCameraMatrix() {
-	bool &calibrated = cam_calibrated;
-	cout << "Loading camera data" << endl;
-	FileStorage fs(path_to_conf+(string)"calibration_camera.yml", FileStorage::READ);
+void Visio::loadParams(string filename) {
+	cout << "Loading detection params" << endl;
+	FileStorage fs(path_to_conf+filename, FileStorage::READ);
 	if (!fs.isOpened()) {
-		cerr << "ERROR : Couldn't find calibration_camera.yml" << endl;
+		cerr << "ERROR : Couldn't find " << filename << endl;
+		return;
+	}
+	fs["min_size"] >> min_size;
+	fs["real_min_size"] >> real_min_size;
+	fs["distort_mode"] >> (int)distort;
+	fs["epsilon_poly"] >> epsilon_poly;
+	fs["max_diff_triangle_edge"] >> max_diff_triangle_edge;
+	fs["use_mask"] >> use_mask;
+	fs["mask_name"] >> mask_name;
+	fs["resize"] >> use_resize;
+	fs["resize_w"] >> resize_w;
+	fs["resize_h"] >> resize_h;
+	fs.release();
+	trans_calibrated = true;
+}
+
+bool Visio::loadCameraMatrix(string filename) {
+	cout << "Loading camera data" << endl;
+	FileStorage fs(path_to_conf+filename, FileStorage::READ);
+	if (!fs.isOpened()) {
+		cerr << "ERROR : Couldn't find " << filename << endl;
 		return false;
 	}
 	fs["D"] >> D;
 	fs["CM"] >> CM;
 	fs["size"] >> size_frame;
+	fs["fps"] >> cam_fps;
 	fs.release();
-	calibrated = true;
+	cam_calibrated = true;
 	return true;
 }
 
-void Visio::saveTransformMatrix() {
-	cout << "Saving transform data" << endl;
+void Visio::savePerspectiveMatrix(string filename) {
+	cout << "Saving transformation matrix" << endl;
 	if (!trans_calibrated) {
-		cerr << "ERROR : Uncalibrated trasnform" << endl;
+		cerr << "ERROR : Uncalibrated detection" << endl;
 		return;
 	}
-	FileStorage fs(path_to_conf+(string)"calibration_persp.yml", FileStorage::WRITE);
+	FileStorage fs(path_to_conf+filename, FileStorage::WRITE);
 	fs << "Q" << perspectiveMatrix;
 	fs.release();
 }
 
-void Visio::saveCameraMatrix() {
+void Visio::saveParams(string filename) {
+	cout << "Saving detection params" << endl;
+	FileStorage fs(path_to_conf+filename, FileStorage::WRITE);
+	fs << "min_size" << min_size;
+	fs << "real_min_size" << real_min_size;
+	fs << "distort_mode" << (int)distort;
+	fs << "epsilon_poly" << epsilon_poly;
+	fs << "max_diff_triangle_edge" << max_diff_triangle_edge;
+	fs << "use_mask" << use_mask;
+	fs << "mask_name" << mask_name;
+	fs << "resize" << use_resize;
+	fs << "resize_w" << resize_w;
+	fs << "resize_h" << resize_h;
+	fs.release();
+}
+void Visio::saveCameraMatrix(string filename) {
 	cout << "Saving camera data" << endl;
 	if (!cam_calibrated) {
 		cerr << "ERROR : Uncalibrated camera" << endl;
 		return;
 	}
-	FileStorage fs(path_to_conf+(string)"calibration_camera.yml", FileStorage::WRITE);
+	FileStorage fs(path_to_conf+filename, FileStorage::WRITE);
 	fs << "D" << D;
 	fs << "CM" << CM;
 	fs << "size" << size_frame;
+	fs << "fps" << cam_fps;
 	fs.release();
 }
 //SETTER
@@ -420,6 +465,10 @@ void Visio::setBlkParameters(Scalar min, Scalar max) {
 
 void Visio::setMinSize(int size) {
 	min_size = size;
+}
+
+void Visio::setRealMinSize(int size) {
+	real_min_size = size;
 }
 
 void Visio::setColor(Color color) {
@@ -528,8 +577,11 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 				if (degree[i] == 3) {
 					vector<Point2f> contour_real;
 					transformPts(contours[i], contour_real);
-					addTriangle(points_real[i], contour_real, triangles);
-					nb_triangles++;
+					Moments moment = moments(contour_real);
+					if (moment.m00 > real_min_size) {
+						addTriangle(points_real[i], contour_real, triangles, moment.m00);
+						nb_triangles++;
+					}
 				}
 				else if (degree[i] > 3 && degree[i] < 8) {
 					vector<Point2f> contour_real;
@@ -542,8 +594,11 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 				if (degree[i] >= 4){
 					vector<Point2f> contour_real;
 					transformPts(contours[i], contour_real);
-					addTriangle(points_real[i], contour_real, triangles);
-					nb_triangles++;
+					Moments moment = moments(contour_real);
+					if (moment.m00 > real_min_size) {
+						addTriangle(points_real[i], contour_real, triangles, moment.m00);
+						nb_triangles++;
+					}
 				}
 			}
 		}
@@ -552,7 +607,7 @@ int Visio::trianglesColor(const Mat& img, vector<Triangle>& triangles, Color col
 	return nb_triangles;
 }
 
-void Visio::addTriangle(const Point2f& point_real, const vector<Point2f>& contour_real, vector<Triangle>& triangles) {
+void Visio::addTriangle(const Point2f& point_real, const vector<Point2f>& contour_real, vector<Triangle>& triangles, double size) {
 	Triangle tri;
 	tri.color = color;
 	tri.coords = point_real;
@@ -575,8 +630,7 @@ void Visio::addTriangle(const Point2f& point_real, const vector<Point2f>& contou
 	else {
 		tri.isDown = false;
 	}
-	Moments moment = moments(contour_real);
-	tri.size = moment.m00;
+	tri.size = size;
 	tri.contour = contour_real;
 	triangles.push_back(tri);
 }
@@ -596,11 +650,11 @@ int Visio::deduceTrianglesFromContour(vector<Point2f>& contour_real, vector<Tria
 					contour_tri.push_back(p2);
 					contour_tri.push_back(p3);
 					Moments moment = moments(contour_tri);
-					if (moment.m00 > min_size) {
+					if (moment.m00 > real_min_size) {
 						Triangle tri;
 						float x = moment.m10 / moment.m00;
 						float y = moment.m01 / moment.m00;
-						addTriangle(Point2f(x,y), contour_tri, triangles);
+						addTriangle(Point2f(x,y), contour_tri, triangles, moment.m00);
 						nb_triangles++;
 						return nb_triangles;
 					}

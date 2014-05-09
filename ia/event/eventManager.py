@@ -27,6 +27,8 @@ class EventManager():
 		self.__MetaData = Data.MetaData
 
 		self.__last_hokuyo_data = None
+		self.__tibot_locked = False
+		self.__filet_fired = False
 
 		self.__last_flussmittel_order_finished = ID_ACTION_MAX	#id_action
 		self.__sleep_time_flussmittel = 0
@@ -64,7 +66,10 @@ class EventManager():
 		#Pendant la funny action
 		while self.__MetaData.getInFunnyAction() == True:
 			self.__majObjectif() #TODO faire une fonction dédiée ?
-			self.__checkEvent()
+			if self.__filet_fired == False:
+				empty_arg = [42,]
+				self.__Communication.sendOrderAPI("ADDR_TIBOT_OTHER", "O_TIR_FILET", *empty_arg)
+				self.__filet_fired = True
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
 	def __majObjectif(self):
@@ -261,13 +266,20 @@ class EventManager():
 					arg += action[2]
 
 				if action[1][0] == 'O':
-						self.__Communication.sendOrderAPI(address[0], action[1], *arg)
+						if self.__tibot_locked == False:
+							self.__Communication.sendOrderAPI(address[0], action[1], *arg)
+						else:
+							self.__logger.error("Attention on drop l'ordre "+str(action[1])+" a destination de "+str(address[0])+" avec les arg "+str(arg)+" car on est bloqué en funny action.")
 
 				elif action[1][0] == 'A':
 					if action[1] == "A_GOTO_SCRIPT":#A_GOTO_SCRIPT n'existe que dans les scripts d'action elemetaire, on l'utilise pour ne pas inclure ces deplacements dans le calcul de collision
 						self.__Communication.sendOrderAPI(address[1], "A_GOTO", *arg)
 					else:
 						self.__Communication.sendOrderAPI(address[1], action[1], *arg)
+
+				elif action[1] == "FUNNY_ACTION_LOCK":
+					self.__tibot_locked = True
+					self.__logger.info("Tibot est prêt pour la funny action, il ne bougera plus.")
 
 				else:
 					self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
