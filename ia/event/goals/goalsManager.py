@@ -78,7 +78,7 @@ class GoalsManager:
 		self.__reverse_table[(13,1)]=(13,0)
 
 		if self.__robot_name == "FLUSSMITTEL":
-			self.__vision = Visio('../supervisio/visio', 0, '../supervisio/', self.__data["FLUSSMITTEL"], False)
+			self.__vision = Visio('../supervisio/visio', 0, '../config/visio_robot/', self.__data["FLUSSMITTEL"], True)
 			self.__last_camera_color = None
 
 		self.__loadBeginScript()
@@ -363,8 +363,59 @@ class GoalsManager:
 			self.__logger.warning("Pb, Il y a un STEP_OVER directement suivit d'un END ?")
 
 	def __positionReady(self, x, y):
-		#TODO
-		return True
+		x2 = x - CENTRE_BRAS_X
+		y2 = y - CENTRE_BRAS_Y
+		a = atan2(y2, x2)
+		r = hypot(x2, y2)
+		return __positionReadyPolaire(a, r)
+
+	def __positionReadyPolaire(self, a, r):
+		if a >= ANGLE_MIN and a <= ANGLE_MAX:
+			if r >= OUVERTURE_BRAS_MIN and r <= OUVERTURE_BRAS_MAX
+				return True
+		return False
+
+	# To verify
+	def __getRotationToHaveTriangle(self, x, y):
+		# "Sécurité", peut être enlevé à priori
+		if self.__positionReady(x, y):
+			return 0
+		if hypot(x, y) > hypot(CENTRE_BRAS_Y, CENTRE_BRAS_X + OUVERTURE_BRAS_MAX):
+			# Il faut avancer
+			self.__logger.error("TODO :P")
+
+		# Angle en degrés entre deux calculs
+		delta_a = 5
+
+		# i_* => itérateurs
+		i_x = x
+		i_y = y
+
+		somme_a = 0
+		nb_a = 0
+		stop = False
+
+		for i in range(1,360/delta_a): # to modify
+			i_rot = radians(i*delta_a)
+			i_x = x * cos(i_rot) - y * sin(i_rot)
+			i_y = x * sin(i_rot) + y * cos(i_rot)
+			if __positionReady(i_x, i_y):
+				somme_a += i_rot
+				nb_a += 1
+				stop = True
+
+			# On s'arrête si on a déjà trouvé des positions et qu'on en troue plus,
+			# pour ne pas que la moyenne tombe dans un "trou"
+			elif stop = True 
+				break
+
+		# Un - car on fait tourner le point (x,y) et non le robot
+		angle_to_go = - somme_a / nb_a
+
+		if angle_to_go = 0:
+			self.__logger.error("Fuck, impossible de l'attraper ! (surement trop près du robot)")
+
+		return angle_to_go
 
 	def processBrasStatus(self, status_fin, id_objectif):
 		objectif = None
