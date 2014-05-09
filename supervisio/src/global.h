@@ -43,7 +43,7 @@
 #define BLK_VAL_MIN 0
 #define BLK_VAL_MAX 60
 
-#define DEFAULT_PERSPECTIVE_MATRIX_FILENAME "perspecive_matrix.yml"
+#define DEFAULT_PERSPECTIVE_MATRIX_FILENAME "perspective_matrix.yml"
 #define DEFAULT_CAMERA_MATRIX_FILENAME "calibration_camera.yml"
 #define DEFAULT_PARAMS_FILENAME "params.yml"
 

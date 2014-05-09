@@ -42,14 +42,16 @@ void getColor(int event, int x, int y, int, void* img_mat) {
 	}
 }
 
-void perspectiveOnlyLoop(int index, string path){
+void perspectiveOnlyLoop(int index, string path) {
 	Mat frame;
 	Visio visio(index, path);
-	visio.loadParams(DEFAULT_PARAMS_FILENAME);
-	visio.loadPerspectiveMatrix(DEFAULT_PERSPECTIVE_MATRIX_FILENAME);
+	if (!visio.isCalibrated()) {
+		cerr << "Calibrate camera and perspective first" << endl;
+		return;
+	}
 	visio.setChessboardSize(Size(9,6));
 
-	int size_min(3000), real_size_min(5000), max_diff_triangle_edge(MAX_DIFF_TRI_EDGE);
+	int size_min(MIN_SIZE), real_size_min(MIN_REAL_SIZE), max_diff_triangle_edge(MAX_DIFF_TRI_EDGE);
 	int h_min_y(YEL_HUE_MIN), h_max_y(YEL_HUE_MAX), s_min_y(YEL_SAT_MIN), s_max_y(YEL_SAT_MAX), v_min_y(YEL_VAL_MIN), v_max_y(YEL_VAL_MAX);
 	int h_min_r(RED_HUE_MIN), h_max_r(RED_HUE_MAX), s_min_r(RED_SAT_MIN), s_max_r(RED_SAT_MAX), v_min_r(RED_VAL_MIN), v_max_r(RED_VAL_MAX);
 	int h_min_b(BLK_HUE_MIN), h_max_b(BLK_HUE_MAX), s_min_b(BLK_SAT_MIN), s_max_b(BLK_SAT_MAX), v_min_b(BLK_VAL_MIN), v_max_b(BLK_VAL_MAX);
@@ -93,10 +95,10 @@ void perspectiveOnlyLoop(int index, string path){
 		frame_ori = visio.getImg();
 
 		if (key == 's') {
-			visio.saveParams("new_params.h");
+			visio.saveParams("new_params.yml");
 		}
 		if (key == 'l') {
-			visio.loadParams("params.h");
+			visio.loadParams(DEFAULT_PARAMS_FILENAME);
 		}
 		
 		else {
