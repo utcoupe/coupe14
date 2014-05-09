@@ -46,17 +46,34 @@ def gui(com):
 					com.sendOrderAPI(5, 'A_SET_POS', *arguments)
 
 				elif order == 's':
-					arguments = [0, 1000, 0, 1.57]
+					arguments = [0,2000,0]
+					com.sendOrderAPI(5, 'A_GOTO', *arguments)
+					arguments = [0,2300,-800]
+					com.sendOrderAPI(5, 'A_GOTO', *arguments)
+					arguments = [0,2000,-1000]
+					com.sendOrderAPI(5, 'A_GOTO', *arguments)
+					arguments = [0,1000,-1200]
+					com.sendOrderAPI(5, 'A_GOTO', *arguments)
+					arguments = [0,500,-900]
+					com.sendOrderAPI(5, 'A_GOTO', *arguments)
+					arguments = [0,0,0,0.0]
 					com.sendOrderAPI(5, 'A_GOTOA', *arguments)
-					time.sleep(3.5)
-					arguments = [0, 6]
-					com.sendOrderAPI(4, 'O_TIR_BALLE', *arguments)
-					time.sleep(1)
-					arguments = [0, 3.14]
-					com.sendOrderAPI(5, 'A_ROT', *arguments)
-					time.sleep(2)
-					arguments = [1]
-					com.sendOrderAPI(5, 'O_TIR_FILET', *arguments)
+					"""arguments = [0, 2000, 0, 3.14]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)
+					arguments = [0, 0, 0, 0.0]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)
+					arguments = [0, 2000, 0, 3.14]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)
+					arguments = [0, 0, 0, 0.0]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)
+					arguments = [0, 2000, 0, 3.14]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)
+					arguments = [0, 0, 0, 0.0]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)
+					arguments = [0, 2000, 0, 3.14]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)
+					arguments = [0, 0, 0, 0.0]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)"""
 
 				elif order in com.orders:
 					if isinstance(order, (int)):

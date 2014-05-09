@@ -26,7 +26,7 @@
  * 
  * OPTIONS : '1' - '2 - '4' */
 
-#define ENCODER_EVAL 2
+#define ENCODER_EVAL 4
 
 #define FIXED_POINT_PRECISION 1000 //The robot's position is stocked with a precision of 1/FIXED_POINT_PRECISION ticks
 
@@ -36,8 +36,8 @@
 #define DUREE_CYCLE 5 //période de calcul, en ms
 #define FREQ (1/(DUREE_CYCLE/1000.0))
 
-#define ACC_MAX 125 //consigne*s-2
-#define RATIO_SPD_ROT_MAX 0.3
+#define ACC_MAX 40 //consigne*s-2
+#define RATIO_SPD_ROT_MAX 0.4
 
 /* CONSIGNE OFFSET
  * DEVRAIT ETRE A 0
@@ -50,20 +50,20 @@
  * envoyer des consignes en pwm au robot
  * partant de 0 et en augmentant progressivement
  * dès que le robot avance, la pwm min est trouvée */
-#define PWM_MIN 20
+#define PWM_MIN 25
 
-#define CONSIGNE_MAX 127
+#define CONSIGNE_MAX 100
 
-#define CONSIGNE_RANGE_MAX CONSIGNE_MAX - PWM_MIN
+#define CONSIGNE_RANGE_MAX (CONSIGNE_MAX - PWM_MIN)
 
 //CONSIGNE_REACHED est la pwm en dessous de laquelle un robot peut etre considéré comme arrêté à son goal
 #define CONSIGNE_REACHED 0
 
 #define ENC_RESOLUTION 1024 //resolution du codeur
 
-#define ENC_LEFT_RADIUS 36.2 //rayon de la roue codeuse
-#define ENC_RIGHT_RADIUS 36.2 //rayon de la roue codeuse
-#define ENTRAXE_ENC 189.83 // Distance entre chaque roue codeuse en mm
+#define ENC_LEFT_RADIUS 36.30 //rayon de la roue codeuse
+#define ENC_RIGHT_RADIUS 36.50 //rayon de la roue codeuse
+#define ENTRAXE_ENC 189.7 // Distance entre chaque roue codeuse en mm
 
 #define ERROR_ANGLE 0.02 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
 #define ERROR_ANGLE_TO_GO 0.1 //erreur en angle(radians) maximale avant d'avancer
@@ -80,12 +80,12 @@
 //Le "I" devrait etre faible (ou nul), le "D" est à régler progressivement pour éviter le dépassement
 #define ANG_P 1000 //spd = P * E_ang(rad)
 #define ANG_I 0 //spd = I * I_ang(rad * s)
-#define ANG_D 130 //a regler par incrementation
+#define ANG_D 180 //a regler par incrementation
 #define ANG_AWU 0 //Anti-windup, en radian
 
-#define DIS_P 0.5 //spd = P * E_dis(mm)
+#define DIS_P 0.2 //spd = P * E_dis(mm)
 #define DIS_I 0 //spd = I * I_dis(mm * s)
-#define DIS_D 0.11 //a regler par incrementation
+#define DIS_D 0.02 //a regler par incrementation
 #define DIS_AWU 0 //Anti-windup, en mm
 
 //BLOCAGE

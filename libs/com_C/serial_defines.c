@@ -42,6 +42,7 @@ void initSize()
 	ordreSize[O_TIR_FILET]=2;
 	ordreSize[O_TIR_BALLE]=4; //Combien de balles ?
 	ordreSize[O_BALAI]=4; //Quel coté ?
+	ordreSize[O_JACK_STATE]=0;
 
 	//GENERAL
 	ordreSize[GET_CAM]=0;
