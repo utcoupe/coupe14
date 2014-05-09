@@ -367,11 +367,11 @@ class GoalsManager:
 		y2 = y - CENTRE_BRAS_Y
 		a = atan2(y2, x2)
 		r = hypot(x2, y2)
-		return __positionReadyPolaire(a, r)
+		return self.__positionReadyPolaire(a, r)
 
 	def __positionReadyPolaire(self, a, r):
 		if a >= ANGLE_MIN and a <= ANGLE_MAX:
-			if r >= OUVERTURE_BRAS_MIN and r <= OUVERTURE_BRAS_MAX
+			if r >= OUVERTURE_BRAS_MIN and r <= OUVERTURE_BRAS_MAX:
 				return True
 		return False
 
@@ -406,13 +406,13 @@ class GoalsManager:
 
 			# On s'arrête si on a déjà trouvé des positions et qu'on en troue plus,
 			# pour ne pas que la moyenne tombe dans un "trou"
-			elif stop = True 
+			elif stop == True:
 				break
 
 		# Un - car on fait tourner le point (x,y) et non le robot
 		angle_to_go = - somme_a / nb_a
 
-		if angle_to_go = 0:
+		if angle_to_go == 0:
 			self.__logger.error("Fuck, impossible de l'attraper ! (surement trop près du robot)")
 
 		return angle_to_go

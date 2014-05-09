@@ -5,7 +5,7 @@ Ce fichier regroupe toutes les constantes de l'IA
 
 import math
 
-TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
@@ -89,8 +89,8 @@ HAUTEUR_TRIANGLE = 30
 MARGE_DROP_TRIANGLE = 0
 HAUTEUR_TORCHE = 36
 # TODO mesures avec précision
-ANGLE_MIN = radians(-50)
-ANGLE_MAX = radians(0)
+ANGLE_MIN = math.radians(-50)
+ANGLE_MAX = math.radians(0)
 OUVERTURE_BRAS_MIN = 150
 OUVERTURE_BRAS_MAX = 220
 CENTRE_BRAS_X = 125
