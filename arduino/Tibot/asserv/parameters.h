@@ -91,8 +91,8 @@
 //BLOCAGE
 //TIME_BLOCKED : période de vérification (ms)
 //MIN_DIST_BLOCKED : disatcne min a parcourir pour ne pas etre considere bloqué (mm)
-#define TIME_BLOCKED 100
-#define MIN_DIST_BLOCKED 1
+#define TIME_BLOCKED 2000
+#define MIN_DIST_BLOCKED 3
 
 //PIN LED
 #define LED_MAINLOOP 22

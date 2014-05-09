@@ -93,8 +93,11 @@ void RobotState::blocked_management() {
 	static float time = 0, timer_led = 0;
 	static bool last_block = false;
 
-	if (!blocked) { //Si le robot est deja bloqué, pas la peine de calculer
-		if (time > TIME_BLOCKED) {
+	if (getRemainingGoals() == 0) {
+		blocked = false;
+	} else {
+		time += DUREE_CYCLE;
+		if (time > PERIOD_BLOCKED) {
 			bool local_block;
 			int dx = current_pos.x - last_pos.x;
 			int dy = current_pos.y - last_pos.y;
@@ -111,15 +114,12 @@ void RobotState::blocked_management() {
 			}
 			blocked = local_block & last_block; //Evite les faux positifs
 			last_block = local_block;
-			if (blocked) {
-				time = -DUREE_CYCLE; //Remise à 0
-				digitalWrite(LED_BLOCKED, LOW); //Allume la led blocage 2s
-				timer_led = 0;
-			}
+			last_pos = current_pos;
+			time = 0; //Remise à 0
 		}
-		time += DUREE_CYCLE;
 	}
-	else {
+	if (blocked) {
+		digitalWrite(LED_BLOCKED, LOW); //Allume la led blocage 2s
 		timer_led = 0;
 	}
 	timer_led += DUREE_CYCLE;
