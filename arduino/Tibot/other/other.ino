@@ -54,4 +54,5 @@ void loop(){
 	}
 
 	retourServo(); //Pour "ranger" les servo quand il faut
+	updateJackState();
 }
