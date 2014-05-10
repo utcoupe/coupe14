@@ -5,15 +5,15 @@ Ce fichier regroupe toutes les constantes de l'IA
 
 import math
 
-TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
 
 #====================Enable====================
-ENABLE_TOURELLE = 		True
+ENABLE_TOURELLE = 		False
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
-ENABLE_TIBOT = 			True
+ENABLE_TIBOT = 			False
 
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
@@ -47,6 +47,7 @@ renvoiImmediat = 		False # fonction non terminé, ne pas activer !
 
 #====================Variables globales====================
 NUMBER_OF_ENEMY = 		2 #TODO
+#si 1, on considère que l'ennemi est petit
 
 #====================eventManager====================
 PERIODE_EVENT_MANAGER =	2
@@ -63,7 +64,7 @@ BEGIN_CHECK_COLLISION =	3000 #TODO
 FINISHED_THRESHOLD = 	50
 
 #====================pullData====================
-PULL_SYSTEM_PERIODE = 			10 #période du système de pull en ms
+PULL_SYSTEM_PERIODE = 	10 #période du système de pull en ms
 PULL_PERIODE = 			100
 
 
@@ -73,6 +74,7 @@ POINTS_PAR_CERCLE = 	8
 MARGE_PASSAGE_PATH = 	0
 MARGE_COLLISION =		-20
 COLLISION_THRESHOLD =	150
+COLLISION_WARNING_THRESHOLD = 500
 
 
 #=======================================Systemes physiques========================================
@@ -91,12 +93,13 @@ HAUTEUR_TRIANGLE = 30
 MARGE_DROP_TRIANGLE = 0
 HAUTEUR_TORCHE = 36
 # TODO mesures avec précision
-ANGLE_MIN = math.radians(-50)
+# Marges 20mm, 5°
+ANGLE_MIN = math.radians(-75)
 ANGLE_MAX = math.radians(0)
-OUVERTURE_BRAS_MIN = 150
-OUVERTURE_BRAS_MAX = 220
-CENTRE_BRAS_X = 125
-CENTRE_BRAS_Y = 140
+OUVERTURE_BRAS_MIN = 125
+OUVERTURE_BRAS_MAX = 235
+CENTRE_BRAS_X = 128
+CENTRE_BRAS_Y = 130
 
 #====================TIBOT====================
 LARGEUR_TIBOT = 		200

@@ -19,11 +19,14 @@ class Goal:
 		self.__elem_goal = []
 		self.__elem_goal_locked = None
 
+	def getId(self):
+		return self.__id
+
 	def getName(self):
 		return self.__name
 
-	def getId(self):
-		return self.__id
+	def getType(self):
+		return self.__type
 
 	def getPosition(self):
 		return (self.__x, self.__y)

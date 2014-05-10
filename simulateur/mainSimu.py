@@ -25,6 +25,7 @@ import sys
 import os
 DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(DIR_PATH, "..", "map"))
+sys.path.append(os.path.join(DIR_PATH, "../../ia", "constantes"))
 
 
 import optparse
@@ -36,6 +37,7 @@ import match
 from map import maploader
 from objects import bigrobot, minirobot
 import processIA
+from constantes import *
 
 
 
@@ -84,20 +86,71 @@ if __name__ == "__main__":
 		minibotYellow = minirobot.MiniRobot(engine = engine,
 							   posinit = mm_to_px(3000-100,690),
 							   team = YELLOW)
-		robots_red = ("RED", bigbotRed, minibotRed, bigbotYellow, minibotYellow)
-		robots_yellow = ("YELLOW", bigbotYellow, minibotYellow, bigbotRed, minibotRed)
 
-		#lancement des subProcess IA
-		processIA.ProcessIA(robots_red)
-		#processIA.ProcessIA(robots_yellow)
+#====================Activation des IA====================
+		"""
+		Mettre à Flase l'IA qu'on veut désactiver.
+		Ne pas toucher au reste du code.
+		"""
+		redIA = True
+		yellowIA = False
+
+#=========================================================
+		bigbotRed_flag = False
+		minibotRed_flag = False
+		bigbotYellow_flag = False
+		minibotYellow_flag = False
+
+
+		if redIA == True:
+			if ENABLE_FLUSSMITTEL == True:
+				if ENABLE_TIBOT == True:
+					bigbotRed_flag = True
+					minibotRed_flag = True
+					robots_red = ("RED", bigbotRed, minibotRed, bigbotYellow, minibotYellow)
+				else:
+					bigbotRed_flag = True
+					robots_red = ("RED", bigbotRed, bigbotYellow, minibotYellow)
+			else:
+				if ENABLE_TIBOT == True:
+					minibotRed_flag = True
+					robots_red = ("RED", minibotRed, bigbotYellow, minibotYellow)
+			#robots_red = ("RED", bigbotRed, minibotRed, bigbotYellow, minibotYellow)
+			processIA.ProcessIA(robots_red)
+		else:
+			bigbotRed_flag = True
+			minibotRed_flag = True
+
+		if yellowIA == True:
+			if ENABLE_FLUSSMITTEL == True:
+				if ENABLE_TIBOT == True:
+					bigbotYellow_flag = True
+					minibotYellow_flag = True
+					robots_yellow = ("YELLOW", bigbotYellow, minibotYellow, bigbotRed, minibotRed)
+				else:
+					bigbotYellow_flag = True
+					robots_yellow = ("YELLOW", bigbotYellow, bigbotRed, minibotRed)
+			else:
+				if ENABLE_TIBOT == True:
+					minibotYellow_flag = True
+					robots_yellow = ("YELLOW", minibotYellow, bigbotRed, minibotRed)
+			#robots_yellow = ("YELLOW", bigbotYellow, minibotYellow, bigbotRed, minibotRed)
+			processIA.ProcessIA(robots_yellow)
+		else:
+			bigbotYellow_flag = True
+			minibotYellow_flag = True
+
+		if bigbotRed_flag == True:
+			engine.add(bigbotRed)
+		if minibotRed_flag == True:
+			engine.add(minibotRed)
+		if bigbotYellow_flag == True:
+			engine.add(bigbotYellow)
+		if minibotYellow_flag == True:
+			engine.add(minibotYellow)
 
 		#chargement de la map
 		maploader.load_map("map/map.xml",engine)
-
-		engine.add(bigbotRed)
-		engine.add(minibotRed)
-		engine.add(bigbotYellow)
-		engine.add(minibotYellow)
 
 		t=threading.Thread(target=engine.start)
 		t.setDaemon(True)

@@ -70,6 +70,7 @@ enum ordre {
 	O_BRAS_OUVRIR_BAS, //@int
 	O_BRAS_OUVRIR_HAUT, //@int
 	O_BRAS_FERMER, //@int
+	O_DROP_TRIANGLE, //@int @int @int
 
 	//TIBOT
 	O_TIR_BALLE, //@int @int

@@ -66,7 +66,7 @@ class EventManager():
 		#Pendant la funny action
 		while self.__MetaData.getInFunnyAction() == True:
 			self.__majObjectif() #TODO faire une fonction dédiée ?
-			if self.__filet_fired == False:
+			if self.__filet_fired == False and self.Tibot is not None:
 				empty_arg = [42,]# 42 est un nombre aleatoire
 				self.__Communication.sendOrderAPI("ADDR_TIBOT_OTHER", "O_TIR_FILET", *empty_arg)
 				self.__logger.info("On lance le filet")
@@ -143,11 +143,15 @@ class EventManager():
 
 		if self.__Tourelle is not None:
 			new_data = ()
+			if self.__Flussmittel is not None:
+				new_data += (self.__Flussmittel.getPosition())
+			if self.__Tibot is not None:
+				new_data += (self.__Tibot.getPosition())
 			if self.__BigEnemyBot is not None:
 				new_data += (self.__BigEnemyBot.getPosition(),)
 			if self.__SmallEnemyBot is not None:
 				new_data += (self.__SmallEnemyBot.getPosition(),)
-			
+
 			if new_data != self.__last_hokuyo_data:
 				self.__last_hokuyo_data = new_data
 				if self.__MetaData.getCheckCollision():
@@ -215,6 +219,9 @@ class EventManager():
 		#Set vrai id
 		for action in data_action_temp:
 			data_action.append((Objet.getNextIdToStack(), action[1], action[2]))
+
+		data_action_temp.clear()
+		data_action_temp.extend(data_action)
 
 		print(str(Objet.getName()) + " charge les actions dans eventManager: " + str((id_objectif, data_action)))
 
@@ -301,15 +308,18 @@ class EventManager():
 			distance = collision_data[1]
 			if distance < self.__MetaData.getCollisionThreshold():
 				first_id_to_remove = collision_data[0]
-				id_canceled_list = system.removeObjectifAbove(first_id_to_remove)
+				
 				action_en_cours, objectif = system.getQueuedObjectif()
 				if first_id_to_remove == objectif[0][0]:
-					self.__logger.info("On annule les ordres: " + str(id_canceled_list) + "et on broadcast A_CLEANG pour causes de collision dans " + str(distance) + " mm")
+					id_canceled_list = system.removeObjectifAbove(first_id_to_remove)
+					self.__logger.info(str(system.getName())+" a annuler les ordres: " + str(id_canceled_list) + " et on broadcast A_CLEANG pour causes de collision dans " + str(distance) + " mm")
 					empty_arg = []
 					self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
 					system.setIdToReach("ANY")
 					self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
 				else:
-					self.__logger.info("On enleve les ordres: " + str(id_canceled_list) + " de la file pour causes de collision dans " + str(distance) + " mm")
-			else:
-				self.__logger.debug("On a detecté une collision dans "+str(distance)+" mm, mais on continue")
+					id_canceled_list = system.removeObjectifAbove(first_id_to_remove)
+					self.__logger.info(str(system.getName())+" a enlever les ordres: " + str(id_canceled_list) + " de la file pour causes de collision dans " + str(distance) + " mm")
+
+			elif  distance < COLLISION_WARNING_THRESHOLD:
+				self.__logger.debug(str(system.getName())+" a detecté une collision dans "+str(distance)+" mm, mais on continue")

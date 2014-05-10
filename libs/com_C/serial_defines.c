@@ -39,6 +39,7 @@ void initSize()
 	ordreSize[O_BRAS_OUVRIR_BAS]=2;
 	ordreSize[O_BRAS_OUVRIR_HAUT]=2;
 	ordreSize[O_BRAS_FERMER]=2;
+	ordreSize[O_DROP_TRIANGLE]=6;
 	//TIBOT
 	ordreSize[O_TIR_FILET]=2;
 	ordreSize[O_TIR_BALLE]=4; //Combien de balles ?

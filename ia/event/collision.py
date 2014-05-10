@@ -30,6 +30,7 @@ class Collision:
 			point - > (x, y) """
 		trajectoires = robot.getTrajectoires()
 
+
 		for data_obj in trajectoires:  # pour chaque trajectoire
 			id = data_obj[0]
 			traj = data_obj[1]
@@ -44,12 +45,13 @@ class Collision:
 						# cas particulier : 1er segment de trajectoire
 						if len(checked_traj) == 1 and self.__p_in_circle(robot_el.getPosition(), robot_el.getRayon() + robot.getRayon() + MARGE_COLLISION, a):
 							distance_to_collision = 0
-							self.__log.debug("Collision (1er segment) sur l'id %s a %s mm" % (id, distance_to_collision))
+							#self.__log.debug("Collision (1er segment) sur l'id %s a %s mm" % (id, distance_to_collision))
 							return (id, distance_to_collision)
 
 						checked_traj.append(self.__get_closest(checked_traj[-1], collision_pts))  # on ajoute le premier pt d'intersection
-						distance_to_collision = self.__traj_length(checked_traj)  # on calcule la longueur restante avant collsion
-						self.__log.debug("Collision sur l'id %s a %s mm" % (id, distance_to_collision))
+						distance_to_collision = self.__traj_length(checked_traj)  # on calcule la longueur restante avant collision de centre à centre
+						#distance_to_collision = distance_to_collision - robot_el.getRayon() - robot.getRayon() #longueur restante avant collision entre les bords du robot
+						#self.__log.debug("Collision sur l'id %s a %s mm" % (id, distance_to_collision))
 						return (id, distance_to_collision)
 				checked_traj.append(b)  # on ajoute le point de depart a la trajctoire verifiee
 		return None

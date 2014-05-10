@@ -101,4 +101,27 @@
 			<order>END</order>
 		</orders>
 	</elemScript>
+	<elemScript>
+		<id_script>8</id_script>
+		<orders>
+			<order>DYNAMIQUE_OVER</order>
+			<order>O_RET_OUVRIR</order>
+			<order>THEN</order>
+			<order>O_RET_FERMER</order>
+			<order>THEN</order>
+			<order>O_RET_OUVRIR</order>
+			<order>THEN</order>
+			<order>O_RET_FERMER</order>
+			<order>THEN</order>
+			<order>O_RET_OUVRIR</order>
+			<order>THEN</order>
+			<order>O_RET_FERMER</order>
+			<order>THEN</order>
+			<order>A_ROT 3.14</order>
+			<order>O_RET_OUVRIR</order>
+			<order>THEN</order>
+			<order>O_RET_FERMER</order>
+			<order>END</order>
+		</orders>
+	</elemScript>
 </elemScripts>
