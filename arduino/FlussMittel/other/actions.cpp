@@ -163,13 +163,13 @@ void cmdTriPush() {
 		switch(step) {
 			case 0: {
 				hauteur_revele = getCurrentHauteur() + MARGE_PREHENSION; //On remontera toujours par rapport à la position actulle, pour eviter de pousser un triangles (petite perte pour grande securité)
-				int hauteur = MIN(HAUTEUR_MAX, MAX(hauteur_revele, HAUTEUR_TRI_BORDURE));
+				int hauteur = MIN(HAUTEUR_MAX, MAX(hauteur_revele, HAUTEUR_PUSH_TRI));
 				cmdAsc(hauteur);
 				step++;
 				break;
 			}
 			case 1:
-				cmdBrasServ(ANGLE_REPLI_TRI, LONGUEUR_MIN); //Pas d'attente ici, cela ne devrai pas etre la peine, sinon, implémenter time_end
+				cmdBrasServ(ANGLE_REPLI_TRI, LONGUEUR_PUSH_TRI); //Pas d'attente ici, cela ne devrai pas etre la peine, sinon, implémenter time_end
 				step++;
 				next_step = true;
 				break;
@@ -179,7 +179,7 @@ void cmdTriPush() {
 				break;
 			case 3:
 				//Pour rentrer ici, next_step doit etre mis à true par la fonction getTriBordureRepliBras()
-				cmdBrasServ(ANGLE_OUVERT, LONGUEUR_MIN);
+				cmdBrasServ(ANGLE_OUVERT, LONGUEUR_PUSH_TRI);
 				time_end = timeMicros() + (long)DELAY_SERVO_PUSH*1000;
 				step++;
 				break;
