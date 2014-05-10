@@ -55,7 +55,7 @@ void initAct() {
 	//Moteurs :
 	pump_motor.run(FORWARD);
 	cmdBrasServ(ANGLE_OUVERT, LONGUEUR_MAX);
-	servoRet.write(ANGLE_RET); 
+	servoRet.write(150); 
 	pump(true);
 	stepperAsc.setAcceleration(AMAX_STEPPER);
 	stepperAsc.setMaxSpeed(VMAX_STEPPER);
