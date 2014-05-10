@@ -73,6 +73,7 @@ POINTS_PAR_CERCLE = 	8
 MARGE_PASSAGE_PATH = 	0
 MARGE_COLLISION =		-20
 COLLISION_THRESHOLD =	150
+COLLISION_WARNING_THRESHOLD = 500
 
 
 #=======================================Systemes physiques========================================

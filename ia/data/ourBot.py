@@ -158,11 +158,11 @@ class OurBot():
 
 	def setLastId(self, address, idd):
 		if address == 'ADDR_FLUSSMITTEL_OTHER' or address == 'ADDR_TIBOT_OTHER':
-			if idd != self.__last_id_executed_other:
+			if idd != self.__last_id_executed_other and idd != -1:
 				self.__last_id_executed_other = idd
 				self.__logger.debug(str(self.__name)+" changement d'id other " + str(idd))
 		else:
-			if idd != self.__last_id_executed_asserv:
+			if idd != self.__last_id_executed_asserv and idd != -1:
 				self.__last_id_executed_asserv = idd
 				self.__logger.debug(str(self.__name)+" changement d'id asserv " + str(idd))
 
@@ -233,13 +233,17 @@ class OurBot():
 		if self.__actions_en_cours is not None:
 			order_of_objectif = self.__actions_en_cours[1] # il ne peut y avoir qu'un objectif à la fois
 			if order_of_objectif:
-				data_order = order_of_objectif.popleft() #type (id_action, ordre, arguments)
+				data_order = order_of_objectif[0] #type (id_action, ordre, arguments)
 				
-				while (self.maxRot(data_order[0], lastIddExecuted) == lastIddExecuted) and order_of_objectif:
+				while (self.maxRot(data_order[0], lastIddExecuted) != lastIddExecuted) and order_of_objectif:
 					data_order = order_of_objectif.popleft()
+
+				if order_of_objectif[0][0] == lastIddExecuted:
+					order_of_objectif.popleft()
 
 				if not order_of_objectif:
 					self.__actions_en_cours = None
+
 
 	def removeObjectifAbove(self, id_objectif):
 		"""remove all queued goal on top of id_objectif, id_objectif included"""
