@@ -71,6 +71,24 @@ void initAct() {
 	//attachInterrupt(INT_ASC_HAUT, topStop, FALLING); //Commenté à cause des micro-interuptions
 }
 
+void callbackRet(int use) {
+	static long time_end = 0;
+	static bool active = false;
+	long now = timeMillis();
+	if (use) { //Set timer
+		time_end = now + DELAY_RET;
+		servoRet.write(ANGLE_RET);
+		active = true;
+	} else if (active) { //update regulier
+		if (now >= time_end) {
+			servoRet.write(0);
+			setLastId();
+			active = false;
+		}
+	}
+}
+
+
 void stopAct() {
 	use_act = false;
 }

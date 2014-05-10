@@ -24,18 +24,10 @@ static const int overflow = 29999;
 int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bool doublon){ 
 	int ret_size = 0;
 	switch(ordre){
-	case O_RET_OUVRIR:
+	case O_RET:
 		if (!doublon && use_act) {
-			last_id = btoi(argv);
-			argv+=2;
-			servoRet.write(95);
-		}
-		break;
-	case O_RET_FERMER:
-		if (!doublon && use_act) {
-			last_id = btoi(argv);
-			argv+=2;
-			servoRet.write(0);
+			next_last_id = btoi(argv);
+			callbackRet(ACTIVATE);
 		}
 		break;
 	case O_GET_TRIANGLE:

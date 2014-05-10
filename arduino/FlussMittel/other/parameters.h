@@ -73,7 +73,9 @@
 #define ANGLE_OUVERT 0 
 
 //RETOURNEMENT
-#define ANGLE_RET 70
+#define ANGLE_RET 85
+#define DELAY_RET 500
+#define ACTIVATE 1
 
 //POMPE
 #define PWM_PUMP 255
