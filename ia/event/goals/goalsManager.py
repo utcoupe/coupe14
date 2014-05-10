@@ -76,7 +76,7 @@ class GoalsManager:
 		self.__reverse_table[(13,0)]=(13,1)
 		self.__reverse_table[(13,1)]=(13,0)
 
-		if self.__robot_name == "FLUSSMITTEL":
+		if self.__robot_name == "FLUSSMITTEL" and TEST_MODE == False:
 			self.__vision = Visio('../supervisio/visio', 0, '../config/visio_robot/', self.__data["FLUSSMITTEL"], True)
 			self.__last_camera_color = None
 
@@ -317,30 +317,33 @@ class GoalsManager:
 						objectif.getElemGoalLocked().removeFirstElemAction()
 
 				else:
-					limite_essai_viso = 5
-					triangle_find = False
-					triangle_list = []
-					while limite_essai_viso != 0 and triangle_find == False:
-						limite_essai_viso -= 1
-						self.__vision.update()
-						triangle_list = self.__vision.getTriangles()
-						if triangle_list != []:
-							triangle_find = True
-							break
+					if TEST_MODE == False:
+						limite_essai_viso = 5
+						triangle_find = False
+						triangle_list = []
+						while limite_essai_viso != 0 and triangle_find == False:
+							limite_essai_viso -= 1
+							self.__vision.update()
+							triangle_list = self.__vision.getTriangles()
+							if triangle_list != []:
+								triangle_find = True
+								break
+					else:
+						triangle_find = True
 
 					if triangle_find == False:
 						self.__logger.warning("On a pas vu de triangle à la position attendu, dont on va supprimer l'objectif "+str(id_objectif))
 						self.__last_camera_color = None
 						self.__deleteGoal(objectif)
 					else:
-						triangle = triangle_list[0] #TODO, prendre le meilleur triangle suivent les arg
-						data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
-						#data_camera = ("RED", 220, 0) #test
-
+						if TEST_MODE == False:
+							triangle = triangle_list[0] #TODO, prendre le meilleur triangle suivent les arg
+							data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
+						else:
+							data_camera = ("RED", 220, 0) #test
 
 						self.__last_camera_color = data_camera[0]
-
-						#si on aura la possibilité de le stcker
+						#si on a la possibilité de le stocker
 						if len(self.__front_triangle_stack)  >= MAX_FRONT_TRIANGLE_STACK:
 							self.__logger.warning("Impossible de stocker ce triangle dans le robot, la pile de devant est pleine.")
 							#Si besoin, on change la couleur du triangle pour la prochaine fois
