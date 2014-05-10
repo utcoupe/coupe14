@@ -216,13 +216,10 @@ void cmdTriBordure() {
 		next_step = false;
 
 		switch(step) {
-			case 0: {
-				hauteur_revele = getCurrentHauteur() + MARGE_PREHENSION; //On remontera toujours par rapport à la position actulle, pour eviter de pousser un triangles (petite perte pour grande securité)
-				int hauteur = MIN(HAUTEUR_MAX, MAX(hauteur_revele, HAUTEUR_TRI_BORDURE));
-				cmdAsc(hauteur);
+			case 0: 
+				cmdAsc(HAUTEUR_MAX);
 				step++;
 				break;
-			}
 			case 1:
 				cmdBrasServ(ANGLE_OUVERT, LONGUEUR_TRI_BORDURE); //Pas d'attente ici, cela ne devrai pas etre la peine, sinon, implémenter time_end
 				step++;
