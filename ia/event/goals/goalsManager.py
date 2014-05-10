@@ -375,11 +375,17 @@ class GoalsManager:
 									x, y, a = temp
 									x_abs, y_abs, a_abs = self.__data[self.__robot_name]["getPositionAndAngle"]
 									script_get_triangle = deque()
-									script_get_triangle.append( ("A_GOTOA", (x+x_abs, y+y_abs, a+a_abs)) ) 
-									script_get_triangle.append( ("STEP_OVER", (),) )
-									self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
+									self.__PathFinding.update(self.__data[self.__robot_name])
+									path = self.__PathFinding.getPath((x_abs, y_abs), (x+x_abs, y+y_abs), enable_smooth=True)
+									if len(path) == 2:
+										script_get_triangle.append( ("A_GOTOA", (path[1][0], path[1][1], a+a_abs)) ) 
+										script_get_triangle.append( ("STEP_OVER", (),) )
+										self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
+									else:
+										self.__logger.warning("Impossible d'attendre le triangle d'après PathFinding, data_camera: "+str(data_camera)+" path: "+str(path)+" x+x_abs: "+str(x+x_abs)+" y+y_abs "+str(y+y_abs)+" a+a_abs "+str(a+a_abs))
+										self.__cancelGoal(objectif, False)
 								else:
-									self.__logger.warning("Impossible d'attendre le triangle data_camera: "+str(data_camera))
+									self.__logger.warning("Impossible d'attendre le triangle d'après Alexis, data_camera: "+str(data_camera))
 									self.__cancelGoal(objectif, False)
 							
 			else:
