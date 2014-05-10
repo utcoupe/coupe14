@@ -93,7 +93,7 @@ if __name__ == "__main__":
 		Ne pas toucher au reste du code.
 		"""
 		redIA = True
-		yellowIA= True
+		yellowIA = False
 
 #=========================================================
 		bigbotRed_flag = False

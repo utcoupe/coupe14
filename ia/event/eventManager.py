@@ -312,14 +312,14 @@ class EventManager():
 				action_en_cours, objectif = system.getQueuedObjectif()
 				if first_id_to_remove == objectif[0][0]:
 					id_canceled_list = system.removeObjectifAbove(first_id_to_remove)
-					self.__logger.info("On annule les ordres: " + str(id_canceled_list) + " et on broadcast A_CLEANG pour causes de collision dans " + str(distance) + " mm")
+					self.__logger.info(str(system.getName())+" a annuler les ordres: " + str(id_canceled_list) + " et on broadcast A_CLEANG pour causes de collision dans " + str(distance) + " mm")
 					empty_arg = []
 					self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
 					system.setIdToReach("ANY")
 					self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
 				else:
 					id_canceled_list = system.removeObjectifAbove(first_id_to_remove)
-					self.__logger.info("On enleve les ordres: " + str(id_canceled_list) + " de la file pour causes de collision dans " + str(distance) + " mm")
+					self.__logger.info(str(system.getName())+" a enlever les ordres: " + str(id_canceled_list) + " de la file pour causes de collision dans " + str(distance) + " mm")
 
 			elif  distance < COLLISION_WARNING_THRESHOLD:
-				self.__logger.debug("On a detecté une collision dans "+str(distance)+" mm, mais on continue")
+				self.__logger.debug(str(system.getName())+" a detecté une collision dans "+str(distance)+" mm, mais on continue")
