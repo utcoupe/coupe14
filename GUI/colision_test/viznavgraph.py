@@ -1,29 +1,17 @@
 # -*- coding: utf-8 -*-
 
 
-class Bot:
+class Bot(dict):
 	def __init__(self):
-		self.ray = 100
-		self.x = -1000
-		self.y = -1000
+		self["getRayon"] = 0
+		self["getPosition"] = (-1000, -1000)
 		self.traj = []
-		self.name = "default"
-
-	def getPosition(self):
-		return (self.x, self.y)
-
-	def getRayon(self):
-		return self.ray
-
-	def setPosition(self, pos):
-		self.x = pos[0]
-		self.y = pos[1]
-
 	def getTrajectoires(self):
 		return self.traj
-
-	def __repr__(self):
-		return self.name + " at %s:%s" % (self.x, self.y)
+	def getRayon(self):
+		return self["getRayon"]
+	def getPosition(self):
+		return self["getPosition"]
 
 if __name__ == "__main__":
 	import sys
@@ -35,9 +23,10 @@ if __name__ == "__main__":
 	import time
 	
 	from graphview import GraphView
-	from event import navigation
+	from event.goals import navigation
+	from event import collision
 	
-	filename = os.path.join(FILE_DIR, "../../ia/event/navigation/map.xml")
+	filename = os.path.join(FILE_DIR, "../../ia/event/goals/navigation/map.xml")
 	try:
 		offset = sys.argv[1]
 	except:
@@ -45,19 +34,20 @@ if __name__ == "__main__":
 	start = time.time()
 	other_bot = Bot()
 	other_bot.name = 'other'
+	other_bot["getRayon"] = 200
 	used_bot = Bot()
 	used_bot.name = 'used'
+	used_bot["getRayon"] = 120
 	ennemy1 = Bot()
 	ennemy1.name = 'en1'
 	ennemy2 = Bot()
 	ennemy2.name = 'en2'
-	ennemy1.x = 1800
-	ennemy1.y = 1500
-	ennemy1.ray = 200
-	ennemy2.x = 2200
-	ennemy2.y = 500
+	ennemy1["getPosition"] = (1800, 1500)
+	ennemy1["getRayon"] = 200
+	ennemy2["getPosition"] = (2200, 500)
+	ennemy1["getRayon"] = 120
 	ng = navigation.PathFinding([used_bot, other_bot, ennemy1, ennemy2], filename)
-	col = navigation.Collision([used_bot, other_bot, ennemy1, ennemy2])
+	col = collision.Collision([used_bot, other_bot, ennemy1, ennemy2])
 	print("init time : %s" % (time.time() - start))
 	
 	v = GraphView(ng, col, other_bot, used_bot)
