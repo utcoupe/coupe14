@@ -257,7 +257,9 @@ class OurBot():
 			if id_objectif == id:
 				removed_objectif = self.__objectifs.pop()
 				if removed_objectif[0] == id_objectif:
-					id_canceled_list.append(removed_objectif[0])
+					#Si on l'a déjà mis depuis action en cours on ne le rajoute pas
+					if id_canceled_list == []:
+						id_canceled_list.append(removed_objectif[0])
 				while removed_objectif[0] != id_objectif:
 					id_canceled_list.append(removed_objectif[0])
 					removed_objectif = self.__objectifs.pop()

@@ -5,14 +5,14 @@ Ce fichier regroupe toutes les constantes de l'IA
 
 import math
 
-TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
 
 #====================Enable====================
-ENABLE_TOURELLE = 		False
-ENABLE_FLUSSMITTEL = 	False #permet de desactiver Flussmitel
+ENABLE_TOURELLE = 		True
+ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
 ENABLE_TIBOT = 			True
 
 #========================================Communication========================================
@@ -63,7 +63,8 @@ BEGIN_CHECK_COLLISION =	3000 #TODO
 FINISHED_THRESHOLD = 	50
 
 #====================pullData====================
-PULL_PERIODE = 			10 #période des pull en ms
+PULL_SYSTEM_PERIODE = 			10 #période du système de pull en ms
+PULL_PERIODE = 			100
 
 
 #====================NAVIGATION================
@@ -78,6 +79,7 @@ COLLISION_THRESHOLD =	150
 #====================tourelle====================
 OUR_ROBOTS_VISIBLE_TOURELLE = True 	#True si une balise visible par l'hokuyo est presente sur nos robots 
 TOURELLE_PULL_PERIODE = 100 		#ms
+DISTANCE_MAX_ROBOT_FUSION = 250 #Différance max entre codeurs et hokuyo
 
 #====================Flussmittel====================
 LARGEUR_FLUSSMITTEL = 	330 # ok car centré en largeur

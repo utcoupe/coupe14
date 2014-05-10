@@ -67,8 +67,9 @@ class EventManager():
 		while self.__MetaData.getInFunnyAction() == True:
 			self.__majObjectif() #TODO faire une fonction dédiée ?
 			if self.__filet_fired == False:
-				empty_arg = [42,]
+				empty_arg = [42,]# 42 est un nombre aleatoire
 				self.__Communication.sendOrderAPI("ADDR_TIBOT_OTHER", "O_TIR_FILET", *empty_arg)
+				self.__logger.info("On lance le filet")
 				self.__filet_fired = True
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
@@ -289,22 +290,26 @@ class EventManager():
 
 	def __testCollision(self):
 		if self.__Flussmittel is not None:
-			self.__checkSystem(self.__Flussmittel)
+			self.__checkCollisionSystem(self.__Flussmittel)
 		
 		if self.__Tibot is not None:
-			self.__checkSystem(self.__Tibot)
+			self.__checkCollisionSystem(self.__Tibot)
 	
-	def __checkSystem(self, system):
+	def __checkCollisionSystem(self, system):
 		collision_data = self.__Collision.getCollision(system)
 		if collision_data is not None:
 			distance = collision_data[1]
 			if distance < self.__MetaData.getCollisionThreshold():
 				first_id_to_remove = collision_data[0]
 				id_canceled_list = system.removeObjectifAbove(first_id_to_remove)
-				self.__logger.info("On annule les ordres: " + str(id_canceled_list) + " pour causes de collision dans " + str(distance) + " mm")
-				empty_arg = []
-				self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
-				system.setIdToReach("ANY")
-				self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
+				action_en_cours, objectif = system.getQueuedObjectif()
+				if first_id_to_remove == objectif[0][0]:
+					self.__logger.info("On annule les ordres: " + str(id_canceled_list) + "et on broadcast A_CLEANG pour causes de collision dans " + str(distance) + " mm")
+					empty_arg = []
+					self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
+					system.setIdToReach("ANY")
+					self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
+				else:
+					self.__logger.info("On enleve les ordres: " + str(id_canceled_list) + " de la file pour causes de collision dans " + str(distance) + " mm")
 			else:
 				self.__logger.debug("On a detecté une collision dans "+str(distance)+" mm, mais on continue")
