@@ -153,7 +153,7 @@ class Communication():
 
 		else:
 			#on ajoute l'ordre reçu à la structure de renvoie
-			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, args)
+			#self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return) # WTF ????
 			if (order == "PINGPING"):
 				self.__bigrobot.ping()
 			elif (order == "A_GOTOA"):
@@ -223,13 +223,11 @@ class Communication():
 		elif (order == "O_TIR_BALLE"):
 			#args : nbr de balles à tirer
 			self.__minirobot.setlastIdActionOther(args[0])
-			pos = (self.__minirobot.getLastIdOther(),)
-			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
+			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
 		elif (order == "O_TIR_FILET"):
 			self.__minirobot.setlastIdActionOther(args[0])
-			pos = (self.__minirobot.getLastIdOther(),)
-			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
+			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
 		elif (order == "O_BALAI"):
 			"""
@@ -240,8 +238,7 @@ class Communication():
 			"""
 			self.__minirobot.ouvrirBras(args[1])
 			self.__minirobot.setlastIdActionOther(args[0])
-			pos = (self.__minirobot.getLastIdOther(),)
-			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
+			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
 		else:
 			print('Error : mauvais paramètre traitement Tibot other ! order '+str(order)+" args "+str(args))

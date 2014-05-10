@@ -67,8 +67,9 @@ class EventManager():
 		while self.__MetaData.getInFunnyAction() == True:
 			self.__majObjectif() #TODO faire une fonction dédiée ?
 			if self.__filet_fired == False:
-				empty_arg = [42,]
+				empty_arg = [42,]# 42 est un nombre aleatoire
 				self.__Communication.sendOrderAPI("ADDR_TIBOT_OTHER", "O_TIR_FILET", *empty_arg)
+				self.__logger.info("On lance le filet")
 				self.__filet_fired = True
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
