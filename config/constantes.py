@@ -93,12 +93,13 @@ HAUTEUR_TRIANGLE = 30
 MARGE_DROP_TRIANGLE = 0
 HAUTEUR_TORCHE = 36
 # TODO mesures avec précision
-ANGLE_MIN = math.radians(-50)
-ANGLE_MAX = math.radians(0)
-OUVERTURE_BRAS_MIN = 145
-OUVERTURE_BRAS_MAX = 215
-CENTRE_BRAS_X = 128
-CENTRE_BRAS_Y = 130
+# Marges 10mm, 5°
+ANGLE_MIN = math.radians(-55)
+ANGLE_MAX = math.radians(5)
+OUVERTURE_BRAS_MIN = 135
+OUVERTURE_BRAS_MAX = 225
+CENTRE_BRAS_X = 138
+CENTRE_BRAS_Y = 140
 
 #====================TIBOT====================
 LARGEUR_TIBOT = 		200
