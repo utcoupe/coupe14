@@ -213,7 +213,7 @@ class Robot(EngineObjectPoly):
 							self.body._set_angle(a)
 						else:
 							#print('angle grand : ', a)
-							self.__goals.insert(0, GoalANGLE(0,a))
+							self.__goals.insert(0, GoalANGLE(-1,a))
 				elif isinstance(current_goal, GoalPWM):
 					if current_goal.start == -1:
 						current_goal.start = time.time()
