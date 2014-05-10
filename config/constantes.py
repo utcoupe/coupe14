@@ -84,6 +84,7 @@ TOURELLE_PULL_PERIODE = 100 		#ms
 DISTANCE_MAX_ROBOT_FUSION = 250 #Différance max entre codeurs et hokuyo
 
 #====================Flussmittel====================
+START_POSITION_RED_FLUSSMITTEL = (187, 1870, -1.57)
 LARGEUR_FLUSSMITTEL = 	330 # ok car centré en largeur
 LONGUEUR_FLUSSMITTEL = 	340 # = 2 fois la distance entre le centre de rotation et le côté le plus loin
 MAX_FRONT_TRIANGLE_STACK = 3
@@ -94,14 +95,17 @@ MARGE_DROP_TRIANGLE = 0
 HAUTEUR_TORCHE = 36
 # TODO mesures avec précision
 # Marges 20mm, 5°
-ANGLE_MIN = math.radians(-75)
+ANGLE_MIN = math.radians(-70)
 ANGLE_MAX = math.radians(0)
 OUVERTURE_BRAS_MIN = 125
 OUVERTURE_BRAS_MAX = 235
+MARGE_OUVERTURE_BRAS_MAX_DEPLACEMENT = 20
+MARGE_OUVERTURE_BRAS_MIN_DEPLACEMENT = 20
 CENTRE_BRAS_X = 128
 CENTRE_BRAS_Y = 130
 
 #====================TIBOT====================
+START_POSITION_RED_TIBOT = (2813, 1870, -1.57)
 LARGEUR_TIBOT = 		200
 LONGUEUR_TIBOT = 		150
 

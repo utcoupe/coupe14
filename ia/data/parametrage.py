@@ -13,11 +13,12 @@ def parametrerHokuyo():
 def parametrerIa(MetaData, color):
 	MetaData.setOurColor(color)
 
+
 	if color == "RED":
-		MetaData.setFirstPositionFlussmittel([200, 1850, -1.55]) #TODO, à parametrer en fonction de la couleur de debut
-		MetaData.setFirstPositionTibot([193, 1542, -0.42203])#TODO
+		MetaData.setFirstPositionFlussmittel(START_POSITION_RED_FLUSSMITTEL)
+		MetaData.setFirstPositionTibot(START_POSITION_RED_TIBOT)
 	elif color == "YELLOW":
-		MetaData.setFirstPositionFlussmittel([2800, 1850, -1.55]) #TODO, utiliser des constantes
-		MetaData.setFirstPositionTibot([2807, 1542, -2.71797])#TODO
+		MetaData.setFirstPositionFlussmittel((3000 - START_POSITION_RED_FLUSSMITTEL[0], START_POSITION_RED_FLUSSMITTEL[1], -3.1415 - START_POSITION_RED_FLUSSMITTEL[2])) #TODO, utiliser des constantes
+		MetaData.setFirstPositionTibot((3000 - START_POSITION_RED_TIBOT[0], START_POSITION_RED_TIBOT[1], -3.1415 - START_POSITION_RED_TIBOT[2]))
 	else:
 		logger.error("Aucun couleur n'a été défini, notre couleur: " + str(color))
