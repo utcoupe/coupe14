@@ -313,6 +313,7 @@ class Communication():
 		if(order == "GET_HOKUYO"):
 			data = tuple(self.__hokuyo.getHokuyo())
 			data_to_ret = data
+			#print('Hokuyo : data : ', data_to_ret)
 			self.__addOrder("ADDR_HOKUYO", order, data_to_ret)
 
 	def __addOrder(self, addr, ordre, args):

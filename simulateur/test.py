@@ -27,14 +27,16 @@ def testIa(conn, color):
 	conn.send(("ADDR_FLUSSMITTEL_ASSERV","A_GOTO",(36,1000,800)))
 	conn.send(("ADDR_FLUSSMITTEL_ASSERV","A_ROT", (54,math.radians(90))))
 	conn.send(("ADDR_FLUSSMITTEL_ASSERV","A_GOTO",(36,1100,300)))
-	#conn.send(("ADDR_FLUSSMITTEL_ASSERV","A_PWM", (54,128,128,800)))"""
+	#conn.send(("ADDR_FLUSSMITTEL_ASSERV","A_PWM", (54,128,128,800)))
 	conn.send(("ADDR_TIBOT_ASSERV","A_SET_POS", (2400,700,math.radians(90))))
 	time.sleep(1)
 	conn.send(("ADDR_TIBOT_OTHER","O_BALAI", (50,1)))
 	#conn.send(("ADDR_FLUSSMITTEL_OTHER","O_BRAS_OUVRIR_BAS", (50,)))
 	time.sleep(1)
 	#conn.send(("ADDR_TIBOT_OTHER","O_BALAI", (50,-1)))
-	conn.send(("ADDR_TIBOT_ASSERV","A_GOTO", (13,2400,900)))
+	conn.send(("ADDR_TIBOT_ASSERV","A_GOTO", (13,2400,900)))"""
+	time.sleep(1)
+	conn.send(("ADDR_HOKUYO","GET_HOKUYO", (50,-1)))
 
 	def __repr__(self):
 		return "testIA"
