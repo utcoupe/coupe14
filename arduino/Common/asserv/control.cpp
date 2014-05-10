@@ -91,13 +91,7 @@ void Control::compute(){
 				float d = dd * cos(da); //Distance adjacente
 				static char aligne = 0;
 
-				//Commenter pour multi-tour
 				da = moduloTwoPI(da);
-
-				if (dd < ERROR_POS) { //"Zone" d'arrivée
-					fifo.pushIsReached();
-					da = 0;
-				}
 
 				//Init ordre
 				if (!order_started) {
@@ -109,6 +103,17 @@ void Control::compute(){
 					}
 					order_started = true;
 				}
+
+
+				if (aligne || (abs(da) > CONE_ALIGNEMENT)) {
+					da = moduloPI(da);
+				}
+
+				if (dd < ERROR_POS) { //"Zone" d'arrivée
+					fifo.pushIsReached();
+					da = 0;
+				}
+
 
 				//Fin de la procedure d'alignement
 				if(!aligne && abs(da) <= ERROR_ANGLE_TO_GO) {
