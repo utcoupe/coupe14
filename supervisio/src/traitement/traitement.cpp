@@ -72,7 +72,10 @@ void Visio::init() {
 		resize(mask, mask, size_frame);
 	}
 	//if (cam_calibrated) distort = image; //TRES LONG
-	if (cam_calibrated) distort = points; 
+	if (cam_calibrated) {
+		cerr << "Distorsion par points" << endl;
+		distort = points; 
+	}
 }
 
 void Visio::init_writer() {
@@ -231,8 +234,9 @@ bool Visio::computeTransformMatrix(const Mat &img, const vector<Point2f> real_po
 		perspectiveMatrix = getPerspectiveTransform(ext_corn, real_positions);
 		trans_calibrated = true;
 		if (out != 0) { //La matrice ou existe
-			for(int i=0; i<4; i++) {
-				drawObject(ext_corn[i].x, ext_corn[i].y, *out, intToString(i));
+			drawObject(ext_corn[0].x, ext_corn[0].y, *out, intToString(real_positions[0].x) + (string)":" + intToString(real_positions[0].y), Scalar(255,0,0));
+			for(int i=1; i<4; i++) {
+				drawObject(ext_corn[i].x, ext_corn[i].y, *out, intToString(real_positions[i].x) + (string)":" + intToString(real_positions[i].y), Scalar(0,0,255));
 			}
 		}
 
@@ -249,19 +253,24 @@ bool Visio::computeTransformMatrix(const Mat &img, const vector<Point2f> real_po
 
 bool Visio::camPerspective() {
 	//TODO choix position
-	vector<Point2f> position;
 	int xsize = 130, ysize = 210;
 	int x = 185, y = 105;
-	position.push_back(Point2f(x, y - ysize));
-	position.push_back(Point2f(x, y));
-	position.push_back(Point2f(x + xsize, y - ysize));
-	position.push_back(Point2f(x + xsize, y));
+	namedWindow("parameters");
+	createTrackbar("x_size", "parameters", &xsize, 500);
+	createTrackbar("y_size", "parameters", &ysize, 500);
+	createTrackbar("x", "parameters", &x, 3000);
+	createTrackbar("y", "parameters", &y, 2000);
 	Mat img, undistorted_img;
 	bool calibrated = false;
 	int key = 0;
 	cout << "Starting perpective calibration" << endl;
 	namedWindow("Perspective");
 	while (!(calibrated && key == 'c')) {
+		vector<Point2f> position;
+		position.push_back(Point2f(x, y - ysize));
+		position.push_back(Point2f(x, y));
+		position.push_back(Point2f(x + xsize, y - ysize));
+		position.push_back(Point2f(x + xsize, y));
 		img = getImg();
 		if (cam_calibrated) {
 			undistort(img, undistorted_img, CM, D);
@@ -280,6 +289,7 @@ bool Visio::camPerspective() {
 		key = waitKey(20);
 	}
 	destroyWindow("Perspective");
+	destroyWindow("parameters");
 	return calibrated;
 }
 

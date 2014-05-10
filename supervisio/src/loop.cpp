@@ -56,6 +56,7 @@ void perspectiveOnlyLoop(int index, string path) {
 	int h_min_r(RED_HUE_MIN), h_max_r(RED_HUE_MAX), s_min_r(RED_SAT_MIN), s_max_r(RED_SAT_MAX), v_min_r(RED_VAL_MIN), v_max_r(RED_VAL_MAX);
 	int h_min_b(BLK_HUE_MIN), h_max_b(BLK_HUE_MAX), s_min_b(BLK_SAT_MIN), s_max_b(BLK_SAT_MAX), v_min_b(BLK_VAL_MIN), v_max_b(BLK_VAL_MAX);
 	int epsilon(EPSILON_POLY*100), key = -1;
+	int xoffset = 0, yoffset = 300, sizezone=1000;
 
 	namedWindow("parameters");
 	namedWindow("parameters2");
@@ -86,6 +87,9 @@ void perspectiveOnlyLoop(int index, string path) {
 	createTrackbar("is equi", "parameters2", &max_diff_triangle_edge, 100);
 	createTrackbar("size_min", "parameters2", &size_min, 20000);
 	createTrackbar("real_size_min", "parameters2", &real_size_min, 20000);
+	createTrackbar("size_zone", "parameters2", &sizezone, 3000);
+	createTrackbar("x_offset", "parameters2", &xoffset, 3000);
+	createTrackbar("y_offset", "parameters2", &yoffset, 2000);
 
 	Scalar c_red(0,0,255), c_blue(255, 0, 0), c_yel(0,110,130);
 	for(;;) { //int i=0; i>=0; i++) {
@@ -114,11 +118,10 @@ void perspectiveOnlyLoop(int index, string path) {
 			visio.setBlkParameters(min_b, max_b);
 
 			Mat frame_hsv;
-			int xoffset = 0, yoffset = 300;
 			Mat translation = (Mat_<double>(3,3) << 1, 0, xoffset, 0, 1, yoffset, 0, 0, 1);
 			cvtColor(frame_ori, frame_hsv, CV_BGR2HSV);
 			undistort(frame_ori, frame, visio.getCM(), visio.getD());
-			warpPerspective(frame, persp, translation*visio.getQ(), Size(1000,600));
+			warpPerspective(frame, persp, translation*visio.getQ(), Size(sizezone,sizezone));
 			visio.setColor(yellow);
 			visio.getDetectedPosition(frame_hsv, detected_pts_yel, detected_contours_yel);
 			visio.setColor(red);
@@ -158,7 +161,7 @@ void perspectiveOnlyLoop(int index, string path) {
 				drawContours(persp, t, -1, c_blue, 2);
 			}
 
-			resize(persp, persp, Size(1000,600));
+			resize(persp, persp, Size(800,800));
 			imshow("persp", persp);
 			imshow("undistort", frame);
 			imshow("origin", frame_ori);
