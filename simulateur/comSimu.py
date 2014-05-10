@@ -153,7 +153,7 @@ class Communication():
 
 		else:
 			#on ajoute l'ordre reçu à la structure de renvoie
-			#self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return) # WTF ????
+			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, empty_return) # WTF ????
 			if (order == "PINGPING"):
 				self.__bigrobot.ping()
 			elif (order == "A_GOTOA"):

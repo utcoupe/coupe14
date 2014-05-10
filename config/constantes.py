@@ -12,7 +12,7 @@ TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux
 
 #====================Enable====================
 ENABLE_TOURELLE = 		True
-ENABLE_FLUSSMITTEL = 	False #permet de desactiver Flussmitel
+ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
 ENABLE_TIBOT = 			True
 
 #========================================Communication========================================
@@ -63,7 +63,8 @@ BEGIN_CHECK_COLLISION =	3000 #TODO
 FINISHED_THRESHOLD = 	50
 
 #====================pullData====================
-PULL_PERIODE = 			10 #période des pull en ms
+PULL_SYSTEM_PERIODE = 			10 #période du système de pull en ms
+PULL_PERIODE = 			100
 
 
 #====================NAVIGATION================

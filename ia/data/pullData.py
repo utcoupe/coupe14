@@ -6,9 +6,10 @@ Classe qui recupère les données de tous les objets
 import threading 
 import time
 import logging
+from constantes import *
 
 class PullData():
-	def __init__(self, Communication, Flussmittel, Tibot, SmallEnemyBot, BigEnemyBot, ComputeHokuyoData, Tourelle, PULL_PERIODE):
+	def __init__(self, Communication, Flussmittel, Tibot, SmallEnemyBot, BigEnemyBot, ComputeHokuyoData, Tourelle):
 		self.__logger = logging.getLogger(__name__.split('.')[0])
 		self.Communication = Communication
 		self.Flussmittel = Flussmittel[0]
@@ -22,14 +23,18 @@ class PullData():
 		self.ComputeHokuyoData = ComputeHokuyoData
 		self.Tourelle = Tourelle[0]
 		self.address_tourelle = Tourelle[1]
-		self.PULL_PERIODE = PULL_PERIODE
 
 		self.__pull_data = True
 		self.__id_flussmittel_other_asked = False
+		self.__id_flussmittel_other_asked_date = 0
 		self.__data_flussmittel_asserv_asked = False
+		self.__data_flussmittel_asserv_asked_date = 0
 		self.__id_tibot_other_asked = False
+		self.__id_tibot_other_asked_date = 0
 		self.__data_tibot_asserv_asked = False
+		self.__data_tibot_asserv_asked_date = 0
 		self.tourelle_asked = False
+		self.tourelle_asked_date = 0
 
 		self.__ThreadPull = threading.Thread(target=self.__gestion)
 
@@ -44,33 +49,39 @@ class PullData():
 		while self.__pull_data:
 			self.__readData()
 			self.__askData()
-			time.sleep(self.PULL_PERIODE/1000.0)
+			time.sleep(PULL_SYSTEM_PERIODE / 1000.0)
 
 	def __askData(self):
 		arguments = []
-
+		date = int(time.time()*1000)
+		
 		if self.Flussmittel is not None:
-			if self.__id_flussmittel_other_asked == False:
+			if self.__id_flussmittel_other_asked == False and (date - self.__id_flussmittel_other_asked_date) > PULL_PERIODE:
 				self.Communication.sendOrderAPI(self.address_flussmittel_other, 'GET_LAST_ID', *arguments)
 				self.__id_flussmittel_other_asked = True
+				self.__id_flussmittel_other_asked_date = date
 
-			if self.__data_flussmittel_asserv_asked == False:
+			if self.__data_flussmittel_asserv_asked == False and (date - self.__data_flussmittel_asserv_asked_date) > PULL_PERIODE:
 				self.Communication.sendOrderAPI(self.address_flussmittel_asserv, 'A_GET_POS_ID', *arguments)
 				self.__data_flussmittel_asserv_asked = True
+				self.__data_flussmittel_asserv_asked_date = date
 
 		if self.Tibot is not None:
-			if self.__id_tibot_other_asked == False:
+			if self.__id_tibot_other_asked == False and (date - self.__id_tibot_other_asked_date) > PULL_PERIODE:
 				self.Communication.sendOrderAPI(self.address_tibot_other, 'GET_LAST_ID', *arguments)
 				self.__id_tibot_other_asked = True
+				self.__id_tibot_other_asked_date = date
 
-			if self.__data_tibot_asserv_asked == False:
+			if self.__data_tibot_asserv_asked == False and (date - self.__data_tibot_asserv_asked_date) > PULL_PERIODE:
 				self.Communication.sendOrderAPI(self.address_tibot_asserv, 'A_GET_POS_ID', *arguments)
 				self.__data_tibot_asserv_asked = True
+				self.__data_tibot_asserv_asked_date = date
 				
 		if self.Tourelle is not None:
-			if self.tourelle_asked == False:
+			if self.tourelle_asked == False and (date - self.tourelle_asked_date) > PULL_PERIODE:
 				self.Communication.sendOrderAPI(self.address_tourelle, 'GET_HOKUYO', *arguments)
 				self.tourelle_asked = True
+				self.tourelle_asked_date = date
 
 
 	def __readData(self):
