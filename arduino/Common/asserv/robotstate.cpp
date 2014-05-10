@@ -19,6 +19,8 @@ RobotState::RobotState():encoderLeft(LEFT_SIDE), encoderRight(RIGHT_SIDE)
 }
 
 void RobotState::reset(){
+	use_block = false;
+	last_block = false;
 	blocked = false;
 	current_pos.x = 0;
 	current_pos.y = 0;
@@ -84,14 +86,15 @@ void RobotState::update(){
 	last_ticksL = ticksL;
 	last_angle = current_pos.angle;
 
-	blocked_management();
+	if (use_block) {
+		blocked_management();
+	}
 }
 
-//Set un flag si robot bloqué (mais le peut pas le clear)
+//Set un flag si robot bloqué
 void RobotState::blocked_management() {
 	static pos last_pos = current_pos;
-	static float time = 0, timer_led = 0;
-	static bool last_block = false;
+	static float time = 0;
 
 	time += DUREE_CYCLE;
 	if (time > PERIOD_BLOCKED) {
@@ -109,23 +112,19 @@ void RobotState::blocked_management() {
 		} else {
 			local_block = false;
 		}
-		blocked = local_block & last_block; //Evite les faux positifs
+		blocked = local_block && last_block; //Evite les faux positifs
 		last_block = local_block;
 		last_pos = current_pos;
 		time = 0; //Remise à 0
 	}
-	if (blocked) {
-		digitalWrite(LED_BLOCKED, LOW); //Allume la led blocage 2s
-		timer_led = 0;
-	}
-	timer_led += DUREE_CYCLE;
-	if (timer_led > 2000) {
-		digitalWrite(LED_BLOCKED, HIGH); //Allume la led blocage
-	}
 }
 
-void RobotState::clearBlocked() {
-	blocked = false;
+void RobotState::useBlock(bool state) {
+	use_block = state;
+	if (use_block == false) {
+		last_block = false;
+		blocked = false;
+	}
 }
 
 bool RobotState::isBlocked() {

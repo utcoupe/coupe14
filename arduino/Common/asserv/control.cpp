@@ -37,15 +37,20 @@ void Control::compute(){
 	static struct goal last_goal = current_goal;
 	pos current_pos = robot.getMmPos();
 	long now = timeMicros();
+
+	if (current_goal.type == NO_GOAL || current_goal.isReached || fifo.isPaused()) {
+		robot.useBlock(false);
+	} else {
+		robot.useBlock(true);
+	}
+
 	robot.update();
 
 	if(fifo.isPaused() || current_goal.type == NO_GOAL){
-		robot.clearBlocked();
 		setConsigne(0, 0);
 	}
 	else{
 		if (current_goal.isReached) {
-			robot.clearBlocked();
 			last_finished_id = current_goal.ID;
 			if (fifo.getRemainingGoals() > 1){//Si le but est atteint et que ce n'est pas le dernier, on passe au suivant
 				current_goal = fifo.gotoNext();
@@ -59,7 +64,6 @@ void Control::compute(){
 			current_goal = fifo.getCurrentGoal();
 			PID_Angle.reset();
 			PID_Distance.reset();
-			robot.clearBlocked();
 			reset = false;
 			order_started = false;
 		}
@@ -221,6 +225,10 @@ void Control::clearGoals(){
 
 pos Control::getPos(){
 	return robot.getMmPos();
+}
+
+bool Control::isBlocked() {
+	return robot.isBlocked();
 }
 
 Encoder* Control::getRenc(){

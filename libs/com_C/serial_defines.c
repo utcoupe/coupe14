@@ -27,6 +27,7 @@ void initSize()
 	ordreSize[A_SET_POS]=8;
 	ordreSize[A_GET_POS]=0;
 	ordreSize[A_GET_POS_ID]=0;
+	ordreSize[A_IS_BLOCKED]=0;
 
 	//OTHERS
 	//FM
