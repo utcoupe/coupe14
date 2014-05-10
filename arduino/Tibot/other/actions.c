@@ -5,11 +5,24 @@
 
 static Servo servoFilet, servoBallesL, servoBallesR, servoBalai;
 
+int jack_state = 0;
+
 struct servoQueue {
 	Servo* servo;
 	int pos, delay;
 	long start;
 };
+
+void updateJackState() {
+	static int last_state = 0;
+	int state = digitalRead(PIN_JACK);
+	if (state == HIGH && last_state == HIGH) {
+		jack_state = 1;
+	} else {
+		jack_state = 0;
+	}
+	last_state = state;
+}
 
 void retourServo(Servo *servo, int pos, int delay) {
 	static struct servoQueue tab[12];

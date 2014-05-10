@@ -11,8 +11,7 @@ from xml.dom.minidom import parseString
 from collections import deque
 import sys
 import inspect, os
-import math
-
+from math import *
 
 from .goal import *
 from .ElemGoal import *
@@ -365,8 +364,7 @@ class GoalsManager:
 	def __positionReady(self, x, y):
 		x2 = x - CENTRE_BRAS_X
 		y2 = y - CENTRE_BRAS_Y
-		a = atan2(y2, x2)
-		r = hypot(x2, y2)
+		a, r = self.__toPolaire(x2, y2)
 		return self.__positionReadyPolaire(a, r)
 
 	def __positionReadyPolaire(self, a, r):
@@ -375,17 +373,37 @@ class GoalsManager:
 				return True
 		return False
 
+	def __toCartesien(self, a, r):
+		return (r * cos(a), r * sin(a))
+	def __toPolaire(self, x, y):
+		return (atan2(y,x), hypot(x,y))
+
 	# To verify
-	def __getRotationToHaveTriangle(self, x, y):
+	def __getPosToHaveTriangle(self, x, y):
 		# "Sécurité", peut être enlevé à priori
-		if self.__positionReady(x, y):
+		"""
+		if __positionReady(x, y):
 			return 0
+		"""
+		# Variable à retourner en cartésien
+		r_to_go = 0
+		a_to_go = 0
+		
+		temp_x, temp_y = self.__toCartesien(ANGLE_MAX - ANGLE_MIN, OUVERTURE_BRAS_MAX - OUVERTURE_BRAS_MIN)
+		centre_zone_x = temp_x + CENTRE_BRAS_X
+		centre_zone_y = temp_y + CENTRE_BRAS_Y
+
+		print(x, y)
 		if hypot(x, y) > hypot(CENTRE_BRAS_Y, CENTRE_BRAS_X + OUVERTURE_BRAS_MAX):
 			# Il faut avancer
-			self.__logger.error("TODO :P")
-
+			a, r = self.__toPolaire(x, y)
+			r_to_go = r - hypot(centre_zone_x, centre_zone_y)
+			r -= r_to_go
+			x, y = self.__toCartesien(a, r)
+		print(x, y)
+		print(r_to_go)
 		# Angle en degrés entre deux calculs
-		delta_a = 5
+		delta_a = 1
 
 		# i_* => itérateurs
 		i_x = x
@@ -395,27 +413,29 @@ class GoalsManager:
 		nb_a = 0
 		stop = False
 
-		for i in range(1,360/delta_a): # to modify
+		for i in range(int(-90/delta_a),int(90/delta_a)): # to modify
 			i_rot = radians(i*delta_a)
 			i_x = x * cos(i_rot) - y * sin(i_rot)
 			i_y = x * sin(i_rot) + y * cos(i_rot)
-			if __positionReady(i_x, i_y):
+			if self.__positionReady(i_x, i_y):
 				somme_a += i_rot
 				nb_a += 1
 				stop = True
 
-			# On s'arrête si on a déjà trouvé des positions et qu'on en troue plus,
+			# On s'arrête si on a déjà trouvé des positions et qu'on en trouve plus,
 			# pour ne pas que la moyenne tombe dans un "trou"
 			elif stop == True:
 				break
 
-		# Un - car on fait tourner le point (x,y) et non le robot
-		angle_to_go = - somme_a / nb_a
+		if nb_a == 0:
+			a_to_go = 0
+			self.__logger.error("Fuck, impossible d'attraper le triangle ! (surement trop près du robot)")
+		else:
+			# Un - car on fait tourner le point (x,y) et non le robot
+			a_to_go = -somme_a / nb_a
 
-		if angle_to_go == 0:
-			self.__logger.error("Fuck, impossible de l'attraper ! (surement trop près du robot)")
-
-		return angle_to_go
+		x_to_go, y_to_go = self.__toCartesien(a_to_go, r_to_go)
+		return (int(x_to_go), int(y_to_go), float(a_to_go))
 
 	def processBrasStatus(self, status_fin, id_objectif):
 		objectif = None

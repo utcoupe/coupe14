@@ -74,6 +74,7 @@ enum ordre {
 	O_TIR_BALLE, //@int @int
 	O_TIR_FILET, //@int
 	O_BALAI, //@int @int
+	O_JACK_STATE, //#int
 
 	//GENERAL
 	GET_CAM,	//#int #int

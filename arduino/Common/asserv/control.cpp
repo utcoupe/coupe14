@@ -40,11 +40,12 @@ void Control::compute(){
 	robot.update();
 
 	if(fifo.isPaused() || current_goal.type == NO_GOAL){
-		value_consigne_right = 0;
-		value_consigne_left = 0;
+		robot.clearBlocked();
+		setConsigne(0, 0);
 	}
 	else{
 		if (current_goal.isReached) {
+			robot.clearBlocked();
 			last_finished_id = current_goal.ID;
 			if (fifo.getRemainingGoals() > 1){//Si le but est atteint et que ce n'est pas le dernier, on passe au suivant
 				current_goal = fifo.gotoNext();
@@ -69,7 +70,7 @@ void Control::compute(){
 			{
 				float da = (current_goal.data_1 - current_pos.angle);
 				
-				da = moduloTwoPI(da);//Commenter pour multi-tour
+				//da = moduloTwoPI(da);//Commenter pour multi-tour
 
 				if(abs(da) <= ERROR_ANGLE){
 					setConsigne(0, 0);
@@ -91,7 +92,7 @@ void Control::compute(){
 				static char aligne = 0;
 
 				//Commenter pour multi-tour
-				da = moduloPI(da);
+				da = moduloTwoPI(da);
 
 				if (dd < ERROR_POS) { //"Zone" d'arrivée
 					fifo.pushIsReached();
@@ -313,13 +314,12 @@ void Control::controlPos(float da, float dd)
 
 	check_max(&consigneDistance, CONSIGNE_RANGE_MAX - abs(consigneAngle));
 	check_dist_acc(&consigneDistance);
-	PDEBUGLN();
 
 	consigneR = consigneDistance + consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
 	consigneL = consigneDistance - consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
 
 	last_consigne_angle = consigneAngle;
-	last_consigne_dist= consigneDistance;
+	last_consigne_dist = consigneDistance;
 	setConsigne(consigneL, consigneR);
 }
 

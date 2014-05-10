@@ -8,6 +8,7 @@
 #define PIN_SERVO_BALLES_L 30
 #define PIN_SERVO_BALLES_R 38
 #define PIN_SERVO_BALAI 34
+#define PIN_JACK 52
 
 #define SERIAL_MAIN Serial1
 #define SERIAL_FWD Serial2
@@ -28,7 +29,7 @@
 
 #define POS_BALAI_INIT 70 
 
-#define POS_TIR_FILET 4 
+#define POS_TIR_FILET 0 
 #define POS_BALAI_R 0
 #define POS_BALAI_L 140
 

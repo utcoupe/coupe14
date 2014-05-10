@@ -4,6 +4,7 @@
 #include "parameters.h"
 #include "Servo.h"
 
+void updateJackState();
 void retourServo(Servo *servo=0, int pos=0, int delay=RETOUR_SERVO);
 void tirBalles(int nbr);
 void balai(int side);

@@ -11,6 +11,8 @@
 #include "serial_defines.h"
 #include "serial_types.h"
 
+extern int jack_state;
+
 //La fonction renvoit le nombre d'octet dans ret, chaine de caractère de réponse. Si doublon, ne pas executer d'ordre mais renvoyer les données à renvoyer
 int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bool doublon){ 
 	static int last_id = 0;
@@ -38,6 +40,10 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		break;
 	case RESET_ID:
 		last_id = 0;
+		break;
+	case O_JACK_STATE:
+		ret_size = 2;
+		itob(jack_state, ret);
 		break;
 	default:
 		return -1;//commande inconnue
