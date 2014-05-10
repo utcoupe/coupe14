@@ -1,9 +1,8 @@
 #include "lidar.h"
 #include "global.h"
 #include "robot.h"
+#include "communication.h"
 #include "compat.h"
-#include "protocole_serial.h"
-#include "serial_switch.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -76,8 +75,7 @@ int main(int argc, char **argv){
 	#endif
 
 	if (use_protocol) {
-		printf("Lancement du thread protocole\n");
-		init_protocol_thread();
+		init_protocol();
 	}
 
 	startTime = timeMillis();
@@ -108,7 +106,7 @@ void frame(){
 	waitScreen();
 	#endif
 	if (use_protocol){
-		pushCoords(robots, nRobots, timestamp);
+		pushResults(robots, nRobots, timestamp);
 	}
 	else{
 		printf("%s%li;%i", PREFIX, timestamp, nRobots);
