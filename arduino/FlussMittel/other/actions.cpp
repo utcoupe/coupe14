@@ -201,7 +201,6 @@ void cmdTriPush() {
 
 void cmdTriBordure() {
 	static unsigned long time_end = 0;
-	static int hauteur_revele;
 	if (step == -1) { //Debut
 		step = 0;
 		next_step = true;
