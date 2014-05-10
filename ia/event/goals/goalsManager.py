@@ -361,26 +361,27 @@ class GoalsManager:
 								objectif.switchColor()
 							self.__cancelGoal(objectif, False)
 						else:
-							find = False
-							script_get_triangle = deque()
 							if self.__positionReady(data_camera[1], data_camera[2]):
-								find = True
-							else:
-								temp = self.__getPosToHaveTriangle(data_camera[1], data_camera[2])
-								if temp != None:
-									find  = True
-									x, y, a = temp
-									x_abs, y_abs, a_abs = self.__data[self.__robot_name]["getPositionAndAngle"]
-									script_get_triangle.append( ("A_GOTOA", (x+x_abs, y+y_abs, a+a_abs)) )
-							if find == True:
+								script_get_triangle = deque()
 								script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], HAUTEUR_TORCHE+3*HAUTEUR_TRIANGLE)) ) #TODO hauteur par triangle dans le cas des triangles au sol
 								script_get_triangle.append( ("THEN", ()) )
 								script_get_triangle.append( ("O_GET_BRAS_STATUS", ()) )
 								script_get_triangle.append( ("THEN", (),) )
 								self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
 							else:
-								self.__logger.warning("Impossible d'attendre le triangle data_camera: "+str(data_camera))
-								self.__cancelGoal(objectif, False)
+								temp = self.__getPosToHaveTriangle(data_camera[1], data_camera[2])
+								if temp != None:
+									find  = True
+									x, y, a = temp
+									x_abs, y_abs, a_abs = self.__data[self.__robot_name]["getPositionAndAngle"]
+									script_get_triangle = deque()
+									script_get_triangle.append( ("A_GOTOA", (x+x_abs, y+y_abs, a+a_abs)) ) 
+									script_get_triangle.append( ("STEP_OVER", (),) )
+									self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
+								else:
+									self.__logger.warning("Impossible d'attendre le triangle data_camera: "+str(data_camera))
+									self.__cancelGoal(objectif, False)
+							
 			else:
 				self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), action_list)
 				objectif.getElemGoalLocked().removeFirstElemAction()
