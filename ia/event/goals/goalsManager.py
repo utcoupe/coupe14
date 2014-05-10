@@ -393,15 +393,13 @@ class GoalsManager:
 		centre_zone_x = temp_x + CENTRE_BRAS_X
 		centre_zone_y = temp_y + CENTRE_BRAS_Y
 
-		print(x, y)
 		if hypot(x, y) > hypot(CENTRE_BRAS_Y, CENTRE_BRAS_X + OUVERTURE_BRAS_MAX):
 			# Il faut avancer
 			a, r = self.__toPolaire(x, y)
 			r_to_go = r - hypot(centre_zone_x, centre_zone_y)
 			r -= r_to_go
 			x, y = self.__toCartesien(a, r)
-		print(x, y)
-		print(r_to_go)
+
 		# Angle en degrés entre deux calculs
 		delta_a = 1
 
