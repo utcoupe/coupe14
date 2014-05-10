@@ -79,7 +79,14 @@ void Visio::init() {
 }
 
 void Visio::init_writer() {
-	string path = path_to_conf+(string)"video.avi";
+	time_t rawtime;
+	struct tm * timeinfo;
+	char buffer[80];
+	time (&rawtime);
+	timeinfo = localtime(&rawtime);
+	strftime(buffer,80,"-%d-%m %I:%M:%S",timeinfo);
+	string date(buffer);
+	string path = path_to_conf+(string)"video"+date+(string)".avi";
 	cerr << "Saving video to : " << path << endl;
 	//int codec = CV_FOURCC('M', 'J', 'P', 'G'); //Marche
 	int codec = CV_FOURCC('D', 'I', 'V', 'X'); //Marche
