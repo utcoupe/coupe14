@@ -308,7 +308,7 @@ class GoalsManager:
 							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
 						elif (nb_front_stack < MAX_FRONT_TRIANGLE_STACK) and (nb_back_stack >= MAX_BACK_TRIANGLE_STACK):
 							self.__back_triangle_stack.popleft()
-							script_to_send.append( ("O_RET_OUVRIR", ()) )
+							script_to_send.append( ("O_RET", ()) )
 							self.__back_triangle_stack.append(self.__last_camera_color)
 							position = -1
 							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
@@ -386,10 +386,10 @@ class GoalsManager:
 										self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
 									else:
 										self.__logger.warning("Impossible d'attendre le triangle d'après PathFinding, data_camera: "+str(data_camera)+" path: "+str(path)+" x+x_abs: "+str(x+x_abs)+" y+y_abs "+str(y+y_abs)+" a+a_abs "+str(a+a_abs))
-										self.__cancelGoal(objectif, False)
+										self.__deleteGoal(objectif, False)
 								else:
 									self.__logger.warning("Impossible d'attendre le triangle d'après Alexis, data_camera: "+str(data_camera))
-									self.__cancelGoal(objectif, False)
+									self.__deleteGoal(objectif, False)
 							
 			else:
 				self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), action_list)

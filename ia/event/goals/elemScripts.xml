@@ -111,10 +111,10 @@
 			<order>THEN</order>
 			<order>O_DROP_TRIANGLE 250 -50</order>
 			<order>THEN</order>
-			<order>A_ROT 3.14</order>
-			<order>O_RET_OUVRIR</order>
-			<order>THEN</order>
-			<order>O_RET_FERMER</order>
+			<order>A_ROT 1.57</order>
+			<order>A_PWM 50 50 150</order>
+			<order>A_ROT 1.57</order>
+			<order>O_RET</order>
 			<order>END</order>
 		</orders>
 	</elemScript>
