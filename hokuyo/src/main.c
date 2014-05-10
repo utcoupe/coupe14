@@ -41,7 +41,7 @@ static void catch_SIGINT(int signal){
 int main(int argc, char **argv){
 	
 	if(argc <= 1 || ( strcmp(argv[1], "red") != 0 && strcmp(argv[1], "blue") ) ){
-		fprintf(stderr, "usage: hokuyo {red|blue} [protocol]\n");
+		fprintf(stderr, "usage: hokuyo {red|blue} [path_pipe]\n");
 		return EXIT_FAILURE;
 	}
 
@@ -60,8 +60,10 @@ int main(int argc, char **argv){
 
 	
 
-	if (argc == 3 && strcmp(argv[2], "protocol") == 0) {
-		printf("Utilisation du protcole\n");
+	char *path;
+	if (argc == 3) {
+		path = argv[2];
+		printf("Utilisation du protcole, pipe : %s\n", path);
 		use_protocol = 1;
 	}
 
@@ -75,7 +77,7 @@ int main(int argc, char **argv){
 	#endif
 
 	if (use_protocol) {
-		init_protocol();
+		init_protocol(path);
 	}
 
 	startTime = timeMillis();
