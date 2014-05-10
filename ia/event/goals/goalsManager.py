@@ -402,6 +402,11 @@ class GoalsManager:
 			r_to_go = r - hypot(centre_zone_x, centre_zone_y)
 			r -= r_to_go
 			x, y = self.__toCartesien(a, r)
+		elif hypot(x, y) < hypot(CENTRE_BRAS_Y, CENTRE_BRAS_X):
+			a, r = self.__toPolaire(x, y)
+			r_to_go = hypot(centre_zone_x, centre_zone_y) - r
+			r += r_to_go
+			x, y = self.__toCartesien(a, r)
 
 		# Angle en degrés entre deux calculs
 		delta_a = 1
