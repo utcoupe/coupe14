@@ -530,18 +530,18 @@ class GoalsManager:
 			name 			= str(xml_goal.getElementsByTagName('name')[0].firstChild.nodeValue) #nom explicite
 			type			= str(xml_goal.getElementsByTagName('type')[0].firstChild.nodeValue) #triangle, 
 			concerned_robot = str(xml_goal.getElementsByTagName('concerned_robot')[0].firstChild.nodeValue) #ALL, TIBOT, FLUSSMITTEL
-			x				= int(xml_goal.getElementsByTagName('x')[0].firstChild.nodeValue)
-			y				= int(xml_goal.getElementsByTagName('y')[0].firstChild.nodeValue)
+			x_objectif		= int(xml_goal.getElementsByTagName('x_objectif')[0].firstChild.nodeValue)
+			y_objectif		= int(xml_goal.getElementsByTagName('y_objectif')[0].firstChild.nodeValue)
 
 			#On ajoute uniquement les objectifs qui nous concerne
 			if concerned_robot == "ALL" or concerned_robot == self.__robot_name:
-				goal = Goal(id, name, type, concerned_robot, x, y)
+				goal = Goal(id, name, type, concerned_robot, x_objectif, y_objectif)
 				self.__available_goals.append(goal)
 
 				for elem_goal in xml_goal.getElementsByTagName('elem_goal'):
 					id			= int(elem_goal.getElementsByTagName('id')[0].firstChild.nodeValue)
-					x			= int(elem_goal.getElementsByTagName('x')[0].firstChild.nodeValue)
-					y			= int(elem_goal.getElementsByTagName('y')[0].firstChild.nodeValue)
+					x_elem		= int(elem_goal.getElementsByTagName('x_elem')[0].firstChild.nodeValue)
+					y_elem		= int(elem_goal.getElementsByTagName('y_elem')[0].firstChild.nodeValue)
 					angle		= float(elem_goal.getElementsByTagName('angle')[0].firstChild.nodeValue)
 					points		= int(elem_goal.getElementsByTagName('points')[0].firstChild.nodeValue)
 					priority	= int(elem_goal.getElementsByTagName('priority')[0].firstChild.nodeValue)
@@ -549,7 +549,7 @@ class GoalsManager:
 					color		= str(elem_goal.getElementsByTagName('color')[0].firstChild.nodeValue)
 					id_script	= int(elem_goal.getElementsByTagName('id_script')[0].firstChild.nodeValue)
 					
-					goal.appendElemGoal( ElemGoal(id, x, y, angle, points, priority, duration, color, self.__elem_script[id_script]) )
+					goal.appendElemGoal( ElemGoal(id, x_objectif+x_elem, y_objectif+y_elem, angle, points, priority, duration, color, self.__elem_script[id_script]) )
 
 	def __loadBeginScript(self):
 		base_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
