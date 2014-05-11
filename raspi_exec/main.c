@@ -3,7 +3,24 @@
 #include <unistd.h>
 #include <string.h>
 #include <signal.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
+/*************************************************************
+ *                                                           *
+ *            Programme père du raspberry pi                 *
+ *                                                           *
+ *                          protocole                        *
+ *                              |                            *
+ *                              |                            *
+ *                            raspi                          *
+ *                            /    \                         *
+ *                      hokuyo     visio_raspi               *
+ *                                /            \             *
+ *                        cam_centre           cam_coin      *
+ *                                                           *
+ *                                                           *
+ ************************************************************/
 
 #define VISIO_CENTRE_PORT "/dev/video0"
 #define VISIO_COIN_PORT "/dev/video1"
@@ -16,6 +33,10 @@ int main(int argc, char **argv) {
 	const char *path, *color;
 	path = argv[1];
 	color = argv[2];
+	if (!(strcmp(color, "red") == 0 || strcmp(color, "yellow") == 0)) {
+		printf("Couleur incorrecte : red/yellow\n");
+		exit(EXIT_FAILURE);
+	}
 	pid_t pid_hokuyo, pid_cameras;
 	pid_hokuyo = fork();
 	if (pid_hokuyo == 0) {
@@ -26,41 +47,36 @@ int main(int argc, char **argv) {
 		strcpy(pipe, path);
 		strcat(pipe, "/config/raspi/pipe_hokuyo");
 
+		printf("%d - Initilizing fifo for hokuyo\n", getpid());
+		//Ouvrir fifo
+		mkfifo(pipe, 0666);
+
+		printf("%d - Hokuyo starting...\n", getpid());
 		execl(exec, color, pipe, (char *)NULL);
 	} else {
-		printf("Spawned hokuyo, pid %d\n", pid_hokuyo);
+		printf("%d - Spawned hokuyo, pid %d\n", getpid(), pid_hokuyo);
 		//CAMERAS CONFIG
 		
 		//exec path
-		char exec[100];
-		strcpy(exec, path);
-		strcat(exec, "/supervisio/visio");
+		char exec[] = "python3";
 
-		//config path couleur
-		char config[100]; 
-		strcpy(config, path);
-		strcat(config, "/config/visio/");
-		if (strcmp(color, "red")) {
-			strcat(config, "visio_tourelle_red/");
-		} else if (strcmp(color, "yellow")) {
-			strcat(config, "visio_tourelle_yellow/");
-		} else {
-			printf("Couleur incorrecte\n");
-			kill(pid_hokuyo, 9);
-			exit(EXIT_FAILURE);
-		}
-
-		//config path position
-		char config_centre[100];
-		strcpy(config_centre, config);
-		strcat(config_centre, "centre/");
+		//path script python
+		char file[100], pipe[100]; 
+		strcpy(pipe, path);
+		strcat(pipe, "/config/raspi/pipe_cameras");
+		strcpy(file, path);
+		strcat(file, "/raspi_exec/visio_raspi.py");
 
 		pid_cameras = fork();
 		if (pid_cameras == 0) {
 			//Cameras
+			printf("%d - Initilizing fifo for cameras\n", getpid());
+			mkfifo(pipe, 0666);
+			printf("%d - Cameras starting...\n", getpid());
+			execl(exec, file, pipe, color, (char *)NULL);
 
 		} else {
-			printf("Spawned cameras, pid %d\n", pid_cameras);
+			printf("%d - Spawned cameras, pid %d\n", getpid(), pid_cameras);
 			//Suite du main
 		}
 	}
