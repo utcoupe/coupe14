@@ -9,9 +9,8 @@
 static FILE *pipe;
 
 void init_protocol(char *path) {
-	char *pipe_path = strcat(path, "/hokuyo_pipe");
-	mkfifo(pipe_path, 0666);
-	pipe = fopen(pipe_path, "w+");
+	mkfifo(path, 0666);
+	pipe = fopen(path, "w+");
 }
 
 // !t;x1:y1;x2:y2;\n

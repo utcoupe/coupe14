@@ -58,10 +58,8 @@ int main(int argc, char **argv){
 		posl1.x = TAILLE_TABLE_X+25;
 	}
 
-	
-
-	char *path;
 	if (argc == 3) {
+		char *path;
 		path = argv[2];
 		printf("Utilisation du protcole, pipe : %s\n", path);
 		use_protocol = 1;
