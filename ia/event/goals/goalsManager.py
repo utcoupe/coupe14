@@ -308,7 +308,7 @@ class GoalsManager:
 							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
 						elif (nb_front_stack < MAX_FRONT_TRIANGLE_STACK) and (nb_back_stack >= MAX_BACK_TRIANGLE_STACK):
 							self.__back_triangle_stack.popleft()
-							script_to_send.append( ("O_RET_OUVRIR", ()) )
+							script_to_send.append( ("O_RET", ()) )
 							self.__back_triangle_stack.append(self.__last_camera_color)
 							position = -1
 							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
