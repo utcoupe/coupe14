@@ -55,7 +55,7 @@ void initAct() {
 	//Moteurs :
 	pump_motor.run(FORWARD);
 	cmdBrasServ(ANGLE_OUVERT, LONGUEUR_MAX);
-	servoRet.write(ANGLE_RET); 
+	servoRet.write(150); 
 	pump(true);
 	stepperAsc.setAcceleration(AMAX_STEPPER);
 	stepperAsc.setMaxSpeed(VMAX_STEPPER);
@@ -201,7 +201,6 @@ void cmdTriPush() {
 
 void cmdTriBordure() {
 	static unsigned long time_end = 0;
-	static int hauteur_revele;
 	if (step == -1) { //Debut
 		step = 0;
 		next_step = true;

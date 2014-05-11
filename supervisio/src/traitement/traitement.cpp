@@ -79,13 +79,14 @@ void Visio::init() {
 }
 
 void Visio::init_writer() {
-	cerr << "Saving video to : " << path_to_conf+(string)"video.avi" << endl;
+	string path = path_to_conf+(string)"video.avi";
+	cerr << "Saving video to : " << path << endl;
 	//int codec = CV_FOURCC('M', 'J', 'P', 'G'); //Marche
 	int codec = CV_FOURCC('D', 'I', 'V', 'X'); //Marche
-	writer = VideoWriter(path_to_conf+(string)"video.avi", codec, cam_fps,
-			Size(camera.get(CV_CAP_PROP_FRAME_WIDTH), camera.get(CV_CAP_PROP_FRAME_HEIGHT)));
+	writer = VideoWriter(path, codec, cam_fps, size_frame);
 	if (!writer.isOpened()) {
 		cerr << "Failed to initialize writer, video can't be saved" << endl;
+		save_video = false;
 	}
 }
 
