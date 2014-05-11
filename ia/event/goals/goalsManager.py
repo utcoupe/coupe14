@@ -18,6 +18,14 @@ from .ElemGoal import *
 from .navigation import *
 from .visio import *
 
+"""
+	<order>O_DROP_TRIANGLE 300 30</order>
+			<order>THEN</order>
+			<order>O_DROP_TRIANGLE 250 -10</order>
+			<order>THEN</order>
+			<order>O_DROP_TRIANGLE 225 -50</order>
+"""
+
 
 class GoalsManager:
 	def __init__(self, SubProcessManager, connection, robot_name):
@@ -90,8 +98,10 @@ class GoalsManager:
 			best_length = float("Inf")
 
 			#On cherche l'elem goal le plus proche par bruteforce
-			if self.__available_goals:
+			if self.__available_goals:	
 				for goal in self.__available_goals:
+					if self.__robot_name == "FLUSSMITTEL" and len(self.__front_triangle_stack) == MAX_FRONT_TRIANGLE_STACK and goal.getType() != "STORE_TRIANGLE":
+						continue
 					nb_elem_goal = goal.getLenElemGoal()
 					for idd in range(nb_elem_goal):
 						path = self.__getOrderTrajectoire(goal, idd)
@@ -340,7 +350,7 @@ class GoalsManager:
 							triangle = triangle_list[0] #TODO, prendre le meilleur triangle suivent les arg
 							data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
 						else:
-							data_camera = ("RED", 220, 0) #test
+							data_camera = ("RED", 400, 0) #test
 
 						self.__last_camera_color = data_camera[0]
 						#si on a la possibilité de le stocker
@@ -360,7 +370,8 @@ class GoalsManager:
 								if temp != None:
 									find  = True
 									x, y, a = temp
-									script_get_triangle.append( ("A_GOTOA", (x, y, a)) )
+									x_abs, y_abs, a_abs = self.__data[self.__robot_name]["getPositionAndAngle"]
+									script_get_triangle.append( ("A_GOTOA", (x+x_abs, y+y_abs, a+a_abs)) )
 							if find == True:
 								script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], HAUTEUR_TORCHE+3*HAUTEUR_TRIANGLE)) ) #TODO hauteur par triangle dans le cas des triangles au sol
 								script_get_triangle.append( ("THEN", ()) )
@@ -408,7 +419,6 @@ class GoalsManager:
 		centre_zone_x = temp_x + CENTRE_BRAS_X
 		centre_zone_y = temp_y + CENTRE_BRAS_Y
 
-		print(x, y)
 		if hypot(x, y) > hypot(CENTRE_BRAS_Y, CENTRE_BRAS_X + OUVERTURE_BRAS_MAX):
 			# Il faut avancer
 			a, r = self.__toPolaire(x, y)
