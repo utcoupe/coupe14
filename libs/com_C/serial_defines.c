@@ -31,8 +31,7 @@ void initSize()
 
 	//OTHERS
 	//FM
-	ordreSize[O_RET_OUVRIR]=2;
-	ordreSize[O_RET_FERMER]=2;
+	ordreSize[O_RET]=2;
 	ordreSize[O_GET_TRIANGLE]=8;
 	ordreSize[O_STORE_TRIANGLE]=4;
 	ordreSize[O_GET_BRAS_STATUS]=2;

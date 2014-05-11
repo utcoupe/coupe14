@@ -381,7 +381,7 @@ class CommunicationGlobale():
 				lastIdToAccept = -1
 
 				if idd == self.getNextConfirmeId(address):
-					self.__logger.debug("Success: l'arduino %s a bien recu l'ordre %s d'id: %s", self.address[address], self.orders[self.ordreLog[address][idd][0]], idd)
+					#self.__logger.debug("Success: l'arduino %s a bien recu l'ordre %s d'id: %s", self.address[address], self.orders[self.ordreLog[address][idd][0]], idd)
 					self.nbTransmitedPaquets +=1
 					self.nbUnconfirmedPacket[address] = (self.nbUnconfirmedPacket[address][0] - unconfirmedIds.index(idd) - 1, date)#on bidone le chiffre date, mais c'est pas grave
 					self.lastIdConfirm[address] = idd
@@ -497,7 +497,7 @@ class CommunicationGlobale():
 					self.ordreLog[int(address)][idd] = (order, chaineTemp)
 					self.lastSendDate[address] = date
 					self.lastIdSend[address] = idd
-					self.__logger.debug("Envoi normal a l'arduino %s de l'ordre %s d'id %s", self.address[address], self.orders[order], idd)
+					#self.__logger.debug("Envoi normal a l'arduino %s de l'ordre %s d'id %s", self.address[address], self.orders[order], idd)
 					self.sendMessage(address, chaineTemp)
 				else:
 					remainOrdersToSend.append(packet)

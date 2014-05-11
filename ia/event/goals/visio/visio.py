@@ -116,13 +116,12 @@ class Visio:
 
 		# En situation de test, big bot est None
 		triangles = self._triangles
-		"""
 		try:
 			if self.__big_bot is not None:
 				self.__post_processing()
-		except:
+		except BaseException as e:
+			self.__log.error("Failed to post-process datas : "+str(e))
 			self._triangles = triangles  # si echec, on ne corrige pas
-			"""
 
 	def __post_processing(self):
 		if self.__big_bot is None:
@@ -142,11 +141,11 @@ class Visio:
 			tri.real_coords = [i + j for i, j in zip(tri.rel_in_abs, self.__big_bot.getPosition())]
 
 			#Traitement de la position pour modif si triangle en hauteur
-			if self.__inHighGround(tri):
-				self.__highGroundProcess(tri)
-			elif self.__inStartZone(tri):
+			if self.__outOfMap(tri) or self.__inFruitZone(tri) or self.__inStartZone(tri):
 				self._triangles.remove(tri)
 
+			#elif self.__inHighGround(tri):
+			#	self.__highGroundProcess(tri)
 
 	def __highGroundProcess(self, tri):
 		"""Corrige les coordonnées des triangles en hauteurs à des positions connues
@@ -159,24 +158,25 @@ class Visio:
 		#reconversion en coords reelles
 		tri.real_coords = [i + j for i, j in zip(tri.rel_in_abs, self.__big_bot.getPosition())]
 
+	def __outOfMap(self, tri):
+		return tri.real_coords.x > 3000 or tri.real_coords.x < 0\
+		or tri.real_coords.y > 2000 or tri.real_coords.y < 0
+
+	def __inFruitZone(self, tri):
+		return (tri.real_coords.x > 400 and tri.real_coords.x < 1100 and tri.real_coords.y > 1700)\
+		or (tri.real_coords.x > 1900 and tri.real_coords.x < 2600 and tri.real_coords.y > 1700)
+
+
 	def __inHighGround(self, tri):
 		#plateformes
-		if self.__p_in_circle((0, 0), 250, tri.real_coords) \
+		return self.__p_in_circle((0, 0), 250, tri.real_coords) \
 		or self.__p_in_circle((3000, 0), 250, tri.real_coords) \
-		or self.__p_in_circle((1500, 950), 150, tri.real_coords):
-			return True
-		else:
-			return False
+		or self.__p_in_circle((1500, 950), 150, tri.real_coords)
 
 	def __inStartZone(self, tri):
-		if self.__p_in_circle((0,1700), 400, tri.real_coords) or self.__p_in_circle((3000, 1700), 400, tri.real_coords):
-			return True
-		else:
-			return False
+		return (tri.real_coords.x < 400 and tri.real_coords.y > 1700) or (tri.real_coords.x > 2600 and tri.real_coords.y > 1700) \
+		or self.__p_in_circle((0,1700), 400, tri.real_coords) or self.__p_in_circle((3000, 1700), 400, tri.real_coords)
 
 	def __p_in_circle(self, center, radius, p):
 			# (x−p)2+(y−q)2<r2
-			if (p[0] - center[0]) ** 2 + (p[1] - center[1]) ** 2 < radius ** 2:
-				return True
-			else:
-				return False
+			return (p[0] - center[0]) ** 2 + (p[1] - center[1]) ** 2 < radius ** 2
