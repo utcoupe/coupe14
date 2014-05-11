@@ -2,7 +2,6 @@
 import os
 import sys
 import time
-import errno
 
 FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(FILE_DIR, "../ia/"))
@@ -27,11 +26,11 @@ def compute(v):
 
 
 def send(triangles, pipe):
-	pass
-	"""
 	for tri in triangles:
-		print(tri)
-	print()"""
+		pipe.write(str(tri.coord[0]) + " " + str(tri.coord[1]) + " " + str(tri.angle) +  " " + str(tri.size)
+				+ " " + str(tri.color) + " " + str(tri.isDown) + "\n")
+	pipe.write('END\n')
+
 
 if __name__ == '__main__':
 	try:
