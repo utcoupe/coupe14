@@ -485,7 +485,7 @@
 			<elem_goal>
 				<id>0</id>
 				<x_elem>430</x_elem>
-				<y_elem>250</y_elem>
+				<y_elem>300</y_elem>
 				<angle>0</angle>
 				<points>0</points>
 				<priority>1</priority>
@@ -506,7 +506,7 @@
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x_elem>-250</x_elem>
+				<x_elem>-300</x_elem>
 				<y_elem>430</y_elem>
 				<angle>-1.57</angle>
 				<points>0</points>

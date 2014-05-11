@@ -70,14 +70,9 @@ class Communication():
 			self.__bigrobot.resetIdOther()
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
 
-		elif (order == "O_RET_OUVRIR"):
+		elif (order == "O_RET"):
 			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__bigrobot.releaseFeuArriere() #pour les tests
-			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
-
-		elif (order == "O_RET_FERMER"):
-			self.__bigrobot.setlastIdActionOther(args[0])
-			#TODO, implementer
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
 
 		elif (order == "O_GET_TRIANGLE"):
@@ -97,6 +92,10 @@ class Communication():
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
 		elif (order == "PINGPING"):
+			self.__bigrobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
+
+		elif (order == "O_DROP_TRIANGLE"):
 			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
 
@@ -198,16 +197,6 @@ class Communication():
 
 		elif (order == "RESET_ID"):
 			self.__minirobot.resetIdOther()
-			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
-
-		elif (order == "O_RET_OUVRIR"):
-			self.__minirobot.setlastIdActionOther(args[0])
-			#TODO, implementer
-			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
-
-		elif (order == "O_RET_FERMER"):
-			self.__minirobot.setlastIdActionOther(args[0])
-			#TODO, implementer
 			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
 		elif (order == "PINGPING"):
