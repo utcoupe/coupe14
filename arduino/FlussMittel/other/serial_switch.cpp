@@ -74,6 +74,13 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 			getTriBordureRepliBras();
 		}
 		break;
+	case O_DROP_TRIANGLE:
+		if (!doublon) {
+			next_last_id = btoi(argv);
+			int x = btoi(argv+2), y = btoi(argv+4);
+			getBrasDepot(x, y);
+		}
+		break;
 	case PAUSE:
 		use_act = false;
 		break;
