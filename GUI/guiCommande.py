@@ -24,9 +24,9 @@ def gui(com):
 					arguments = last_arg
 					order = last_ordre
 				if order[0] == 'A':
-					address = 5
+					address = 2
 				elif order[0] == 'O':
-					address = 4
+					address = 1
 				elif order == 'GET_HOKUYO':
 					address = 6
 
