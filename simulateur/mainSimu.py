@@ -39,7 +39,6 @@ from map import maploader
 from objects import bigrobot, minirobot
 import processIA
 from constantes import *
-from gui import mainGUI
 
 
 if __name__ == "__main__":
