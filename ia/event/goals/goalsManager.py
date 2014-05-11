@@ -17,6 +17,8 @@ from .goal import *
 from .ElemGoal import *
 from .navigation import *
 from .visio import *
+from .goalsLibrary import *
+from .goalsChoice import *
 
 """
 	<order>O_DROP_TRIANGLE 300 30</order>
@@ -50,6 +52,9 @@ class GoalsManager:
 
 		self.__loadElemScript(base_dir+"/elemScripts.xml")
 		self.__loadGoals(base_dir+"/goals.xml")
+
+		self.__goalsLib = GoalsLibrary(self.__robot_name, self.__data, self.__blocked_goals, self.__PathFinding)
+		self.__goalsChoice = GoalsChoice(self.__robot_name, self.__data, self.__goalsLib)
 
 		#Permet de faire une symétrie pour les ordres dans le cas où on commence en jaune
 		self.__reverse_table = {}
@@ -94,22 +99,10 @@ class GoalsManager:
 		if not self.__blocked_goals:
 			self.__logger.debug(str(self.__robot_name)+" Recherche d'un nouvel objectif")	
 			self.__PathFinding.update(self.__data[self.__robot_name])
-			best_goal = ([], None, None) #type (path, id_goal, id_elem_goal)
-			best_length = float("Inf")
 
 			#On cherche l'elem goal le plus proche par bruteforce
-			if self.__available_goals:	
-				for goal in self.__available_goals:
-					if self.__robot_name == "FLUSSMITTEL" and len(self.__front_triangle_stack) == MAX_FRONT_TRIANGLE_STACK and goal.getType() != "STORE_TRIANGLE":
-						continue
-					nb_elem_goal = goal.getLenElemGoal()
-					for idd in range(nb_elem_goal):
-						path = self.__getOrderTrajectoire(goal, idd)
-						if path != []:
-							length = self.__pathLen(path)
-							if length < best_length:
-								best_length = length
-								best_goal = (path, goal, idd)
+			if self.__available_goals:
+				best_goal = self.__goalsChoice.getBestGoal(self.__available_goals)
 
 				if best_goal[1] != None:
 					self.__logger.info("On a choisi l'objectif goal_id "+str(best_goal[1].getId())+" elem_goal_id "+str(best_goal[2])+" avec le path "+str(best_goal[0]))
@@ -118,19 +111,7 @@ class GoalsManager:
 					time.sleep(5)#TODO diminuer
 					self.__queueBestGoals()
 			else:
-				self.__logger.info(str(self.__robot_name)+" N'a plus aucun objectif disponible, GG !")
-
-	def __pathLen(self, path):
-		length = 0.0
-		begin_point = (0,0)
-		if path:
-			begin_point = path[0]
-
-		for point in path:
-			length += math.sqrt( (int(point[0])-int(begin_point[0]))**2 + (int(point[1])-int(begin_point[1]))**2 )
-			begin_point = point
-
-		return length
+				self.__logger.info(str(self.__robot_name)+" N'a plus aucun objectif disponible, GG (ou pas, y'a toujours un truc à faire) !")
 
 	#GOAL management from ID
 	def blockGoalFromId(self, id_objectif):
@@ -188,7 +169,7 @@ class GoalsManager:
 				orders = prev_action
 
 			#on ajoute la trajectoire calculé
-			orders.extend(self.__tupleTrajectoireToDeque(tuple_trajectoire_list[1:]))
+			orders.extend(self.__goalsLib.tupleTrajectoireToDeque(tuple_trajectoire_list[1:]))
 			orders.append( ("A_ROT", (goal.getElemGoalOfId(elem_goal_id).getPositionAndAngle()[2],)) )
 			#on ajoute attend d'être arrivé pour lancer les actions
 			orders.append( ("THEN", ()) )
@@ -476,12 +457,13 @@ class GoalsManager:
 				break
 
 		if nb_a == 0:
-			self.__logger.error("Fuck, impossible d'attraper le triangle ! (surement trop près du robot)")
+			self.__logger.error("Fuck, impossible d'attraper le triangle !")
 			return None
 		else:
 			# Un - car on fait tourner le point (x,y) et non le robot
 			a_to_go = -somme_a / nb_a
 			x_to_go, y_to_go = self.__toCartesien(a_to_go, r_to_go)
+			#self.__logger.info("Nouvelle position pour attraper le triangle : ("+int(x_to_go)+','+int(y_to_go)+','+float(a_to_go)+')')
 			return (int(x_to_go), int(y_to_go), float(a_to_go))
 
 	def processBrasStatus(self, status_fin, id_objectif):
@@ -607,7 +589,7 @@ class GoalsManager:
 			for goal in self.__available_goals:
 				if goal.getId() == id_objectif:
 					find = True
-					path = self.__getOrderTrajectoire(goal, elem_goal_id, position_depart_speciale)
+					path = self.__goalsLib.getOrderTrajectoire(goal, elem_goal_id, position_depart_speciale)
 					if path != []:
 						self.__addGoal(path, goal, elem_goal_id, prev_action=prev_action)
 					else:
@@ -620,26 +602,4 @@ class GoalsManager:
 			if not find:
 				self.__logger.error(str(self.__robot_name) + " impossible de lui ajouter le goal d'id: " + str(id_objectif))
 	
-	def __getOrderTrajectoire(self, goal, elem_goal_id, position_depart_speciale=None):
-		"""Il faut mettre à jour les polygones avant d'utiliser cette fonction"""
-		if position_depart_speciale is not None:
-			position_last_goal = position_depart_speciale
-			self.__logger.debug("Position from position_depart_speciale" + str(position_last_goal))
-		elif self.__blocked_goals:
-			last_goal = self.__blocked_goals[-1]
-			position_last_goal = last_goal.getElemGoalLocked().getPositionAndAngle()
-			self.__logger.debug("Position from queue" + str(position_last_goal))
-		else:
-			position_last_goal = self.__data[self.__robot_name]["getPositionAndAngle"]
-			self.__logger.debug("Position from data" + str(position_last_goal))
 
-		position_to_reach = goal.getElemGoalOfId(elem_goal_id).getPositionAndAngle()
-		path = self.__PathFinding.getPath((position_last_goal[0], position_last_goal[1]), (position_to_reach[0], position_to_reach[1]), enable_smooth=True)
-
-		return path
-
-	def __tupleTrajectoireToDeque(self, tuple_trajectoire_list):
-		order_list = deque()
-		for tuple in tuple_trajectoire_list:
-			order_list.append(('A_GOTO', [tuple[0], tuple[1]]))
-		return order_list

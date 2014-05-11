@@ -91,6 +91,11 @@ class Communication():
 			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
+		elif (order == "O_DROP_TRIANGE"):
+			self.__bigrobot.setlastIdActionOther(args[0])
+			self.__bigrobot.dropFeu(args[1],args[2])
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
+
 		elif (order == "PINGPING"):
 			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
