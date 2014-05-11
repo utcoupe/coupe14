@@ -20,10 +20,8 @@ class Tourelle:
 		return (0, 0, 0)
 
 
-def compute(v_centre, v_coin):
-	triangles = []
-	triangles += v_centre.update()
-	triangles += v_coin.update()
+def compute(v):
+	triangles = v.update()
 	return triangles
 
 
@@ -41,15 +39,13 @@ if __name__ == '__main__':
 		exit()
 
 	path_to_exec = "../supervisio/visio"
-	config_path = "../config/visio/visio_tourelle_" + color + "/"
+	config_path = "../config/visio/visio_tourelle" + color + "/"
 
-	print("Executing two visio programs at",path_to_exec)
-	print("\tFirst with config at", config_path+"centre/", "on port video0")
-	print("\tSecond with config at", config_path+"coin/", "on port video1")
+	print("Executing the visio program at", path_to_exec)
+	print("\tFirst with config at", config_path, "on port video0")
 	try:
 		tourelle = Tourelle()
-		v_centre = visio.Visio(path_to_exec, 0, config_path + "centre/", tourelle, True)
-		v_coin = visio.Visio(path_to_exec, 1, config_path + "coin/", tourelle, True)
+		v = visio.Visio(path_to_exec, 0, config_path, tourelle, True)
 	except BaseException as e:
 		print("Failed to open visio programs : "+str(e))
 		exit()
@@ -66,7 +62,7 @@ if __name__ == '__main__':
 		start = time.time()
 		triangles = []
 		try:
-			triangles = compute(v_centre, v_coin)
+			triangles = compute(v)
 			send(triangles, pipe)
 		except BaseException as e:
 			print("Failed to compute and send triangles :", str(e))
