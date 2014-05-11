@@ -57,15 +57,26 @@ int main(int argc, char **argv) {
 	}
 	pid_t pid_hokuyo, pid_cameras;
 	pid_hokuyo = fork();
+
+	//Path hokuyo
+	strcpy(pipe_hok, path);
+	strcat(pipe_hok, "/config/raspi/pipe_hokuyo");
+
+	//Path cam
+	char file[100], pipe[100]; 
+	strcpy(pipe_cam, path);
+	strcat(pipe_cam, "/config/raspi/pipe_cameras");
+	strcpy(file, path);
+	strcat(file, "/raspi_exec/visio_raspi.py");
+
+
 	if (pid_hokuyo == 0) {
 		//Programme hokuyo
 		char exec[100];
 		strcpy(exec, path);
 		strcat(exec, "/hokuyo/hokuyo");
-		strcpy(pipe_hok, path);
-		strcat(pipe_hok, "/config/raspi/pipe_hokuyo");
 
-		printf("%d - Initilizing fifo for hokuyo\n", getpid());
+		printf("%d - Initializing fifo for hokuyo\n", getpid());
 		//Ouvrir fifo
 		mkfifo(pipe_hok, 0666);
 
@@ -79,11 +90,6 @@ int main(int argc, char **argv) {
 		char exec[] = "/usr/bin/python3";
 
 		//path script python
-		char file[100], pipe[100]; 
-		strcpy(pipe_cam, path);
-		strcat(pipe_cam, "/config/raspi/pipe_cameras");
-		strcpy(file, path);
-		strcat(file, "/raspi_exec/visio_raspi.py");
 
 		pid_cameras = fork();
 		if (pid_cameras == 0) {
@@ -96,7 +102,7 @@ int main(int argc, char **argv) {
 			signal(SIGINT, exit_handler);
 			printf("%d - Spawned cameras, pid %d\n", getpid(), pid_cameras);
 			//Suite du main
-			sleep(1);
+			sleep(5);
 			
 			printf("[MAIN]  Starting main program\n");
 			com_loop(pipe_cam, pipe_hok);
