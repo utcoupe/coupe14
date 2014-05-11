@@ -40,8 +40,8 @@ static void catch_SIGINT(int signal){
 
 int main(int argc, char **argv){
 	
-	if(argc <= 1 || ( strcmp(argv[1], "red") != 0 && strcmp(argv[1], "blue") ) ){
-		fprintf(stderr, "usage: hokuyo {red|blue} [path_pipe]\n");
+	if(argc <= 1 || ( strcmp(argv[1], "red") != 0 && strcmp(argv[1], "yellow") ) ){
+		fprintf(stderr, "usage: hokuyo {red|yellow} [path_pipe]\n");
 		return EXIT_FAILURE;
 	}
 
@@ -58,10 +58,9 @@ int main(int argc, char **argv){
 		posl1.x = TAILLE_TABLE_X+25;
 	}
 
+	char *path = 0;
 	if (argc == 3) {
-		char *path;
 		path = argv[2];
-		printf("Utilisation du protcole, pipe : %s\n", path);
 		use_protocol = 1;
 	}
 

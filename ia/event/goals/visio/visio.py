@@ -17,6 +17,7 @@ class Triangle:
 		self.angle = float(angle)
 		self.size = float(size)
 		self.color = ''
+		self.real_coord = [0, 0]
 		color = int(color)
 		if color == 0:
 			self.color = 'RED'
@@ -72,6 +73,10 @@ class Visio:
 		self.__log.info("Visio ready")
 
 		self._triangles = []
+
+	def close(self):
+		self.client.kill()
+		self.client.wait()
 
 	def getTriangles(self):
 		return self._triangles
@@ -137,8 +142,8 @@ class Visio:
 
 			#calcul des coordonnées relatives dans le repère des coords absolues
 			robot_angle = self.__big_bot.getPositionAndAngle()[2]
-			tri.rel_in_abs = (tri.coords[0] * cos(robot_angle) - tri.coords[1] * sin(robot_angle), 
-								tri.coords[0] * sin(robot_angle) + tri.coords[1] * cos(robot_angle))
+			tri.rel_in_abs = (tri.coord[0] * cos(robot_angle) - tri.coord[1] * sin(robot_angle), 
+								tri.coord[0] * sin(robot_angle) + tri.coord[1] * cos(robot_angle))
 
 			#calcul des coordonnées réelles du triangles, on le recalcule par la
 			# suite si elles sont a modifier, mais on en a besoin pour savoir
@@ -156,20 +161,20 @@ class Visio:
 		"""Corrige les coordonnées des triangles en hauteurs à des positions connues
 		exemple : triangle sur une plateforme de depot"""
 		#modif coords
-		tri.coords[0] = (1 - self.__hcam / self.__hplat) * tri.coords[0] \
+		tri.coord[0] = (1 - self.__hcam / self.__hplat) * tri.coord[0] \
 							+ (self.__hcam / self.__hplat) * self.__xcam
-		tri.coords[1] = (1 - self.__hcam / self.__hplat) * tri.coords[1] \
+		tri.coord[1] = (1 - self.__hcam / self.__hplat) * tri.coord[1] \
 							+ (self.__hcam / self.__hplat) * self.__ycam
 		#reconversion en coords reelles
 		tri.real_coords = [i + j for i, j in zip(tri.rel_in_abs, self.__big_bot.getPosition())]
 
 	def __outOfMap(self, tri):
-		return tri.real_coords.x > 3000 or tri.real_coords.x < 0\
-		or tri.real_coords.y > 2000 or tri.real_coords.y < 0
+		return tri.real_coords[0] > 3000 or tri.real_coords[0] < 0\
+		or tri.real_coord[1] > 2000 or tri.real_coord[1] < 0
 
 	def __inFruitZone(self, tri):
-		return (tri.real_coords.x > 400 and tri.real_coords.x < 1100 and tri.real_coords.y > 1700)\
-		or (tri.real_coords.x > 1900 and tri.real_coords.x < 2600 and tri.real_coords.y > 1700)
+		return (tri.real_coords[0] > 400 and tri.real_coords[0] < 1100 and tri.real_coord[1] > 1700)\
+		or (tri.real_coords[0] > 1900 and tri.real_coords[0] < 2600 and tri.real_coord[1] > 1700)
 
 
 	def __inHighGround(self, tri):
@@ -179,7 +184,7 @@ class Visio:
 		or self.__p_in_circle((1500, 950), 150, tri.real_coords)
 
 	def __inStartZone(self, tri):
-		return (tri.real_coords.x < 400 and tri.real_coords.y > 1700) or (tri.real_coords.x > 2600 and tri.real_coords.y > 1700) \
+		return (tri.real_coords[0] < 400 and tri.real_coord[1] > 1700) or (tri.real_coords[0] > 2600 and tri.real_coord[1] > 1700) \
 		or self.__p_in_circle((0,1700), 400, tri.real_coords) or self.__p_in_circle((3000, 1700), 400, tri.real_coords)
 
 	def __p_in_circle(self, center, radius, p):

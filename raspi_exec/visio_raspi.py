@@ -2,6 +2,7 @@
 import os
 import sys
 import time
+import errno
 
 FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(FILE_DIR, "../ia/"))
@@ -32,47 +33,51 @@ def send(triangles, pipe):
 
 if __name__ == '__main__':
 	try:
-		path_pipe = sys.argv[1]
+		path = sys.argv[1]
 		color = sys.argv[2]
 	except:
 		print('Not enough arguments : visio_raspi path_pipe color')
-		exit()
+		sys.exit()
 	try:
 		index = int(sys.argv[3])
 	except:
 		index = 0
 
-	path_to_exec = "../supervisio/visio"
-	config_path = "../config/visio/visio_tourelle_" + color + "/"
+	path_to_exec = path+"/supervisio/visio"
+	path_pipe = path+"/config/raspi/pipe_cameras"
+	config_path = path+"/config/visio/visio_tourelle_" + color + "/"
 
-	print("Executing the visio program at", path_to_exec)
-	print("\tFirst with config at", config_path, "on port video"+str(index))
+	print("Executing visio with config at", config_path, "on port video"+str(index))
 	try:
 		tourelle = Tourelle()
 		v = visio.Visio(path_to_exec, index, config_path, tourelle, True)
 	except BaseException as e:
 		print("Failed to open visio programs : "+str(e))
-		exit()
+		sys.exit()
 
-	print("Done, attempting to open fifo")
+	print("Done")
+	print("[CAM ]  Attempting to open fifo at",path_pipe)
 	try:
-		pipe = open(path_pipe, "w+")
+		pipe = open(path_pipe, "w")
 	except BaseException as e:
 		print("Failed to open pipe : "+str(e))
-		exit()
+		sys.exit()
 	print("Fifo opened")
 
-	while(1):
+	conti = True
+	while(conti):
 		start = time.time()
 		triangles = []
 		try:
 			triangles = compute(v)
 			send(triangles, pipe)
+			print("Detected", len(triangles), "in", (time.time() - start), "seconds")
 		except BaseException as e:
+			conti = False
 			print("Failed to compute and send triangles :", str(e))
+
 			triangles = []
 
-		print("Detected", len(triangles), "in", (time.time() - start), "seconds")
-
-
-
+	print('Closing')
+	v.close()
+	sys.exit()

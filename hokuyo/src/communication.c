@@ -10,9 +10,13 @@
 static FILE *pipe = 0;
 
 void init_protocol(char *path) {
-	pipe = fopen(path, "w+");
+	char pipe_path[255];
+	strcpy(pipe_path, path);
+	strcat(pipe_path, "/config/raspi/pipe_hokuyo");
+	printf("%sInitialisation du protcole, pipe : %s\n", PREFIX, pipe_path);
+	pipe = fopen(pipe_path, "w+");
 	if (pipe == 0) {
-		printf("Failed to open pipe at %s\n", path);
+		printf("Failed to open pipe at %s\n", pipe_path);
 		exit(EXIT_FAILURE);
 	}
 }
