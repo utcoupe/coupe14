@@ -34,14 +34,14 @@ Visio::Visio(int index, string path, bool save_vid) : camera(index), save_video(
 	//Genral
 	calib_cam_filename(DEFAULT_CAMERA_MATRIX_FILENAME), calib_detection_filename(DEFAULT_PARAMS_FILENAME), 
 	calib_transform_matrix_filename(DEFAULT_PERSPECTIVE_MATRIX_FILENAME), mask_name("mask.jpg"),
-	color(red), distort(none), path_to_conf(path), chessboard_size(Size(9,6)), isready(false),
+	color(red), distort(none), path_to_conf(path), chessboard_size(Size(9,6)), isready(false), is_opened(false),
+
 
 	//Params par defaut
 	min_size(MIN_SIZE), real_min_size(MIN_REAL_SIZE), epsilon_poly(EPSILON_POLY), max_diff_triangle_edge(MAX_DIFF_TRI_EDGE), 
 
 	//Options
 	use_mask(USE_MASK), use_resize(RESIZE), resize_w(RESIZEW), resize_h(RESIZEH),
-
 	//param cam
 	cam_fps(CAM_FPS), size_frame(camera.get(CV_CAP_PROP_FRAME_WIDTH), camera.get(CV_CAP_PROP_FRAME_HEIGHT)){
 	frame_mutex.lock();
@@ -53,6 +53,7 @@ Visio::Visio(int index, string path, bool save_vid) : camera(index), save_video(
 	if (save_video) {
 		init_writer();
 	}
+	is_opened = true;
 	thread_update = thread(&Visio::refreshFrame, this);
 }
 
@@ -553,6 +554,10 @@ bool Visio::isCalibrated() {
 
 bool Visio::isReady() {
 	return isready;
+}
+
+bool Visio::isOpened() {
+	return is_opened;
 }
 
 DistortType Visio::getDistortMode() {

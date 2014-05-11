@@ -40,8 +40,8 @@ if __name__ == '__main__':
 		print('Not enough arguments : visio_raspi path_pipe color')
 		exit()
 
-	path_to_exec = os.path.join(FILE_DIR, "../supervisio/visio")
-	config_path = os.path.join(FILE_DIR, "../config/visio/visio_tourelle_" + color + "/")
+	path_to_exec = "../supervisio/visio"
+	config_path = "../config/visio/visio_tourelle_" + color + "/"
 
 	print("Executing two visio programs at",path_to_exec)
 	print("\tFirst with config at", config_path+"centre/", "on port video0")

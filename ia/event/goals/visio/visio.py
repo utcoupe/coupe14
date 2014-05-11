@@ -59,11 +59,16 @@ class Visio:
 		self.__log.info("C++ Program executed, waiting till program is ready")
 		atexit.register(self.client.kill)
 		stdout = ''
-		while stdout != 'READY\n':
+		while stdout != 'READY\n' and stdout != 'FAILED\n':
 			#Attente des données client
 			stdout = self.client.stdout.readline()
 			#Sleep 1ms
 			time.sleep(self.__updatePeriod)
+
+		if stdout == 'FAILED\n':
+			raise Exception('Visio failed')
+			return
+
 		self.__log.info("Visio ready")
 
 		self._triangles = []

@@ -62,6 +62,7 @@ class Visio {
 		Mat getImg();
 		bool isCalibrated();
 		bool isReady();
+		bool isOpened();
 		DistortType getDistortMode();
 	private:
 		void init();
@@ -88,7 +89,7 @@ class Visio {
 		int cam_fps;
 		double epsilon_poly; //Marge d'erreur lors de l'estimation de polyligne
 		bool trans_calibrated, cam_calibrated;
-		bool save_video, isready;
+		bool save_video, isready, is_opened;
 		bool use_resize, use_mask;
 		int resize_h, resize_w;
 		Color color;
