@@ -169,7 +169,7 @@ class GoalsManager:
 				orders = prev_action
 
 			#on ajoute la trajectoire calculé
-			orders.extend(self.__tupleTrajectoireToDeque(tuple_trajectoire_list[1:]))
+			orders.extend(self.__goalsLib.tupleTrajectoireToDeque(tuple_trajectoire_list[1:]))
 			orders.append( ("A_ROT", (goal.getElemGoalOfId(elem_goal_id).getPositionAndAngle()[2],)) )
 			#on ajoute attend d'être arrivé pour lancer les actions
 			orders.append( ("THEN", ()) )
