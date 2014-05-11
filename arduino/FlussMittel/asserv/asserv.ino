@@ -42,9 +42,16 @@ void loop(){
 	if (timeStart - timeLED > 60*1000000) {
 		digitalWrite(LED_MAINLOOP, HIGH);
 	}
-		
+
 	//Action asserv
 	control.compute();
+
+	if (control.isBlocked()) {
+		digitalWrite(LED_BLOCKED, LOW); //Allume la led blocage 2s
+	} else {
+		digitalWrite(LED_BLOCKED, HIGH);
+	}
+
 
 	// zone programmation libre
 	int available = SERIAL_MAIN.available();

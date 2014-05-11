@@ -58,6 +58,7 @@ enum ordre {
 	A_SET_POS, //@int @int @float
 	A_GET_POS,	//#int #int #float
 	A_GET_POS_ID,	//#int #int #float #int
+	A_IS_BLOCKED, //#int
 
 	//OTHERS
 	//FM

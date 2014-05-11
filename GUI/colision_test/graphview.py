@@ -51,7 +51,7 @@ class GraphView(View):
 		event = self.event_to_x_y(event)
 		print(event)
 		
-		self.dynamic_obstacle.setPosition(event)
+		self.dynamic_obstacle["getPosition"] = event
 		self.graph.update(self.self_bot)
 		self.remove()
 

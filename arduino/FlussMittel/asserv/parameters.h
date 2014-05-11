@@ -62,8 +62,8 @@
 #define ENC_RESOLUTION 1024 //resolution du codeur
 
 #define ENC_LEFT_RADIUS 36.1 //REGLE PAR TEST - rayon de la roue codeuse
-#define ENC_RIGHT_RADIUS 36.1 //REGLE PAR TEST - rayon de la roue codeuse
-#define ENTRAXE_ENC 324.5 //REGLE PAR TES - Distance entre chaque roue codeuse en mm
+#define ENC_RIGHT_RADIUS 36.0 //REGLE PAR TEST - rayon de la roue codeuse
+#define ENTRAXE_ENC 323.3 //REGLE PAR TES - Distance entre chaque roue codeuse en mm
 
 #define ERROR_ANGLE 0.02 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
 #define ERROR_ANGLE_TO_GO 0.1 //erreur en angle(radians) maximale avant de partir en cas de GOTO
@@ -71,6 +71,7 @@
 
 #define MAX_ANGLE 0.20  //~10° angle en dessous duquel on décrit une trajectoire curviligne (trop bas, le robot s'arretera constamment pour se recaler au lieu d'avancer, trop haut, les trajectoires seront très courbes voir meme fausses (overflow spd -> overflow pwm).
 #define D_MIN_ASSERV_ANGLE 20
+#define CONE_ALIGNEMENT (2*M_PI)
 
 //Intégrales et dérivée sont calculée avec un intervalle de temps en SECONDES
 //Ne modifier que le nombre, laisser les DUREE_CYCLE
@@ -89,7 +90,7 @@
 //BLOCAGE
 //TIME_BLOCKED : période de vérification (ms)
 //MIN_DIST_BLOCKED : disatcne min a parcourir pour ne pas etre considere bloqué (mm)
-#define PERIOD_BLOCKED 2000
+#define PERIOD_BLOCKED 1000
 #define MIN_DIST_BLOCKED 3
 
 //PIN LED

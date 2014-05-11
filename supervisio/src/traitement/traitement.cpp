@@ -256,8 +256,8 @@ bool Visio::camPerspective() {
 	int xsize = 130, ysize = 210;
 	int x = 185, y = 105;
 	namedWindow("parameters");
-	createTrackbar("x_size", "parameters", &xsize, 500);
-	createTrackbar("y_size", "parameters", &ysize, 500);
+	createTrackbar("x_size", "parameters", &xsize, 600);
+	createTrackbar("y_size", "parameters", &ysize, 600);
 	createTrackbar("x", "parameters", &x, 3000);
 	createTrackbar("y", "parameters", &y, 2000);
 	Mat img, undistorted_img;

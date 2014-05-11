@@ -45,6 +45,7 @@ class Control{
 	//Toutes les positions sont renvoyée en mm, toutes les vitess en mm/ms = m/s
 	void pushPos(pos n_pos); 
 	pos getPos();
+	bool isBlocked();
 
 	//Renvoie les codeurs (utile pour debug)
 	Encoder* getLenc();
