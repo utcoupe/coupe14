@@ -386,10 +386,10 @@ class GoalsManager:
 										self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
 									else:
 										self.__logger.warning("Impossible d'attendre le triangle d'après PathFinding, data_camera: "+str(data_camera)+" path: "+str(path)+" x+x_abs: "+str(x+x_abs)+" y+y_abs "+str(y+y_abs)+" a+a_abs "+str(a+a_abs))
-										self.__cancelGoal(objectif, False)
+										self.__deleteGoal(objectif, False)
 								else:
 									self.__logger.warning("Impossible d'attendre le triangle d'après Alexis, data_camera: "+str(data_camera))
-									self.__cancelGoal(objectif, False)
+									self.__deleteGoal(objectif, False)
 							
 			else:
 				self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), action_list)
