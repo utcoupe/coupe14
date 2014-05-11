@@ -37,15 +37,19 @@ if __name__ == '__main__':
 	except:
 		print('Not enough arguments : visio_raspi path_pipe color')
 		exit()
+	try:
+		index = int(sys.argv[3])
+	except:
+		index = 0
 
 	path_to_exec = "../supervisio/visio"
-	config_path = "../config/visio/visio_tourelle" + color + "/"
+	config_path = "../config/visio/visio_tourelle_" + color + "/"
 
 	print("Executing the visio program at", path_to_exec)
-	print("\tFirst with config at", config_path, "on port video0")
+	print("\tFirst with config at", config_path, "on port video"+str(index))
 	try:
 		tourelle = Tourelle()
-		v = visio.Visio(path_to_exec, 0, config_path, tourelle, True)
+		v = visio.Visio(path_to_exec, index, config_path, tourelle, True)
 	except BaseException as e:
 		print("Failed to open visio programs : "+str(e))
 		exit()

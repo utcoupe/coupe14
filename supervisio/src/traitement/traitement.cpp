@@ -47,14 +47,14 @@ Visio::Visio(int index, string path, bool save_vid) : camera(index), save_video(
 	frame_mutex.lock();
 	if(!camera.isOpened()) {  // check if we succeeded
 		cerr << "Failed to open camera" << endl;
-		return;
+	} else  {
+		init();
+		if (save_video) {
+			init_writer();
+		}
+		is_opened = true;
+		thread_update = thread(&Visio::refreshFrame, this);
 	}
-	init();
-	if (save_video) {
-		init_writer();
-	}
-	is_opened = true;
-	thread_update = thread(&Visio::refreshFrame, this);
 }
 
 void Visio::init() {
