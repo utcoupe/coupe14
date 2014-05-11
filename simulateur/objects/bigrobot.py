@@ -54,7 +54,7 @@ class BigRobot(Robot):
 			extension_objects	= [],
 		)
 		self.__state_jack = 0  # jack in
-		self.__nbrFeuAvant = 0
+		self.__nbrFeuAvant = 2
 		self.__nbrFeuArriere = 0 #normalement à 0, 1 pour les tests
 		self.__engine = engine
 		self.__feuHit = 0
@@ -102,6 +102,19 @@ class BigRobot(Robot):
 		else:
 			self.__nbrFeuArriere += 1
 
+	def dropFeu(self,x,y):
+		"""
+		Va déposer un feu à l'avant du robot
+		@param x,y : endroit où déposer le feu
+		"""
+		if self.__nbrFeuAvant > 0:
+			self.__nbrFeuAvant -= 1
+			new_feu = feu.Feu(self.__engine,(self.__computePositionTriangleAvant(x,y)),"vert",True)
+			self.__engine.add(new_feu)
+			new_feu.coucherFeuCouleur(self.getTeam()) #pour donner la bonne couleur au feu
+		else:
+			print('pas de feu stocké à avant du robot')
+
 	def releaseFeuArriere(self):
 		"""
 		Ejecte un feu à l'arrière du robot
@@ -109,7 +122,7 @@ class BigRobot(Robot):
 		#print('release feu arriere, NBR : ', self.__nbrFeuArriere)
 		if (self.__nbrFeuArriere > 0):
 			self.__nbrFeuArriere -= 1
-			new_feu = feu.Feu(self.__engine,(self.__computePositionTriangle()),"vert",True)
+			new_feu = feu.Feu(self.__engine,(self.__computePositionTriangleArriere()),"vert",True)
 			self.__engine.add(new_feu)
 			new_feu.coucherFeuCouleur(self.getTeam()) #pour donner la bonne couleur au feu
 		else:
@@ -118,7 +131,7 @@ class BigRobot(Robot):
 	def getStateJack(self):
 		return self.__state_jack
 
-	def __computePositionTriangle(self):
+	def __computePositionTriangleArriere(self):
 		"""
 		Calcule la position où éjecter le triangle derrière le robot
 		"""
@@ -129,3 +142,15 @@ class BigRobot(Robot):
 		xFeu = (int)(xBot - math.ceil(mm_to_px(dist_feu_robot + WIDTH_GROS/2)*math.cos(aBot)))
 		yFeu = (int)(yBot - math.ceil(mm_to_px(dist_feu_robot + WIDTH_GROS/2)*math.sin(aBot)))
 		return xFeu,yFeu
+
+	def __computePositionTriangleAvant(self,xFeu,yFeu):
+		"""
+		Calcule la position où éjecter le triangle devant le robot
+		"""
+		xBot = self.body.position[0]
+		yBot = self.body.position[1]
+		aBot = self.body.angle
+		dist_feu_robot = mm_to_px(math.sqrt(xFeu*xFeu + yFeu*yFeu))
+		xPosFeu = (int)(xBot + math.ceil(dist_feu_robot*math.cos(aBot)))
+		yPosFeu = (int)(yBot + math.ceil(dist_feu_robot*math.sin(aBot)))
+		return xPosFeu,yPosFeu

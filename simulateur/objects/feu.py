@@ -161,7 +161,7 @@ class Feu(EngineObjectPoly):
 		Color le feu suivant la couleur
 		@param color couleur du feu
 		"""
-		if color == 'RED':
+		if color == RED:
 			self.__addCoucherExtension(self.triangleRedDroite)
 		else:
 			self.__addCoucherExtension(self.triangleYellowDroite)

@@ -25,6 +25,7 @@ import sys
 import os
 DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(DIR_PATH, "..", "map"))
+sys.path.append(os.path.join(DIR_PATH, "..", "gui"))
 sys.path.append(os.path.join(DIR_PATH, "../../ia", "constantes"))
 
 
@@ -38,37 +39,10 @@ from map import maploader
 from objects import bigrobot, minirobot
 import processIA
 from constantes import *
-
+from gui import mainGUI
 
 
 if __name__ == "__main__":
-
-		default = {}
-		default["server_ip"]            = "localhost"
-		default["port_frontend"]        = 5000
-		default["port_backend"]         = 5001
-		default["port_ev_push"]         = 5003
-		default["port_ev_sub"]          = 5004
-
-		usage = "usage: %prog [options]"
-		parser = optparse.OptionParser(usage,version="%prog 0.0")
-		parser.add_option("-S", "--server-ip",
-						  action="store", dest="server_ip", default=default["server_ip"],
-						  help="ip zerobot server")
-		parser.add_option("-b", "--port-backend",
-						  action="store", dest="port_backend", type="int", default=default["port_backend"],
-						  help="port backend")
-		parser.add_option("-f", "--port-frontend",
-						  action="store", dest="port_frontend", type="int", default=default["port_frontend"],
-						  help="port frontend")
-		parser.add_option("-p", "--port-ev-push",
-						  action="store", dest="port_ev_push", type="int", default=default["port_ev_push"],
-						  help="port events publishing")
-		parser.add_option("-s", "--port-ev-sub",
-						  action="store", dest="port_ev_sub", type="int", default=default["port_ev_sub"],
-						  help="port events subscribtion")
-		(options, args) = parser.parse_args()
-
 
 		engine = Engine()
 		match = match.Match()
@@ -96,6 +70,7 @@ if __name__ == "__main__":
 		yellowIA = False
 
 #=========================================================
+		#ne pas toucher des drapaux !
 		bigbotRed_flag = False
 		minibotRed_flag = False
 		bigbotYellow_flag = False
@@ -116,6 +91,7 @@ if __name__ == "__main__":
 					minibotRed_flag = True
 					robots_red = ("RED", minibotRed, bigbotYellow, minibotYellow)
 			#robots_red = ("RED", bigbotRed, minibotRed, bigbotYellow, minibotYellow)
+			#mainGUI.GUISimu(robots_red)
 			processIA.ProcessIA(robots_red)
 		else:
 			bigbotRed_flag = True
@@ -135,6 +111,7 @@ if __name__ == "__main__":
 					minibotYellow_flag = True
 					robots_yellow = ("YELLOW", minibotYellow, bigbotRed, minibotRed)
 			#robots_yellow = ("YELLOW", bigbotYellow, minibotYellow, bigbotRed, minibotRed)
+			#mainGUI.GUISimu(robots_yellow)
 			processIA.ProcessIA(robots_yellow)
 		else:
 			bigbotYellow_flag = True
@@ -156,12 +133,16 @@ if __name__ == "__main__":
 		t.setDaemon(True)
 		t.start()
 
+		#start de la GUI
+		#guiRed = mainGUI.GUISimu(robots_red)
+		#threading.Thread(target=guiRed.start).start()
+		#guiRed.start()
+
 		while not engine.e_stop.is_set():
 				try:
 						engine.e_stop.wait(3)
 				except KeyboardInterrupt:
 						engine.stop()
 						break
-
 
 
