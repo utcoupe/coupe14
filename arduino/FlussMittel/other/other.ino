@@ -51,9 +51,7 @@ void loop(){
 		executeCmd(generic_serial_read());
 	}
 
-	if (use_act) {
-		updateBras();
-	}
+	updateAct();
 
 	int availablefwd = SERIAL_FWD.available();
 	if (availablefwd > MAX_READ) {
@@ -63,7 +61,5 @@ void loop(){
 		serial_send(SERIAL_FWD.read());
 	}
 
-	if (use_act) {
-		updateBras();
-	}
+	updateAct();
 }

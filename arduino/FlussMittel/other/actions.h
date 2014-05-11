@@ -9,6 +9,7 @@ enum action {
 	BrasDepot
 };
 
+void updateAct();
 void initPins();
 void initAct();
 void callbackRet(int use=0);
