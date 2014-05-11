@@ -225,6 +225,9 @@ class GoalsManager:
 		if goal in self.__dynamique_finished_goals:	
 			self.__dynamique_finished_goals.remove(goal)
 			self.__finished_goals.append(goal)
+			if goal.getType() == "STORE_TRIANGLE":
+				self.__front_triangle_stack.clear()
+				self.__back_triangle_stack.clear()
 			self.__logger.info('Goal ' + str(goal.getName()) + " d'id "+str(goal.getId())+" is finished")
 			self.__queueBestGoals()
 		#Dans le cas où c'est l'autre robot qui à fait l'objectif
@@ -350,7 +353,7 @@ class GoalsManager:
 							triangle = triangle_list[0] #TODO, prendre le meilleur triangle suivent les arg
 							data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
 						else:
-							data_camera = ("RED", 400, 0) #test
+							data_camera = ("RED", 220, 0) #test
 
 						self.__last_camera_color = data_camera[0]
 						#si on a la possibilité de le stocker

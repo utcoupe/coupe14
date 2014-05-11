@@ -106,10 +106,14 @@ class OurBot():
 					trajectoire = ()
 			
 			for objectif in self.__objectifs:
+				#On ajoute le point du dernier goto sur l'objectif précedant
+				if trajectoire == ():
+					trajectoire = (last_point,)
 				id_objectif = objectif[0]
 				for order in objectif[1]:
 					if order[1] == 'A_GOTO':
 						trajectoire += ((order[2][0], order[2][1]),)
+						last_point = (order[2][0], order[2][1])
 				if len(trajectoire)>1:
 					data_trajectoires += ((id_objectif, trajectoire),)
 					trajectoire = ()
