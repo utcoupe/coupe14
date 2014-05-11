@@ -426,14 +426,15 @@ class GoalsManager:
 		centre_zone_x = temp_x + CENTRE_BRAS_X
 		centre_zone_y = temp_y + CENTRE_BRAS_Y
 
-		if hypot(x, y) > hypot(CENTRE_BRAS_Y, CENTRE_BRAS_X + OUVERTURE_BRAS_MAX):
+		if hypot(x, y) > hypot(CENTRE_BRAS_Y, CENTRE_BRAS_X + OUVERTURE_BRAS_MAX) - MARGE_OUVERTURE_BRAS_MAX_DEPLACEMENT:
 			# Il faut avancer
 			a, r = self.__toPolaire(x, y)
 			r_to_go = r - hypot(centre_zone_x, centre_zone_y)
 			r -= r_to_go
 			x, y = self.__toCartesien(a, r)
 
-		elif hypot(x, y) < hypot(CENTRE_BRAS_Y, CENTRE_BRAS_X):
+		elif hypot(x, y) < hypot(CENTRE_BRAS_Y, CENTRE_BRAS_X) + MARGE_OUVERTURE_BRAS_MIN_DEPLACEMENT:
+			# Il faut reculer
 			a, r = self.__toPolaire(x, y)
 			r_to_go = hypot(centre_zone_x, centre_zone_y) - r
 			r += r_to_go
