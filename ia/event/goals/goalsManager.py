@@ -225,6 +225,9 @@ class GoalsManager:
 		if goal in self.__dynamique_finished_goals:	
 			self.__dynamique_finished_goals.remove(goal)
 			self.__finished_goals.append(goal)
+			if goal.getType() == "STORE_TRIANGLE":
+				self.__front_triangle_stack.clear()
+				self.__back_triangle_stack.clear()
 			self.__logger.info('Goal ' + str(goal.getName()) + " d'id "+str(goal.getId())+" is finished")
 			self.__queueBestGoals()
 		#Dans le cas où c'est l'autre robot qui à fait l'objectif
@@ -305,7 +308,7 @@ class GoalsManager:
 							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
 						elif (nb_front_stack < MAX_FRONT_TRIANGLE_STACK) and (nb_back_stack >= MAX_BACK_TRIANGLE_STACK):
 							self.__back_triangle_stack.popleft()
-							script_to_send.append( ("O_RET_OUVRIR", ()) )
+							script_to_send.append( ("O_RET", ()) )
 							self.__back_triangle_stack.append(self.__last_camera_color)
 							position = -1
 							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
@@ -347,10 +350,17 @@ class GoalsManager:
 						self.__deleteGoal(objectif)
 					else:
 						if TEST_MODE == False:
-							triangle = triangle_list[0] #TODO, prendre le meilleur triangle suivent les arg
+							min_distance = float("inf")
+							min_id = None
+							for i, triangle in enumerate(triangle_list):
+								distance = sqrt((triangle.coord[0]-220)**2 + (triangle.coord[1])**2)
+								if distance < min_distance:
+									min_distance = distance
+									min_id = i
+							triangle = triangle_list[i] 
 							data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
 						else:
-							data_camera = ("RED", 400, 0) #test
+							data_camera = ("RED", 220, 0) #test
 
 						self.__last_camera_color = data_camera[0]
 						#si on a la possibilité de le stocker
@@ -383,10 +393,10 @@ class GoalsManager:
 										self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
 									else:
 										self.__logger.warning("Impossible d'attendre le triangle d'après PathFinding, data_camera: "+str(data_camera)+" path: "+str(path)+" x+x_abs: "+str(x+x_abs)+" y+y_abs "+str(y+y_abs)+" a+a_abs "+str(a+a_abs))
-										self.__cancelGoal(objectif, False)
+										self.__deleteGoal(objectif)
 								else:
 									self.__logger.warning("Impossible d'attendre le triangle d'après Alexis, data_camera: "+str(data_camera))
-									self.__cancelGoal(objectif, False)
+									self.__deleteGoal(objectif)
 							
 			else:
 				self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), action_list)
@@ -527,18 +537,19 @@ class GoalsManager:
 			name 			= str(xml_goal.getElementsByTagName('name')[0].firstChild.nodeValue) #nom explicite
 			type			= str(xml_goal.getElementsByTagName('type')[0].firstChild.nodeValue) #triangle, 
 			concerned_robot = str(xml_goal.getElementsByTagName('concerned_robot')[0].firstChild.nodeValue) #ALL, TIBOT, FLUSSMITTEL
-			x				= int(xml_goal.getElementsByTagName('x')[0].firstChild.nodeValue)
-			y				= int(xml_goal.getElementsByTagName('y')[0].firstChild.nodeValue)
+			x_objectif		= int(xml_goal.getElementsByTagName('x_objectif')[0].firstChild.nodeValue)
+			y_objectif		= int(xml_goal.getElementsByTagName('y_objectif')[0].firstChild.nodeValue)
+			angle_objectif	= float(xml_goal.getElementsByTagName('angle_objectif')[0].firstChild.nodeValue)
 
 			#On ajoute uniquement les objectifs qui nous concerne
 			if concerned_robot == "ALL" or concerned_robot == self.__robot_name:
-				goal = Goal(id, name, type, concerned_robot, x, y)
+				goal = Goal(id, name, type, concerned_robot, x_objectif, y_objectif)
 				self.__available_goals.append(goal)
 
 				for elem_goal in xml_goal.getElementsByTagName('elem_goal'):
 					id			= int(elem_goal.getElementsByTagName('id')[0].firstChild.nodeValue)
-					x			= int(elem_goal.getElementsByTagName('x')[0].firstChild.nodeValue)
-					y			= int(elem_goal.getElementsByTagName('y')[0].firstChild.nodeValue)
+					x_elem		= int(elem_goal.getElementsByTagName('x_elem')[0].firstChild.nodeValue)
+					y_elem		= int(elem_goal.getElementsByTagName('y_elem')[0].firstChild.nodeValue)
 					angle		= float(elem_goal.getElementsByTagName('angle')[0].firstChild.nodeValue)
 					points		= int(elem_goal.getElementsByTagName('points')[0].firstChild.nodeValue)
 					priority	= int(elem_goal.getElementsByTagName('priority')[0].firstChild.nodeValue)
@@ -546,7 +557,7 @@ class GoalsManager:
 					color		= str(elem_goal.getElementsByTagName('color')[0].firstChild.nodeValue)
 					id_script	= int(elem_goal.getElementsByTagName('id_script')[0].firstChild.nodeValue)
 					
-					goal.appendElemGoal( ElemGoal(id, x, y, angle, points, priority, duration, color, self.__elem_script[id_script]) )
+					goal.appendElemGoal( ElemGoal(id, x_objectif+x_elem, y_objectif+y_elem, angle_objectif+angle, points, priority, duration, color, self.__elem_script[id_script]) )
 
 	def __loadBeginScript(self):
 		base_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))

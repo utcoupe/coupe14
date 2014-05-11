@@ -62,8 +62,7 @@ enum ordre {
 
 	//OTHERS
 	//FM
-	O_RET_OUVRIR, //@int
-	O_RET_FERMER, //@int
+	O_RET, //@int
 	O_GET_TRIANGLE, //@int @int @int @int
 	O_STORE_TRIANGLE, //@int @int
 	O_GET_BRAS_STATUS, //@int #int

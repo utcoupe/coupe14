@@ -9,8 +9,10 @@ enum action {
 	BrasDepot
 };
 
+void updateAct();
 void initPins();
 void initAct();
+void callbackRet(int use=0);
 void stopAct();
 bool readyForNext();
 void getBrasDepot(int x, int y);

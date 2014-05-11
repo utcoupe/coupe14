@@ -27,7 +27,7 @@ if __name__ == "__main__":
 	other_bot = Bot()
 	other_bot["getRayon"] = 200
 	used_bot = Bot()
-	used_bot["getRayon"] = 120
+	used_bot["getRayon"] = 200
 	ennemy1 = Bot()
 	ennemy2 = Bot()
 	ennemy1["getPosition"] = (1800, 1500)
