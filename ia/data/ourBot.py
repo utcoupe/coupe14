@@ -81,6 +81,7 @@ class OurBot():
 	def getTrajectoires(self):
 		data_trajectoires = ()
 		trajectoire = ((self.__positionX, self.__positionY),)
+		last_point = (self.__positionX, self.__positionY)
 
 		#Pour les actions en cours d'execution
 		id_action_en_cours = None
@@ -89,6 +90,7 @@ class OurBot():
 			for order in self.__actions_en_cours[1]:
 				if order[1] == 'A_GOTO':
 					trajectoire += ((order[2][0], order[2][1]),)
+					last_point = (order[2][0], order[2][1])
 			if not self.__objectifs:
 				if len(trajectoire)>1:
 					data_trajectoires += ((id_action_en_cours, trajectoire),)

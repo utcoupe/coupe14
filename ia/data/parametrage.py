@@ -3,6 +3,7 @@
 Ce fichier regroupe les systèmes à configurer avant le debut d'un match
 """
 import logging
+from constantes import *
 
 logger = logging.getLogger(__name__.split('.')[0])
 
