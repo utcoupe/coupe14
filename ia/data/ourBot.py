@@ -238,7 +238,7 @@ class OurBot():
 				while (self.maxRot(data_order[0], lastIddExecuted) != lastIddExecuted) and order_of_objectif:
 					data_order = order_of_objectif.popleft()
 
-				if order_of_objectif[0][0] == lastIddExecuted:
+				if order_of_objectif and order_of_objectif[0][0] == lastIddExecuted:
 					order_of_objectif.popleft()
 
 				if not order_of_objectif:
