@@ -532,6 +532,7 @@ class GoalsManager:
 			concerned_robot = str(xml_goal.getElementsByTagName('concerned_robot')[0].firstChild.nodeValue) #ALL, TIBOT, FLUSSMITTEL
 			x_objectif		= int(xml_goal.getElementsByTagName('x_objectif')[0].firstChild.nodeValue)
 			y_objectif		= int(xml_goal.getElementsByTagName('y_objectif')[0].firstChild.nodeValue)
+			angle_objectif	= float(xml_goal.getElementsByTagName('angle_objectif')[0].firstChild.nodeValue)
 
 			#On ajoute uniquement les objectifs qui nous concerne
 			if concerned_robot == "ALL" or concerned_robot == self.__robot_name:
@@ -549,7 +550,7 @@ class GoalsManager:
 					color		= str(elem_goal.getElementsByTagName('color')[0].firstChild.nodeValue)
 					id_script	= int(elem_goal.getElementsByTagName('id_script')[0].firstChild.nodeValue)
 					
-					goal.appendElemGoal( ElemGoal(id, x_objectif+x_elem, y_objectif+y_elem, angle, points, priority, duration, color, self.__elem_script[id_script]) )
+					goal.appendElemGoal( ElemGoal(id, x_objectif+x_elem, y_objectif+y_elem, angle_objectif+angle, points, priority, duration, color, self.__elem_script[id_script]) )
 
 	def __loadBeginScript(self):
 		base_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))

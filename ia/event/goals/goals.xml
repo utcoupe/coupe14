@@ -7,6 +7,7 @@
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x_objectif>900</x_objectif>
 		<y_objectif>1400</y_objectif>
+		<angle_objectif>0.0</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
@@ -39,6 +40,7 @@
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x_objectif>2100</x_objectif>
 		<y_objectif>1400</y_objectif>
+		<angle_objectif>0.0</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
@@ -71,6 +73,7 @@
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x_objectif>3000</x_objectif>
 		<y_objectif>1200</y_objectif>
+		<angle_objectif>0.0</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>1</id>
@@ -92,12 +95,13 @@
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x_objectif>2600</x_objectif>
 		<y_objectif>900</y_objectif>
+		<angle_objectif>-1.57</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
 				<x_elem>0</x_elem>
 				<y_elem>250</y_elem>
-				<angle>-1.57</angle>
+				<angle>0</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -108,7 +112,7 @@
 				<id>1</id>
 				<x_elem>-30</x_elem>
 				<y_elem>-250</y_elem>
-				<angle>1.57</angle>
+				<angle>3.14</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -124,6 +128,7 @@
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x_objectif>2100</x_objectif>
 		<y_objectif>400</y_objectif>
+		<angle_objectif>0.0</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
@@ -156,12 +161,13 @@
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x_objectif>1700</x_objectif>
 		<y_objectif>0</y_objectif>
+		<angle_objectif>-1.57</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
 				<x_elem>200</x_elem>
 				<y_elem>250</y_elem>
-				<angle>-2.53</angle>
+				<angle>-0.96</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -177,12 +183,13 @@
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x_objectif>1300</x_objectif>
 		<y_objectif>0</y_objectif>
+		<angle_objectif>-1.57</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>1</id>
 				<x_elem>200</x_elem>
 				<y_elem>250</y_elem>
-				<angle>-2.53</angle>
+				<angle>-0.96</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -198,6 +205,7 @@
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x_objectif>900</x_objectif>
 		<y_objectif>400</y_objectif>
+		<angle_objectif>0.0</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
@@ -230,12 +238,13 @@
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x_objectif>400</x_objectif>
 		<y_objectif>900</y_objectif>
+		<angle_objectif>-1.57</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
 				<x_elem>0</x_elem>
 				<y_elem>250</y_elem>
-				<angle>-1.57</angle>
+				<angle>0.0</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -246,7 +255,7 @@
 				<id>1</id>
 				<x_elem>30</x_elem>
 				<y_elem>-200</y_elem>
-				<angle>1.57</angle>
+				<angle>3.14</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -262,12 +271,13 @@
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x_objectif>0</x_objectif>
 		<y_objectif>1200</y_objectif>
+		<angle_objectif>3.14</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
 				<x_elem>250</x_elem>
 				<y_elem>-200</y_elem>
-				<angle>2.18</angle>
+				<angle>-0.96</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -283,12 +293,13 @@
 		<concerned_robot>TIBOT</concerned_robot>
 		<x_objectif>1500</x_objectif>
 		<y_objectif>2000</y_objectif>
+		<angle_objectif>1.57</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
 				<x_elem>-150</x_elem>
 				<y_elem>-200</y_elem>
-				<angle>1.57</angle>
+				<angle>0</angle>
 				<points>6</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -299,7 +310,7 @@
 				<id>1</id>
 				<x_elem>150</x_elem>
 				<y_elem>-200</y_elem>
-				<angle>1.57</angle>
+				<angle>0</angle>
 				<points>6</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -315,12 +326,13 @@
 		<concerned_robot>TIBOT</concerned_robot>
 		<x_objectif>800</x_objectif>
 		<y_objectif>1700</y_objectif>
+		<angle_objectif>-1.57</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
 				<x_elem>0</x_elem>
 				<y_elem>-160</y_elem>
-				<angle>3.14</angle>
+				<angle>-1.57</angle>
 				<points>4</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -331,7 +343,7 @@
 				<id>1</id>
 				<x_elem>0</x_elem>
 				<y_elem>-160</y_elem>
-				<angle>3.14</angle>
+				<angle>-1.57</angle>
 				<points>2</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -347,12 +359,13 @@
 		<concerned_robot>TIBOT</concerned_robot>
 		<x_objectif>2200</x_objectif>
 		<y_objectif>1700</y_objectif>
+		<angle_objectif>-1.57</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
 				<x_elem>0</x_elem>
 				<y_elem>-160</y_elem>
-				<angle>3.14</angle>
+				<angle>-1.57</angle>
 				<points>4</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -363,7 +376,7 @@
 				<id>1</id>
 				<x_elem>0</x_elem>
 				<y_elem>-160</y_elem>
-				<angle>3.14</angle>
+				<angle>-1.57</angle>
 				<points>2</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -377,14 +390,15 @@
 		<name>TIR_FILET</name>
 		<type>FILET</type>
 		<concerned_robot>TIBOT</concerned_robot>
-		<x_objectif>0</x_objectif>
-		<y_objectif>0</y_objectif>
+		<x_objectif>1500</x_objectif>
+		<y_objectif>1000</y_objectif>
+		<angle_objectif>-1.57</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x_elem>380</x_elem>
-				<y_elem>1560</y_elem>
-				<angle>-2.355</angle>
+				<x_elem>-1120</x_elem>
+				<y_elem>560</y_elem>
+				<angle>-0.78</angle>
 				<points>6</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -393,9 +407,9 @@
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
-				<x_elem>2620</x_elem>
-				<y_elem>1560</y_elem>
-				<angle>-0.7854</angle>
+				<x_elem>1120</x_elem>
+				<y_elem>560</y_elem>
+				<angle>0.78</angle>
 				<points>6</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -411,6 +425,7 @@
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x_objectif>1500</x_objectif>
 		<y_objectif>1050</y_objectif>
+		<angle_objectif>0.0</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
@@ -465,12 +480,13 @@
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x_objectif>0</x_objectif>
 		<y_objectif>0</y_objectif>
+		<angle_objectif>-3.14</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
 				<x_elem>430</x_elem>
 				<y_elem>250</y_elem>
-				<angle>3.14</angle>
+				<angle>0</angle>
 				<points>0</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -486,6 +502,7 @@
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x_objectif>3000</x_objectif>
 		<y_objectif>0</y_objectif>
+		<angle_objectif>0.0</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
