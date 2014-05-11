@@ -30,6 +30,7 @@ def send(triangles, pipe):
 		pipe.write(str(tri.coord[0]) + " " + str(tri.coord[1]) + " " + str(tri.angle) +  " " + str(tri.size)
 				+ " " + str(tri.color) + " " + str(tri.isDown) + "\n")
 	pipe.write('END\n')
+	pipe.flush()
 
 
 if __name__ == '__main__':

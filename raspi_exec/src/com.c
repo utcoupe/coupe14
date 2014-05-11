@@ -22,11 +22,14 @@ void com_loop(const char* cam_pipe, const char* hok_pipe) {
 		printf("[MAIN]  Pipe opened with hokuyo\n");
 	}
 	while (1) {
+		/*
 		char buffer[255];
-		fscanf(cam, "%s\n", buffer);
-		printf("[MAIN-CAM]  %s\n", buffer);
-		/*fscanf(hok, "%s\n", buffer);
-		printf("[MAIN-HOK]  %s\n", buffer);*/
+		fread(buffer, sizeof(char), 20, cam);
+		printf("%s", buffer);
+		fflush(stdout);
+		fread(buffer, sizeof(char), 20, hok);
+		printf("%s", buffer);
+		fflush(stdout);*/
 	}
 	fclose(cam);
 }

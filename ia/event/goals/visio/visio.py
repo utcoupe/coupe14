@@ -13,7 +13,7 @@ la position des triangles en hauteur"""
 class Triangle:
 	"""Simple structure de stockage des infos triangles"""
 	def __init__(self, x, y, angle, size, color, isDown):
-		self.coord = [x, y]
+		self.coord = [float(x), float(y)]
 		self.angle = float(angle)
 		self.size = float(size)
 		self.color = ''
