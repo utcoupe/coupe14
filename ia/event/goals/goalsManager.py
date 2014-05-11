@@ -350,7 +350,14 @@ class GoalsManager:
 						self.__deleteGoal(objectif)
 					else:
 						if TEST_MODE == False:
-							triangle = triangle_list[0] #TODO, prendre le meilleur triangle suivent les arg
+							min_distance = float("inf")
+							min_id = None
+							for i, triangle in enumerate(triangle_list):
+								distance = sqrt((triangle.coord[0]-220)**2 + (triangle.coord[1])**2)
+								if distance < min_distance:
+									min_distance = distance
+									min_id = i
+							triangle = triangle_list[i] 
 							data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
 						else:
 							data_camera = ("RED", 220, 0) #test
@@ -386,10 +393,10 @@ class GoalsManager:
 										self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
 									else:
 										self.__logger.warning("Impossible d'attendre le triangle d'après PathFinding, data_camera: "+str(data_camera)+" path: "+str(path)+" x+x_abs: "+str(x+x_abs)+" y+y_abs "+str(y+y_abs)+" a+a_abs "+str(a+a_abs))
-										self.__deleteGoal(objectif, False)
+										self.__deleteGoal(objectif)
 								else:
 									self.__logger.warning("Impossible d'attendre le triangle d'après Alexis, data_camera: "+str(data_camera))
-									self.__deleteGoal(objectif, False)
+									self.__deleteGoal(objectif)
 							
 			else:
 				self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), action_list)
