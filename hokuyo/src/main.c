@@ -32,9 +32,9 @@ static struct coord robots[MAX_ROBOTS];
 
 
 static void catch_SIGINT(int signal){
-	printf("Closing lidar(s), please wait...\n");
+	printf("\n%sClosing lidar(s), please wait...\n", PREFIX);
 	closeLidar(&l1);
-	printf("Exitting\n");
+	printf("%sExitting\n", PREFIX);
 	exit(EXIT_SUCCESS);
 }
 
@@ -90,7 +90,7 @@ void frame(){
 	long timestamp;
 	getPoints(&l1);
 	timestamp = timeMillis() - startTime;
-	printf("%li \t", timestamp-lastTime);
+	printf("%sDuration : %lims\n", PREFIX, timestamp-lastTime);
 	if(lastTime != 0 && timestamp-lastTime > HOKUYO_WATCHDOG){
 		printf("%s WatchDog exceeded: %li > %li\n", PREFIX, timestamp-lastTime, (long int)HOKUYO_WATCHDOG);
 		restartLidar(&l1);

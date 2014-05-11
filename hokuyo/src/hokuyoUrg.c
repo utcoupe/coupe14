@@ -23,7 +23,7 @@ initHokuyoUrg(char* device, double angleMin, double angleMax){
 	
 	printf("%sConnection établie à %s\n", PREFIX, device);
 
-	printf("Hokuyo init from %f to %f\n", angleMin*180/PI, angleMax*180/PI);
+	printf("%sHokuyo init from %f to %f\n", PREFIX, angleMin*180/PI, angleMax*180/PI);
     urg_set_scanning_parameter(urg, urg_rad2step(urg, angleMin), urg_rad2step(urg, angleMax), 0);//scan en continu, on ne garde que les point entre angleMin et angleMax
 	
 	printf("%sParameters set #1\n", PREFIX);
