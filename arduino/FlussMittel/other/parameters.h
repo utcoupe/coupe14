@@ -8,7 +8,7 @@
 //DIMENSIONS
 
 #define BRAS_OFFSET_DIST 145 //Distance in mm
-#define BRAS_OFFSET_ANGLE 30 //Angle offset in degrees
+#define BRAS_OFFSET_ANGLE 10 //Angle offset in degrees
 
 #define HAUTEUR_MAX 128 //En mm
 #define HAUTEUR_MIN 15 //en mm
@@ -36,10 +36,10 @@
 #define MARGE_PREHENSION 40
 #define HAUTEUR_GARDE_DEPOT HAUTEUR_MIN
 
-#define ANGLE_DEPOT (-(110.0/180.0)*M_PI)
+#define ANGLE_DEPOT (-(95.0/180.0)*M_PI)
 #define LONGUEUR_DEPOT 150
 
-#define ANGLE_DEPOT_RET (-(140.0/180.0)*M_PI) 
+#define ANGLE_DEPOT_RET (-(135.0/180.0)*M_PI) 
 #define LONGUEUR_DEPOT_RET 210
 
 #define PERIOD_STEPPER 200
@@ -51,10 +51,15 @@
 #define DELAY_REPLI_BRAS2 100
 #define DELAY_STOP_PUMP 500
 
+//POUSSER TRIANGLES
+
+#define HAUTEUR_PUSH_TRI 50
+#define LONGUEUR_PUSH_TRI 180 
+
 //TRIANGLES BORDURES
 #define HAUTEUR_TRI_BORDURE 70
 #define LONGUEUR_TRI_BORDURE 200
-#define ANGLE_REPLI_TRI (-(80/180.0)*M_PI) 
+#define ANGLE_REPLI_TRI (-(70/180.0)*M_PI) 
 #define ANGLE_OUVERT 0 
 
 //RETOURNEMENT
