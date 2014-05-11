@@ -87,14 +87,11 @@ int main(int argc, char **argv) {
 
 		pid_cameras = fork();
 		if (pid_cameras == 0) {
-			/*
 			//Cameras
 			printf("%d - Initializing fifo for cameras\n", getpid());
 			mkfifo(pipe_cam, 0666);
 			printf("%d - Cameras starting...\n", getpid());
 			execl(exec, "python3", file, path, color, (char *)NULL);
-			*/
-
 		} else {
 			signal(SIGINT, exit_handler);
 			printf("%d - Spawned cameras, pid %d\n", getpid(), pid_cameras);

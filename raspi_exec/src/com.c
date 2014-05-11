@@ -7,15 +7,17 @@ void com_loop(const char* cam_pipe, const char* hok_pipe) {
 	cam = fopen(cam_pipe, "r");
 	if (cam < 0) {
 		printf("[MAIN]  Failed to open camera pipe\n");
+	} else {
+		printf("[MAIN]  Pipe opened with cameras\n");
 	}
-	/*
+
 	hok = fopen(hok_pipe, "r");
 	if (hok < 0) {
-		printf("Failed to open hokuyo pipe\n");
-	}*/
-
+		printf("[MAIN]  Failed to open hokuyo pipe\n");
+	} else {
+		printf("[MAIN]  Pipe opened with hokuyo\n");
+	}
 	while (1) {
 	}
 	fclose(cam);
-	//fclose(hok);
 }
