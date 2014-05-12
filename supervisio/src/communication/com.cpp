@@ -17,11 +17,6 @@ void communication(int index, string path_to_conf, bool save) {
 		cerr << "ERROR : Uncalibrated on index " << index << endl;
 		return;
 	}
-	if (visio.getDistortMode() != none) {
-		cerr << "INFO : Starting visio WITH distortion correction on index " << index << endl;
-	} else {
-		cerr << "INFO : Starting visio WITHOUT distortion correction on index " << index << endl;
-	}
 	comLoop(visio);
 }
 

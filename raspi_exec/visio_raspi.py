@@ -51,7 +51,8 @@ if __name__ == '__main__':
 		print("[CAM ]  Executing visio with config at", config_path, "on port video"+str(index))
 		try:
 			tourelle = Tourelle()
-			v = visio.Visio(path_to_exec, index, config_path, tourelle, True)
+			v_centre = visio.Visio(path_to_exec, index, config_path, tourelle, True)
+			v_coin = visio.Visio(path_to_exec, index+1, config_path, tourelle, True)
 			success = True
 		except BaseException as e:
 			print("[CAM ]  Failed to open visio programs : "+str(e))
@@ -73,7 +74,8 @@ if __name__ == '__main__':
 		start = time.time()
 		triangles = []
 		try:
-			triangles = compute(v)
+			triangles = compute(v_centre)
+			triangles += compute(v_coin)
 			send(triangles, pipe)
 			#print("Detected", len(triangles), "in", (time.time() - start), "seconds")
 		except BaseException as e:

@@ -30,25 +30,40 @@ using namespace std;
  * CONSTRUCTEUR   *
  * ****************/
 
-Visio::Visio(int index, string path, bool save_vid) : camera(index), save_video(save_vid),
+Visio::Visio(int index_cam, string path, bool save_vid) : camera(), save_video(save_vid),
 	//Genral
 	calib_cam_filename(DEFAULT_CAMERA_MATRIX_FILENAME), calib_detection_filename(DEFAULT_PARAMS_FILENAME), 
 	calib_transform_matrix_filename(DEFAULT_PERSPECTIVE_MATRIX_FILENAME), mask_name("mask.jpg"),
 	color(red), distort(none), path_to_conf(path), chessboard_size(Size(9,6)), isready(false), is_opened(false),
+	index(index_cam),
 
 
 	//Params par defaut
 	min_size(MIN_SIZE), real_min_size(MIN_REAL_SIZE), epsilon_poly(EPSILON_POLY), max_diff_triangle_edge(MAX_DIFF_TRI_EDGE), 
 
 	//Options
-	use_mask(USE_MASK), use_resize(RESIZE), resize_w(RESIZEW), resize_h(RESIZEH),
+	use_mask(USE_MASK) {
 	//param cam
-	cam_fps(CAM_FPS), size_frame(camera.get(CV_CAP_PROP_FRAME_WIDTH), camera.get(CV_CAP_PROP_FRAME_HEIGHT)){
 	frame_mutex.lock();
+	camera.open(index);
 	if(!camera.isOpened()) {  // check if we succeeded
 		cerr << "Failed to open camera" << endl;
 	} else  {
 		init();
+
+		cout << "Starting camera " << index << " :" << flush; 
+		int ignore = system("v4l2-ctl -V | sed 's/\tWidth\\/Height  ://p' -n | tr '\n' ' @'");
+		ignore = system("v4l2-ctl -P | sed 's/\tFrames per second://p' -n | tr '\n' ' '");
+		cout << "distort ";
+		if (distort == none) {
+			cout << "none";
+		} else if (distort == points) { 
+			cout << "points";
+		} else if (distort == image) {
+			cout << "image";
+		}
+		cout << endl;
+
 		if (save_video) {
 			init_writer();
 		}
@@ -61,21 +76,25 @@ void Visio::init() {
 	setRedParameters(Scalar(RED_HUE_MIN, RED_SAT_MIN, RED_VAL_MIN), Scalar(RED_HUE_MAX, RED_SAT_MAX, RED_VAL_MAX));
 	setYelParameters(Scalar(YEL_HUE_MIN, YEL_SAT_MIN, YEL_VAL_MIN), Scalar(YEL_HUE_MAX, YEL_SAT_MAX, YEL_VAL_MAX));
 	setBlkParameters(Scalar(BLK_HUE_MIN, BLK_SAT_MIN, BLK_VAL_MIN), Scalar(BLK_HUE_MAX, BLK_SAT_MAX, BLK_VAL_MAX));
+
 	erode_dilate_kernel = getStructuringElement(MORPH_ELLIPSE, Size(10,10));
 	trans_calibrated = loadPerspectiveMatrix(calib_transform_matrix_filename);
 	cam_calibrated = loadCameraMatrix(calib_cam_filename);
+
+
+	//Parametres par defaut, modifies dans loadParams
+	size_frame = Size(camera.get(CV_CAP_PROP_FRAME_WIDTH), camera.get(CV_CAP_PROP_FRAME_HEIGHT));
+	cam_fps = CAM_FPS;
+	distort = none;
+
 	loadParams(calib_detection_filename);
-	if (use_resize) {
-		size_frame = Size(resize_w, resize_h);
-	}
+
+	camera.set(CV_CAP_PROP_FRAME_WIDTH, size_frame.width);
+	camera.set(CV_CAP_PROP_FRAME_HEIGHT, size_frame.height);
+	camera.set(CV_CAP_PROP_FPS, cam_fps);
+
 	if (use_mask) {
 		mask = imread(path_to_conf+mask_name);
-		resize(mask, mask, size_frame);
-	}
-	//if (cam_calibrated) distort = image; //TRES LONG
-	if (cam_calibrated) {
-		cerr << "Distorsion par points" << endl;
-		distort = points; 
 	}
 }
 
@@ -87,9 +106,8 @@ void Visio::init_writer() {
 	timeinfo = localtime(&rawtime);
 	strftime(buffer,80,"-%d-%m %I:%M:%S",timeinfo);
 	string date(buffer);
-	string path = path_to_conf+(string)"video"+date+(string)".avi";
-	cerr << "Saving video to : " << path << endl;
-	//int codec = CV_FOURCC('M', 'J', 'P', 'G'); //Marche
+	string path = path_to_conf+(string)"video"+(char)(index+'0')+"-"+date+(string)".avi";
+	cout << "Saving video to : " << path << endl;
 	int codec = CV_FOURCC('D', 'I', 'V', 'X'); //Marche
 	writer = VideoWriter(path, codec, cam_fps, size_frame);
 	if (!writer.isOpened()) {
@@ -196,9 +214,6 @@ int Visio::triangles(vector<Triangle>& triangles) {
 	int nbr_of_tri = 0;
 	Mat img, src_img, color_img;
 	src_img = getImg();
-	if (RESIZE) {
-		resize(src_img, src_img, size_frame);
-	}
 	if (USE_MASK) {
 		src_img.copyTo(color_img, mask);
 	} else {
@@ -368,7 +383,7 @@ bool Visio::camCalibrate(int nbr_of_views) {
 //FILE MANAGER
 
 bool Visio::loadPerspectiveMatrix(string filename) {
-	cout << "Loading transform matrix" << endl;
+	cout << "Loading transform matrix from " << path_to_conf+filename << endl;
 	FileStorage fs(path_to_conf+filename, FileStorage::READ);
 	if (!fs.isOpened()) {
 		cerr << "ERROR : Couldn't find " << filename << endl;
@@ -381,12 +396,13 @@ bool Visio::loadPerspectiveMatrix(string filename) {
 }
 
 void Visio::loadParams(string filename) {
-	cout << "Loading detection params" << endl;
+	cout << "Loading detection params from " << path_to_conf+filename << endl;
 	FileStorage fs(path_to_conf+filename, FileStorage::READ);
 	if (!fs.isOpened()) {
 		cerr << "ERROR : Couldn't find " << filename << endl;
 		return;
 	}
+	int h, w;
 	fs["min_size"] >> min_size;
 	fs["real_min_size"] >> real_min_size;
 	fs["distort_mode"] >> (int)distort;
@@ -394,15 +410,16 @@ void Visio::loadParams(string filename) {
 	fs["max_diff_triangle_edge"] >> max_diff_triangle_edge;
 	fs["use_mask"] >> use_mask;
 	fs["mask_name"] >> mask_name;
-	fs["resize"] >> use_resize;
-	fs["resize_w"] >> resize_w;
-	fs["resize_h"] >> resize_h;
+	fs["width"] >> w;
+	fs["height"] >> h;
+	fs["fps"] >> cam_fps;
+	size_frame = Size(w,h);
 	fs.release();
 	trans_calibrated = true;
 }
 
 bool Visio::loadCameraMatrix(string filename) {
-	cout << "Loading camera data" << endl;
+	cout << "Loading camera data from " << path_to_conf+filename << endl;
 	FileStorage fs(path_to_conf+filename, FileStorage::READ);
 	if (!fs.isOpened()) {
 		cerr << "ERROR : Couldn't find " << filename << endl;
@@ -410,8 +427,6 @@ bool Visio::loadCameraMatrix(string filename) {
 	}
 	fs["D"] >> D;
 	fs["CM"] >> CM;
-	fs["size"] >> size_frame;
-	fs["fps"] >> cam_fps;
 	fs.release();
 	cam_calibrated = true;
 	return true;
@@ -438,9 +453,9 @@ void Visio::saveParams(string filename) {
 	fs << "max_diff_triangle_edge" << max_diff_triangle_edge;
 	fs << "use_mask" << use_mask;
 	fs << "mask_name" << mask_name;
-	fs << "resize" << use_resize;
-	fs << "resize_w" << resize_w;
-	fs << "resize_h" << resize_h;
+	fs << "width" << size_frame.width;
+	fs << "height" << size_frame.height;
+	fs << "fps" << cam_fps;
 	fs.release();
 }
 void Visio::saveCameraMatrix(string filename) {
@@ -452,8 +467,6 @@ void Visio::saveCameraMatrix(string filename) {
 	FileStorage fs(path_to_conf+filename, FileStorage::WRITE);
 	fs << "D" << D;
 	fs << "CM" << CM;
-	fs << "size" << size_frame;
-	fs << "fps" << cam_fps;
 	fs.release();
 }
 //SETTER

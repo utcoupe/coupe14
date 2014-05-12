@@ -61,6 +61,7 @@ class Visio:
 		atexit.register(self.client.kill)
 		stdout = ''
 		while stdout != 'READY\n' and stdout != 'FAILED\n':
+			print(stdout, end='')
 			#Attente des données client
 			stdout = self.client.stdout.readline()
 			#Sleep 1ms
