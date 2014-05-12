@@ -235,7 +235,6 @@ void cmdBrasDepot(double a, int l) {
 				cmdBrasServ(angle, longueur); //Pas d'attente ici, cela ne devrai pas etre la peine, sinon, implémenter time_end
 				time_end = timeMicros() + (long)DELAY_SERVO_PUSH*1000;
 				step++;
-				next_step = true;
 				break;
 			case 6:
 				pump(false);
