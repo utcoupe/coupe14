@@ -20,15 +20,17 @@ class Tourelle:
 		return (0, 0, 0)
 
 
-def compute(v):
-	triangles = v.update()
+def compute(v_centre, v_coin):
+	triangles = v_centre.update()
+	triangles += v_centre.update()
 	return triangles
 
 
 def send(triangles, pipe):
 	for tri in triangles:
-		pipe.write(str(tri.coord[0]) + " " + str(tri.coord[1]) + " " + str(tri.angle) +  " " + str(tri.size)
-				+ " " + str(tri.color) + " " + str(tri.isDown) + "\n")
+		pipe.write(str(tri.coord[0]) + " " + str(tri.coord[1]) + " " + str(tri.angle)
+					+ " " + str(tri.size) + " " + str(tri.color) + " " 
+					+ str(tri.isDown) + "\n")
 	pipe.write('END\n')
 	pipe.flush()
 
@@ -41,14 +43,14 @@ if __name__ == '__main__':
 		print('[CAM ]  Not enough arguments : visio_raspi path_pipe color')
 		sys.exit()
 
-	path_to_exec = path+"/supervisio/visio"
-	path_pipe = path+"/config/raspi/pipe_cameras"
-	config_path = path+"/config/visio/visio_tourelle_" + color + "/"
+	path_to_exec = path + "/supervisio/visio"
+	path_pipe = path + "/config/raspi/pipe_cameras"
+	config_path = path + "/config/visio/visio_tourelle_" + color + "/"
 	success = False
 	index = 0
 
 	while index < 3 and not success:
-		print("[CAM ]  Executing visio with config at", config_path, "on port video"+str(index))
+		print("[CAM ]  Executing visio with config at", config_path, "on port video" + str(index))
 		try:
 			tourelle = Tourelle()
 			v_centre = visio.Visio(path_to_exec, index, config_path, tourelle, True)
@@ -74,8 +76,7 @@ if __name__ == '__main__':
 		start = time.time()
 		triangles = []
 		try:
-			triangles = compute(v_centre)
-			triangles += compute(v_coin)
+			triangles = compute(v_centre, v_coin)
 			send(triangles, pipe)
 			#print("Detected", len(triangles), "in", (time.time() - start), "seconds")
 		except BaseException as e:
