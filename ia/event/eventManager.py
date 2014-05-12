@@ -274,7 +274,7 @@ class EventManager():
 					arg += action[2]
 
 				if action[1][0] == 'O':
-						if self.__tibot_locked == False:
+						if self.__tibot_locked == False or str(address[0]) == "ADDR_FLUSSMITTEL_OTHER":
 							self.__Communication.sendOrderAPI(address[0], action[1], *arg)
 						else:
 							self.__logger.error("Attention on drop l'ordre "+str(action[1])+" a destination de "+str(address[0])+" avec les arg "+str(arg)+" car on est bloqué en funny action.")
