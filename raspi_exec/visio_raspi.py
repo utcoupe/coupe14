@@ -28,9 +28,8 @@ def compute(v_centre, v_coin):
 
 def send(triangles, pipe):
 	for tri in triangles:
-		pipe.write(str(tri.coord[0]) + " " + str(tri.coord[1]) + " " + str(tri.angle)
-					+ " " + str(tri.size) + " " + str(tri.color) + " " 
-					+ str(tri.isDown) + "\n")
+		pipe.write(str(tri.coord[0]) + " " + str(tri.coord[1]) + " " + str(tri.angle) \
+					+ " " + str(tri.size) + " " + str(tri.color) + " " + str(tri.isDown) + "\n")
 	pipe.write('END\n')
 	pipe.flush()
 
@@ -48,6 +47,12 @@ if __name__ == '__main__':
 	config_path = path + "/config/visio/visio_tourelle_" + color + "/"
 	success = False
 	index = 0
+
+	#clean des fichiers chiants
+	print('[CAM ]  Removing old videos"')
+	os.system("rm " + path + "/config/raspi/pipe_*")
+	os.system("rm " + path + "/config/visio/visio_tourelle_red/video* " \
+					+ path + "/config/visio/visio_tourelle_yellow/video*")
 
 	while index < 3 and not success:
 		print("[CAM ]  Executing visio with config at", config_path, "on port video" + str(index))
