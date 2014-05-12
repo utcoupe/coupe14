@@ -134,9 +134,9 @@ if __name__ == "__main__":
 		t.start()
 
 		#start de la GUI
-		#guiRed = mainGUI.GUISimu(robots_red)
+		guiRed = mainGUI.GUISimu(robots_red)
 		#threading.Thread(target=guiRed.start).start()
-		#guiRed.start()
+		guiRed.start()
 
 		while not engine.e_stop.is_set():
 				try:

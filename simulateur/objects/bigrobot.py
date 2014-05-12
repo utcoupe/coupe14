@@ -54,7 +54,7 @@ class BigRobot(Robot):
 			extension_objects	= [],
 		)
 		self.__state_jack = 0  # jack in
-		self.__nbrFeuAvant = 2
+		self.__nbrFeuAvant = 0
 		self.__nbrFeuArriere = 0 #normalement à 0, 1 pour les tests
 		self.__engine = engine
 		self.__feuHit = 0

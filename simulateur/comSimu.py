@@ -27,19 +27,23 @@ class Communication():
 		@param args suivent l'ordre
 		"""
 		if (address == "ADDR_FLUSSMITTEL_OTHER"):
+			self.__bigrobot.saveOrder(order, arguments)
 			self.__traitementFlussmittelOthers(order, arguments)
 		elif (address == "ADDR_FLUSSMITTEL_ASSERV"):
+			self.__bigrobot.saveOrder(order, arguments)
 			self.__traitementFlussmittelAsserv(order, arguments)
 		elif (address == "ADDR_FLUSSMITTEL_CAM"):
 			self.__traitementFlussmittelCam(order, arguments)
 		elif (address == "ADDR_TIBOT_OTHER"):
+			self.__minirobot.saveOrder(order, arguments)
 			self.__traitementTibotOthers(order, arguments)
 		elif (address == "ADDR_TIBOT_ASSERV"):
+			self.__minirobot.saveOrder(order, arguments)
 			self.__traitementTibotAsserv(order, arguments)
 		elif (address == "ADDR_HOKUYO"):
 			self.__traitementHokuyo(order, arguments)
 		else:
-			print('ordre non valide'+str(address))
+			print('ordre non valide '+str(address))
 
 	def __traitementFlussmittelOthers(self, order, args):
 		"""
