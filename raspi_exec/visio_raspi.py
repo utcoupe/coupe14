@@ -8,6 +8,11 @@ sys.path.append(os.path.join(FILE_DIR, "../ia/"))
 
 import event.goals.visio as visio
 
+PATH_CONFIG = "/config/visio/visio_tourelle_red/video*"
+PATH_TO_EXEC = "/supervisio/visio"
+PATH_PIPE = "/config/raspi/"
+DIST_SAME_TRI = 100
+
 
 class Tourelle:
 	def __init__(self):
@@ -22,7 +27,13 @@ class Tourelle:
 
 def compute(v_centre, v_coin):
 	triangles = v_centre.update()
-	triangles += v_centre.update()
+	triangles_coin = v_centre.update()
+	for tri in triangles_coin:
+		for t in triangles:
+			if tri.dist2(t) < DIST_SAME_TRI:
+				triangles.append(tri)
+				break
+
 	return triangles
 
 
@@ -42,9 +53,9 @@ if __name__ == '__main__':
 		print('[CAM ]  Not enough arguments : visio_raspi path_pipe color')
 		sys.exit()
 
-	path_to_exec = path + "/supervisio/visio"
-	path_pipe = path + "/config/raspi/pipe_cameras"
-	config_path = path + "/config/visio/visio_tourelle_" + color + "/"
+	path_to_exec = path + PATH_TO_EXEC
+	path_pipe = path + PATH_PIPE
+	config_path = path + PATH_CONFIG 
 	success = False
 	index = 0
 
@@ -91,5 +102,6 @@ if __name__ == '__main__':
 			triangles = []
 
 	print('Closing')
-	v.close()
+	v_coin.close()
+	v_centre.close()
 	sys.exit()

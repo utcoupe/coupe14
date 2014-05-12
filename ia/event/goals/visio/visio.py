@@ -34,6 +34,11 @@ class Triangle:
 			state = 'up'
 		return str(self.coord) + '\ta=' + str(self.angle) + '\t' + str(self.size) + '\t' + self.color + '\t' + state
 
+	def dist2(self, tri):
+		dx = self.coord[0] - tri.coord[0]
+		dy = self.coord[1] - tri.coord[1]
+		return dx*dx + dy*dy
+
 
 class Visio:
 	def __init__(self, path_exec, index=0, path_config='./', big_bot=None, capture_vid=True):
