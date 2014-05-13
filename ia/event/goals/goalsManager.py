@@ -405,8 +405,7 @@ class GoalsManager:
 											self.__deleteGoal(objectif)
 									 # Sinon on a besoin de juste tourner
 									else:
-										#doesn't work simu ? : script_get_triangle.append( ("A_ROT", (a+a_abs)) )
-										script_get_triangle.append( ("A_GOTOA", (x_abs, y_abs, a+a_abs)) ) 
+										script_get_triangle.append( ("A_GOTOA", (x+x_abs, y+y_abs, a+a_abs)) ) 
 										script_get_triangle.append( ("STEP_OVER", (),) )
 										self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
 								else:
