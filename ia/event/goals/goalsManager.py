@@ -349,7 +349,7 @@ class GoalsManager:
 						else:
 							# Coordonées du triangle par rapport au centre du robot
 							# sera corrigé par l'algo lors de la prise du premier triangle normalement
-							temp = (250, -100)
+							temp = (50, -100)
 							# Correction x y
 							temp_x = temp[0] + self.__hack_camera_simu_x
 							temp_y = temp[1] + self.__hack_camera_simu_y
@@ -390,13 +390,16 @@ class GoalsManager:
 										self.__hack_camera_simu_angle -= a
 
 									# Si on a besoin d'avancer, on vérifie avec le pathfinding
-									if x > 0 or y > 0:
+									if hypot(x, y) > MARGE_SANS_PATHFINDING:
 										self.__PathFinding.update(self.__data[self.__robot_name])
 										path = self.__PathFinding.getPath((x_abs, y_abs), (x+x_abs, y+y_abs), enable_smooth=True)
 										if len(path) == 2:
 											script_get_triangle.append( ("A_GOTOA", (path[1][0], path[1][1], a+a_abs)) ) 
 											script_get_triangle.append( ("STEP_OVER", (),) )
 											self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
+										elif len(path) > 2:
+											self.__logger.warning("Impossible d'attendre le triangle en ligne droite d'après PathFinding, data_camera: "+str(data_camera)+" path: "+str(path)+" x+x_abs: "+str(x+x_abs)+" y+y_abs "+str(y+y_abs)+" a+a_abs "+str(a+a_abs))
+											self.__deleteGoal(objectif)
 										else:
 											self.__logger.warning("Impossible d'attendre le triangle d'après PathFinding, data_camera: "+str(data_camera)+" path: "+str(path)+" x+x_abs: "+str(x+x_abs)+" y+y_abs "+str(y+y_abs)+" a+a_abs "+str(a+a_abs))
 											self.__deleteGoal(objectif)
