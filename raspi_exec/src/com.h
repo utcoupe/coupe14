@@ -2,7 +2,7 @@
 #define COM_H
 
 #define MAX_TRI 10
-#define MAX_ROBOTS 4
+#define NBR_ROBOTS 4
 
 enum camArgs { x, y, a, size, color, isDown, end }; //ordonés
 

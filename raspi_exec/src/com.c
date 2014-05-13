@@ -74,19 +74,17 @@ void com_loop(const char* cam_pipe, const char* hok_pipe) {
 			}
 			i_hok = 0;
 		}
-		/*
-		char buffer[255];
-		fread(buffer, sizeof(char), 20, cam);
-		printf("%s", buffer);
-		fflush(stdout);
-		fread(buffer, sizeof(char), 20, hok);
-		printf("%s", buffer);
-		fflush(stdout);*/
 	}
 	fclose(cam);
 	fclose(hok);
 }
 
+
+//Une ligne par triangle, chaque set finit par END\n
+//x y a size color isdown
+//x y a size color isdown
+//x y a size color isdown
+//END\n
 void parseCamera(char *line) {
 	static int nbr_tri = 0;
 	static struct camData triangles[MAX_TRI];
@@ -137,34 +135,46 @@ void parseCamera(char *line) {
 	}
 }
 
+
+// Une ligne par set de data :
+// timestamp nbr_coords x1 y1 x2 y2 x3 y3
 void parseHokuyo(char *line) {
-	static int nbr_robots = 0, nbr_robots_to_parse = 0;
-	static long timestamp = 0;
-	static struct hokData robots[MAX_ROBOTS];
-	if (strcmp(line, "END\n") == 0) { //Fin de frame
-		pushHokData(robots, nbr_robots);
-		nbr_robots = 0;
-	} else {
-		char arg[50];
-		char c = 0;
-		int i = 0, arg_nbr = 0;
+	int nbr_robots = 0, nbr_robots_to_parse = 0;
+	long timestamp = 0;
+	struct hokData robots[NBR_ROBOTS];
+	char arg[50];
+	char c = 0;
+	int i = 0, arg_nbr = 0, ignore = 0, coord_index = 0;
 
-		while (c != '\n') { //Jusqua la fin de la ligne
-			while (c != ' ' && c != '\n') { //Jusqua la fin de l'arg
-				c = *(line++);
-				arg[i++] = c;
-			}
-			i = 0;
-
-			if (arg_nbr == 0) {
-				timestamp = atol(arg);
-			} else if (arg_nbr == 1) {
-				nbr_robots_to_parse = atoi(arg);
-			} else if (arg_nbr % 2 == 0) { //X
-			} else { //Y
-			}
-			arg_nbr++;
-			//TODO parse X,Y, vérifier le nombre de coords
+	while (c != '\n') { //Jusqua la fin de la ligne
+		while (c != ' ' && c != '\n') { //Jusqua la fin de l'arg
+			c = *(line++);
+			arg[i++] = c;
 		}
+		i = 0;
+
+		coord_index = (arg_nbr-1) / 2;
+
+		if (arg_nbr == 0) {
+			timestamp = atol(arg);
+		} else if (coord_index < NBR_ROBOTS) { //On attend encore des coords
+			if ((arg_nbr+1) % 2 == 0) { //X
+				robots[coord_index].x = atoi(arg);
+			} else { //Y
+				robots[coord_index].y = atoi(arg);
+				nbr_robots++;
+			}
+		} else if (!ignore) { //Trop d'arguments !
+			printf("[MAIN]   Failed to parse hokuyo data : too many coords\n");
+			ignore = 1;
+		}
+		arg_nbr++;
+	}
+	if (coord_index != NBR_ROBOTS-1) {
+		printf("[MAIN]   Failed to parse hokuyo data : got only %d coords\n", coord_index+1);
+		ignore = 1;
+	}
+	if (!ignore) {
+		pushHokData(robots, timestamp);
 	}
 }
