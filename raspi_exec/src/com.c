@@ -88,21 +88,15 @@ void com_loop(const char* cam_pipe, const char* hok_pipe) {
 }
 
 void parseCamera(char *line) {
-	static int ready = 0, nbr_tri = 0;
+	static int nbr_tri = 0;
 	static struct camData triangles[MAX_TRI];
-	if (!ready) {
-		if (strcmp(line, "READY\n") == 0) {
-			ready = 1;
-		} else {
-			printf("%s", line); //Ecrire stdou tant qu'on est pas pret
-		}
-	} else if (strcmp(line, "END\n") == 0) { //Fin de frame
+	if (strcmp(line, "END\n") == 0) { //Fin de frame
 		pushCamData(triangles, nbr_tri);
 		nbr_tri = 0;
 	} else {
 		char arg[50];
 		char c = 0;
-		int i = 0, j = 0;
+		int i = 0;
 		enum camArgs arg_type = x;
 
 		while (c != '\n') { //Jusqua la fin de la ligne
@@ -144,4 +138,33 @@ void parseCamera(char *line) {
 }
 
 void parseHokuyo(char *line) {
+	static int nbr_robots = 0, nbr_robots_to_parse = 0;
+	static long timestamp = 0;
+	static struct hokData robots[MAX_ROBOTS];
+	if (strcmp(line, "END\n") == 0) { //Fin de frame
+		pushHokData(robots, nbr_robots);
+		nbr_robots = 0;
+	} else {
+		char arg[50];
+		char c = 0;
+		int i = 0, arg_nbr = 0;
+
+		while (c != '\n') { //Jusqua la fin de la ligne
+			while (c != ' ' && c != '\n') { //Jusqua la fin de l'arg
+				c = *(line++);
+				arg[i++] = c;
+			}
+			i = 0;
+
+			if (arg_nbr == 0) {
+				timestamp = atol(arg);
+			} else if (arg_nbr == 1) {
+				nbr_robots_to_parse = atoi(arg);
+			} else if (arg_nbr % 2 == 0) { //X
+			} else { //Y
+			}
+			arg_nbr++;
+			//TODO parse X,Y, vérifier le nombre de coords
+		}
+	}
 }

@@ -2,6 +2,7 @@
 #define COM_H
 
 #define MAX_TRI 10
+#define MAX_ROBOTS 4
 
 enum camArgs { x, y, a, size, color, isDown, end }; //ordonés
 
@@ -11,6 +12,7 @@ struct camData {
 };
 
 struct hokData {
+	int x, y;
 };
 
 void com_loop(const char* cam_pipe, const char* hok_pipe) ;

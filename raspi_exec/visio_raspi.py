@@ -39,8 +39,16 @@ def compute(v_centre, v_coin):
 
 def send(triangles, pipe):
 	for tri in triangles:
+		if tri.color == 'RED':
+			int_color = 0
+		elif tri.color == 'YELLOW':
+			int_color = 1
+		elif tri.color == 'BLACK':
+			int_color = 2
+		else:
+			int_color = -1
 		pipe.write(str(tri.coord[0]) + " " + str(tri.coord[1]) + " " + str(tri.angle) \
-					+ " " + str(tri.size) + " " + str(tri.color) + " " + str(tri.isDown) + "\n")
+					+ " " + str(tri.size) + " " + str(int_color) + " " + str(int(tri.isDown)) + "\n")
 	pipe.write('END\n')
 	pipe.flush()
 
