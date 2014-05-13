@@ -18,7 +18,7 @@ extern int serial;
 
 void* poll_proto () {
 	while (1) {
-		char data = generic_serial_read();
+		char data = generic_serial_read(); //blocant
 		executeCmd(data);
 	}
 }
