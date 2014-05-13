@@ -58,6 +58,23 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 			break;
 			}
 		case T_GET_CAM: {
+			static int datas_left = 0;
+			static int current_index = 0;
+			static struct camData data[MAX_TRI];
+
+			if (datas_left == 0) { //Debut de trasnmission, copie des datas
+				pthread_mutex_lock(&mutexCam);
+				memcpy(data, lastCamData, last_cam_nbr*sizeof(struct camData));
+				datas_left = last_cam_nbr;
+				pthread_mutex_unlock(&mutexCam);
+			}
+
+			datas_left--;
+			itob(data[current_index].x, ret);
+			itob(data[current_index].y, ret+2);
+			itob(datas_left, ret+4);
+			current_index++;
+			ret_size = 6;
 			break;
 			}
 		default:
