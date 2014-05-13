@@ -347,12 +347,17 @@ class GoalsManager:
 							triangle = triangle_list[i] 
 							data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
 						else:
+							# Coordonées du triangle par rapport au centre du robot
+							# sera corrigé par l'algo lors de la prise du premier triangle normalement
 							temp = (250, -100)
+							# Correction x y
 							temp_x = temp[0] + self.__hack_camera_simu_x
 							temp_y = temp[1] + self.__hack_camera_simu_y
+							# Rotation du robot
 							temp_x_rot = temp_x * cos(self.__hack_camera_simu_angle) - temp_y * sin(self.__hack_camera_simu_angle)
 							temp_y_rot = temp_x * sin(self.__hack_camera_simu_angle) + temp_y * cos(self.__hack_camera_simu_angle)
-							data_camera = ("RED", temp_x_rot, temp_y_rot) #test
+							
+							data_camera = ("RED", temp_x_rot, temp_y_rot)
 
 
 						self.__last_camera_color = data_camera[0]
