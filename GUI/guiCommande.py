@@ -27,7 +27,7 @@ def gui(com):
 					address = 2
 				elif order[0] == 'O':
 					address = 1
-				elif order == 'GET_HOKUYO':
+				elif order == 'T_GET_HOKUYO':
 					address = 6
 
 				if order == 'k':# arret d'urgence

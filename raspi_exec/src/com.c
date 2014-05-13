@@ -1,4 +1,7 @@
 #include "com.h"
+#include "protocole/serial_switch.h"
+#include "protocole/compat.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 
