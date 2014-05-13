@@ -17,3 +17,6 @@ add_executable(
 	${EXEC_NAME}
 	${source_files}
 )
+
+target_link_libraries( raspi
+	pthread)

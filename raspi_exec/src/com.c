@@ -5,6 +5,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 void com_loop(const char* cam_pipe, const char* hok_pipe) {
 	FILE *cam = 0, *hok = 0;
@@ -87,6 +88,59 @@ void com_loop(const char* cam_pipe, const char* hok_pipe) {
 }
 
 void parseCamera(char *line) {
+	static int ready = 0, nbr_tri = 0;
+	static struct camData triangles[MAX_TRI];
+	if (!ready) {
+		if (strcmp(line, "READY\n") == 0) {
+			ready = 1;
+		} else {
+			printf("%s", line); //Ecrire stdou tant qu'on est pas pret
+		}
+	} else if (strcmp(line, "END\n") == 0) { //Fin de frame
+		pushCamData(triangles, nbr_tri);
+		nbr_tri = 0;
+	} else {
+		char arg[50];
+		char c = 0;
+		int i = 0, j = 0;
+		enum camArgs arg_type = x;
+
+		while (c != '\n') { //Jusqua la fin de la ligne
+			while (c != ' ' && c != '\n') { //Jusqua la fin de l'arg
+				c = *(line++);
+				arg[i++] = c;
+			}
+			i = 0;
+			switch (arg_type) {
+				case x:
+					triangles[nbr_tri].x = atoi(arg);
+					break;
+				case y:
+					triangles[nbr_tri].y = atoi(arg);
+					break;
+				case a:
+					triangles[nbr_tri].a = atof(arg);
+					break;
+				case size:
+					triangles[nbr_tri].size = atoi(arg);
+					break;
+				case color:
+					triangles[nbr_tri].color = atoi(arg);
+					break;
+				case isDown:
+					triangles[nbr_tri].isDown = atoi(arg);
+					break;
+				default:
+					break;
+			}
+			arg_type++; //Next arg
+		}
+		if (arg_type == end) { //On a le bon nombre d'args : ok
+			nbr_tri++;
+		} else {
+			printf("[MAIN]  Failed to parse camera data, expected %d args, got %d\n", end, arg_type);
+		}
+	}
 }
 
 void parseHokuyo(char *line) {
