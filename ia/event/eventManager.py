@@ -269,30 +269,31 @@ class EventManager():
 			for action in data_action:
 				arg = [action[0]]
 				
-				#Si l'ordre a des arguments
-				if action[2] is not None:
-					arg += action[2]
-
-				if action[1][0] == 'O':
-						if self.__tibot_locked == False:
-							self.__Communication.sendOrderAPI(address[0], action[1], *arg)
-						else:
-							self.__logger.error("Attention on drop l'ordre "+str(action[1])+" a destination de "+str(address[0])+" avec les arg "+str(arg)+" car on est bloqué en funny action.")
-
-				elif action[1][0] == 'A':
-					if action[1] == "A_GOTO_SCRIPT":#A_GOTO_SCRIPT n'existe que dans les scripts d'action elemetaire, on l'utilise pour ne pas inclure ces deplacements dans le calcul de collision
-						self.__Communication.sendOrderAPI(address[1], "A_GOTO", *arg)
-					else:
-						self.__Communication.sendOrderAPI(address[1], action[1], *arg)
-
-				elif action[1] == "FUNNY_ACTION_LOCK":
-					self.__tibot_locked = True
-					self.__logger.info("Tibot est prêt pour la funny action, il ne bougera plus.")
-
+				#Si tibot est en funny action
+				if address in ("ADDR_TIBOT_OTHER", "ADDR_TIBOT_ASSERV") and self.__tibot_locked == True:
+					self.__logger.error("Attention on drop l'ordre "+str(action[1])+" a destination de "+str(address)+" avec les arg "+str(arg)+" car on est bloqué en funny action.")
 				else:
-					self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
+					#Si l'ordre a des arguments
+					if action[2] is not None:
+						arg += action[2]
 
-				self.__logger.debug(str(address) + " envoi de l'ordre: " + str(action))
+					if action[1][0] == 'O':
+						self.__Communication.sendOrderAPI(address[0], action[1], *arg)
+
+					elif action[1][0] == 'A':
+						if action[1] == "A_GOTO_SCRIPT":#A_GOTO_SCRIPT n'existe que dans les scripts d'action elemetaire, on l'utilise pour ne pas inclure ces deplacements dans le calcul de collision
+							self.__Communication.sendOrderAPI(address[1], "A_GOTO", *arg)
+						else:
+							self.__Communication.sendOrderAPI(address[1], action[1], *arg)
+
+					elif action[1] == "FUNNY_ACTION_LOCK":
+						self.__tibot_locked = True
+						self.__logger.info("Tibot est prêt pour la funny action, il ne bougera plus.")
+
+					else:
+						self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
+
+					self.__logger.debug(str(address) + " envoi de l'ordre: " + str(action))
 
 
 	def __testCollision(self):

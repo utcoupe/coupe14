@@ -54,7 +54,13 @@ class GoalsManager:
 		self.__loadGoals(base_dir+"/goals.xml")
 
 		self.__goalsLib = GoalsLibrary(self.__robot_name, self.__data, self.__blocked_goals, self.__PathFinding)
-		self.__goalsChoice = GoalsChoice(self.__robot_name, self.__data, self.__goalsLib)
+		self.__goalsChoice = GoalsChoice(self.__robot_name, self.__data, self.__goalsLib, self.__our_color)
+
+		# Pour tester le déplacement du robot dans le simu lorsqu'il ne peut pas attraper un triangle
+		if TEST_MODE == True:
+			self.__hack_camera_simu_angle = 0
+			self.__hack_camera_simu_x = 0
+			self.__hack_camera_simu_y = 0
 
 		#Permet de faire une symétrie pour les ordres dans le cas où on commence en jaune
 		self.__reverse_table = {}
@@ -341,7 +347,18 @@ class GoalsManager:
 							triangle = triangle_list[i] 
 							data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
 						else:
-							data_camera = ("RED", 220, 0) #test
+							# Coordonées du triangle par rapport au centre du robot
+							# sera corrigé par l'algo lors de la prise du premier triangle normalement
+							temp = (50, -100)
+							# Correction x y
+							temp_x = temp[0] + self.__hack_camera_simu_x
+							temp_y = temp[1] + self.__hack_camera_simu_y
+							# Rotation du robot
+							temp_x_rot = temp_x * cos(self.__hack_camera_simu_angle) - temp_y * sin(self.__hack_camera_simu_angle)
+							temp_y_rot = temp_x * sin(self.__hack_camera_simu_angle) + temp_y * cos(self.__hack_camera_simu_angle)
+							
+							data_camera = ("RED", temp_x_rot, temp_y_rot)
+
 
 						self.__last_camera_color = data_camera[0]
 						#si on a la possibilité de le stocker
@@ -366,15 +383,31 @@ class GoalsManager:
 									x, y, a = temp
 									x_abs, y_abs, a_abs = self.__data[self.__robot_name]["getPositionAndAngle"]
 									script_get_triangle = deque()
-									self.__PathFinding.update(self.__data[self.__robot_name])
-									path = self.__PathFinding.getPath((x_abs, y_abs), (x+x_abs, y+y_abs), enable_smooth=True)
-									if len(path) == 2:
-										script_get_triangle.append( ("A_GOTOA", (path[1][0], path[1][1], a+a_abs)) ) 
+
+									if TEST_MODE == True:
+										self.__hack_camera_simu_x -= x
+										self.__hack_camera_simu_y -= y
+										self.__hack_camera_simu_angle -= a
+
+									# Si on a besoin d'avancer, on vérifie avec le pathfinding
+									if hypot(x, y) > MARGE_SANS_PATHFINDING:
+										self.__PathFinding.update(self.__data[self.__robot_name])
+										path = self.__PathFinding.getPath((x_abs, y_abs), (x+x_abs, y+y_abs), enable_smooth=True)
+										if len(path) == 2:
+											script_get_triangle.append( ("A_GOTOA", (path[1][0], path[1][1], a+a_abs)) ) 
+											script_get_triangle.append( ("STEP_OVER", (),) )
+											self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
+										elif len(path) > 2:
+											self.__logger.warning("Impossible d'attendre le triangle en ligne droite d'après PathFinding, data_camera: "+str(data_camera)+" path: "+str(path)+" x+x_abs: "+str(x+x_abs)+" y+y_abs "+str(y+y_abs)+" a+a_abs "+str(a+a_abs))
+											self.__deleteGoal(objectif)
+										else:
+											self.__logger.warning("Impossible d'attendre le triangle d'après PathFinding, data_camera: "+str(data_camera)+" path: "+str(path)+" x+x_abs: "+str(x+x_abs)+" y+y_abs "+str(y+y_abs)+" a+a_abs "+str(a+a_abs))
+											self.__deleteGoal(objectif)
+									 # Sinon on a besoin de juste tourner
+									else:
+										script_get_triangle.append( ("A_GOTOA", (x+x_abs, y+y_abs, a+a_abs)) ) 
 										script_get_triangle.append( ("STEP_OVER", (),) )
 										self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
-									else:
-										self.__logger.warning("Impossible d'attendre le triangle d'après PathFinding, data_camera: "+str(data_camera)+" path: "+str(path)+" x+x_abs: "+str(x+x_abs)+" y+y_abs "+str(y+y_abs)+" a+a_abs "+str(a+a_abs))
-										self.__deleteGoal(objectif)
 								else:
 									self.__logger.warning("Impossible d'attendre le triangle d'après Alexis, data_camera: "+str(data_camera))
 									self.__deleteGoal(objectif)
