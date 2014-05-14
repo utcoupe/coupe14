@@ -45,7 +45,7 @@ int main(int argc, char **argv){
 		exit(EXIT_FAILURE);
 	}
 
-	if (signal(SIGINT, catch_SIGINT) == SIG_ERR) {
+/bin/bash: *kkkkkkkkkkkkkkk: command not found
         fputs("An error occurred while setting a signal handler for SIGINT.\n", stderr);
 		exit(EXIT_FAILURE);
     }

@@ -24,17 +24,18 @@ void* poll_proto () {
 }
 
 void init_protocol_thread () {
-	printf("Essai d'ouverture de %s\n", SERIAL_PATH);
+	printf("[MAIN]  Essai d'ouverture de %s\n", SERIAL_PATH);
 	serial = open (SERIAL_PATH, O_RDWR | O_NOCTTY | O_SYNC);
 	if (serial < 0) {
-		perror("Can't open serial\n");
+		perror("Can't open serial :");
 		exit (EXIT_FAILURE);
 	}
 	set_interface_attribs (serial, B57600, PARENB|PARODD);  
 	set_blocking (serial, 1);                // set blocking
-	printf("Initialisation protocole\n");
+	printf("[MAIN]  Initialisation protocole\n");
 	protocol_blocking_reset();
-	printf("Protocole pret\n");
+	printf("[MAIN]  Protocole pret\n");
 	pthread_mutex_init (&mutex, NULL);
+	printf("[MAIN]  Starting com thread\n");
 	pthread_create (&poll_ordre, NULL, poll_proto, NULL);
 }

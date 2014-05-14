@@ -29,27 +29,27 @@
 #define VISIO_COIN_PORT "/dev/video1"
 
 static char pipe_hok[255], pipe_cam[255];
-static pid_t pid_hokuyo, pid_cameras;
+static pid_t pid_hokuyo = 0, pid_cameras = 0;
 
 void exit_handler() {
 	static int done = 0;
-	printf("[MAIN]  Waiting for children to end\n");
-	waitpid(pid_cameras, NULL, 0);
-	waitpid(pid_hokuyo, NULL, 0);
 	if (!done) {
+		done = 1;
+		if (pid_cameras != 0) {
+			kill(pid_cameras, SIGINT);
+		}
+		if (pid_hokuyo != 0) {
+			kill(pid_hokuyo, SIGINT);
+		}
+		printf("[MAIN]  Waiting for children to end\n");
+		waitpid(pid_cameras, NULL, 0);
+		waitpid(pid_hokuyo, NULL, 0);
 		char cmd[255] = "rm ";
 		system(strcat(cmd, pipe_cam));
 		strcpy(cmd, "rm ");
 		system(strcat(cmd, pipe_hok));
 		printf("[MAIN]  Deleted pipes\n");
-		done = 1;
 	}
-}
-
-void childen_end() {
-	kill(pid_cameras, SIGINT);
-	kill(pid_hokuyo, SIGINT);
-	exit(EXIT_SUCCESS);
 }
 
 int main(int argc, char **argv) {
@@ -83,6 +83,7 @@ int main(int argc, char **argv) {
 
 	pid_hokuyo = fork();
 	if (pid_hokuyo == 0) {
+		usleep(500000); //Le temps de créer les subprocess
 		//Programme hokuyo
 		char exec[100];
 		strcpy(exec, path);
@@ -95,6 +96,7 @@ int main(int argc, char **argv) {
 
 		pid_cameras = fork();
 		if (pid_cameras == 0) {
+			usleep(500000); //Le temps de créer les subprocess
 			//Cameras
 			//path python
 			char exec[] = "/usr/bin/python3", file[255];
@@ -103,12 +105,13 @@ int main(int argc, char **argv) {
 			printf("%d - Cameras starting...\n", getpid());
 			execl(exec, "python3", file, path, color, (char *)NULL);
 		} else {
-			signal(SIGUSR1, childen_end);
+			signal(SIGUSR1, exit_handler);
+			signal(SIGINT, exit_handler);
 			atexit(exit_handler);
 			printf("%d - Spawned cameras, pid %d\n", getpid(), pid_cameras);
 			//Suite du main
-			//printf("[MAIN]  Waiting for initialization\n");
-			//sleep(5);
+			printf("[MAIN]  Waiting for initialization\n");
+			sleep(5);
 			
 			printf("[MAIN]  Starting main program\n");
 			com_loop(pipe_cam, pipe_hok);
