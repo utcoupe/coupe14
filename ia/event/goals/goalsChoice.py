@@ -22,6 +22,16 @@ class GoalsChoice:
 		self.__back_triangle_stack = back_triangle_stack
 		self.__front_triangle_stack = front_triangle_stack
 
+
+		# Variables FLUSSMITTEL
+		self.__NB_TRIANGLES_AVANT_FM = 0
+		self.__NB_TRIANGLES_ARRIERE_FM = 0
+		self.__ZONE_DEPOT_CENTRALE_VIDE = 0
+		self.__ZONE_DEPOT_GAUCHE_VIDE = 0
+		self.__ZONE_DEPOT_DROITE_VIDE = 0
+
+		# Variables TIBOT
+
 	def getBestGoal(self, goals):
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 		best_length = float("Inf")
@@ -42,6 +52,7 @@ class GoalsChoice:
 						if length < best_length:
 							best_length = length
 							best_goal = (path, goal, idd)
+
 		elif self.__robot_name == "TIBOT":
 			for goal in goals:
 				nb_elem_goal = goal.getLenElemGoal()
@@ -54,4 +65,5 @@ class GoalsChoice:
 							best_goal = (path, goal, idd)
 		else:
 			self.__logger.info("Robot "+str(self.__robot_name)+" inconnu.")
+
 		return best_goal

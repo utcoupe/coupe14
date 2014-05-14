@@ -47,6 +47,7 @@ class GoalsManager:
 		self.__goalsLib = GoalsLibrary(self.__robot_name, self.__data, self.__blocked_goals, self.__PathFinding)
 		self.__goalsChoice = GoalsChoice(self.__robot_name, self.__data, self.__goalsLib, self.__our_color, self.__back_triangle_stack, self.__front_triangle_stack)
 
+
 		# Pour tester le déplacement du robot dans le simu lorsqu'il ne peut pas attraper un triangle
 		if TEST_MODE == True:
 			self.__hack_camera_simu_angle = 0
@@ -340,7 +341,7 @@ class GoalsManager:
 						else:
 							# Coordonées du triangle par rapport au centre du robot
 							# sera corrigé par l'algo lors de la prise du premier triangle normalement
-							temp = (50, -100)
+							temp = (220, -100)
 							# Correction x y
 							temp_x = temp[0] + self.__hack_camera_simu_x
 							temp_y = temp[1] + self.__hack_camera_simu_y
