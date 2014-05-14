@@ -130,7 +130,7 @@ class PullData():
 				self.__logger.error("un systeme non initilisé nous envoi des données")
 
 			if order == "O_JACK_STATE":
-				if arguments[0] == 0:
+				if arguments[0] == 1:
 					self.MetaData.startMatch()
 				else:
 					self.__jack_asked = False
