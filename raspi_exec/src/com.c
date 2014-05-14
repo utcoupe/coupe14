@@ -31,6 +31,7 @@ void com_loop(const char* cam_pipe, const char* hok_pipe) {
 	printf("[MAIN]  Starting protocol thread\n");
 	init_protocol_thread();
 
+	printf("[MAIN]  Init done, beginning broadcast\n");
 	while (1) {
 		const int max_length = 255;
 		char line_camera[max_length], line_hokuyo[max_length];
