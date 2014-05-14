@@ -87,7 +87,7 @@ class PullData():
 				self.tourelle_asked_date = date
 
 		if self.__jack_asked == False and (date - self.__jack_asked_date) > PULL_PERIODE:
-			self.Communication.sendOrderAPI(self.address_tourelle, 'O_JACK_STATE', *arguments)
+			self.Communication.sendOrderAPI(self.address_tibot_other, 'O_JACK_STATE', *arguments)
 			self.__jack_asked = True
 			self.__jack_asked_date = date
 
@@ -130,6 +130,7 @@ class PullData():
 				self.__logger.error("un systeme non initilisé nous envoi des données")
 
 			if order == "O_JACK_STATE":
+				print(arguments)
 				if arguments[0] == 0:
 					self.MetaData.startMatch()
 				else:
