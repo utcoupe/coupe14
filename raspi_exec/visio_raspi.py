@@ -11,7 +11,7 @@ import event.goals.visio as visio
 
 PATH_CONFIG = "/config/visio/visio_tourelle_"
 PATH_TO_EXEC = "/supervisio/visio"
-PATH_PIPE = "/config/raspi/"
+PATH_PIPE = "/config/raspi/pipe_cameras"
 DIST_SAME_TRI = 100
 
 

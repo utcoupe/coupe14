@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 void com_loop(const char* cam_pipe, const char* hok_pipe) {
 	FILE *cam = 0, *hok = 0;
@@ -60,7 +63,7 @@ void com_loop(const char* cam_pipe, const char* hok_pipe) {
 		}
 
 		//Parse char hokuyo
-		c = fgetc(hok);
+		c = getc(hok);
 		if (c != EOF) {
 			if (i_hok < max_length) {
 				line_hokuyo[i_hok] = c;

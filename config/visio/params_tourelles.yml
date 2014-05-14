@@ -8,4 +8,4 @@ use_mask: 0
 mask_name: "mask.jpg"
 width: 640
 height: 480
-fps: 15
+fps: 10
