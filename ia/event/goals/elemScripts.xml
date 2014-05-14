@@ -118,4 +118,12 @@
 			<order>END</order>
 		</orders>
 	</elemScript>
+	<elemScript>
+		<id_script>9</id_script>
+		<orders>
+			<order>DYNAMIQUE_OVER</order>
+			<order>A_ROT 6.283</order>
+			<order>END</order>
+		</orders>
+	</elemScript>
 </elemScripts>
