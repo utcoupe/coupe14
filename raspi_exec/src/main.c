@@ -29,18 +29,27 @@
 #define VISIO_COIN_PORT "/dev/video1"
 
 static char pipe_hok[255], pipe_cam[255];
+static pid_t pid_hokuyo, pid_cameras;
 
 void exit_handler() {
 	static int done = 0;
+	printf("[MAIN]  Waiting for children to end\n");
+	waitpid(pid_cameras, NULL, 0);
+	waitpid(pid_hokuyo, NULL, 0);
 	if (!done) {
 		char cmd[255] = "rm ";
 		system(strcat(cmd, pipe_cam));
 		strcpy(cmd, "rm ");
 		system(strcat(cmd, pipe_hok));
-		printf("Deleted pipes\n");
+		printf("[MAIN]  Deleted pipes\n");
 		done = 1;
 	}
-	exit(EXIT_FAILURE);
+}
+
+void childen_end() {
+	kill(pid_cameras, SIGINT);
+	kill(pid_hokuyo, SIGINT);
+	exit(EXIT_SUCCESS);
 }
 
 int main(int argc, char **argv) {
@@ -55,51 +64,47 @@ int main(int argc, char **argv) {
 		printf("Couleur incorrecte : red/yellow\n");
 		exit(EXIT_FAILURE);
 	}
-	pid_t pid_hokuyo, pid_cameras;
-	pid_hokuyo = fork();
 
 	//Path hokuyo
 	strcpy(pipe_hok, path);
 	strcat(pipe_hok, "/config/raspi/pipe_hokuyo");
 
+	printf("%d - Initializing fifo for cameras\n", getpid());
+	mkfifo(pipe_hok, 0666);
+
 	//Path cam
-	char file[100], pipe[100]; 
+	char pipe[100]; 
 	strcpy(pipe_cam, path);
 	strcat(pipe_cam, "/config/raspi/pipe_cameras");
-	strcpy(file, path);
-	strcat(file, "/raspi_exec/visio_raspi.py");
 
+	printf("%d - Initializing fifo for hokuyo\n", getpid());
+	//Ouvrir fifo
+	mkfifo(pipe_cam, 0666);
 
+	pid_hokuyo = fork();
 	if (pid_hokuyo == 0) {
 		//Programme hokuyo
 		char exec[100];
 		strcpy(exec, path);
 		strcat(exec, "/hokuyo/hokuyo");
 
-		printf("%d - Initializing fifo for hokuyo\n", getpid());
-		//Ouvrir fifo
-		mkfifo(pipe_hok, 0666);
-
 		printf("%d - Hokuyo starting...\n", getpid());
 		execl(exec, "hokuyo", color, path, (char *)NULL);
 	} else {
 		printf("%d - Spawned hokuyo, pid %d\n", getpid(), pid_hokuyo);
-		//CAMERAS CONFIG
-		
-		//exec path
-		char exec[] = "/usr/bin/python3";
-
-		//path script python
 
 		pid_cameras = fork();
 		if (pid_cameras == 0) {
 			//Cameras
-			printf("%d - Initializing fifo for cameras\n", getpid());
-			mkfifo(pipe_cam, 0666);
+			//path python
+			char exec[] = "/usr/bin/python3", file[255];
+			strcpy(file, path);
+			strcat(file, "/raspi_exec/visio_raspi.py");
 			printf("%d - Cameras starting...\n", getpid());
 			execl(exec, "python3", file, path, color, (char *)NULL);
 		} else {
-			signal(SIGINT, exit_handler);
+			signal(SIGUSR1, childen_end);
+			atexit(exit_handler);
 			printf("%d - Spawned cameras, pid %d\n", getpid(), pid_cameras);
 			//Suite du main
 			//printf("[MAIN]  Waiting for initialization\n");
@@ -107,11 +112,6 @@ int main(int argc, char **argv) {
 			
 			printf("[MAIN]  Starting main program\n");
 			com_loop(pipe_cam, pipe_hok);
-
-			printf("[MAIN]  Waiting for children to end\n");
-			waitpid(pid_cameras, NULL, 0);
-			waitpid(pid_hokuyo, NULL, 0);
-			exit_handler();
 		}
 	}
 	return 0;

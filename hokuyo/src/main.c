@@ -4,22 +4,18 @@
 #include "communication.h"
 #include "compat.h"
 
+#include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
-
+#include <unistd.h>
 
 #ifdef SDL
 #include "gui.h"
 #endif
 
-
-
-
-
 void frame();
-
 
 static int use_protocol = 0;
 static struct lidar l1;
@@ -35,6 +31,7 @@ static void catch_SIGINT(int signal){
 	printf("\n%sClosing lidar(s), please wait...\n", PREFIX);
 	closeLidar(&l1);
 	printf("%sExitting\n", PREFIX);
+	kill(getppid(), SIGUSR1); //Erreur envoyee au pere
 	exit(EXIT_SUCCESS);
 }
 
@@ -42,12 +39,14 @@ int main(int argc, char **argv){
 	
 	if(argc <= 1 || ( strcmp(argv[1], "red") != 0 && strcmp(argv[1], "yellow") ) ){
 		fprintf(stderr, "usage: hokuyo {red|yellow} [path_pipe]\n");
-		return EXIT_FAILURE;
+		//Exit
+		catch_SIGINT(0);
 	}
 
 	if (signal(SIGINT, catch_SIGINT) == SIG_ERR) {
         fputs("An error occurred while setting a signal handler for SIGINT.\n", stderr);
-        return EXIT_FAILURE;
+		//Exit
+		catch_SIGINT(0);
     }
 
 	struct coord posl1;
@@ -83,7 +82,6 @@ int main(int argc, char **argv){
 		frame();
 	}
 	catch_SIGINT(0);
-	
 }
 
 void frame(){

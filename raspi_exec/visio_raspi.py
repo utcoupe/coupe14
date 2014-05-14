@@ -2,13 +2,14 @@
 import os
 import sys
 import time
+import signal
 
 FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(FILE_DIR, "../ia/"))
 
 import event.goals.visio as visio
 
-PATH_CONFIG = "/config/visio/visio_tourelle_red/video*"
+PATH_CONFIG = "/config/visio/visio_tourelle_"
 PATH_TO_EXEC = "/supervisio/visio"
 PATH_PIPE = "/config/raspi/"
 DIST_SAME_TRI = 100
@@ -53,22 +54,34 @@ def send(triangles, pipe):
 	pipe.flush()
 
 
+def close():
+	os.kill(os.getppid(), signal.SIGUSR1)
+	sys.exit()
+
 if __name__ == '__main__':
+	print("[CAM ]  Starting cam client")
 	try:
 		path = sys.argv[1]
 		color = sys.argv[2]
 	except:
 		print('[CAM ]  Not enough arguments : visio_raspi path_pipe color')
-		sys.exit()
+		close()
 
 	path_to_exec = path + PATH_TO_EXEC
 	path_pipe = path + PATH_PIPE
-	config_path = path + PATH_CONFIG 
+	config_path = path + PATH_CONFIG
+	if color == 'red':
+		config_path += 'red/'
+	elif color == 'yellow':
+		config_path += 'yellow/'
+	else:
+		print("[CAM ]  Unknown color :", color)
+		close()
 	success = False
 	index = 0
 
 	#clean des fichiers chiants
-	print('[CAM ]  Removing old videos"')
+	print('[CAM ]  Removing old videos')
 	os.system("rm " + path + "/config/raspi/pipe_*")
 	os.system("rm " + path + "/config/visio/visio_tourelle_red/video* " \
 					+ path + "/config/visio/visio_tourelle_yellow/video*")
@@ -85,14 +98,14 @@ if __name__ == '__main__':
 			index += 1
 
 	if not success:
-		sys.exit()
+		close()
 
 	print("[CAM ]  Attempting to open fifo at",path_pipe)
 	try:
 		pipe = open(path_pipe, "w")
 	except BaseException as e:
 		print("[CAM ]  Failed to open pipe : "+str(e))
-		sys.exit()
+		close()
 	print("[CAM ]  Fifo opened")
 
 	conti = True
@@ -112,4 +125,4 @@ if __name__ == '__main__':
 	print('Closing')
 	v_coin.close()
 	v_centre.close()
-	sys.exit()
+	close()
