@@ -28,7 +28,7 @@ class GoalsChoice:
 		# Variables TIBOT
 
 	def getBestGoal(self, goals):
-		best_goal = ([], None, None) #type (path, id_goal, id_elem_goal)
+		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 		best_length = float("Inf")
 
 		if self.__robot_name == "FLUSSMITTEL":
@@ -54,4 +54,5 @@ class GoalsChoice:
 							best_goal = (path, goal, idd)
 		else:
 			self.__logger.info("Robot "+str(self.__robot_name)+" inconnu.")
+
 		return best_goal

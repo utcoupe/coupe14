@@ -20,15 +20,6 @@ from .visio import *
 from .goalsLibrary import *
 from .goalsChoice import *
 
-"""
-	<order>O_DROP_TRIANGLE 300 30</order>
-			<order>THEN</order>
-			<order>O_DROP_TRIANGLE 250 -10</order>
-			<order>THEN</order>
-			<order>O_DROP_TRIANGLE 225 -50</order>
-"""
-
-
 class GoalsManager:
 	def __init__(self, SubProcessManager, connection, robot_name):
 		base_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -108,7 +99,7 @@ class GoalsManager:
 
 			#On cherche l'elem goal le plus proche par bruteforce
 			if self.__available_goals:
-				best_goal = self.__goalsChoice.getBestGoal(self.__available_goals)
+				best_goal = self.__goalsChoice.getBestGoal(self.__available_goals) #best_goal type (path, goal, id_elem_goal)
 
 				if best_goal[1] != None:
 					self.__logger.info("On a choisi l'objectif goal_id "+str(best_goal[1].getId())+" elem_goal_id "+str(best_goal[2])+" avec le path "+str(best_goal[0]))
@@ -377,10 +368,10 @@ class GoalsManager:
 								script_get_triangle.append( ("THEN", (),) )
 								self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
 							else:
-								temp = self.__getPosToHaveTriangle(data_camera[1], data_camera[2])
-								if temp != None:
+								coord_to_move_to = self.__getPosToHaveTriangle(data_camera[1], data_camera[2])
+								if coord_to_move_to != None:
 									find  = True
-									x, y, a = temp
+									x, y, a = coord_to_move_to
 									x_abs, y_abs, a_abs = self.__data[self.__robot_name]["getPositionAndAngle"]
 									script_get_triangle = deque()
 
