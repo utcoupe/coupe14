@@ -86,4 +86,5 @@ class Data():
 
 		data["METADATA"] = {}
 		data["METADATA"]["getOurColor"] = self.MetaData.getOurColor()
+		data["METADATA"]["getGameClock"] = self.MetaData.getGameClock()
 		return data

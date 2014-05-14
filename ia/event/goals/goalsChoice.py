@@ -20,7 +20,7 @@ class GoalsChoice:
 		self.__logger = logging.getLogger(__name__)
 
 	def getBestGoal(self, goals):
-		best_goal = ([], None, None) #type (path, id_goal, id_elem_goal)
+		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 		best_length = float("Inf")
 
 		if self.__robot_name == "FLUSSMITTEL":
@@ -46,27 +46,3 @@ class GoalsChoice:
 		else:
 			self.__logger.info("Robot "+str(self.__robot_name)+" inconnu.")
 		return best_goal
-
-	"""
-	TODO : Demander à Cédric si il inverse les goals en fonction de la couleur
-	automatiquement et donc je peux considérer que les robots sont toujorus du côté rouge ou pas
-	Dans ce cas la fonction ci-dessous ne sert à rien (en tout cas le test sur les couleurs)
-	"""
-	def getNameGoal(self, goal):
-		if self.__robot_name == "FLUSSMITTEL":
-			if self.__our_color == "RED":
-				pass
-			elif self.__our_color == "YELLOW":
-				pass
-			else:
-				self.__logger.info("Couleur "+str(self.__our_color)+" inconnu.")
-		elif self.__robot_name == "TIBOT":
-			if self.__our_color == "RED":
-				pass
-			elif self.__our_color == "YELLOW":
-				pass
-			else:
-				self.__logger.info("Couleur "+str(self.__our_color)+" inconnu.")
-		else:
-			self.__logger.info("Robot "+str(self.__robot_name)+" inconnu.")
-			return None
