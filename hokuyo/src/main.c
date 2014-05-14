@@ -26,27 +26,28 @@ static struct color l1Color;
 long startTime, lastTime = 0;
 static struct coord robots[MAX_ROBOTS];
 
-
-static void catch_SIGINT(int signal){
+void exit_handler() {
 	printf("\n%sClosing lidar(s), please wait...\n", PREFIX);
 	closeLidar(&l1);
 	printf("%sExitting\n", PREFIX);
 	kill(getppid(), SIGUSR1); //Erreur envoyee au pere
-	exit(EXIT_SUCCESS);
+}
+
+static void catch_SIGINT(int signal){
+	exit(EXIT_FAILURE);
 }
 
 int main(int argc, char **argv){
+	atexit(exit_handler);
 	
 	if(argc <= 1 || ( strcmp(argv[1], "red") != 0 && strcmp(argv[1], "yellow") ) ){
 		fprintf(stderr, "usage: hokuyo {red|yellow} [path_pipe]\n");
-		//Exit
-		catch_SIGINT(0);
+		exit(EXIT_FAILURE);
 	}
 
 	if (signal(SIGINT, catch_SIGINT) == SIG_ERR) {
         fputs("An error occurred while setting a signal handler for SIGINT.\n", stderr);
-		//Exit
-		catch_SIGINT(0);
+		exit(EXIT_FAILURE);
     }
 
 	struct coord posl1;
@@ -81,7 +82,7 @@ int main(int argc, char **argv){
 	while(1){
 		frame();
 	}
-	catch_SIGINT(0);
+	exit(EXIT_SUCCESS);
 }
 
 void frame(){
