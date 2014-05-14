@@ -21,12 +21,17 @@ __copyright__ = "Copyright 2013, UTCoupe 2014"
 from tkinter import *
 import threading
 import time
+import sys
+import os
+DIR_PATH = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(DIR_PATH, "../..", "define"))
+from define import *
 
 class general(Frame):
 	""" Frame qui regroupe les widgets du frame général.
 	Hérite de Frame."""
 
-	def __init__(self, fenetre, **kwargs):
+	def __init__(self, fenetre, bots, **kwargs):
 		"""
 		@param fenetre : frame de la fenêtre principale
 		"""
@@ -35,6 +40,8 @@ class general(Frame):
 		self.__time_count = 0
 		self.__temps_ecoule = StringVar()
 		self.__temps_restant= StringVar()
+		self.__bigrobot_us = bots[1]
+		self.__minirobot_us = bots[2]
 
 		#reste
 		self.grid()
@@ -78,6 +85,8 @@ class general(Frame):
 		liste_button = ["Start", "Stop", "Pause"]
 		for n in range(3):
 			bout = Button(Fbouton, text = liste_button[n])
+			if n == 0: #bouton start
+				bout.config(command=self.__minirobot_us.setStateJack)
 			bout.grid(column = n, row = 0)
 		Fbouton.grid(column = 2, row = 0, sticky=N+S+W+E)
 
@@ -105,7 +114,10 @@ class general(Frame):
 		#! ajouter l'accès aux données de l'IA !
 		Fteam = LabelFrame(self, text="Team", bg="white")
 		labelfont = ('times', 20, 'bold')
-		equipe = Label(Fteam, text="Blue", bg="blue")
+		if self.__bigrobot_us.getTeam() == RED:
+			equipe = Label(Fteam, text="Red", bg="red")
+		elif self.__bigrobot_us.getTeam() == YELLOW:
+			equipe = Label(Fteam, text="Yellow", bg="yellow")
 		equipe.config(font=labelfont, anchor=CENTER)
 		equipe.grid()
 		Fteam.grid(column = 1, row = 2, sticky=N+S)

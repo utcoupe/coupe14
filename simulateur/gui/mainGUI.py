@@ -20,10 +20,10 @@ class GUISimu():
 		my_h = h_fen/1.5
 		self.__fen.geometry("%dx%d+%d+%d" % (my_w,my_h,x_fen,y_fen))
 		# exemple d'utilisation:
-		self.__wids = gui_general.general(self.__fen)
+		self.__wids = gui_general.general(self.__fen, self.__liste_robots)
 		self.__robots = gui_robots.robots(self.__fen,self.__liste_robots)
 		self.__actions = gui_actions.actions(self.__fen,self.__liste_robots)
-		self.__effecteur = gui_actionneurs.actionneurs(self.__fen)
+		self.__effecteur = gui_actionneurs.actionneurs(self.__fen,self.__liste_robots)
 		#self.__fen.mainloop()
 
 	def start(self):

@@ -230,11 +230,12 @@ class Communication():
 			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
 		elif (order == "O_TIR_BALLE"):
-			#args : nbr de balles à tirer
+			self.__minirobot.lancerBalle(args[1]) #args = nbr balles à lancer
 			self.__minirobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
 		elif (order == "O_TIR_FILET"):
+			self.__minirobot.tirFilet()
 			self.__minirobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
@@ -248,6 +249,10 @@ class Communication():
 			self.__minirobot.ouvrirBras(args[1])
 			self.__minirobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
+
+		elif order == "O_JACK_STATE":
+			pos = (self.__minirobot.getStateJack(),)
+			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
 
 		else:
 			print('Error : mauvais paramètre traitement Tibot other ! order '+str(order)+" args "+str(args))

@@ -53,11 +53,16 @@ class BigRobot(Robot):
 			poly_points			= mm_to_px((0,0),(HEIGHT_GROS,0),(HEIGHT_GROS,WIDTH_GROS-95),(HEIGHT_GROS-115,WIDTH_GROS),(0,WIDTH_GROS)),
 			extension_objects	= [],
 		)
-		self.__state_jack = 0  # jack in
 		self.__nbrFeuAvant = 0
 		self.__nbrFeuArriere = 0 #normalement à 0, 1 pour les tests
 		self.__engine = engine
 		self.__feuHit = 0
+
+	def getFeuxAvant(self):
+		return self.__nbrFeuAvant
+
+	def getFeuxArriere(self):
+		return self.__nbrFeuArriere
 
 	def setFeuHit(self, value):
 		self.__feuHit = value
@@ -127,9 +132,6 @@ class BigRobot(Robot):
 			new_feu.coucherFeuCouleur(self.getTeam()) #pour donner la bonne couleur au feu
 		else:
 			print('pas de feu stocké à arriere du robot')
-
-	def getStateJack(self):
-		return self.__state_jack
 
 	def __computePositionTriangleArriere(self):
 		"""
