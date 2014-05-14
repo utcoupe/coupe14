@@ -12,7 +12,7 @@ TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté au
 
 #====================Enable====================
 ENABLE_TOURELLE = 		False
-ENABLE_FLUSSMITTEL = 	False#permet de desactiver Flussmitel
+ENABLE_FLUSSMITTEL = 	False #permet de desactiver Flussmitel
 ENABLE_TIBOT = 			True
 
 #========================================Communication========================================

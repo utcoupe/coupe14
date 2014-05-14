@@ -45,9 +45,11 @@ void initSize()
 	ordreSize[O_BALAI]=4; //Quel coté ?
 	ordreSize[O_JACK_STATE]=0;
 
+	//TOURELLE
+	ordreSize[T_GET_CAM]=0;
+	ordreSize[T_GET_HOKUYO]=0;
+
 	//GENERAL
-	ordreSize[GET_CAM]=0;
-	ordreSize[GET_HOKUYO]=0;
 	ordreSize[GET_LAST_ID]=0;
 
 	ordreSize[PAUSE]=0;

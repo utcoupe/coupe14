@@ -24,7 +24,7 @@ typedef struct triangle {
 
 class Visio {
 	public:
-		Visio(int index, string path_to_conf="./", bool save_vid=false);
+		Visio(int index_cam, string path_to_conf="./", bool save_vid=false);
 		void detectColor(const Mat& img, Mat& out);
 		void getContour(const Mat& img, vector<vector<Point> >& contours);
 		int getDetectedPosition(const Mat& img, vector<Point2f>& detected_pts, vector<vector<Point> >& detected_contours);
@@ -62,6 +62,7 @@ class Visio {
 		Mat getImg();
 		bool isCalibrated();
 		bool isReady();
+		bool isOpened();
 		DistortType getDistortMode();
 	private:
 		void init();
@@ -85,12 +86,11 @@ class Visio {
 		Mat last_image;
 		int min_size, real_min_size; //Taille minimal d'une zone de couleur valide
 		int max_diff_triangle_edge;
-		int cam_fps;
+		int cam_fps, index;
 		double epsilon_poly; //Marge d'erreur lors de l'estimation de polyligne
 		bool trans_calibrated, cam_calibrated;
-		bool save_video, isready;
-		bool use_resize, use_mask;
-		int resize_h, resize_w;
+		bool save_video, isready, is_opened;
+		bool  use_mask;
 		Color color;
 		DistortType distort;
 		string path_to_conf, calib_detection_filename, calib_cam_filename, mask_name, calib_transform_matrix_filename;

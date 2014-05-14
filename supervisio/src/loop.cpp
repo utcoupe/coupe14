@@ -9,20 +9,6 @@
 
 using namespace cv;
 
-void communication(int index, string path_to_conf, bool save) {
-	Visio visio(index, path_to_conf, save);
-	if (!visio.isCalibrated()) {
-		cerr << "ERROR : Uncalibrated" << endl;
-		return;
-	}
-	if (visio.getDistortMode() != none) {
-		cerr << "INFO : Starting visio WITH distortion correction" << endl;
-	} else {
-		cerr << "INFO : Starting visio WITHOUT distortion correction" << endl;
-	}
-	comLoop(visio);
-}
-
 void calibration(int index, string path) {
 	Visio visio(index, path);
 	visio.setChessboardSize(Size(9,6));
