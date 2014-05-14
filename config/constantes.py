@@ -11,7 +11,7 @@ TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux
 
 
 #====================Enable====================
-ENABLE_TOURELLE = 		True
+ENABLE_TOURELLE = 		False
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
 ENABLE_TIBOT = 			True
 
@@ -103,7 +103,6 @@ MARGE_OUVERTURE_BRAS_MAX_DEPLACEMENT = 20
 MARGE_OUVERTURE_BRAS_MIN_DEPLACEMENT = 20
 CENTRE_BRAS_X = 128
 CENTRE_BRAS_Y = 130
-MARGE_SANS_PATHFINDING = 50
 
 #====================TIBOT====================
 START_POSITION_RED_TIBOT = (193, 1542, -0.42203)

@@ -381,7 +381,7 @@ class GoalsManager:
 										self.__hack_camera_simu_angle -= a
 
 									# Si on a besoin d'avancer, on vérifie avec le pathfinding
-									if hypot(x, y) > MARGE_SANS_PATHFINDING:
+									if x != 0 or y != 0:
 										self.__PathFinding.update(self.__data[self.__robot_name])
 										path = self.__PathFinding.getPath((x_abs, y_abs), (x+x_abs, y+y_abs), enable_smooth=True)
 										if len(path) == 2:
@@ -396,7 +396,7 @@ class GoalsManager:
 											self.__deleteGoal(objectif)
 									 # Sinon on a besoin de juste tourner
 									else:
-										script_get_triangle.append( ("A_GOTOA", (x+x_abs, y+y_abs, a+a_abs)) ) 
+										script_get_triangle.append( ("A_ROT", (a+a_abs,)) ) 
 										script_get_triangle.append( ("STEP_OVER", (),) )
 										self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
 								else:
