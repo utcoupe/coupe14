@@ -84,8 +84,8 @@ void com_loop(const char* cam_pipe, const char* hok_pipe) {
 			i_hok = 0;
 		}
 	}
-	fclose(cam);
-	fclose(hok);
+	close(cam);
+	close(hok);
 }
 
 
