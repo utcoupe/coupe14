@@ -141,21 +141,23 @@ class EventManager():
 	def __checkEvent(self):
 		self.__checkBrasStatus()
 
+		
+		new_data = ()
+		if self.__Flussmittel is not None:
+			new_data += (self.__Flussmittel.getPosition())
+		if self.__Tibot is not None:
+			new_data += (self.__Tibot.getPosition())
+			
 		if self.__Tourelle is not None:
-			new_data = ()
-			if self.__Flussmittel is not None:
-				new_data += (self.__Flussmittel.getPosition())
-			if self.__Tibot is not None:
-				new_data += (self.__Tibot.getPosition())
 			if self.__BigEnemyBot is not None:
 				new_data += (self.__BigEnemyBot.getPosition(),)
 			if self.__SmallEnemyBot is not None:
 				new_data += (self.__SmallEnemyBot.getPosition(),)
 
-			if new_data != self.__last_hokuyo_data:
-				self.__last_hokuyo_data = new_data
-				if self.__MetaData.getCheckCollision():
-					self.__testCollision()
+		if new_data != self.__last_hokuyo_data:
+			self.__last_hokuyo_data = new_data
+			if self.__MetaData.getCheckCollision():
+				self.__testCollision()
 
 		if self.__Flussmittel is not None:
 			new_id = self.__Flussmittel.getLastIdGlobale()
