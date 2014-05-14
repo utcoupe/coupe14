@@ -15,9 +15,11 @@ PATH_PIPE = "/config/raspi/pipe_cameras"
 DIST_SAME_TRI = 100
 
 
-class Tourelle:
+class Tourelle(dict):
 	def __init__(self):
 		self.isATourelle = True
+		self["getPosition"] = (0, 0)
+		self["getPositionAndAngle"] = (0, 0, 0)
 
 	def getPosition(self):
 		return (0, 0)
