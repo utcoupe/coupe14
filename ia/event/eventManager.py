@@ -60,15 +60,16 @@ class EventManager():
 
 		#On attend le debut de la funny action
 		while self.__MetaData.getInFunnyAction() == False:
-			self.__majObjectif()
+			self.__logger.info("On est en fin de match")
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
 		#Pendant la funny action
 		while self.__MetaData.getInFunnyAction() == True:
-			self.__majObjectif() #TODO faire une fonction dédiée ?
+			print("Funny Action")
+			self.__logger.info("On est en funny action")
 			if self.__filet_fired == False and self.__Tibot is not None:
-				empty_arg = [42,]# 42 est un nombre aleatoire
-				self.__Communication.sendOrderAPI("ADDR_TIBOT_OTHER", "O_TIR_FILET", *empty_arg)
+				arg = [42,]# 42 est un nombre aleatoire
+				self.__Communication.sendOrderAPI("ADDR_TIBOT_OTHER", "O_TIR_FILET", *arg)
 				self.__logger.info("On lance le filet")
 				self.__filet_fired = True
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
@@ -147,7 +148,7 @@ class EventManager():
 			new_data += (self.__Flussmittel.getPosition())
 		if self.__Tibot is not None:
 			new_data += (self.__Tibot.getPosition())
-			
+
 		if self.__Tourelle is not None:
 			if self.__BigEnemyBot is not None:
 				new_data += (self.__BigEnemyBot.getPosition(),)

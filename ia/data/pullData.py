@@ -87,7 +87,7 @@ class PullData():
 				self.tourelle_asked_date = date
 
 		if self.__jack_asked == False and (date - self.__jack_asked_date) > PULL_PERIODE:
-			self.Communication.sendOrderAPI(self.address_tourelle, 'O_JACK_STATE', *arguments)
+			self.Communication.sendOrderAPI(self.address_tibot_other, 'O_JACK_STATE', *arguments)
 			self.__jack_asked = True
 			self.__jack_asked_date = date
 
@@ -134,22 +134,22 @@ class PullData():
 					self.MetaData.startMatch()
 				else:
 					self.__jack_asked = False
-
-			if system is not None:
-				if order == 'A_GET_POS_ID':
-					system.setPositionAndId(address, arguments)
-				elif order == 'GET_LAST_ID':
-					system.setLastId(address, arguments[0])
-				elif order == 'O_GET_BRAS_STATUS':
-					system.setBrasStatus( arguments[0])
-				elif order == 'T_GET_HOKUYO':
-					system.majPositionHokuyo(arguments)
-				elif order == 'T_GET_CAM':
-					system.majCam(arguments)
-				elif order == 'A_GOTO':
-					pass	
-				else:
-					self.__logger.warning("ce retour n'est pas implementé, address " + str(address) + " ordre " + str(order) + " arguments " + str(arguments))
+			else:
+				if system is not None:
+					if order == 'A_GET_POS_ID':
+						system.setPositionAndId(address, arguments)
+					elif order == 'GET_LAST_ID':
+						system.setLastId(address, arguments[0])
+					elif order == 'O_GET_BRAS_STATUS':
+						system.setBrasStatus( arguments[0])
+					elif order == 'T_GET_HOKUYO':
+						system.majPositionHokuyo(arguments)
+					elif order == 'T_GET_CAM':
+						system.majCam(arguments)
+					elif order == 'A_GOTO':
+						pass	
+					else:
+						self.__logger.warning("ce retour n'est pas implementé, address " + str(address) + " ordre " + str(order) + " arguments " + str(arguments))
 
 			
 
