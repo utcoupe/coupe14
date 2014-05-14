@@ -54,7 +54,7 @@ class GoalsManager:
 		self.__loadGoals(base_dir+"/goals.xml")
 
 		self.__goalsLib = GoalsLibrary(self.__robot_name, self.__data, self.__blocked_goals, self.__PathFinding)
-		self.__goalsChoice = GoalsChoice(self.__robot_name, self.__data, self.__goalsLib, self.__our_color)
+		self.__goalsChoice = GoalsChoice(self.__robot_name, self.__data, self.__goalsLib)
 
 		# Pour tester le déplacement du robot dans le simu lorsqu'il ne peut pas attraper un triangle
 		if TEST_MODE == True:
@@ -349,7 +349,7 @@ class GoalsManager:
 						else:
 							# Coordonées du triangle par rapport au centre du robot
 							# sera corrigé par l'algo lors de la prise du premier triangle normalement
-							temp = (50, -100)
+							temp = (220, -100)
 							# Correction x y
 							temp_x = temp[0] + self.__hack_camera_simu_x
 							temp_y = temp[1] + self.__hack_camera_simu_y
@@ -390,7 +390,7 @@ class GoalsManager:
 										self.__hack_camera_simu_angle -= a
 
 									# Si on a besoin d'avancer, on vérifie avec le pathfinding
-									if hypot(x, y) > MARGE_SANS_PATHFINDING:
+									if hypot(x, y) > 0:
 										self.__PathFinding.update(self.__data[self.__robot_name])
 										path = self.__PathFinding.getPath((x_abs, y_abs), (x+x_abs, y+y_abs), enable_smooth=True)
 										if len(path) == 2:
@@ -405,7 +405,7 @@ class GoalsManager:
 											self.__deleteGoal(objectif)
 									 # Sinon on a besoin de juste tourner
 									else:
-										script_get_triangle.append( ("A_GOTOA", (x+x_abs, y+y_abs, a+a_abs)) ) 
+										script_get_triangle.append( ("A_ROT", (a+a_abs,)) ) 
 										script_get_triangle.append( ("STEP_OVER", (),) )
 										self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
 								else:
