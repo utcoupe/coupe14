@@ -37,13 +37,15 @@ void com_loop(const char* cam_pipe, const char* hok_pipe) {
 
 		//Parse char cameras
 		c = fgetc(cam);
-		if (i_cam < max_length && c != EOF) {
-			line_camera[i_cam] = c;
-			i_cam++;
-		} else if (!ignore_cam) { //Affiche une message d'erreur, une seule fois
-			ignore_cam = 1;
-			printf("[MAIN]  Error : camera line too long for buffer, dropping line max=%d\n", max_length);
-		} 
+		if (c != EOF) {
+			if (i_cam < max_length) {
+				line_camera[i_cam] = c;
+				i_cam++;
+			} else if (c != EOF && !ignore_cam) { //Affiche une message d'erreur, une seule fois
+				ignore_cam = 1;
+				printf("[MAIN]  Error : camera line too long for buffer, dropping line max=%d\n", max_length);
+			} 
+		}
 
 		//Parse une ligne camera
 		if (c == '\n') {
@@ -57,13 +59,15 @@ void com_loop(const char* cam_pipe, const char* hok_pipe) {
 
 		//Parse char hokuyo
 		c = fgetc(hok);
-		if (i_hok < max_length && c != EOF) {
-			line_hokuyo[i_hok] = c;
-			i_hok++;
-		} else if (!ignore_hok) { //Affiche une message d'erreur, une seule fois
-			ignore_hok = 1;
-			printf("[MAIN]  Error : hokuyo line too long for buffer, dropping line max=%d\n", max_length);
-		} 
+		if (c != EOF) {
+			if (i_hok < max_length) {
+				line_hokuyo[i_hok] = c;
+				i_hok++;
+			} else if (!ignore_hok) { //Affiche une message d'erreur, une seule fois
+				ignore_hok = 1;
+				printf("[MAIN]  Error : hokuyo line too long for buffer, dropping line max=%d\n", max_length);
+			} 
+		}
 
 		//Parse une ligne camera
 		if (c == '\n') {

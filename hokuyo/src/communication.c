@@ -14,7 +14,7 @@ void init_protocol(char *path) {
 	strcpy(pipe_path, path);
 	strcat(pipe_path, "/config/raspi/pipe_hokuyo");
 	printf("%sInitialisation du protcole, fifo : %s\n", PREFIX, pipe_path);
-	pipe = fopen(pipe_path, "w+");
+	pipe = fopen(pipe_path, "w");
 	if (pipe == 0) {
 		printf("Failed to open fifo at %s\n", pipe_path);
 		exit(EXIT_FAILURE);
