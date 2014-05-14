@@ -381,7 +381,7 @@ class GoalsManager:
 										self.__hack_camera_simu_angle -= a
 
 									# Si on a besoin d'avancer, on vérifie avec le pathfinding
-									if hypot(x, y) > 0:
+									if x != 0 or y != 0:
 										self.__PathFinding.update(self.__data[self.__robot_name])
 										path = self.__PathFinding.getPath((x_abs, y_abs), (x+x_abs, y+y_abs), enable_smooth=True)
 										if len(path) == 2:
@@ -550,7 +550,12 @@ class GoalsManager:
 			#On ajoute uniquement les objectifs qui nous concerne
 			if concerned_robot == "ALL" or concerned_robot == self.__robot_name:
 				goal = Goal(id, name, type, concerned_robot, x_objectif, y_objectif)
-				self.__available_goals.append(goal)
+
+				#Hack pour ignore le premier triangle que le petit fait tombé
+				if (self.__our_color == "RED" and id == 0) or (self.__our_color == "YELLOW" and id == 1):
+					self.__finished_goals.append(goal)
+				else:
+					self.__available_goals.append(goal)
 
 				for elem_goal in xml_goal.getElementsByTagName('elem_goal'):
 					id			= int(elem_goal.getElementsByTagName('id')[0].firstChild.nodeValue)
@@ -561,6 +566,7 @@ class GoalsManager:
 					priority	= int(elem_goal.getElementsByTagName('priority')[0].firstChild.nodeValue)
 					duration	= int(elem_goal.getElementsByTagName('duration')[0].firstChild.nodeValue)
 					color		= str(elem_goal.getElementsByTagName('color')[0].firstChild.nodeValue)
+					script_only	= bool(elem_goal.getElementsByTagName('script_only')[0].firstChild.nodeValue)
 					id_script	= int(elem_goal.getElementsByTagName('id_script')[0].firstChild.nodeValue)
 					
 					goal.appendElemGoal( ElemGoal(id, x_objectif+x_elem, y_objectif+y_elem, angle_objectif+angle, points, priority, duration, color, self.__elem_script[id_script]) )
