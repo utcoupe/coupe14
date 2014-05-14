@@ -147,14 +147,14 @@ class Visio:
 			tri = self._triangles[i]
 
 			#calcul des coordonnées relatives dans le repère des coords absolues
-			robot_angle = self.__big_bot.getPositionAndAngle()[2]
+			robot_angle = self.__big_bot["getPositionAndAngle"][2]
 			tri.rel_in_abs = (tri.coord[0] * cos(robot_angle) - tri.coord[1] * sin(robot_angle), 
 								tri.coord[0] * sin(robot_angle) + tri.coord[1] * cos(robot_angle))
 
 			#calcul des coordonnées réelles du triangles, on le recalcule par la
 			# suite si elles sont a modifier, mais on en a besoin pour savoir
 			# s'i faut les modifier
-			tri.real_coords = [i + j for i, j in zip(tri.rel_in_abs, self.__big_bot.getPosition())]
+			tri.real_coords = [i + j for i, j in zip(tri.rel_in_abs, self.__big_bot["getPosition"])]
 
 			#Traitement de la position pour modif si triangle en hauteur
 			if self.__outOfMap(tri) or self.__inFruitZone(tri) or self.__inStartZone(tri):
@@ -172,7 +172,7 @@ class Visio:
 		tri.coord[1] = (1 - self.__hcam / self.__hplat) * tri.coord[1] \
 							+ (self.__hcam / self.__hplat) * self.__ycam
 		#reconversion en coords reelles
-		tri.real_coords = [i + j for i, j in zip(tri.rel_in_abs, self.__big_bot.getPosition())]
+		tri.real_coords = [i + j for i, j in zip(tri.rel_in_abs, self.__big_bot["getPosition"])]
 
 	def __outOfMap(self, tri):
 		return tri.real_coords[0] > 3000 or tri.real_coords[0] < 0\
