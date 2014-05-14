@@ -565,6 +565,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>Y</color>
+				<script_only>False</script_only>
 				<id_script>1</id_script>
 			</elem_goal>
 		</elem_goals>
