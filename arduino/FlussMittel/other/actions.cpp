@@ -61,7 +61,7 @@ void initPins(){
 void initAct() {
 	//Moteurs :
 	pump_motor.run(FORWARD);
-	cmdBrasServ(ANGLE_OUVERT, LONGUEUR_MAX);
+	cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
 	servoRet.write(150); 
 	pump(true);
 	stepperAsc.setAcceleration(AMAX_STEPPER);
