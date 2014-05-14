@@ -9,7 +9,7 @@ import logging
 from constantes import *
 
 class PullData():
-	def __init__(self, Communication, Flussmittel, Tibot, SmallEnemyBot, BigEnemyBot, ComputeHokuyoData, Tourelle):
+	def __init__(self, Communication, Flussmittel, Tibot, SmallEnemyBot, BigEnemyBot, ComputeHokuyoData, Tourelle, MetaData):
 		self.__logger = logging.getLogger(__name__.split('.')[0])
 		self.Communication = Communication
 		self.Flussmittel = Flussmittel[0]
@@ -23,6 +23,7 @@ class PullData():
 		self.ComputeHokuyoData = ComputeHokuyoData
 		self.Tourelle = Tourelle[0]
 		self.address_tourelle = Tourelle[1]
+		self.MetaData = MetaData
 
 		self.__pull_data = True
 		self.__id_flussmittel_other_asked = False
@@ -35,6 +36,8 @@ class PullData():
 		self.__data_tibot_asserv_asked_date = 0
 		self.tourelle_asked = False
 		self.tourelle_asked_date = 0
+		self.__jack_asked = False
+		self.__jack_asked_date = 0
 
 		self.__ThreadPull = threading.Thread(target=self.__gestion)
 
@@ -83,6 +86,11 @@ class PullData():
 				self.tourelle_asked = True
 				self.tourelle_asked_date = date
 
+		if self.__jack_asked == False and (date - self.__jack_asked_date) > PULL_PERIODE:
+			self.Communication.sendOrderAPI(self.address_tourelle, 'O_JACK_STATE', *arguments)
+			self.__jack_asked = True
+			self.__jack_asked_date = date
+
 
 	def __readData(self):
 		orderTuple = self.Communication.readOrdersAPI() # (address, order, arguments)
@@ -120,6 +128,12 @@ class PullData():
 			else:
 				system = None
 				self.__logger.error("un systeme non initilisé nous envoi des données")
+
+			if order == "O_JACK_STATE":
+				if arguments[0] == 0:
+					self.MetaData.startMatch()
+				else:
+					self.__jack_asked = False
 
 			if system is not None:
 				if order == 'A_GET_POS_ID':

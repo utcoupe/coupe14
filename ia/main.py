@@ -64,8 +64,8 @@ def startIa(pipe=None, ia_color="RED"):
 	TimeManager = event.TimeManager(Communication, Data)
 	EventManager = event.EventManager(Communication, Data)
 
-	#TODO attendre le jack
-	TimeManager.startMatch()
+	if TEST_MODE == True:
+		TimeManager.startMatch()
 
 #si on lance l'IA via le main.py
 if __name__ == "__main__":
