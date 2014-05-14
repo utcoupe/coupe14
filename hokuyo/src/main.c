@@ -1,26 +1,21 @@
 #include "lidar.h"
 #include "global.h"
 #include "robot.h"
+#include "communication.h"
 #include "compat.h"
-#include "protocole_serial.h"
-#include "serial_switch.h"
 
+#include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
-
+#include <unistd.h>
 
 #ifdef SDL
 #include "gui.h"
 #endif
 
-
-
-
-
 void frame();
-
 
 static int use_protocol = 0;
 static struct lidar l1;
@@ -31,24 +26,28 @@ static struct color l1Color;
 long startTime, lastTime = 0;
 static struct coord robots[MAX_ROBOTS];
 
+void exit_handler() {
+	printf("\n%sClosing lidar(s), please wait...\n", PREFIX);
+	closeLidar(&l1);
+	printf("%sExitting\n", PREFIX);
+	kill(getppid(), SIGUSR1); //Erreur envoyee au pere
+}
 
 static void catch_SIGINT(int signal){
-	printf("Closing lidar(s), please wait...\n");
-	closeLidar(&l1);
-	printf("Exitting\n");
-	exit(EXIT_SUCCESS);
+	exit(EXIT_FAILURE);
 }
 
 int main(int argc, char **argv){
+	atexit(exit_handler);
 	
-	if(argc <= 1 || ( strcmp(argv[1], "red") != 0 && strcmp(argv[1], "blue") ) ){
-		fprintf(stderr, "usage: hokuyo {red|blue} [protocol]\n");
-		return EXIT_FAILURE;
+	if(argc <= 1 || ( strcmp(argv[1], "red") != 0 && strcmp(argv[1], "yellow") ) ){
+		fprintf(stderr, "usage: hokuyo {red|yellow} [path_pipe]\n");
+		exit(EXIT_FAILURE);
 	}
 
-	if (signal(SIGINT, catch_SIGINT) == SIG_ERR) {
+/bin/bash: *kkkkkkkkkkkkkkk: command not found
         fputs("An error occurred while setting a signal handler for SIGINT.\n", stderr);
-        return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
     }
 
 	struct coord posl1;
@@ -59,10 +58,9 @@ int main(int argc, char **argv){
 		posl1.x = TAILLE_TABLE_X+25;
 	}
 
-	
-
-	if (argc == 3 && strcmp(argv[2], "protocol") == 0) {
-		printf("Utilisation du protcole\n");
+	char *path = 0;
+	if (argc == 3) {
+		path = argv[2];
 		use_protocol = 1;
 	}
 
@@ -76,8 +74,7 @@ int main(int argc, char **argv){
 	#endif
 
 	if (use_protocol) {
-		printf("Lancement du thread protocole\n");
-		init_protocol_thread();
+		init_protocol(path);
 	}
 
 	startTime = timeMillis();
@@ -85,15 +82,14 @@ int main(int argc, char **argv){
 	while(1){
 		frame();
 	}
-	catch_SIGINT(0);
-	
+	exit(EXIT_SUCCESS);
 }
 
 void frame(){
 	long timestamp;
 	getPoints(&l1);
 	timestamp = timeMillis() - startTime;
-	printf("%li \t", timestamp-lastTime);
+	//printf("%sDuration : %lims\n", PREFIX, timestamp-lastTime);
 	if(lastTime != 0 && timestamp-lastTime > HOKUYO_WATCHDOG){
 		printf("%s WatchDog exceeded: %li > %li\n", PREFIX, timestamp-lastTime, (long int)HOKUYO_WATCHDOG);
 		restartLidar(&l1);
@@ -108,7 +104,7 @@ void frame(){
 	waitScreen();
 	#endif
 	if (use_protocol){
-		pushCoords(robots, nRobots, timestamp);
+		pushResults(robots, nRobots, timestamp);
 	}
 	else{
 		printf("%s%li;%i", PREFIX, timestamp, nRobots);

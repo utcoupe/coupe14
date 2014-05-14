@@ -30,10 +30,9 @@ enum address{
 	//DEBUTPARSE
 	ADDR_FLUSSMITTEL_OTHER= 1,
 	ADDR_FLUSSMITTEL_ASSERV,
-	ADDR_FLUSSMITTEL_CAM,
 	ADDR_TIBOT_OTHER,
 	ADDR_TIBOT_ASSERV,
-	ADDR_HOKUYO,
+	ADDR_TOURELLE,
 	ADRESSE_NON_PARSE
 	//FINPARSE
 };
@@ -77,9 +76,12 @@ enum ordre {
 	O_BALAI, //@int @int
 	O_JACK_STATE, //#int
 
+	//TOURELLE
+	//x, y, tri_restants
+	T_GET_CAM,	//#int #int #int
+	T_GET_HOKUYO,	//#long #int #int #int #int #int #int #int #int
+
 	//GENERAL
-	GET_CAM,	//#int #int
-	GET_HOKUYO,	//#long #int #int #int #int #int #int #int #int
 	GET_LAST_ID, //#int
 
 	PAUSE,

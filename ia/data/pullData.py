@@ -82,7 +82,7 @@ class PullData():
 				
 		if self.Tourelle is not None:
 			if self.tourelle_asked == False and (date - self.tourelle_asked_date) > PULL_PERIODE:
-				self.Communication.sendOrderAPI(self.address_tourelle, 'GET_HOKUYO', *arguments)
+				self.Communication.sendOrderAPI(self.address_tourelle, 'T_GET_HOKUYO', *arguments)
 				self.tourelle_asked = True
 				self.tourelle_asked_date = date
 
@@ -142,9 +142,9 @@ class PullData():
 					system.setLastId(address, arguments[0])
 				elif order == 'O_GET_BRAS_STATUS':
 					system.setBrasStatus( arguments[0])
-				elif order == 'GET_HOKUYO':
+				elif order == 'T_GET_HOKUYO':
 					system.majPositionHokuyo(arguments)
-				elif order == 'GET_CAM':
+				elif order == 'T_GET_CAM':
 					system.majCam(arguments)
 				elif order == 'A_GOTO':
 					pass	

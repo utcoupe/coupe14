@@ -17,9 +17,9 @@ void updateJackState() {
 	static int last_state = 0;
 	int state = digitalRead(PIN_JACK);
 	if (state == HIGH && last_state == HIGH) {
-		jack_state = 1;
+		jack_state = 0; //Inversé
 	} else {
-		jack_state = 0;
+		jack_state = 1;
 	}
 	last_state = state;
 }
@@ -114,6 +114,7 @@ void tirFilet() {
 }
 
 void initPins() {
+	pinMode(PIN_JACK, INPUT_PULLUP);
 	servoFilet.attach(PIN_SERVO_FILET);
 	servoBallesL.attach(PIN_SERVO_BALLES_L);
 	servoBallesR.attach(PIN_SERVO_BALLES_R);

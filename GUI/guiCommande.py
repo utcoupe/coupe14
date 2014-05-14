@@ -24,10 +24,10 @@ def gui(com):
 					arguments = last_arg
 					order = last_ordre
 				if order[0] == 'A':
-					address = 2
+					address = 4
 				elif order[0] == 'O':
-					address = 1
-				elif order == 'GET_HOKUYO':
+					address = 3
+				elif order == 'T_GET_HOKUYO':
 					address = 6
 
 				if order == 'k':# arret d'urgence
@@ -93,5 +93,5 @@ def gui(com):
 					print("L'ordre n'a pas été trouvé dans les fichiers arduino")
 			last_ordre = order
 			last_arg = arguments
-		except:
-			pass
+		except Exception as e:
+			print(e)

@@ -36,7 +36,7 @@ class Communication():
 			self.__traitementTibotOthers(order, arguments)
 		elif (address == "ADDR_TIBOT_ASSERV"):
 			self.__traitementTibotAsserv(order, arguments)
-		elif (address == "ADDR_HOKUYO"):
+		elif (address == "ADDR_TOURELLE"):
 			self.__traitementHokuyo(order, arguments)
 		else:
 			print('ordre non valide'+str(address))
@@ -298,13 +298,13 @@ class Communication():
 
 	def __traitementHokuyo(self, order, args):
 		"""
-		Parse l'ordre envoyé à ADDR_HOKUYO
+		Parse l'ordre envoyé à ADDR_TOURELLE
 		"""
-		if(order == "GET_HOKUYO"):
+		if(order == "T_GET_HOKUYO"):
 			data = tuple(self.__hokuyo.getHokuyo())
 			data_to_ret = data
 			#print('Hokuyo : data : ', data_to_ret)
-			self.__addOrder("ADDR_HOKUYO", order, data_to_ret)
+			self.__addOrder("ADDR_TOURELLE", order, data_to_ret)
 
 	def __addOrder(self, addr, ordre, args):
 		self.__ia.writePipe(addr, ordre, args)

@@ -6,6 +6,20 @@
 
 using namespace std;
 
+void communication(int index, string path_to_conf, bool save) {
+	Visio visio(index, path_to_conf, save);
+	if (!visio.isOpened()) {
+		cerr << "Failed to initialize vision on index " << index << endl;
+		cout << "FAILED" << endl;
+		return;
+	}
+	if (!visio.isCalibrated()) {
+		cerr << "ERROR : Uncalibrated on index " << index << endl;
+		return;
+	}
+	comLoop(visio);
+}
+
 void comLoop(Visio& visio) {
 	string order;
 	while (!visio.isReady()) {}
@@ -18,7 +32,7 @@ void comLoop(Visio& visio) {
 			try {
 				visio.triangles(tri);
 				for (int i=0; i<tri.size(); i++) {
-					cout << tri[i].coords.x<<":"<<tri[i].coords.y<<" "<<tri[i].angle<<" "<<tri[i].size<<" "<<tri[i].color<<" "<<tri[i].isDown << endl;
+					cout << tri[i].coords.x<<" "<<tri[i].coords.y<<" "<<tri[i].angle<<" "<<tri[i].size<<" "<<tri[i].color<<" "<<tri[i].isDown << endl;
 				}
 				cout << "END" << endl;
 			} catch (const std::exception &e) {
