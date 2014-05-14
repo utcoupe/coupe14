@@ -27,7 +27,7 @@ void init_protocol_thread () {
 	printf("[MAIN]  Essai d'ouverture de %s\n", SERIAL_PATH);
 	serial = open (SERIAL_PATH, O_RDWR | O_NOCTTY | O_SYNC);
 	if (serial < 0) {
-		perror("Can't open serial :");
+		perror("[MAIN]  Can't open serial :");
 		exit (EXIT_FAILURE);
 	}
 	set_interface_attribs (serial, B57600, PARENB|PARODD);  
