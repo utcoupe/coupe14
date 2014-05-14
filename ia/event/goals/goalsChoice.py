@@ -12,11 +12,16 @@ from .navigation import *
 from .goalsLibrary import *
 
 class GoalsChoice:
-	def __init__(self, robot_name, data, goalsLib):
+	def __init__(self, robot_name, data, goalsLib, our_color, back_triangle_stack, front_triangle_stack):
+		self.__logger = logging.getLogger(__name__)
+
 		self.__robot_name = robot_name
 		self.__data = data
 		self.__goalsLib = goalsLib
-		self.__logger = logging.getLogger(__name__)
+		self.__our_color = our_color
+		self.__back_triangle_stack = back_triangle_stack
+		self.__front_triangle_stack = front_triangle_stack
+
 
 		# Variables FLUSSMITTEL
 		self.__NB_TRIANGLES_AVANT_FM = 0
@@ -33,6 +38,12 @@ class GoalsChoice:
 
 		if self.__robot_name == "FLUSSMITTEL":
 			for goal in goals:
+				if len(self.__front_triangle_stack) == MAX_FRONT_TRIANGLE_STACK:
+					if goal.getType() != "STORE_TRIANGLE":
+						continue
+				else:
+					if goal.getType() == "STORE_TRIANGLE":
+						continue
 				nb_elem_goal = goal.getLenElemGoal()
 				for idd in range(nb_elem_goal):
 					path = self.__goalsLib.getOrderTrajectoire(goal, idd)

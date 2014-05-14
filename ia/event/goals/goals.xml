@@ -604,7 +604,7 @@
 	</goal>
 	<goal>
 		<id>18</id>
-		<name>Torche côté droite</name>
+		<name>Torche côté droit</name>
 		<type>torche</type>
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x_objectif>2100</x_objectif>

@@ -45,7 +45,8 @@ class GoalsManager:
 		self.__loadGoals(base_dir+"/goals.xml")
 
 		self.__goalsLib = GoalsLibrary(self.__robot_name, self.__data, self.__blocked_goals, self.__PathFinding)
-		self.__goalsChoice = GoalsChoice(self.__robot_name, self.__data, self.__goalsLib)
+		self.__goalsChoice = GoalsChoice(self.__robot_name, self.__data, self.__goalsLib, self.__our_color, self.__back_triangle_stack, self.__front_triangle_stack)
+
 
 		# Pour tester le déplacement du robot dans le simu lorsqu'il ne peut pas attraper un triangle
 		if TEST_MODE == True:
