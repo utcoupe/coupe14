@@ -565,6 +565,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>RYR</color>
+				<script_only>False</script_only>
 				<id_script>9</id_script>
 			</elem_goal>
 			<elem_goal>
@@ -576,6 +577,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>RYR</color>
+				<script_only>False</script_only>
 				<id_script>9</id_script>
 			</elem_goal>
 			<elem_goal>
@@ -587,6 +589,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>RYR</color>
+				<script_only>False</script_only>
 				<id_script>9</id_script>
 			</elem_goal>
 			<elem_goal>
@@ -598,6 +601,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>RYR</color>
+				<script_only>False</script_only>
 				<id_script>9</id_script>
 			</elem_goal>
 		</elem_goals>
@@ -620,6 +624,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>YRY</color>
+				<script_only>False</script_only>
 				<id_script>9</id_script>
 			</elem_goal>
 			<elem_goal>
@@ -631,6 +636,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>YRY</color>
+				<script_only>False</script_only>
 				<id_script>9</id_script>
 			</elem_goal>
 			<elem_goal>
@@ -642,6 +648,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>YRY</color>
+				<script_only>False</script_only>
 				<id_script>9</id_script>
 			</elem_goal>
 			<elem_goal>
@@ -653,6 +660,7 @@
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>YRY</color>
+				<script_only>False</script_only>
 				<id_script>9</id_script>
 			</elem_goal>
 		</elem_goals>
