@@ -39,12 +39,15 @@ class TimeManager():
 
 		self.__MetaData.stopMatch()
 		self.__broadcastStopOrder()
+		self.__logger.info("On a terminé le match après "+str(self.__MetaData.getGameClock())+" ms de jeu")
 
 		#Temps mort
 		while ( date_actuel - self.__date_match_begin ) < BEGIN_FUNNY_ACTION:
 			self.__MetaData.setGameClock(date_actuel - self.__date_match_begin)
 			time.sleep(PERIODE_TIME_MANAGER/1000.0)
 			date_actuel = int(time.time()*1000.0)
+
+		self.__logger.info("On a terminé l'attente de Funny_action après "+str(self.__MetaData.getGameClock())+" ms de jeu")
 
 		#Pendant la funnyAction
 		self.__MetaData.startFunny()
@@ -56,6 +59,7 @@ class TimeManager():
 
 		self.__MetaData.stopFunny()
 		self.__broadcastStopOrder()
+		self.__logger.info("On a terminé l'attente la Funny_action après "+str(self.__MetaData.getGameClock())+" ms de jeu")
 
 	def __broadcastStopOrder(self):
 		empty_arg = []
@@ -72,6 +76,8 @@ class TimeManager():
 			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_CLEANG', *empty_arg)
 			self.__Communication.sendOrderAPI(self.__Tibot.getAddressOther(), 'RESUME', *empty_arg)
 			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'RESUME', *empty_arg)
+
+		self.__logger.info("On arrete les robtos avec broadcastStopOrder")
 
 	def __sendResetBot(self):
 		empty_arg = []
