@@ -36,7 +36,7 @@ class Communication():
 			self.__traitementTibotOthers(order, arguments)
 		elif (address == "ADDR_TIBOT_ASSERV"):
 			self.__traitementTibotAsserv(order, arguments)
-		elif (address == "ADDR_HOKUYO"):
+		elif (address == "ADDR_TOURELLE"):
 			self.__traitementHokuyo(order, arguments)
 		else:
 			print('ordre non valide'+str(address))
@@ -45,50 +45,45 @@ class Communication():
 		"""
 		Parse l'ordre envoyé à ADDR_FLUSSMITTEL_OTHER
 		"""
-		if (order == "O_BRAS_OUVRIR"):
-			pos = ()
+		empty_return = ()
+		if (order == "O_BRAS_OUVRIR_BAS"):
 			self.__bigrobot.activerBrasOuvrir()
 			self.__bigrobot.setlastIdActionOther(args[0])
-			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
+
+		elif (order == "O_BRAS_OUVRIR_HAUT"):
+			#TODO ouvrir le bras sans toucher les triangles
+			#self.__bigrobot.activerBrasOuvrir()
+			self.__bigrobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
 
 		elif (order == "O_BRAS_FERMER"):
-			pos = ()
 			self.__bigrobot.activerBrasFermer()
 			self.__bigrobot.setlastIdActionOther(args[0])
-			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
 
 		elif (order == "GET_LAST_ID"):
 			pos = (self.__bigrobot.getLastIdOther(),)
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
 		elif (order == "RESET_ID"):
-			pos = ()
 			self.__bigrobot.resetIdOther()
-			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
 
-		elif (order == "O_RET_OUVRIR"):
-			pos = ()
+		elif (order == "O_RET"):
 			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__bigrobot.releaseFeuArriere() #pour les tests
-			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
-
-		elif (order == "O_RET_FERMER"):
-			pos = ()
-			self.__bigrobot.setlastIdActionOther(args[0])
-			#TODO, implementer
-			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
 
 		elif (order == "O_GET_TRIANGLE"):
-			pos = ()
 			self.__bigrobot.activerVisio()
 			self.__bigrobot.setlastIdActionOther(args[0])
-			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
 
 		elif (order == "O_STORE_TRIANGLE"):
-			pos = ()
 			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__bigrobot.storeFeu(args[1])
-			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
 
 		elif (order == "O_GET_BRAS_STATUS"):
 			pos = (self.__bigrobot.getFeuHit(),)
@@ -96,22 +91,29 @@ class Communication():
 			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
-		elif (order == "PINGPING"):
-			pos = ()
+		elif (order == "O_DROP_TRIANGLE"):
 			self.__bigrobot.setlastIdActionOther(args[0])
-			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+			self.__bigrobot.dropFeu(args[1],args[2])
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
+
+		elif (order == "PINGPING"):
+			self.__bigrobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
 
 		elif (order == "PAUSE"):
-			pos = ()
-			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
+
+		elif (order == "RESUME"):
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
 
 		else:
-			print('Error : mauvais paramètre traitement Flussmittel other !')
+			print('Error : mauvais paramètre traitement Flussmittel other ! order '+str(order)+" args "+str(args))
 
 	def __traitementFlussmittelAsserv(self, order, args):
 		"""
 		Parse l'ordre envoyé à ADDR_FLUSSMITTEL_ASSERV
 		"""
+		empty_return = ()
 
 		#on traite les ordres qui nécessitent de renvoyer des informations
 		if (order == "A_GET_POS"):
@@ -129,31 +131,29 @@ class Communication():
 			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos_id)
 
 		elif (order == "A_CLEANG"):
-			pos = ()
 			self.__bigrobot.cleanGoals()
-			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos)
+			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, empty_return)
 
 		elif (order == "RESET_ID"):
-			pos = ()
 			self.__bigrobot.resetIdAsserv()
-			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos)
+			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, empty_return)
 
 		elif (order == "A_SET_POS"):
-			pos = ()
 			self.__bigrobot.setPosition(args[0],args[1], args[2])
-			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos)
+			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, empty_return)
 
 		elif (order == "PINGPING"):
-			pos = ()
-			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos)
+			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, empty_return)
 
 		elif (order == "PAUSE"):
-			pos = ()
-			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos)
+			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, empty_return)
+
+		elif (order == "RESUME"):
+			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, empty_return)
 
 		else:
 			#on ajoute l'ordre reçu à la structure de renvoie
-			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, args)
+			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, empty_return) # WTF ????
 			if (order == "PINGPING"):
 				self.__bigrobot.ping()
 			elif (order == "A_GOTOA"):
@@ -171,7 +171,7 @@ class Communication():
 			elif (order == "A_PWM"):
 				self.__bigrobot.addGoalOrder(PWM, args)
 			else:
-				print('Error : mauvais paramètre traitement Flussmittel asserv !')
+				print('Error : mauvais paramètre traitement Flussmittel asserv ! order '+str(order)+" args "+str(args))
 
 	def __traitementFlussmittelCam(self, order, args):
 		"""
@@ -183,55 +183,62 @@ class Communication():
 		"""
 		Parse l'ordre envoyé à ADDR_TIBOT_OTHER
 		"""
+		empty_return = ()
 		if (order == "O_BRAS_OUVRIR"):
-			pos = ()
 			self.__minirobot.setlastIdActionOther(args[0])
-			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
+			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
 		elif (order == "O_BRAS_FERMER"):
-			pos = ()
 			self.__minirobot.setlastIdActionOther(args[0])
-			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
+			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
 		elif (order == "GET_LAST_ID"):
 			pos = (self.__minirobot.getLastIdOther(),)
 			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
 
 		elif (order == "RESET_ID"):
-			pos = ()
 			self.__minirobot.resetIdOther()
-			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
-
-		elif (order == "O_RET_OUVRIR"):
-			pos = ()
-			self.__minirobot.setlastIdActionOther(args[0])
-			#TODO, implementer
-			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
-
-		elif (order == "O_RET_FERMER"):
-			pos = ()
-			self.__minirobot.setlastIdActionOther(args[0])
-			#TODO, implementer
-			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
+			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
 		elif (order == "PINGPING"):
-			pos = ()
 			self.__minirobot.setlastIdActionOther(args[0])
-			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
+			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
 		elif (order == "PAUSE"):
-			pos = ()
-			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
+			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
+		elif (order == "RESUME"):
+			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
+
+		elif (order == "O_TIR_BALLE"):
+			#args : nbr de balles à tirer
+			self.__minirobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
+
+		elif (order == "O_TIR_FILET"):
+			self.__minirobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
+
+		elif (order == "O_BALAI"):
+			"""
+			arg :
+			0 = bras au milieu
+			1 : bras à droite des fresques
+			-1 : bras à gauche des fresques
+			"""
+			self.__minirobot.ouvrirBras(args[1])
+			self.__minirobot.setlastIdActionOther(args[0])
+			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
 		else:
-			print('Error : mauvais paramètre traitement Tibot other !')
+			print('Error : mauvais paramètre traitement Tibot other ! order '+str(order)+" args "+str(args))
 
 	def __traitementTibotAsserv(self, order, args):
 		"""
 		Parse l'ordre envoyé à ADDR_TIBOT_ASSERV
 		"""
 		#on traite les ordres qui nécessitent de renvoyer des informations
+		empty_return = ()
 		if (order == "A_GET_POS"):
 			pos = self.__minirobot.getPosition()
 			fixed_pos = (pos[0], pos[1], pos[2])
@@ -247,27 +254,25 @@ class Communication():
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos_id)
 
 		elif (order == "A_CLEANG"):
-			pos = ()
 			self.__minirobot.cleanGoals()
-			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
+			self.__addOrder("ADDR_TIBOT_ASSERV", order, empty_return)
 
 		elif (order == "RESET_ID"):
-			pos = ()
 			self.__minirobot.resetIdAsserv()
-			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
+			self.__addOrder("ADDR_TIBOT_ASSERV", order, empty_return)
 
 		elif (order == "A_SET_POS"):
-			pos = ()
 			self.__minirobot.setPosition(args[0], args[1], args[2])
-			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
+			self.__addOrder("ADDR_TIBOT_ASSERV", order, empty_return)
 
 		elif (order == "PINGPING"):
-			pos = ()
-			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
+			self.__addOrder("ADDR_TIBOT_ASSERV", order, empty_return)
 
 		elif (order == "PAUSE"):
-			pos = ()
-			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
+			self.__addOrder("ADDR_TIBOT_ASSERV", order, empty_return)
+
+		elif (order == "RESUME"):
+			self.__addOrder("ADDR_TIBOT_ASSERV", order, empty_return)
 
 		else:
 			if (order == "PINGPING"):
@@ -289,16 +294,17 @@ class Communication():
 			elif (order == "A_PWM"):
 				self.__minirobot.addGoalOrder(PWM, args)
 			else:
-				print('Error : mauvais paramètre traitement Tibot asserv !')
+				print('Error : mauvais paramètre traitement Tibot asserv ! order '+str(order)+" args "+str(args))
 
 	def __traitementHokuyo(self, order, args):
 		"""
-		Parse l'ordre envoyé à ADDR_HOKUYO
+		Parse l'ordre envoyé à ADDR_TOURELLE
 		"""
-		if(order == "GET_HOKUYO"):
+		if(order == "T_GET_HOKUYO"):
 			data = tuple(self.__hokuyo.getHokuyo())
 			data_to_ret = data
-			self.__addOrder("ADDR_HOKUYO", order, data_to_ret)
+			#print('Hokuyo : data : ', data_to_ret)
+			self.__addOrder("ADDR_TOURELLE", order, data_to_ret)
 
 	def __addOrder(self, addr, ordre, args):
 		self.__ia.writePipe(addr, ordre, args)

@@ -9,27 +9,13 @@
 
 using namespace cv;
 
-void communication(int index, string path_to_conf, bool save) {
-	Visio visio(index, path_to_conf, save);
-	if (!visio.isCalibrated()) {
-		cerr << "ERROR : Uncalibarted" << endl;
-		return;
-	}
-	if (visio.getDistortMode() != none) {
-		cerr << "INFO : Starting visio WITH distortion correction" << endl;
-	} else {
-		cerr << "INFO : Starting visio WITHOUT distortion correction" << endl;
-	}
-	comLoop(visio);
-}
-
 void calibration(int index, string path) {
 	Visio visio(index, path);
 	visio.setChessboardSize(Size(9,6));
 	if (visio.camCalibrate(25)) 
-		visio.saveCameraMatrix();
+		visio.saveCameraMatrix("new_calibration_camera.yml");
 	if (visio.camPerspective())
-		visio.saveTransformMatrix();
+		visio.savePerspectiveMatrix("new_perspective_matrix.yml");
 }
 
 void getColor(int event, int x, int y, int, void* img_mat) {
@@ -42,16 +28,21 @@ void getColor(int event, int x, int y, int, void* img_mat) {
 	}
 }
 
-void perspectiveOnlyLoop(int index, string path){
+void perspectiveOnlyLoop(int index, string path) {
 	Mat frame;
 	Visio visio(index, path);
+	if (!visio.isCalibrated()) {
+		cerr << "Calibrate camera and perspective first" << endl;
+		return;
+	}
 	visio.setChessboardSize(Size(9,6));
 
-	int size_min(5000), max_diff_triangle_edge(MAX_DIFF_TRI_EDGE);
+	int size_min(MIN_SIZE), real_size_min(MIN_REAL_SIZE), max_diff_triangle_edge(MAX_DIFF_TRI_EDGE);
 	int h_min_y(YEL_HUE_MIN), h_max_y(YEL_HUE_MAX), s_min_y(YEL_SAT_MIN), s_max_y(YEL_SAT_MAX), v_min_y(YEL_VAL_MIN), v_max_y(YEL_VAL_MAX);
 	int h_min_r(RED_HUE_MIN), h_max_r(RED_HUE_MAX), s_min_r(RED_SAT_MIN), s_max_r(RED_SAT_MAX), v_min_r(RED_VAL_MIN), v_max_r(RED_VAL_MAX);
 	int h_min_b(BLK_HUE_MIN), h_max_b(BLK_HUE_MAX), s_min_b(BLK_SAT_MIN), s_max_b(BLK_SAT_MAX), v_min_b(BLK_VAL_MIN), v_max_b(BLK_VAL_MAX);
 	int epsilon(EPSILON_POLY*100), key = -1;
+	int xoffset = 0, yoffset = 300, sizezone=1000;
 
 	namedWindow("parameters");
 	namedWindow("parameters2");
@@ -81,6 +72,10 @@ void perspectiveOnlyLoop(int index, string path){
 	createTrackbar("epsilon", "parameters2", &epsilon, 100);
 	createTrackbar("is equi", "parameters2", &max_diff_triangle_edge, 100);
 	createTrackbar("size_min", "parameters2", &size_min, 20000);
+	createTrackbar("real_size_min", "parameters2", &real_size_min, 20000);
+	createTrackbar("size_zone", "parameters2", &sizezone, 3000);
+	createTrackbar("x_offset", "parameters2", &xoffset, 3000);
+	createTrackbar("y_offset", "parameters2", &yoffset, 2000);
 
 	Scalar c_red(0,0,255), c_blue(255, 0, 0), c_yel(0,110,130);
 	for(;;) { //int i=0; i>=0; i++) {
@@ -90,10 +85,10 @@ void perspectiveOnlyLoop(int index, string path){
 		frame_ori = visio.getImg();
 
 		if (key == 's') {
-			visio.saveTransformMatrix();
+			visio.saveParams("new_params.yml");
 		}
 		if (key == 'l') {
-			visio.loadTransformMatrix();
+			visio.loadParams(DEFAULT_PARAMS_FILENAME);
 		}
 		
 		else {
@@ -101,6 +96,7 @@ void perspectiveOnlyLoop(int index, string path){
 			Scalar min_y(h_min_y,s_min_y,v_min_y), max_y(h_max_y,s_max_y,v_max_y);
 			Scalar min_b(h_min_b,s_min_b,v_min_b), max_b(h_max_b,s_max_b,v_max_b);
 			visio.setMinSize(size_min);
+			visio.setRealMinSize(real_size_min);
 			visio.setMaxDiffTriangleEdget(max_diff_triangle_edge);
 			visio.setEpsilonPoly(epsilon/100.0);
 			visio.setYelParameters(min_y, max_y);
@@ -108,11 +104,10 @@ void perspectiveOnlyLoop(int index, string path){
 			visio.setBlkParameters(min_b, max_b);
 
 			Mat frame_hsv;
-			int xoffset = 0, yoffset = 300;
 			Mat translation = (Mat_<double>(3,3) << 1, 0, xoffset, 0, 1, yoffset, 0, 0, 1);
 			cvtColor(frame_ori, frame_hsv, CV_BGR2HSV);
 			undistort(frame_ori, frame, visio.getCM(), visio.getD());
-			warpPerspective(frame, persp, translation*visio.getQ(), Size(1000,600));
+			warpPerspective(frame, persp, translation*visio.getQ(), Size(sizezone,sizezone));
 			visio.setColor(yellow);
 			visio.getDetectedPosition(frame_hsv, detected_pts_yel, detected_contours_yel);
 			visio.setColor(red);
@@ -152,7 +147,7 @@ void perspectiveOnlyLoop(int index, string path){
 				drawContours(persp, t, -1, c_blue, 2);
 			}
 
-			resize(persp, persp, Size(1000,600));
+			resize(persp, persp, Size(800,800));
 			imshow("persp", persp);
 			imshow("undistort", frame);
 			imshow("origin", frame_ori);

@@ -2,9 +2,8 @@
 #define COMPAT_H
 
 #include <stdio.h>
-#include "../global.h"
 
-#define LOCAL_ADDR ADDR_HOKUYO
+#define LOCAL_ADDR ADDR_TOURELLE
 #define SERIAL_PATH "/dev/ttyUSB1"
 
 typedef enum bool 

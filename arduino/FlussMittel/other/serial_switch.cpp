@@ -24,18 +24,10 @@ static const int overflow = 29999;
 int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bool doublon){ 
 	int ret_size = 0;
 	switch(ordre){
-	case O_RET_OUVRIR:
+	case O_RET:
 		if (!doublon && use_act) {
-			last_id = btoi(argv);
-			argv+=2;
-			servoRet.write(95);
-		}
-		break;
-	case O_RET_FERMER:
-		if (!doublon && use_act) {
-			last_id = btoi(argv);
-			argv+=2;
-			servoRet.write(0);
+			next_last_id = btoi(argv);
+			callbackRet(ACTIVATE);
 		}
 		break;
 	case O_GET_TRIANGLE:
@@ -56,7 +48,13 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		last_id = btoi(argv);
 		itob((int)got_tri,ret);
 		break;
-	case O_BRAS_OUVRIR:
+	case O_BRAS_OUVRIR_BAS:
+		if (!doublon) {
+			next_last_id = btoi(argv);
+			getTriPush();
+		}
+		break;
+	case O_BRAS_OUVRIR_HAUT:
 		if (!doublon) {
 			next_last_id = btoi(argv);
 			getTriBordure();
@@ -66,6 +64,13 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		if (!doublon) {
 			next_last_id = btoi(argv);
 			getTriBordureRepliBras();
+		}
+		break;
+	case O_DROP_TRIANGLE:
+		if (!doublon) {
+			next_last_id = btoi(argv);
+			int x = btoi(argv+2), y = btoi(argv+4);
+			getBrasDepot(x, y);
 		}
 		break;
 	case PAUSE:

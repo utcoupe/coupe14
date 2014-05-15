@@ -122,6 +122,10 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 		ret_size = 2;
 		break;
 		}
+	case A_IS_BLOCKED:
+		itob((int)control.isBlocked(), ret);
+		ret_size = 2;
+		break;
 	case PAUSE: 
 		control.pause();
 		break;

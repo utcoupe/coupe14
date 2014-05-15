@@ -3,6 +3,8 @@
 Ce fichier contient les structures de données 
 """
 
+import math
+
 class Position():
 	def __init__(self, arg1, y=None):
 		if isinstance(arg1, Position):
@@ -16,7 +18,7 @@ class Position():
 
 
 	def distanceSquarred(self, pos):
-		return (self.x-pos.x)**2 + (self.y-pos.y)**2
+		return math.sqrt((self.x-pos.x)**2 + (self.y-pos.y)**2)
 
 	def add(self, pos): #return self
 		self.x += pos.x

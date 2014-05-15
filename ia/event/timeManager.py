@@ -26,7 +26,6 @@ class TimeManager():
 
 
 	def startMatch(self):
-		self.__MetaData.startMatch()
 		self.__date_match_begin = int(time.time()*1000.0)
 
 		#Pendant le match

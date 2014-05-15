@@ -50,7 +50,7 @@
  * envoyer des consignes en pwm au robot
  * partant de 0 et en augmentant progressivement
  * dès que le robot avance, la pwm min est trouvée */
-#define PWM_MIN 8
+#define PWM_MIN 10
 
 #define CONSIGNE_MAX 255
 
@@ -62,23 +62,24 @@
 #define ENC_RESOLUTION 1024 //resolution du codeur
 
 #define ENC_LEFT_RADIUS 36.1 //REGLE PAR TEST - rayon de la roue codeuse
-#define ENC_RIGHT_RADIUS 36.1 //REGLE PAR TEST - rayon de la roue codeuse
-#define ENTRAXE_ENC 324.5 //REGLE PAR TES - Distance entre chaque roue codeuse en mm
+#define ENC_RIGHT_RADIUS 36.0 //REGLE PAR TEST - rayon de la roue codeuse
+#define ENTRAXE_ENC 323.3 //REGLE PAR TES - Distance entre chaque roue codeuse en mm
 
 #define ERROR_ANGLE 0.02 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
 #define ERROR_ANGLE_TO_GO 0.1 //erreur en angle(radians) maximale avant de partir en cas de GOTO
-#define ERROR_POS 5 // erreur en position (mm)  maximale pour considérer l'objectif comme atteint
+#define ERROR_POS 10 // erreur en position (mm)  maximale pour considérer l'objectif comme atteint
 
 #define MAX_ANGLE 0.20  //~10° angle en dessous duquel on décrit une trajectoire curviligne (trop bas, le robot s'arretera constamment pour se recaler au lieu d'avancer, trop haut, les trajectoires seront très courbes voir meme fausses (overflow spd -> overflow pwm).
 #define D_MIN_ASSERV_ANGLE 20
+#define CONE_ALIGNEMENT 2.09 //120deg
 
 //Intégrales et dérivée sont calculée avec un intervalle de temps en SECONDES
 //Ne modifier que le nombre, laisser les DUREE_CYCLE
 
 //Le "I" devrait etre faible (ou nul), le "D" est à régler progressivement pour éviter le dépassement
-#define ANG_P 180 //spd = P * E_ang(rad)
+#define ANG_P 1000 //spd = P * E_ang(rad)
 #define ANG_I 0 //spd = I * I_ang(rad * s)
-#define ANG_D 40 //a regler par incrementation
+#define ANG_D 150 //a regler par incrementation
 #define ANG_AWU 0
 
 #define DIS_P 3.5 //spd = P * E_dis(mm)
@@ -89,8 +90,8 @@
 //BLOCAGE
 //TIME_BLOCKED : période de vérification (ms)
 //MIN_DIST_BLOCKED : disatcne min a parcourir pour ne pas etre considere bloqué (mm)
-#define TIME_BLOCKED 100
-#define MIN_DIST_BLOCKED 1
+#define PERIOD_BLOCKED 1000
+#define MIN_DIST_BLOCKED 3
 
 //PIN LED
 #define LED_MAINLOOP 22

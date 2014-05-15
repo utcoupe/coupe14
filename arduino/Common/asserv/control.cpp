@@ -37,11 +37,17 @@ void Control::compute(){
 	static struct goal last_goal = current_goal;
 	pos current_pos = robot.getMmPos();
 	long now = timeMicros();
+
+	if (current_goal.type == NO_GOAL || current_goal.isReached || fifo.isPaused()) {
+		robot.useBlock(false);
+	} else {
+		robot.useBlock(true);
+	}
+
 	robot.update();
 
 	if(fifo.isPaused() || current_goal.type == NO_GOAL){
-		value_consigne_right = 0;
-		value_consigne_left = 0;
+		setConsigne(0, 0);
 	}
 	else{
 		if (current_goal.isReached) {
@@ -58,7 +64,6 @@ void Control::compute(){
 			current_goal = fifo.getCurrentGoal();
 			PID_Angle.reset();
 			PID_Distance.reset();
-			robot.clearBlocked();
 			reset = false;
 			order_started = false;
 		}
@@ -69,7 +74,7 @@ void Control::compute(){
 			{
 				float da = (current_goal.data_1 - current_pos.angle);
 				
-				//da = moduloPI(da);//Commenter pour multi-tour
+				da = moduloTwoPI(da);//Commenter pour multi-tour
 
 				if(abs(da) <= ERROR_ANGLE){
 					setConsigne(0, 0);
@@ -88,15 +93,9 @@ void Control::compute(){
 				float da = (goal_a - current_pos.angle);
 				float dd = sqrt(pow(dx, 2.0)+pow(dy, 2.0));//erreur en distance
 				float d = dd * cos(da); //Distance adjacente
-				float dop = dd * sin(da); //Distance opposée
 				static char aligne = 0;
 
-				//Commenter pour multi-tour
-				da = moduloPI(da);
-
-				if (dop < ERROR_POS && dd < D_MIN_ASSERV_ANGLE) { //"Zone" de précision TODO
-					da = 0;
-				}
+				da = moduloTwoPI(da);
 
 				//Init ordre
 				if (!order_started) {
@@ -108,6 +107,17 @@ void Control::compute(){
 					}
 					order_started = true;
 				}
+
+
+				if (aligne || (abs(da) > CONE_ALIGNEMENT)) {
+					da = moduloPI(da);
+				}
+
+				if (dd < ERROR_POS) { //"Zone" d'arrivée
+					fifo.pushIsReached();
+					da = 0;
+				}
+
 
 				//Fin de la procedure d'alignement
 				if(!aligne && abs(da) <= ERROR_ANGLE_TO_GO) {
@@ -122,31 +132,25 @@ void Control::compute(){
 				else {
 					controlPos(da, d + current_goal.data_3);//erreur en dist = dist au point + dist additionelle
 				}
-
-				//Fin de consigne
-				if(abs(dd) <= ERROR_POS) {
-					setConsigne(0, 0);
-					fifo.pushIsReached();
-				}
 				break;
 			}
 
 			case TYPE_PWM :
 			{
 				static float pwmR = 0, pwmL = 0;
-				if(!order_started){
+				if (!order_started){
 					start_time = now;
 					pwmR = 0; pwmL = 0;
 					order_started = true;
 				}
-				if((now - start_time)/1000.0 <= current_goal.data_3){
+				if ((now - start_time)/1000.0 <= current_goal.data_3){
 					float consigneR = current_goal.data_2, consigneL = current_goal.data_1;
 					check_acc(&consigneL, pwmL);
 					check_acc(&consigneR, pwmR);
 					pwmR = consigneR; pwmL = consigneL;
 					setConsigne(pwmL, pwmR);
 				}
-				else{
+				else {
 					setConsigne(0,0);
 					fifo.pushIsReached();
 				}
@@ -221,6 +225,10 @@ void Control::clearGoals(){
 
 pos Control::getPos(){
 	return robot.getMmPos();
+}
+
+bool Control::isBlocked() {
+	return robot.isBlocked();
 }
 
 Encoder* Control::getRenc(){
@@ -319,13 +327,12 @@ void Control::controlPos(float da, float dd)
 
 	check_max(&consigneDistance, CONSIGNE_RANGE_MAX - abs(consigneAngle));
 	check_dist_acc(&consigneDistance);
-	PDEBUGLN();
 
 	consigneR = consigneDistance + consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
 	consigneL = consigneDistance - consigneAngle; //On additionne les deux speed pour avoir une trajectoire curviligne
 
 	last_consigne_angle = consigneAngle;
-	last_consigne_dist= consigneDistance;
+	last_consigne_dist = consigneDistance;
 	setConsigne(consigneL, consigneR);
 }
 

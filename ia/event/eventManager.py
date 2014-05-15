@@ -27,6 +27,8 @@ class EventManager():
 		self.__MetaData = Data.MetaData
 
 		self.__last_hokuyo_data = None
+		self.__tibot_locked = False
+		self.__filet_fired = False
 
 		self.__last_flussmittel_order_finished = ID_ACTION_MAX	#id_action
 		self.__sleep_time_flussmittel = 0
@@ -58,13 +60,18 @@ class EventManager():
 
 		#On attend le debut de la funny action
 		while self.__MetaData.getInFunnyAction() == False:
-			self.__majObjectif()
+			self.__logger.info("On est en fin de match")
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
 		#Pendant la funny action
 		while self.__MetaData.getInFunnyAction() == True:
-			self.__majObjectif() #TODO faire une fonction dédiée ?
-			self.__checkEvent()
+			print("Funny Action")
+			self.__logger.info("On est en funny action")
+			if self.__filet_fired == False and self.__Tibot is not None:
+				arg = [42,]# 42 est un nombre aleatoire
+				self.__Communication.sendOrderAPI("ADDR_TIBOT_OTHER", "O_TIR_FILET", *arg)
+				self.__logger.info("On lance le filet")
+				self.__filet_fired = True
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
 	def __majObjectif(self):
@@ -135,17 +142,23 @@ class EventManager():
 	def __checkEvent(self):
 		self.__checkBrasStatus()
 
+		
+		new_data = ()
+		if self.__Flussmittel is not None:
+			new_data += (self.__Flussmittel.getPosition())
+		if self.__Tibot is not None:
+			new_data += (self.__Tibot.getPosition())
+
 		if self.__Tourelle is not None:
-			new_data = ()
 			if self.__BigEnemyBot is not None:
 				new_data += (self.__BigEnemyBot.getPosition(),)
 			if self.__SmallEnemyBot is not None:
 				new_data += (self.__SmallEnemyBot.getPosition(),)
-			
-			if new_data != self.__last_hokuyo_data:
-				self.__last_hokuyo_data = new_data
-				if self.__MetaData.getCheckCollision():
-					self.__testCollision()
+
+		if new_data != self.__last_hokuyo_data:
+			self.__last_hokuyo_data = new_data
+			if self.__MetaData.getCheckCollision():
+				self.__testCollision()
 
 		if self.__Flussmittel is not None:
 			new_id = self.__Flussmittel.getLastIdGlobale()
@@ -210,6 +223,9 @@ class EventManager():
 		for action in data_action_temp:
 			data_action.append((Objet.getNextIdToStack(), action[1], action[2]))
 
+		data_action_temp.clear()
+		data_action_temp.extend(data_action)
+
 		print(str(Objet.getName()) + " charge les actions dans eventManager: " + str((id_objectif, data_action)))
 
 		last_order = data_action.pop()
@@ -256,43 +272,58 @@ class EventManager():
 			for action in data_action:
 				arg = [action[0]]
 				
-				#Si l'ordre a des arguments
-				if action[2] is not None:
-					arg += action[2]
+				#Si tibot est en funny action
+				if address in ("ADDR_TIBOT_OTHER", "ADDR_TIBOT_ASSERV") and self.__tibot_locked == True:
+					self.__logger.error("Attention on drop l'ordre "+str(action[1])+" a destination de "+str(address)+" avec les arg "+str(arg)+" car on est bloqué en funny action.")
+				else:
+					#Si l'ordre a des arguments
+					if action[2] is not None:
+						arg += action[2]
 
-				if action[1][0] == 'O':
+					if action[1][0] == 'O':
 						self.__Communication.sendOrderAPI(address[0], action[1], *arg)
 
-				elif action[1][0] == 'A':
-					if action[1] == "A_GOTO_SCRIPT":#A_GOTO_SCRIPT n'existe que dans les scripts d'action elemetaire, on l'utilise pour ne pas inclure ces deplacements dans le calcul de collision
-						self.__Communication.sendOrderAPI(address[1], "A_GOTO", *arg)
+					elif action[1][0] == 'A':
+						if action[1] == "A_GOTO_SCRIPT":#A_GOTO_SCRIPT n'existe que dans les scripts d'action elemetaire, on l'utilise pour ne pas inclure ces deplacements dans le calcul de collision
+							self.__Communication.sendOrderAPI(address[1], "A_GOTO", *arg)
+						else:
+							self.__Communication.sendOrderAPI(address[1], action[1], *arg)
+
+					elif action[1] == "FUNNY_ACTION_LOCK":
+						self.__tibot_locked = True
+						self.__logger.info("Tibot est prêt pour la funny action, il ne bougera plus.")
+
 					else:
-						self.__Communication.sendOrderAPI(address[1], action[1], *arg)
+						self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
 
-				else:
-					self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
-
-				self.__logger.debug(str(address) + " envoi de l'ordre: " + str(action))
+					self.__logger.debug(str(address) + " envoi de l'ordre: " + str(action))
 
 
 	def __testCollision(self):
 		if self.__Flussmittel is not None:
-			self.__checkSystem(self.__Flussmittel)
+			self.__checkCollisionSystem(self.__Flussmittel)
 		
 		if self.__Tibot is not None:
-			self.__checkSystem(self.__Tibot)
+			self.__checkCollisionSystem(self.__Tibot)
 	
-	def __checkSystem(self, system):
+	def __checkCollisionSystem(self, system):
 		collision_data = self.__Collision.getCollision(system)
 		if collision_data is not None:
 			distance = collision_data[1]
 			if distance < self.__MetaData.getCollisionThreshold():
 				first_id_to_remove = collision_data[0]
-				id_canceled_list = system.removeObjectifAbove(first_id_to_remove)
-				self.__logger.info("On annule les ordres: " + str(id_canceled_list) + " pour causes de collision dans " + str(distance) + " mm")
-				empty_arg = []
-				self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
-				system.setIdToReach("ANY")
-				self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
-			else:
-				self.__logger.debug("On a detecté une collision dans "+str(distance)+" mm, mais on continue")
+				
+				action_en_cours, objectif = system.getQueuedObjectif()
+				if first_id_to_remove == objectif[0][0]:
+					id_canceled_list = system.removeObjectifAbove(first_id_to_remove)
+					self.__logger.info(str(system.getName())+" a annuler les ordres: " + str(id_canceled_list) + " et on broadcast A_CLEANG pour causes de collision dans " + str(distance) + " mm")
+					empty_arg = []
+					self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
+					system.setIdToReach("ANY")
+					self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
+				else:
+					id_canceled_list = system.removeObjectifAbove(first_id_to_remove)
+					self.__logger.info(str(system.getName())+" a enlever les ordres: " + str(id_canceled_list) + " de la file pour causes de collision dans " + str(distance) + " mm")
+
+			elif  distance < COLLISION_WARNING_THRESHOLD:
+				self.__logger.debug(str(system.getName())+" a detecté une collision dans "+str(distance)+" mm, mais on continue")

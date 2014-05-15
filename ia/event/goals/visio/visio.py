@@ -12,11 +12,12 @@ la position des triangles en hauteur"""
 
 class Triangle:
 	"""Simple structure de stockage des infos triangles"""
-	def __init__(self, coord, angle, size, color, isDown):
-		self.coord = [int(float(x)) for x in coord.split(':')]
+	def __init__(self, x, y, angle, size, color, isDown):
+		self.coord = [float(x), float(y)]
 		self.angle = float(angle)
 		self.size = float(size)
 		self.color = ''
+		self.real_coord = [0, 0]
 		color = int(color)
 		if color == 0:
 			self.color = 'RED'
@@ -32,6 +33,11 @@ class Triangle:
 		else:
 			state = 'up'
 		return str(self.coord) + '\ta=' + str(self.angle) + '\t' + str(self.size) + '\t' + self.color + '\t' + state
+
+	def dist2(self, tri):
+		dx = self.coord[0] - tri.coord[0]
+		dy = self.coord[1] - tri.coord[1]
+		return dx*dx + dy*dy
 
 
 class Visio:
@@ -56,16 +62,27 @@ class Visio:
 		#Lancement du client
 		self.__log.info("Executing C++ program")
 		self.client = Popen([self.path_exec, str(index), 'com', path_config, capture_vid], stdin=PIPE, universal_newlines=True, stdout=PIPE)
+		self.__log.info("C++ Program executed, waiting till program is ready")
 		atexit.register(self.client.kill)
 		stdout = ''
-		while stdout != 'READY\n':
+		while stdout != 'READY\n' and stdout != 'FAILED\n':
+			print(stdout, end='')
 			#Attente des données client
 			stdout = self.client.stdout.readline()
 			#Sleep 1ms
 			time.sleep(self.__updatePeriod)
+
+		if stdout == 'FAILED\n':
+			raise Exception('Visio failed')
+			return
+
 		self.__log.info("Visio ready")
 
 		self._triangles = []
+
+	def close(self):
+		self.client.kill()
+		self.client.wait()
 
 	def getTriangles(self):
 		return self._triangles
@@ -115,13 +132,12 @@ class Visio:
 
 		# En situation de test, big bot est None
 		triangles = self._triangles
-		"""
 		try:
 			if self.__big_bot is not None:
 				self.__post_processing()
-		except:
+		except BaseException as e:
+			self.__log.error("Failed to post-process datas : "+str(e))
 			self._triangles = triangles  # si echec, on ne corrige pas
-			"""
 
 	def __post_processing(self):
 		if self.__big_bot is None:
@@ -131,51 +147,52 @@ class Visio:
 			tri = self._triangles[i]
 
 			#calcul des coordonnées relatives dans le repère des coords absolues
-			robot_angle = self.__big_bot.getPositionAndAngle()[2]
-			tri.rel_in_abs = (tri.coords[0] * cos(robot_angle) - tri.coords[1] * sin(robot_angle), 
-								tri.coords[0] * sin(robot_angle) + tri.coords[1] * cos(robot_angle))
+			robot_angle = self.__big_bot["getPositionAndAngle"][2]
+			tri.rel_in_abs = (tri.coord[0] * cos(robot_angle) - tri.coord[1] * sin(robot_angle), 
+								tri.coord[0] * sin(robot_angle) + tri.coord[1] * cos(robot_angle))
 
 			#calcul des coordonnées réelles du triangles, on le recalcule par la
 			# suite si elles sont a modifier, mais on en a besoin pour savoir
 			# s'i faut les modifier
-			tri.real_coords = [i + j for i, j in zip(tri.rel_in_abs, self.__big_bot.getPosition())]
+			tri.real_coords = [i + j for i, j in zip(tri.rel_in_abs, self.__big_bot["getPosition"])]
 
 			#Traitement de la position pour modif si triangle en hauteur
-			if self.__inHighGround(tri):
-				self.__highGroundProcess(tri)
-			elif self.__inStartZone(tri):
+			if self.__outOfMap(tri) or self.__inFruitZone(tri) or self.__inStartZone(tri):
 				self._triangles.remove(tri)
 
+			#elif self.__inHighGround(tri):
+			#	self.__highGroundProcess(tri)
 
 	def __highGroundProcess(self, tri):
 		"""Corrige les coordonnées des triangles en hauteurs à des positions connues
 		exemple : triangle sur une plateforme de depot"""
 		#modif coords
-		tri.coords[0] = (1 - self.__hcam / self.__hplat) * tri.coords[0] \
+		tri.coord[0] = (1 - self.__hcam / self.__hplat) * tri.coord[0] \
 							+ (self.__hcam / self.__hplat) * self.__xcam
-		tri.coords[1] = (1 - self.__hcam / self.__hplat) * tri.coords[1] \
+		tri.coord[1] = (1 - self.__hcam / self.__hplat) * tri.coord[1] \
 							+ (self.__hcam / self.__hplat) * self.__ycam
 		#reconversion en coords reelles
-		tri.real_coords = [i + j for i, j in zip(tri.rel_in_abs, self.__big_bot.getPosition())]
+		tri.real_coords = [i + j for i, j in zip(tri.rel_in_abs, self.__big_bot["getPosition"])]
+
+	def __outOfMap(self, tri):
+		return tri.real_coords[0] > 3000 or tri.real_coords[0] < 0\
+		or tri.real_coord[1] > 2000 or tri.real_coord[1] < 0
+
+	def __inFruitZone(self, tri):
+		return (tri.real_coords[0] > 400 and tri.real_coords[0] < 1100 and tri.real_coord[1] > 1700)\
+		or (tri.real_coords[0] > 1900 and tri.real_coords[0] < 2600 and tri.real_coord[1] > 1700)
+
 
 	def __inHighGround(self, tri):
 		#plateformes
-		if self.__p_in_circle((0, 0), 250, tri.real_coords) \
+		return self.__p_in_circle((0, 0), 250, tri.real_coords) \
 		or self.__p_in_circle((3000, 0), 250, tri.real_coords) \
-		or self.__p_in_circle((1500, 950), 150, tri.real_coords):
-			return True
-		else:
-			return False
+		or self.__p_in_circle((1500, 950), 150, tri.real_coords)
 
 	def __inStartZone(self, tri):
-		if self.__p_in_circle((0,1700), 400, tri.real_coords) or self.__p_in_circle((3000, 1700), 400, tri.real_coords):
-			return True
-		else:
-			return False
+		return (tri.real_coords[0] < 400 and tri.real_coord[1] > 1700) or (tri.real_coords[0] > 2600 and tri.real_coord[1] > 1700) \
+		or self.__p_in_circle((0,1700), 400, tri.real_coords) or self.__p_in_circle((3000, 1700), 400, tri.real_coords)
 
 	def __p_in_circle(self, center, radius, p):
 			# (x−p)2+(y−q)2<r2
-			if (p[0] - center[0]) ** 2 + (p[1] - center[1]) ** 2 < radius ** 2:
-				return True
-			else:
-				return False
+			return (p[0] - center[0]) ** 2 + (p[1] - center[1]) ** 2 < radius ** 2

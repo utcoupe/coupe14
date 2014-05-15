@@ -11,14 +11,14 @@ from xml.dom.minidom import parseString
 from collections import deque
 import sys
 import inspect, os
-import math
-
+from math import *
 
 from .goal import *
 from .ElemGoal import *
 from .navigation import *
 from .visio import *
-
+from .goalsLibrary import *
+from .goalsChoice import *
 
 class GoalsManager:
 	def __init__(self, SubProcessManager, connection, robot_name):
@@ -44,6 +44,17 @@ class GoalsManager:
 		self.__loadElemScript(base_dir+"/elemScripts.xml")
 		self.__loadGoals(base_dir+"/goals.xml")
 
+		self.__goalsLib = GoalsLibrary(self.__robot_name, self.__data, self.__blocked_goals, self.__PathFinding)
+		self.__goalsChoice = GoalsChoice(self.__robot_name, self.__data, self.__goalsLib, self.__our_color, self.__back_triangle_stack, self.__front_triangle_stack)
+
+
+		# Pour tester le déplacement du robot dans le simu lorsqu'il ne peut pas attraper un triangle
+		if TEST_MODE == True:
+			self.__hack_camera_simu_angle = 0
+			self.__hack_camera_simu_x = 0
+			self.__hack_camera_simu_y = 0
+
+		#Permet de faire une symétrie pour les ordres dans le cas où on commence en jaune
 		self.__reverse_table = {}
 		self.__reverse_table[(0,0)] = (1,1)
 		self.__reverse_table[(1,1)] = (0,0)
@@ -68,8 +79,16 @@ class GoalsManager:
 
 		self.__reverse_table[(10,0)]=(10,1)
 
+		self.__reverse_table[(11,0)]=(12,0)
+		self.__reverse_table[(11,1)]=(12,1)
+		self.__reverse_table[(12,0)]=(11,0)
+		self.__reverse_table[(12,1)]=(11,1)
+
+		self.__reverse_table[(13,0)]=(13,1)
+		self.__reverse_table[(13,1)]=(13,0)
+
 		if self.__robot_name == "FLUSSMITTEL" and TEST_MODE == False:
-			#self.__vision = Visio('../supervisio/build/visio', 0, '../supervisio/', self.__data["FLUSSMITTEL"])
+			self.__vision = Visio('../supervisio/visio', 0, '../config/visio/visio_robot/', self.__data["FLUSSMITTEL"], True)
 			self.__last_camera_color = None
 
 		self.__loadBeginScript()
@@ -78,41 +97,19 @@ class GoalsManager:
 		if not self.__blocked_goals:
 			self.__logger.debug(str(self.__robot_name)+" Recherche d'un nouvel objectif")	
 			self.__PathFinding.update(self.__data[self.__robot_name])
-			best_goal = ([], None, None) #type (path, id_goal, id_elem_goal)
-			best_length = float("Inf")
 
 			#On cherche l'elem goal le plus proche par bruteforce
 			if self.__available_goals:
-				for goal in self.__available_goals:
-					nb_elem_goal = goal.getLenElemGoal()
-					for idd in range(nb_elem_goal):
-						path = self.__getOrderTrajectoire(goal, idd)
-						if path != []:
-							length = self.__pathLen(path)
-							if length < best_length:
-								best_length = length
-								best_goal = (path, goal, idd)
+				best_goal = self.__goalsChoice.getBestGoal(self.__available_goals) #best_goal type (path, goal, id_elem_goal)
 
 				if best_goal[1] != None:
-					self.__logger.info("On a choisi l'objectif goal_id "+str(best_goal[1])+" elem_goal_id "+str(best_goal[2])+" avec le path "+str(best_goal[0]))
+					self.__logger.info("On a choisi l'objectif goal_id "+str(best_goal[1].getId())+" elem_goal_id "+str(best_goal[2])+" avec le path "+str(best_goal[0]))
 					self.__addGoal(best_goal[0], best_goal[1], best_goal[2])
 				else:
 					time.sleep(5)#TODO diminuer
 					self.__queueBestGoals()
 			else:
-				self.__logger.info(str(self.__robot_name)+" N'a plus aucun objectif disponible, GG !")
-
-	def __pathLen(self, path):
-		length = 0.0
-		begin_point = (0,0)
-		if path:
-			begin_point = path[0]
-
-		for point in path:
-			length += math.sqrt( (int(point[0])-int(begin_point[0]))**2 + (int(point[1])-int(begin_point[1]))**2 )
-			begin_point = point
-
-		return length
+				self.__logger.info(str(self.__robot_name)+" N'a plus aucun objectif disponible, GG (ou pas, y'a toujours un truc à faire) !")
 
 	#GOAL management from ID
 	def blockGoalFromId(self, id_objectif):
@@ -170,11 +167,14 @@ class GoalsManager:
 				orders = prev_action
 
 			#on ajoute la trajectoire calculé
-			orders.extend(self.__tupleTrajectoireToDeque(tuple_trajectoire_list))
+			orders.extend(self.__goalsLib.tupleTrajectoireToDeque(tuple_trajectoire_list[1:]))
 			orders.append( ("A_ROT", (goal.getElemGoalOfId(elem_goal_id).getPositionAndAngle()[2],)) )
 			#on ajoute attend d'être arrivé pour lancer les actions
 			orders.append( ("THEN", ()) )
-			orders.append( ("STEP_OVER", ()) )
+			
+			first_action_elem = goal.getElemGoalLocked().getFirstElemAction()
+			orders.extend(first_action_elem)
+			goal.getElemGoalLocked().removeFirstElemAction()
 
 			#on envoi le tout
 			if self.__id_objectif_send:
@@ -193,6 +193,7 @@ class GoalsManager:
 		self.__available_goals.append(goal)
 		self.__logger.info('Goal ' + goal.getName() + ' has been canceled and is now released')
 		self.__removeLastValueOfDeque(self.__id_objectif_send, goal.getId())
+		goal.getElemGoalLocked().resetElemAction()
 
 		if not fromEvent:
 			self.__SubProcessManager.sendDeleteGoal(goal.getId())
@@ -203,7 +204,10 @@ class GoalsManager:
 		if goal in self.__dynamique_finished_goals:	
 			self.__dynamique_finished_goals.remove(goal)
 			self.__finished_goals.append(goal)
-			self.__logger.info('Goal ' + goal.getName() + ' is finished')
+			if goal.getType() == "STORE_TRIANGLE":
+				self.__front_triangle_stack.clear()
+				self.__back_triangle_stack.clear()
+			self.__logger.info('Goal ' + str(goal.getName()) + " d'id "+str(goal.getId())+" is finished")
 			self.__queueBestGoals()
 		#Dans le cas où c'est l'autre robot qui à fait l'objectif
 		elif goal in self.__available_goals:
@@ -249,7 +253,7 @@ class GoalsManager:
 				removed_deque.appendleft(temp_value)
 
 		if find == True:
-			self.__logger.debug("On supprime la dernièrer occurance de "+str(value_to_remove)+" il reste "+str(deque_list))
+			self.__logger.debug("On supprime la dernière occurance de "+str(value_to_remove)+" il reste "+str(deque_list))
 		else:
 			self.__logger.warning("Impossible de supprimer la valeur "+str(value_to_remove)+" de la liste "+str(deque))
 
@@ -283,7 +287,7 @@ class GoalsManager:
 							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
 						elif (nb_front_stack < MAX_FRONT_TRIANGLE_STACK) and (nb_back_stack >= MAX_BACK_TRIANGLE_STACK):
 							self.__back_triangle_stack.popleft()
-							script_to_send.append( ("O_RET_OUVRIR", ()) )
+							script_to_send.append( ("O_RET", ()) )
 							self.__back_triangle_stack.append(self.__last_camera_color)
 							position = -1
 							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
@@ -305,27 +309,51 @@ class GoalsManager:
 						objectif.getElemGoalLocked().removeFirstElemAction()
 
 				else:
-					#self.__vision.update()
-					#triangle_list = self.__vision.getTriangles()
+					if TEST_MODE == False:
+						limite_essai_viso = 5
+						triangle_find = False
+						triangle_list = []
+						while limite_essai_viso != 0 and triangle_find == False:
+							limite_essai_viso -= 1
+							self.__vision.update()
+							triangle_list = self.__vision.getTriangles()
+							if triangle_list != []:
+								triangle_find = True
+								break
+					else:
+						triangle_find = True
 
-
-					#TODO remove this bypass:
-					#if triangle_list == []:
-					if False:
-
+					if triangle_find == False:
 						self.__logger.warning("On a pas vu de triangle à la position attendu, dont on va supprimer l'objectif "+str(id_objectif))
 						self.__last_camera_color = None
 						self.__deleteGoal(objectif)
 					else:
-						#TODO remove this bypass:
-						#triangle = triangle_list[0] #TODO, prendre le meilleur triangle suivent les arg
-						#data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
-						data_camera = ("RED", 220, 0)
+						if TEST_MODE == False:
+							min_distance = float("inf")
+							min_id = None
+							for i, triangle in enumerate(triangle_list):
+								distance = sqrt((triangle.coord[0]-220)**2 + (triangle.coord[1])**2)
+								if distance < min_distance:
+									min_distance = distance
+									min_id = i
+							triangle = triangle_list[i] 
+							data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
+						else:
+							# Coordonées du triangle par rapport au centre du robot
+							# sera corrigé par l'algo lors de la prise du premier triangle normalement
+							temp = (220, -100)
+							# Correction x y
+							temp_x = temp[0] + self.__hack_camera_simu_x
+							temp_y = temp[1] + self.__hack_camera_simu_y
+							# Rotation du robot
+							temp_x_rot = temp_x * cos(self.__hack_camera_simu_angle) - temp_y * sin(self.__hack_camera_simu_angle)
+							temp_y_rot = temp_x * sin(self.__hack_camera_simu_angle) + temp_y * cos(self.__hack_camera_simu_angle)
+							
+							data_camera = ("RED", temp_x_rot, temp_y_rot)
 
 
 						self.__last_camera_color = data_camera[0]
-
-						#si on aura la possibilité de le stcker
+						#si on a la possibilité de le stocker
 						if len(self.__front_triangle_stack)  >= MAX_FRONT_TRIANGLE_STACK:
 							self.__logger.warning("Impossible de stocker ce triangle dans le robot, la pile de devant est pleine.")
 							#Si besoin, on change la couleur du triangle pour la prochaine fois
@@ -340,6 +368,42 @@ class GoalsManager:
 								script_get_triangle.append( ("O_GET_BRAS_STATUS", ()) )
 								script_get_triangle.append( ("THEN", (),) )
 								self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
+							else:
+								coord_to_move_to = self.__getPosToHaveTriangle(data_camera[1], data_camera[2])
+								if coord_to_move_to != None:
+									find  = True
+									x, y, a = coord_to_move_to
+									x_abs, y_abs, a_abs = self.__data[self.__robot_name]["getPositionAndAngle"]
+									script_get_triangle = deque()
+
+									if TEST_MODE == True:
+										self.__hack_camera_simu_x -= x
+										self.__hack_camera_simu_y -= y
+										self.__hack_camera_simu_angle -= a
+
+									# Si on a besoin d'avancer, on vérifie avec le pathfinding
+									if x != 0 or y != 0:
+										self.__PathFinding.update(self.__data[self.__robot_name])
+										path = self.__PathFinding.getPath((x_abs, y_abs), (x+x_abs, y+y_abs), enable_smooth=True)
+										if len(path) == 2:
+											script_get_triangle.append( ("A_GOTOA", (path[1][0], path[1][1], a+a_abs)) ) 
+											script_get_triangle.append( ("STEP_OVER", (),) )
+											self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
+										elif len(path) > 2:
+											self.__logger.warning("Impossible d'attendre le triangle en ligne droite d'après PathFinding, data_camera: "+str(data_camera)+" path: "+str(path)+" x+x_abs: "+str(x+x_abs)+" y+y_abs "+str(y+y_abs)+" a+a_abs "+str(a+a_abs))
+											self.__deleteGoal(objectif)
+										else:
+											self.__logger.warning("Impossible d'attendre le triangle d'après PathFinding, data_camera: "+str(data_camera)+" path: "+str(path)+" x+x_abs: "+str(x+x_abs)+" y+y_abs "+str(y+y_abs)+" a+a_abs "+str(a+a_abs))
+											self.__deleteGoal(objectif)
+									 # Sinon on a besoin de juste tourner
+									else:
+										script_get_triangle.append( ("A_ROT", (a+a_abs,)) ) 
+										script_get_triangle.append( ("STEP_OVER", (),) )
+										self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
+								else:
+									self.__logger.warning("Impossible d'attendre le triangle d'après Alexis, data_camera: "+str(data_camera))
+									self.__deleteGoal(objectif)
+							
 			else:
 				self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), action_list)
 				objectif.getElemGoalLocked().removeFirstElemAction()
@@ -347,8 +411,85 @@ class GoalsManager:
 			self.__logger.warning("Pb, Il y a un STEP_OVER directement suivit d'un END ?")
 
 	def __positionReady(self, x, y):
-		#TODO
-		return True
+		x2 = x - CENTRE_BRAS_X
+		y2 = y - CENTRE_BRAS_Y
+		a, r = self.__toPolaire(x2, y2)
+		return self.__positionReadyPolaire(a, r)
+
+	def __positionReadyPolaire(self, a, r):
+		if a >= ANGLE_MIN and a <= ANGLE_MAX:
+			if r >= OUVERTURE_BRAS_MIN and r <= OUVERTURE_BRAS_MAX:
+				return True
+		return False
+
+	def __toCartesien(self, a, r):
+		return (r * cos(a), r * sin(a))
+	def __toPolaire(self, x, y):
+		return (atan2(y,x), hypot(x,y))
+
+	# To verify
+	def __getPosToHaveTriangle(self, x, y):
+		# "Sécurité", peut être enlevé à priori
+		"""
+		if __positionReady(x, y):
+			return 0
+		"""
+		# Variable à retourner en cartésien
+		r_to_go = 0
+		a_to_go = 0
+		
+		temp_x, temp_y = self.__toCartesien(ANGLE_MAX - ANGLE_MIN, OUVERTURE_BRAS_MAX - OUVERTURE_BRAS_MIN)
+		centre_zone_x = temp_x + CENTRE_BRAS_X
+		centre_zone_y = temp_y + CENTRE_BRAS_Y
+
+		if hypot(x, y) > hypot(CENTRE_BRAS_Y, CENTRE_BRAS_X + OUVERTURE_BRAS_MAX) - MARGE_OUVERTURE_BRAS_MAX_DEPLACEMENT:
+			# Il faut avancer
+			a, r = self.__toPolaire(x, y)
+			r_to_go = r - hypot(centre_zone_x, centre_zone_y)
+			r -= r_to_go
+			x, y = self.__toCartesien(a, r)
+
+		elif hypot(x, y) < hypot(CENTRE_BRAS_Y, CENTRE_BRAS_X) + MARGE_OUVERTURE_BRAS_MIN_DEPLACEMENT:
+			# Il faut reculer
+			a, r = self.__toPolaire(x, y)
+			r_to_go = hypot(centre_zone_x, centre_zone_y) - r
+			r += r_to_go
+			x, y = self.__toCartesien(a, r)
+
+		# Angle en degrés entre deux calculs
+		delta_a = 1
+
+		# i_* => itérateurs
+		i_x = x
+		i_y = y
+
+		somme_a = 0
+		nb_a = 0
+		stop = False
+
+		for i in range(int(-90/delta_a),int(90/delta_a)): # to modify
+			i_rot = radians(i*delta_a)
+			i_x = x * cos(i_rot) - y * sin(i_rot)
+			i_y = x * sin(i_rot) + y * cos(i_rot)
+			if self.__positionReady(i_x, i_y):
+				somme_a += i_rot
+				nb_a += 1
+				stop = True
+
+			# On s'arrête si on a déjà trouvé des positions et qu'on en trouve plus,
+			# pour ne pas que la moyenne tombe dans un "trou"
+			elif stop == True:
+				break
+
+		if nb_a == 0:
+			self.__logger.error("Fuck, impossible d'attraper le triangle !")
+			return None
+		else:
+			# Un - car on fait tourner le point (x,y) et non le robot
+			a_to_go = -somme_a / nb_a
+			x_to_go, y_to_go = self.__toCartesien(a_to_go, r_to_go)
+			#self.__logger.info("Nouvelle position pour attraper le triangle : ("+int(x_to_go)+','+int(y_to_go)+','+float(a_to_go)+')')
+			return (int(x_to_go), int(y_to_go), float(a_to_go))
 
 	def processBrasStatus(self, status_fin, id_objectif):
 		objectif = None
@@ -403,26 +544,33 @@ class GoalsManager:
 			name 			= str(xml_goal.getElementsByTagName('name')[0].firstChild.nodeValue) #nom explicite
 			type			= str(xml_goal.getElementsByTagName('type')[0].firstChild.nodeValue) #triangle, 
 			concerned_robot = str(xml_goal.getElementsByTagName('concerned_robot')[0].firstChild.nodeValue) #ALL, TIBOT, FLUSSMITTEL
-			x				= int(xml_goal.getElementsByTagName('x')[0].firstChild.nodeValue)
-			y				= int(xml_goal.getElementsByTagName('y')[0].firstChild.nodeValue)
+			x_objectif		= int(xml_goal.getElementsByTagName('x_objectif')[0].firstChild.nodeValue)
+			y_objectif		= int(xml_goal.getElementsByTagName('y_objectif')[0].firstChild.nodeValue)
+			angle_objectif	= float(xml_goal.getElementsByTagName('angle_objectif')[0].firstChild.nodeValue)
 
 			#On ajoute uniquement les objectifs qui nous concerne
 			if concerned_robot == "ALL" or concerned_robot == self.__robot_name:
-				goal = Goal(id, name, type, concerned_robot, x, y)
-				self.__available_goals.append(goal)
+				goal = Goal(id, name, type, concerned_robot, x_objectif, y_objectif)
+
+				#Hack pour ignore le premier triangle que le petit fait tombé
+				if (self.__our_color == "RED" and id == 0) or (self.__our_color == "YELLOW" and id == 1):
+					self.__finished_goals.append(goal)
+				else:
+					self.__available_goals.append(goal)
 
 				for elem_goal in xml_goal.getElementsByTagName('elem_goal'):
 					id			= int(elem_goal.getElementsByTagName('id')[0].firstChild.nodeValue)
-					x			= int(elem_goal.getElementsByTagName('x')[0].firstChild.nodeValue)
-					y			= int(elem_goal.getElementsByTagName('y')[0].firstChild.nodeValue)
+					x_elem		= int(elem_goal.getElementsByTagName('x_elem')[0].firstChild.nodeValue)
+					y_elem		= int(elem_goal.getElementsByTagName('y_elem')[0].firstChild.nodeValue)
 					angle		= float(elem_goal.getElementsByTagName('angle')[0].firstChild.nodeValue)
 					points		= int(elem_goal.getElementsByTagName('points')[0].firstChild.nodeValue)
 					priority	= int(elem_goal.getElementsByTagName('priority')[0].firstChild.nodeValue)
 					duration	= int(elem_goal.getElementsByTagName('duration')[0].firstChild.nodeValue)
 					color		= str(elem_goal.getElementsByTagName('color')[0].firstChild.nodeValue)
+					script_only	= bool(elem_goal.getElementsByTagName('script_only')[0].firstChild.nodeValue)
 					id_script	= int(elem_goal.getElementsByTagName('id_script')[0].firstChild.nodeValue)
 					
-					goal.appendElemGoal( ElemGoal(id, x, y, angle, points, priority, duration, color, self.__elem_script[id_script]) )
+					goal.appendElemGoal( ElemGoal(id, x_objectif+x_elem, y_objectif+y_elem, angle_objectif+angle, points, priority, duration, color, self.__elem_script[id_script]) )
 
 	def __loadBeginScript(self):
 		base_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -453,11 +601,17 @@ class GoalsManager:
 				arguments = raw_order[1:]
 				if order == "MYPOSITION_INFO":
 					if self.__our_color == "RED":
-						position_depart_speciale = (int(arguments[0]), int(arguments[1]), float(arguments[2]))
+						position_depart_speciale = (int(arguments[0]), int(arguments[1]))
 					else:
-						position_depart_speciale = (3000 - int(arguments[0]), int(arguments[1]), float(arguments[2]))
+						position_depart_speciale = (3000 - int(arguments[0]), int(arguments[1]))
+				elif order == "O_BALAI" and self.__our_color == "YELLOW":
+					arg = (int(arguments[0]) * -1,)
+					prev_action.append((order, arg))
 				elif order == "A_GOTO" and self.__our_color == "YELLOW":
 					arg = (3000 - int(arguments[0]), int(arguments[1]))
+					prev_action.append((order, arg))
+				elif order == "A_GOTOA" and self.__our_color == "YELLOW":
+					arg = (3000 - int(arguments[0]), int(arguments[1]), float(arguments[2])-1.57)
 					prev_action.append((order, arg))
 				else:
 					prev_action.append((order, arguments))
@@ -466,7 +620,7 @@ class GoalsManager:
 			for goal in self.__available_goals:
 				if goal.getId() == id_objectif:
 					find = True
-					path = self.__getOrderTrajectoire(goal, elem_goal_id, position_depart_speciale)
+					path = self.__goalsLib.getOrderTrajectoire(goal, elem_goal_id, position_depart_speciale)
 					if path != []:
 						self.__addGoal(path, goal, elem_goal_id, prev_action=prev_action)
 					else:
@@ -479,26 +633,4 @@ class GoalsManager:
 			if not find:
 				self.__logger.error(str(self.__robot_name) + " impossible de lui ajouter le goal d'id: " + str(id_objectif))
 	
-	def __getOrderTrajectoire(self, goal, elem_goal_id, position_depart_speciale=None):
-		"""Il faut mettre à jour les polygones avant d'utiliser cette fonction"""
-		if position_depart_speciale is not None:
-			position_last_goal = position_depart_speciale
-			self.__logger.debug("Position from position_depart_speciale" + str(position_last_goal))
-		elif self.__blocked_goals:
-			last_goal = self.__blocked_goals[-1]
-			position_last_goal = last_goal.getElemGoalLocked().getPositionAndAngle()
-			self.__logger.debug("Position from queue" + str(position_last_goal))
-		else:
-			position_last_goal = self.__data[self.__robot_name]["getPositionAndAngle"]
-			self.__logger.debug("Position from data" + str(position_last_goal))
 
-		position_to_reach = goal.getElemGoalOfId(elem_goal_id).getPositionAndAngle()
-		path = self.__PathFinding.getPath((position_last_goal[0], position_last_goal[1]), (position_to_reach[0], position_to_reach[1]), enable_smooth=True)
-
-		return path
-
-	def __tupleTrajectoireToDeque(self, tuple_trajectoire_list):
-		order_list = deque()
-		for tuple in tuple_trajectoire_list:
-			order_list.append(('A_GOTO', [tuple[0], tuple[1]]))
-		return order_list

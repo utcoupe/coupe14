@@ -31,6 +31,13 @@ bool use_act = true;
 volatile bool next_step = true; //Blocage entre les etapes
 volatile bool got_tri = false; //True si triangle en suspension
 
+void updateAct() {
+	if (use_act) {
+		updateBras();
+		callbackRet();
+	}
+}
+
 void initPins(){
 	pinMode(PIN_DEBUG_LED, OUTPUT);//led debug
 	digitalWrite(PIN_DEBUG_LED, HIGH);
@@ -54,22 +61,78 @@ void initPins(){
 void initAct() {
 	//Moteurs :
 	pump_motor.run(FORWARD);
-	cmdBrasServ(ANGLE_OUVERT, LONGUEUR_MAX);
-	servoRet.write(ANGLE_RET); 
+	cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
+	servoRet.write(150); 
 	pump(true);
 	stepperAsc.setAcceleration(AMAX_STEPPER);
 	stepperAsc.setMaxSpeed(VMAX_STEPPER);
 	stepperAsc.move(6000);
+	while (digitalRead(PIN_INT_HAUT_ASC) == 1) {
+		updateBras();
+	}
+	stepperAsc.setCurrentPosition(HAUTEUR_MAX*H_TO_STEP + MARGE_SECU_TOP);
+	topStop();
+	pump(false);
+	cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
+	servoRet.write(180); 
 	//attachInterrupt(INT_ASC_HAUT, topStop, FALLING); //Commenté à cause des micro-interuptions
 }
+
+void callbackRet(int use) {
+	static long time_end = 0;
+	static bool active = false;
+	long now = timeMillis();
+	if (use) { //Set timer
+		time_end = now + DELAY_RET;
+		servoRet.write(ANGLE_RET);
+		active = true;
+	} else if (active) { //update regulier
+		if (now >= time_end) {
+			servoRet.write(180);
+			setLastId();
+			active = false;
+		}
+	}
+}
+
 
 void stopAct() {
 	use_act = false;
 }
 
+bool readyForNext() {
+	if (action_en_cours == None) 
+		return true;
+	if (action_en_cours == TriPush && step > 4)
+		return true;
+	if (action_en_cours == BrasDepot && step > 7)
+		return true;
+	return false;
+}
+
+void getBrasDepot(int x, int y) {
+	if (readyForNext()) {
+		action_en_cours = BrasDepot;
+		step = -1;
+		x -= X_BRAS; y -= Y_BRAS;
+		double a = atan2(y, x);
+		int l = (int)sqrt(x*x + y*y);
+		cmdBrasDepot(a, l);
+	}
+}
+
+void getTriPush() {
+	if (readyForNext()) {
+		action_en_cours = TriPush;
+		step = -1;
+		cmdTriPush();
+	}
+}
+
 void getTriBordure() {
-	if (action_en_cours == None) {
+	if (readyForNext()) {
 		action_en_cours = TriBordure;
+		step = -1;
 		block = true;
 		cmdTriBordure();
 	}
@@ -83,8 +146,9 @@ void getTriBordureRepliBras() {
 }
 
 void getTri(long x, long y, int h) {
-	if (action_en_cours == None) {
+	if (readyForNext()) {
 		action_en_cours = BrasVentouse;
+		step = -1;
 		block = true;
 		x -= X_BRAS; y -= Y_BRAS;
 		double a = atan2(y, x);
@@ -111,14 +175,146 @@ void updateBras() {
 		case TriBordure:
 			cmdTriBordure();
 			break;
+		case TriPush:
+			cmdTriPush();
+			break;
+		case BrasDepot:
+			cmdBrasDepot();
+			break;
 		default:
 			break;
 	}
 }
 
+void cmdBrasDepot(double a, int l) {
+	static unsigned long time_end = 0;
+	static int hauteur_revele, longueur = 0;
+	static double angle = 0;
+	if (step == -1) { //Debut
+		angle = a;
+		longueur = l;
+		step = 0;
+		next_step = true;
+	}
+	//Temporisation
+	if (timeMicros() > time_end && time_end != 0) {
+		next_step = true;
+		time_end = 0;
+	}
+	if (next_step) {
+		next_step = false;
+
+		switch(step) {
+			case 0:
+				cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
+				pump(true);
+				time_end = timeMicros() + (long)DELAY_REPLI_BRAS2*1000;
+				step++;
+				break;
+			case 1:
+				cmdAsc(HAUTEUR_GARDE_DEPOT);
+				step++;
+				break;
+			case 2: {
+				hauteur_revele = getCurrentHauteur() + MARGE_PREHENSION; //On remontera toujours par rapport à la position actulle, pour eviter de pousser un triangles (petite perte pour grande securité)
+				int hauteur = MIN(HAUTEUR_MAX, hauteur_revele);
+				cmdAsc(hauteur);
+				step++;
+				break;
+			}
+			case 3:
+				cmdBrasServ(ANGLE_REPLI_TRI, LONGUEUR_BRAS_AVANT_DEPOT); //Pas d'attente ici, cela ne devrai pas etre la peine, sinon, implémenter time_end
+				step++;
+				time_end = timeMicros() + (long)DELAY_REPLI_BRAS2*1000;
+				break;
+			case 4:
+				cmdAsc(HAUTEUR_BRAS_DEPOT);
+				step++;
+				break;
+			case 5:
+				cmdBrasServ(angle, longueur); //Pas d'attente ici, cela ne devrai pas etre la peine, sinon, implémenter time_end
+				time_end = timeMicros() + (long)DELAY_SERVO_PUSH*1000;
+				step++;
+				break;
+			case 6:
+				pump(false);
+				time_end = timeMicros() + (long)DELAY_STOP_PUMP*1000;
+				step++;
+				break;
+			case 7: {
+				int hauteur = MIN(HAUTEUR_MAX, hauteur_revele - 30);
+				cmdAsc(hauteur);
+				step++;
+				setLastId();
+				break;
+				}
+			case 8:
+				cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
+				cmdAsc(HAUTEUR_GARDE_DEPOT);
+				step = -1;
+				action_en_cours = None;
+				break;
+		}
+	}
+}
+
+void cmdTriPush() {
+	static unsigned long time_end = 0;
+	static int hauteur_revele;
+	if (step == -1) { //Debut
+		step = 0;
+		next_step = true;
+	}
+	//Temporisation
+	if (timeMicros() > time_end && time_end != 0) {
+		next_step = true;
+		time_end = 0;
+	}
+	if (next_step) {
+		next_step = false;
+
+		switch(step) {
+			case 0: {
+				hauteur_revele = getCurrentHauteur() + MARGE_PREHENSION; //On remontera toujours par rapport à la position actulle, pour eviter de pousser un triangles (petite perte pour grande securité)
+				int hauteur = MIN(HAUTEUR_MAX, MAX(hauteur_revele, HAUTEUR_PUSH_TRI));
+				cmdAsc(hauteur);
+				step++;
+				break;
+			}
+			case 1:
+				cmdBrasServ(ANGLE_REPLI_TRI, LONGUEUR_PUSH_TRI); //Pas d'attente ici, cela ne devrai pas etre la peine, sinon, implémenter time_end
+				step++;
+				next_step = true;
+				break;
+			case 2:
+				cmdAsc(HAUTEUR_TRI_BORDURE);
+				step++;
+				break;
+			case 3:
+				//Pour rentrer ici, next_step doit etre mis à true par la fonction getTriBordureRepliBras()
+				cmdBrasServ(ANGLE_OUVERT, LONGUEUR_PUSH_TRI);
+				time_end = timeMicros() + (long)DELAY_SERVO_PUSH*1000;
+				step++;
+				break;
+			case 4:
+				cmdAsc(hauteur_revele);
+				cmdBrasServ(ANGLE_REPLI_TRI, LONGUEUR_MIN); //Pas d'attente ici, cela ne devrai pas etre la peine, sinon, implémenter time_end
+				step++;
+				setLastId(); 
+				break;
+			case 5: //On abaisse le bras sur les triangles du depot
+				cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
+				cmdAsc(HAUTEUR_GARDE_DEPOT); //On descend le bras pour bloquer les triangles
+				step = -1;
+				action_en_cours = None;
+				break;
+		}
+	}
+}
+
 void cmdTriBordure() {
 	static unsigned long time_end = 0;
-	if (step == -1) {
+	if (step == -1) { //Debut
 		step = 0;
 		next_step = true;
 		block = true;
@@ -132,13 +328,10 @@ void cmdTriBordure() {
 		next_step = false;
 
 		switch(step) {
-			case 0: {
-				int hauteur_revele = getCurrentHauteur() + MARGE_PREHENSION; //On remontera toujours par rapport à la position actulle, pour eviter de pousser un triangles (petite perte pour grande securité)
-				int hauteur = MIN(HAUTEUR_MAX, MAX(hauteur_revele, HAUTEUR_TRI_BORDURE));
-				cmdAsc(hauteur);
+			case 0: 
+				cmdAsc(HAUTEUR_MAX);
 				step++;
 				break;
-			}
 			case 1:
 				cmdBrasServ(ANGLE_OUVERT, LONGUEUR_TRI_BORDURE); //Pas d'attente ici, cela ne devrai pas etre la peine, sinon, implémenter time_end
 				step++;
@@ -149,7 +342,7 @@ void cmdTriBordure() {
 				step++;
 				break;
 			case 3:
-				setLastId(); //Fin de préhension
+				setLastId(); 
 				if (!block) {
 					//Pour rentrer ici, next_step doit etre mis à true par la fonction getTriBordureRepliBras()
 					cmdBrasServ(ANGLE_REPLI_TRI, LONGUEUR_TRI_BORDURE);
@@ -220,7 +413,6 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 				break;
 			case 2: 
 				//Remonter asc
-				setLastId(); //Fin de préhension
 				if (got_tri) {
 					if (!block) { //On continue
 						int hauteur = MAX(getCurrentHauteur() + MARGE_PREHENSION, abs(depot) + MARGE_DEPOT);
@@ -231,6 +423,8 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 						step++;
 						hauteur = MIN(hauteur, HAUTEUR_MAX);
 						cmdAsc(hauteur);
+					} else {
+						setLastId(); //Fin de préhension
 					}
 				} else { //Pas de triangles
 					pump(false);
@@ -243,11 +437,11 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 				//Se placer au bon rangement
 				if (depot > 0) { //Depot a l'arriere
 					cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
-					time_end = timeMicros() + (long)DELAY_REPLI_BRAS*1000;
+					time_end = timeMicros() + (long)DELAY_REPLI_BRAS_AVANT_POMPE*1000;
 				}
 				else {
 					cmdBrasServ(ANGLE_DEPOT_RET, LONGUEUR_DEPOT_RET);
-					time_end = timeMicros() + (long)(DELAY_REPLI_BRAS+SECU_DELAY_ROT_BRAS)*1000;
+					time_end = timeMicros() + (long)(DELAY_REPLI_BRAS_AVANT_POMPE+SECU_DELAY_ROT_BRAS)*1000;
 				}
 				step++;
 				break;
@@ -379,7 +573,7 @@ int getCurrentHauteur() {
 
 void ascInt() {
 	if (stepperAsc.distanceToGo() == 0) {
-		if (step == 2) {
+		if (step == 2 && action_en_cours == BrasVentouse) {
 			got_tri = false;
 		} 
 		Timer1.detachInterrupt();
@@ -387,10 +581,14 @@ void ascInt() {
 	}
 	if (digitalRead(PIN_INTERRUPT_BRAS) == 0) {
 		//On touche un triangle
-		if ((action_en_cours == BrasVentouse && step == 2) || (action_en_cours == None && step == -1)) {
+		if ((action_en_cours == BrasVentouse && step == 2)) {
 			Timer1.detachInterrupt();
 			next_step = true;
 			got_tri = true;
+			stepperAsc.move(0);
+		} else if ((action_en_cours == BrasDepot && step == 1) || (action_en_cours == None && step == -1)) {
+			Timer1.detachInterrupt();
+			next_step = true;
 			stepperAsc.move(0);
 		}
 	}

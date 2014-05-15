@@ -82,13 +82,13 @@ class MetaData():
 		if self.__in_funny_action == False:
 			self.__in_funny_action = True
 		else:
-			self.__logger.warning("Demande de debut funny action alors que funny action est déjà en cours.")
+			self.__logger.error("Demande de debut funny action alors que funny action est déjà en cours.")
 
 	def stopFunny(self):
 		if self.__in_funny_action == True:
 			self.__in_funny_action = False
 		else:
-			self.__logger.warning("Demande la fin de funny action alors que funny action est arreté.")
+			self.__logger.error("Demande la fin de funny action alors que funny action est arreté.")
 
 	def startCheckCollision(self):
 		self.__checkCollision = True

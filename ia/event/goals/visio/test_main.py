@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from visio import Visio
 import sys
 import time
@@ -7,7 +9,7 @@ try:
 except:
 	index = 0
 
-v = Visio('../../../../supervisio/visio', index, '../../../../supervisio/', None, False)
+v = Visio('../../../../supervisio/visio', index, '../../../../config/visio/visio_robot/', None, True)
 print('Visio started')
 
 while 1:

@@ -1,24 +1,22 @@
 #include "lidar.h"
 #include "global.h"
 #include "robot.h"
-#include "protocol/compat.h"
-#include "protocol/protocole_serial.h"
-#include "protocol/serial_switch.h"
+#include "communication.h"
+#include "compat.h"
 
+#include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
 #include <sys/time.h>
-
+#include <unistd.h>
 
 #ifdef SDL
 #include "gui.h"
 #endif
 
-
 void frame();
-
 
 static int use_protocol = 0;
 static struct lidar l1, l2;
@@ -29,9 +27,8 @@ static struct color l1Color, l2Color;
 long startTime, lastTime = 0;
 static struct coord robots[MAX_ROBOTS];
 
-
-static void catch_SIGINT(int signal){
-	printf("Closing lidar(s), please wait...\n");
+void exit_handler() {
+	printf("\n%sClosing lidar(s), please wait...\n", PREFIX);
 	struct itimerval it_val; //removing timer
 	it_val.it_value.tv_sec = 0;
 	it_val.it_value.tv_usec = 0;	
@@ -42,8 +39,12 @@ static void catch_SIGINT(int signal){
 	}
 	closeLidar(&l1);
 	closeLidar(&l2);
-	printf("Exitting\n");
-	exit(EXIT_SUCCESS);
+	printf("%sExitting\n", PREFIX);
+	kill(getppid(), SIGUSR1); //Erreur envoyee au pere
+}
+
+static void catch_SIGINT(int signal){
+	exit(EXIT_FAILURE);
 }
 
 static void catch_SIGALRM(int signal){
@@ -65,16 +66,12 @@ void resetTimer(){
 }
 
 int main(int argc, char **argv){
+	atexit(exit_handler);
 	
-	if(argc <= 1 || ( strcmp(argv[1], "red") != 0 && strcmp(argv[1], "blue") ) ){
-		fprintf(stderr, "usage: hokuyo {red|blue} [protocol]\n");
-		return EXIT_FAILURE;
+	if(argc <= 1 || ( strcmp(argv[1], "red") != 0 && strcmp(argv[1], "yellow") ) ){
+		fprintf(stderr, "usage: hokuyo {red|yellow} [path_pipe]\n");
+		exit(EXIT_FAILURE);
 	}
-
-	if (signal(SIGINT, catch_SIGINT) == SIG_ERR) {
-        fputs("An error occurred while setting a signal handler for SIGINT.\n", stderr);
-        return EXIT_FAILURE;
-    }
 
     if (signal(SIGALRM, catch_SIGALRM) == SIG_ERR) {
         fputs("An error occurred while setting a signal handler for SIGALRM.\n", stderr);
@@ -93,10 +90,9 @@ int main(int argc, char **argv){
 		posl2.x = -25;
 	}
 
-	
-
-	if (argc == 3 && strcmp(argv[2], "protocol") == 0) {
-		printf("Utilisation du protcole\n");
+	char *path = 0;
+	if (argc == 3) {
+		path = argv[2];
 		use_protocol = 1;
 	}
 
@@ -113,8 +109,7 @@ int main(int argc, char **argv){
 	#endif
 
 	if (use_protocol) {
-		printf("Lancement du thread protocole\n");
-		init_protocol_thread();
+		init_protocol(path);
 	}
 
 	startTime = timeMillis();
@@ -122,7 +117,7 @@ int main(int argc, char **argv){
 	while(1){
 		frame();
 	}
-	catch_SIGINT(0);
+	exit(EXIT_SUCCESS);
 }
 
 void frame(){
@@ -131,8 +126,12 @@ void frame(){
 	getPoints(&l1);
 	getPoints(&l2);
 	timestamp = timeMillis() - startTime;
-
-	//printf("Time since last measurement : %lims\n", timestamp-lastTime);
+	//printf("%sDuration : %lims\n", PREFIX, timestamp-lastTime);
+	if(lastTime != 0 && timestamp-lastTime > HOKUYO_WATCHDOG){
+		printf("%s WatchDog exceeded: %li > %li\n", PREFIX, timestamp-lastTime, (long int)HOKUYO_WATCHDOG);
+		restartLidar(&l1);
+		restartLidar(&l2);
+	}
 	//printf("nPoints:%i\n", l1.fm.n);
 	int nRobots = getRobots(l1.points, l1.fm.n, robots);
 	#ifdef SDL
@@ -147,7 +146,7 @@ void frame(){
 	printf("%li\n", timestamp);
 	fflush(stdout);
 	if (use_protocol){
-		pushCoords(robots, nRobots, timestamp);
+		pushResults(robots, nRobots, timestamp);
 	}
 	else{
 		printf("%s%li;%i", PREFIX, timestamp, nRobots);

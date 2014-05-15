@@ -10,6 +10,8 @@ def gui(com):
 	dic = com.getConst()
 	ordersArguments = dic['ordersArguments']
 	arguments = []
+	last_ordre = ''
+	last_arg = []
 
 	while 1:
 		try:
@@ -18,34 +20,60 @@ def gui(com):
 			arguments = []
 			order = str(input("Entre le nom ou le numéro d'un ordre:\n"))
 			if order:
+				if order == '.':
+					arguments = last_arg
+					order = last_ordre
 				if order[0] == 'A':
-					address = 2
+					address = 4
 				elif order[0] == 'O':
-					address = 1
-				elif order == 'GET_HOKUYO':
+					address = 3
+				elif order == 'T_GET_HOKUYO':
 					address = 6
 
 				if order == 'k':# arret d'urgence
 					com.sendOrderAPI(5, 'A_CLEANG', *arguments)
 				elif order == 'a':# arret d'urgence
-					arguments = [1000, 500]
-					com.sendOrderAPI(2, 'A_GOTO', *arguments)
-					arguments = [1000, -500]
-					com.sendOrderAPI(2, 'A_GOTO', *arguments)
-					arguments = [0, 0, 0]
-					com.sendOrderAPI(2, 'A_GOTOA', *arguments)
+					arguments = [0, 1000, 0]
+					com.sendOrderAPI(5, 'A_GOTO', *arguments)
+					arguments = [0, 0, 0, 0.0]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)
 				elif order == 'c':
 					com.sendOrderAPI(5, 'A_GET_CODER', *arguments)
 				elif order == 'p':
 					com.sendOrderAPI(5, 'A_GET_POS', *arguments)
 				elif order == 'r':
-					com.sendOrderAPI(5, 'A_RESET_POS', *arguments)
+					arguments = [0, 0, 0.0]
+					com.sendOrderAPI(5, 'A_SET_POS', *arguments)
 
 				elif order == 's':
-
-					for a in range(1000):
-						arguments = []
-
+					arguments = [0,2000,0]
+					com.sendOrderAPI(5, 'A_GOTO', *arguments)
+					arguments = [0,2300,-800]
+					com.sendOrderAPI(5, 'A_GOTO', *arguments)
+					arguments = [0,2000,-1000]
+					com.sendOrderAPI(5, 'A_GOTO', *arguments)
+					arguments = [0,1000,-1200]
+					com.sendOrderAPI(5, 'A_GOTO', *arguments)
+					arguments = [0,500,-900]
+					com.sendOrderAPI(5, 'A_GOTO', *arguments)
+					arguments = [0,0,0,0.0]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)
+					"""arguments = [0, 2000, 0, 3.14]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)
+					arguments = [0, 0, 0, 0.0]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)
+					arguments = [0, 2000, 0, 3.14]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)
+					arguments = [0, 0, 0, 0.0]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)
+					arguments = [0, 2000, 0, 3.14]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)
+					arguments = [0, 0, 0, 0.0]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)
+					arguments = [0, 2000, 0, 3.14]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)
+					arguments = [0, 0, 0, 0.0]
+					com.sendOrderAPI(5, 'A_GOTOA', *arguments)"""
 
 				elif order in com.orders:
 					if isinstance(order, (int)):
@@ -63,5 +91,7 @@ def gui(com):
 					com.sendOrderAPI(address, order, *arguments)	
 				else:
 					print("L'ordre n'a pas été trouvé dans les fichiers arduino")
-		except:
-			pass
+			last_ordre = order
+			last_arg = arguments
+		except Exception as e:
+			print(e)

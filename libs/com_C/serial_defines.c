@@ -27,24 +27,29 @@ void initSize()
 	ordreSize[A_SET_POS]=8;
 	ordreSize[A_GET_POS]=0;
 	ordreSize[A_GET_POS_ID]=0;
+	ordreSize[A_IS_BLOCKED]=0;
 
 	//OTHERS
 	//FM
-	ordreSize[O_RET_OUVRIR]=2;
-	ordreSize[O_RET_FERMER]=2;
+	ordreSize[O_RET]=2;
 	ordreSize[O_GET_TRIANGLE]=8;
 	ordreSize[O_STORE_TRIANGLE]=4;
 	ordreSize[O_GET_BRAS_STATUS]=2;
-	ordreSize[O_BRAS_OUVRIR]=2;
+	ordreSize[O_BRAS_OUVRIR_BAS]=2;
+	ordreSize[O_BRAS_OUVRIR_HAUT]=2;
 	ordreSize[O_BRAS_FERMER]=2;
+	ordreSize[O_DROP_TRIANGLE]=6;
 	//TIBOT
 	ordreSize[O_TIR_FILET]=2;
 	ordreSize[O_TIR_BALLE]=4; //Combien de balles ?
 	ordreSize[O_BALAI]=4; //Quel coté ?
+	ordreSize[O_JACK_STATE]=0;
+
+	//TOURELLE
+	ordreSize[T_GET_CAM]=0;
+	ordreSize[T_GET_HOKUYO]=0;
 
 	//GENERAL
-	ordreSize[GET_CAM]=0;
-	ordreSize[GET_HOKUYO]=0;
 	ordreSize[GET_LAST_ID]=0;
 
 	ordreSize[PAUSE]=0;

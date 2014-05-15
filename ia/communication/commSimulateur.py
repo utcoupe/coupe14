@@ -19,7 +19,8 @@ class CommSimulateur:
 		self.__readPipe()
 
 		if self.__input_buffer:
-			return self.__input_buffer.popleft()
+			temp = self.__input_buffer.popleft()
+			return temp
 		else:
 			return -1
 

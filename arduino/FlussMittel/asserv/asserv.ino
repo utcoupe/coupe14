@@ -23,13 +23,14 @@ void setup(){
 	TCCR3B = (TCCR3B & 0xF8) | 0x01 ;
 	TCCR1B = (TCCR1B & 0xF8) | 0x01 ;
 	initPins();
+	initSize();
 	SERIAL_MAIN.begin(57600, SERIAL_8O1);
 #ifdef DEBUG
 	Serial.begin(115200);
 	PDEBUGLN("BOOT");
 #endif
 	digitalWrite(LED_BLOCKED, LOW); //HIGH = eteinte
-	init_protocol();
+	protocol_blocking_reset();
 	digitalWrite(LED_BLOCKED, HIGH); //HIGH = eteinte
 	PDEBUGLN("INIT DONE");
 
@@ -41,9 +42,16 @@ void loop(){
 	if (timeStart - timeLED > 60*1000000) {
 		digitalWrite(LED_MAINLOOP, HIGH);
 	}
-		
+
 	//Action asserv
 	control.compute();
+
+	if (control.isBlocked()) {
+		digitalWrite(LED_BLOCKED, LOW); //Allume la led blocage 2s
+	} else {
+		digitalWrite(LED_BLOCKED, HIGH);
+	}
+
 
 	// zone programmation libre
 	int available = SERIAL_MAIN.available();

@@ -10,8 +10,9 @@
 #include "serial_types.h"
 
 extern unsigned char ordreSize[MAX_ORDRES];
+static bool init_done = false;
 
-void executeCmd(char serial_data){
+int executeCmd(char serial_data){
 	static char ID_recu;
 	static char ID_attendu = 0;
 	static unsigned char data[MAX_DATA];
@@ -24,16 +25,27 @@ void executeCmd(char serial_data){
 
 	static enum etape etape = wait_step;
 
+	int return_code = 0;
 	if((serial_data & PROTOCOL_BIT) == PROTOCOL_BIT){ //Si 0b1xxxxxxx
 		if((serial_data & 0x0F) == LOCAL_ADDR){ //Si début de paquet adressé au client
 			if ((serial_data & 0xF0) == RESET){ //Si demande de reset
 				ID_attendu = 0;
 				serial_send(RESET_CONF | LOCAL_ADDR);
-				//PDEBUGLN("RESET CONFIRME");
-			}
-			else{
+				PDEBUGLN("RESET CONFIRME PAR ARDUINO");
+				init_done = true;
+			} 
+			else if (init_done) {
 				etape = ID_step; //Sinon le message nous est adressé
 				client_concerne = true;
+			}
+			else if ((serial_data & 0xF0) == RESET_CONF){ //IA accepte reset
+				ID_attendu = 0;
+				PDEBUGLN("RESET CONFIRME PAR IA");
+				init_done = true;
+			}
+			else { //On nous envoit un ordre mais on est pas encore initilisé
+				etape = wait_step;
+				PDEBUGLN("Ordre recu mais protocole non initialisé");
 			}
 		}
 #ifdef FORWARD_ADDR
@@ -102,6 +114,7 @@ void executeCmd(char serial_data){
 			break;
 		}
 	}
+	return return_code;
 }
 
 //decode permet de décoder les données recues par la protocole, de manièe complète (plusieurs ordres par tramme. En revanche, le décodage est BEAUCOUP plus long.
@@ -228,27 +241,30 @@ void sendInvalid() {//renvoit le code de message invalide (dépend de la platefo
 	serial_send(END);
 }
 
-void protocol_reset(){
-	int reset = 0;
-	while (!reset) {
+void protocol_blocking_reset() {
+	unsigned char data;
+	long last_send = 0;
+	while (!init_done) {
+		data = generic_serial_read();
+		executeCmd(data);
 		long t = timeMillis();
-		serial_send(RESET | LOCAL_ADDR);
-		while (timeMillis() - t < 1000 && !reset) {
-			unsigned char data = generic_serial_read();
-			if (data == (RESET_CONF | LOCAL_ADDR)) {
-				reset = 1;
-			}
-			else if (data == (RESET | LOCAL_ADDR)) {
-				serial_send(RESET_CONF | LOCAL_ADDR);
-				reset = 1;
-			}
+		if (!init_done && (t - last_send > 1000)) {
+			last_send = t;
+			serial_send(RESET | LOCAL_ADDR);
 		}
 	}
-	PDEBUGLN("RESET");
 }
 
-void init_protocol(){
-	initSize();
-	protocol_reset();
+void protocol_send_reset(){
+	static long last_send = 0;
+	long t = timeMillis();
+	if (t - last_send > 1000) {
+		last_send = t;
+		serial_send(RESET | LOCAL_ADDR);
+		init_done = false; //On a dmeande un reste, on est plus initialisé
+	}
 }
 
+bool isInitDone() {
+	return init_done;
+}

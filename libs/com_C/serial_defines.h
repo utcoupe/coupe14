@@ -30,10 +30,9 @@ enum address{
 	//DEBUTPARSE
 	ADDR_FLUSSMITTEL_OTHER= 1,
 	ADDR_FLUSSMITTEL_ASSERV,
-	ADDR_FLUSSMITTEL_CAM,
 	ADDR_TIBOT_OTHER,
 	ADDR_TIBOT_ASSERV,
-	ADDR_HOKUYO,
+	ADDR_TOURELLE,
 	ADRESSE_NON_PARSE
 	//FINPARSE
 };
@@ -58,25 +57,31 @@ enum ordre {
 	A_SET_POS, //@int @int @float
 	A_GET_POS,	//#int #int #float
 	A_GET_POS_ID,	//#int #int #float #int
+	A_IS_BLOCKED, //#int
 
 	//OTHERS
 	//FM
-	O_RET_OUVRIR, //@int
-	O_RET_FERMER, //@int
+	O_RET, //@int
 	O_GET_TRIANGLE, //@int @int @int @int
 	O_STORE_TRIANGLE, //@int @int
 	O_GET_BRAS_STATUS, //@int #int
-	O_BRAS_OUVRIR, //@int
+	O_BRAS_OUVRIR_BAS, //@int
+	O_BRAS_OUVRIR_HAUT, //@int
 	O_BRAS_FERMER, //@int
+	O_DROP_TRIANGLE, //@int @int @int
 
 	//TIBOT
 	O_TIR_BALLE, //@int @int
 	O_TIR_FILET, //@int
 	O_BALAI, //@int @int
+	O_JACK_STATE, //#int
+
+	//TOURELLE
+	//x, y, tri_restants
+	T_GET_CAM,	//#int #int #int
+	T_GET_HOKUYO,	//#long #int #int #int #int #int #int #int #int
 
 	//GENERAL
-	GET_CAM,	//#int #int
-	GET_HOKUYO,	//#long #int #int #int #int #int #int #int #int
 	GET_LAST_ID, //#int
 
 	PAUSE,

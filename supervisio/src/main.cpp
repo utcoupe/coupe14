@@ -5,6 +5,7 @@
 #include <opencv2/opencv.hpp>
 
 #include "loop.h"
+#include "communication/com.h"
 
 using namespace cv;
 using namespace std;

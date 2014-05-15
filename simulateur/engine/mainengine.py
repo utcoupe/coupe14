@@ -33,6 +33,7 @@ class Engine:
 		self.physicsengine.add_collision_handler(COLLTYPE_BRAS, COLLTYPE_FEU, self.__on_collision_bras_feu)
 		self.physicsengine.add_collision_handler(COLLTYPE_BRAS_OUVRIR, COLLTYPE_FEU, self.__on_collision_bras_ouvrir_feu)
 		self.physicsengine.add_collision_handler(COLLTYPE_BRAS_FERMER, COLLTYPE_FEU, self.__on_collision_bras_fermer_feu)
+		self.physicsengine.add_collision_handler(COLLTYPE_BRAS_PETIT, COLLTYPE_FEU, self.__on_collision_bras_petit_feu)
 		self.physicsengine.add_collision_handler(COLLTYPE_PETIT_ROBOT, COLLTYPE_WALL, self.graphicsengine.draw_collision)
 		self.e_stop = threading.Event()
 		self.objects = []
@@ -130,6 +131,31 @@ class Engine:
 						feu.coucher('g','close')
 					else:
 						feu.coucher('d','close')
+
+	def __on_collision_bras_petit_feu(self, space, arb):
+		"""
+		Quand le bras du petit robot touche un feu
+		"""
+		robot = self.find_obj_by_shape(arb.shapes[0])
+		if not robot:
+			print("bras not found")
+		else:
+			feu = self.find_obj_by_shape(arb.shapes[1])
+			if not feu:
+				print("Feu not found")
+			else:
+				xR,yR = robot.getPositionPixel()
+				xF,yF = feu.getPositionPixel()
+				if(feu.getOrientation() == 'vert'):
+					if(xR < xF):
+						feu.coucher('g','open')
+					else:
+						feu.coucher('d','open')
+				else:
+					if(yR < yF):
+						feu.coucher('g','open')
+					else:
+						feu.coucher('d','open')
 
 	def stop(self):
 		self.e_stop.set()

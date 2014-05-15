@@ -81,6 +81,7 @@ class OurBot():
 	def getTrajectoires(self):
 		data_trajectoires = ()
 		trajectoire = ((self.__positionX, self.__positionY),)
+		last_point = (self.__positionX, self.__positionY)
 
 		#Pour les actions en cours d'execution
 		id_action_en_cours = None
@@ -89,6 +90,7 @@ class OurBot():
 			for order in self.__actions_en_cours[1]:
 				if order[1] == 'A_GOTO':
 					trajectoire += ((order[2][0], order[2][1]),)
+					last_point = (order[2][0], order[2][1])
 			if not self.__objectifs:
 				if len(trajectoire)>1:
 					data_trajectoires += ((id_action_en_cours, trajectoire),)
@@ -104,10 +106,14 @@ class OurBot():
 					trajectoire = ()
 			
 			for objectif in self.__objectifs:
+				#On ajoute le point du dernier goto sur l'objectif précedant
+				if trajectoire == ():
+					trajectoire = (last_point,)
 				id_objectif = objectif[0]
 				for order in objectif[1]:
 					if order[1] == 'A_GOTO':
 						trajectoire += ((order[2][0], order[2][1]),)
+						last_point = (order[2][0], order[2][1])
 				if len(trajectoire)>1:
 					data_trajectoires += ((id_objectif, trajectoire),)
 					trajectoire = ()
@@ -158,11 +164,11 @@ class OurBot():
 
 	def setLastId(self, address, idd):
 		if address == 'ADDR_FLUSSMITTEL_OTHER' or address == 'ADDR_TIBOT_OTHER':
-			if idd != self.__last_id_executed_other:
+			if idd != self.__last_id_executed_other and idd != -1:
 				self.__last_id_executed_other = idd
 				self.__logger.debug(str(self.__name)+" changement d'id other " + str(idd))
 		else:
-			if idd != self.__last_id_executed_asserv:
+			if idd != self.__last_id_executed_asserv and idd != -1:
 				self.__last_id_executed_asserv = idd
 				self.__logger.debug(str(self.__name)+" changement d'id asserv " + str(idd))
 
@@ -183,13 +189,12 @@ class OurBot():
 
 	def __castOrders(self, action_data):
 		data_objectif = deque()
-		print("action_data "+str(action_data))
 		for elm_action in action_data:
 			action = (-1,)
 			order = elm_action[0]
 			action += (order,)
 
-			if order not in ("SLEEP", "THEN", "STEP_OVER", "END", "DYNAMIQUE_OVER", "IA_GET_BRAS_STATUS"):
+			if order not in ("SLEEP", "THEN", "STEP_OVER", "END", "DYNAMIQUE_OVER", "IA_GET_BRAS_STATUS", "FUNNY_ACTION_LOCK"):
 				argument_type_list = self.__arduino_constantes['ordersArguments'][order]
 				arguments_temp = ()
 				for i, argument_type in enumerate(argument_type_list):
@@ -234,13 +239,17 @@ class OurBot():
 		if self.__actions_en_cours is not None:
 			order_of_objectif = self.__actions_en_cours[1] # il ne peut y avoir qu'un objectif à la fois
 			if order_of_objectif:
-				data_order = order_of_objectif.popleft() #type (id_action, ordre, arguments)
+				data_order = order_of_objectif[0] #type (id_action, ordre, arguments)
 				
-				while (self.maxRot(data_order[0], lastIddExecuted) == lastIddExecuted) and order_of_objectif:
+				while (self.maxRot(data_order[0], lastIddExecuted) != lastIddExecuted) and order_of_objectif:
 					data_order = order_of_objectif.popleft()
+
+				if order_of_objectif and order_of_objectif[0][0] == lastIddExecuted:
+					order_of_objectif.popleft()
 
 				if not order_of_objectif:
 					self.__actions_en_cours = None
+
 
 	def removeObjectifAbove(self, id_objectif):
 		"""remove all queued goal on top of id_objectif, id_objectif included"""
@@ -258,7 +267,9 @@ class OurBot():
 			if id_objectif == id:
 				removed_objectif = self.__objectifs.pop()
 				if removed_objectif[0] == id_objectif:
-					id_canceled_list.append(removed_objectif[0])
+					#Si on l'a déjà mis depuis action en cours on ne le rajoute pas
+					if id_canceled_list == []:
+						id_canceled_list.append(removed_objectif[0])
 				while removed_objectif[0] != id_objectif:
 					id_canceled_list.append(removed_objectif[0])
 					removed_objectif = self.__objectifs.pop()

@@ -9,11 +9,13 @@
 #endif
 
 #define MIN_SIZE 3000 //Attention, ici ce n'est pas la taille reelle mais la taille sur image originale
+#define MIN_REAL_SIZE 5000
+
 #define USE_MASK false
 
-#define RESIZE false 
-#define RESIZEW 320
-#define RESIZEH 240
+#define WIDTH 640
+#define HEIGHT 480
+#define CAM_FPS 20
 
 #define EPSILON_POLY 0.04
 #define MAX_DIFF_TRI_EDGE 50
@@ -39,5 +41,9 @@
 #define BLK_SAT_MAX 255
 #define BLK_VAL_MIN 0
 #define BLK_VAL_MAX 60
+
+#define DEFAULT_PERSPECTIVE_MATRIX_FILENAME "perspective_matrix.yml"
+#define DEFAULT_CAMERA_MATRIX_FILENAME "calibration_camera.yml"
+#define DEFAULT_PARAMS_FILENAME "params.yml"
 
 #endif

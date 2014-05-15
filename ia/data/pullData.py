@@ -6,9 +6,10 @@ Classe qui recupère les données de tous les objets
 import threading 
 import time
 import logging
+from constantes import *
 
 class PullData():
-	def __init__(self, Communication, Flussmittel, Tibot, SmallEnemyBot, BigEnemyBot, ComputeHokuyoData, Tourelle, PULL_PERIODE):
+	def __init__(self, Communication, Flussmittel, Tibot, SmallEnemyBot, BigEnemyBot, ComputeHokuyoData, Tourelle, MetaData):
 		self.__logger = logging.getLogger(__name__.split('.')[0])
 		self.Communication = Communication
 		self.Flussmittel = Flussmittel[0]
@@ -22,14 +23,21 @@ class PullData():
 		self.ComputeHokuyoData = ComputeHokuyoData
 		self.Tourelle = Tourelle[0]
 		self.address_tourelle = Tourelle[1]
-		self.PULL_PERIODE = PULL_PERIODE
+		self.MetaData = MetaData
 
 		self.__pull_data = True
 		self.__id_flussmittel_other_asked = False
+		self.__id_flussmittel_other_asked_date = 0
 		self.__data_flussmittel_asserv_asked = False
+		self.__data_flussmittel_asserv_asked_date = 0
 		self.__id_tibot_other_asked = False
+		self.__id_tibot_other_asked_date = 0
 		self.__data_tibot_asserv_asked = False
+		self.__data_tibot_asserv_asked_date = 0
 		self.tourelle_asked = False
+		self.tourelle_asked_date = 0
+		self.__jack_asked = False
+		self.__jack_asked_date = 0
 
 		self.__ThreadPull = threading.Thread(target=self.__gestion)
 
@@ -44,33 +52,44 @@ class PullData():
 		while self.__pull_data:
 			self.__readData()
 			self.__askData()
-			time.sleep(self.PULL_PERIODE/1000.0)
+			time.sleep(PULL_SYSTEM_PERIODE / 1000.0)
 
 	def __askData(self):
 		arguments = []
-
+		date = int(time.time()*1000)
+		
 		if self.Flussmittel is not None:
-			if self.__id_flussmittel_other_asked == False:
+			if self.__id_flussmittel_other_asked == False and (date - self.__id_flussmittel_other_asked_date) > PULL_PERIODE:
 				self.Communication.sendOrderAPI(self.address_flussmittel_other, 'GET_LAST_ID', *arguments)
 				self.__id_flussmittel_other_asked = True
+				self.__id_flussmittel_other_asked_date = date
 
-			if self.__data_flussmittel_asserv_asked == False:
+			if self.__data_flussmittel_asserv_asked == False and (date - self.__data_flussmittel_asserv_asked_date) > PULL_PERIODE:
 				self.Communication.sendOrderAPI(self.address_flussmittel_asserv, 'A_GET_POS_ID', *arguments)
 				self.__data_flussmittel_asserv_asked = True
+				self.__data_flussmittel_asserv_asked_date = date
 
 		if self.Tibot is not None:
-			if self.__id_tibot_other_asked == False:
+			if self.__id_tibot_other_asked == False and (date - self.__id_tibot_other_asked_date) > PULL_PERIODE:
 				self.Communication.sendOrderAPI(self.address_tibot_other, 'GET_LAST_ID', *arguments)
 				self.__id_tibot_other_asked = True
+				self.__id_tibot_other_asked_date = date
 
-			if self.__data_tibot_asserv_asked == False:
+			if self.__data_tibot_asserv_asked == False and (date - self.__data_tibot_asserv_asked_date) > PULL_PERIODE:
 				self.Communication.sendOrderAPI(self.address_tibot_asserv, 'A_GET_POS_ID', *arguments)
 				self.__data_tibot_asserv_asked = True
+				self.__data_tibot_asserv_asked_date = date
 				
 		if self.Tourelle is not None:
-			if self.tourelle_asked == False:
-				self.Communication.sendOrderAPI(self.address_tourelle, 'GET_HOKUYO', *arguments)
+			if self.tourelle_asked == False and (date - self.tourelle_asked_date) > PULL_PERIODE:
+				self.Communication.sendOrderAPI(self.address_tourelle, 'T_GET_HOKUYO', *arguments)
 				self.tourelle_asked = True
+				self.tourelle_asked_date = date
+
+		if self.__jack_asked == False and (date - self.__jack_asked_date) > PULL_PERIODE:
+			self.Communication.sendOrderAPI(self.address_tibot_other, 'O_JACK_STATE', *arguments)
+			self.__jack_asked = True
+			self.__jack_asked_date = date
 
 
 	def __readData(self):
@@ -110,21 +129,28 @@ class PullData():
 				system = None
 				self.__logger.error("un systeme non initilisé nous envoi des données")
 
-			if system is not None:
-				if order == 'A_GET_POS_ID':
-					system.setPositionAndId(address, arguments)
-				elif order == 'GET_LAST_ID':
-					system.setLastId(address, arguments[0])
-				elif order == 'O_GET_BRAS_STATUS':
-					system.setBrasStatus( arguments[0])
-				elif order == 'GET_HOKUYO':
-					system.majPositionHokuyo(arguments)
-				elif order == 'GET_CAM':
-					system.majCam(arguments)
-				elif order == 'A_GOTO':
-					pass	
+			if order == "O_JACK_STATE":
+				print(arguments)
+				if arguments[0] == 0:
+					self.MetaData.startMatch()
 				else:
-					self.__logger.warning("ce retour n'est pas implementé, address " + str(address) + " ordre " + str(order) + " arguments " + str(arguments))
+					self.__jack_asked = False
+			else:
+				if system is not None:
+					if order == 'A_GET_POS_ID':
+						system.setPositionAndId(address, arguments)
+					elif order == 'GET_LAST_ID':
+						system.setLastId(address, arguments[0])
+					elif order == 'O_GET_BRAS_STATUS':
+						system.setBrasStatus( arguments[0])
+					elif order == 'T_GET_HOKUYO':
+						system.majPositionHokuyo(arguments)
+					elif order == 'T_GET_CAM':
+						system.majCam(arguments)
+					elif order == 'A_GOTO':
+						pass	
+					else:
+						self.__logger.warning("ce retour n'est pas implementé, address " + str(address) + " ordre " + str(order) + " arguments " + str(arguments))
 
 			
 

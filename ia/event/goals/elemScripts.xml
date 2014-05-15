@@ -3,6 +3,12 @@
 	<elemScript><!--script récupèration triangle rouge avec mur-->
 		<id_script>0</id_script>
 		<orders>
+			<order>O_BRAS_OUVRIR_HAUT</order>
+			<order>THEN</order>
+			<order>O_BRAS_FERMER</order>
+			<order>THEN</order>
+			<order>SLEEP 1000</order>
+			<order>STEP_OVER</order>
 			<order>GET_TRIANGLE_IA</order>
 			<order>DYNAMIQUE_OVER</order>
 			<order>STORE_TRIANGLE_IA</order>
@@ -12,6 +18,12 @@
 	<elemScript><!--script récupèration triangle jaune avec mur -->
 		<id_script>1</id_script>
 		<orders>
+			<order>O_BRAS_OUVRIR_HAUT</order>
+			<order>THEN</order>
+			<order>O_BRAS_FERMER</order>
+			<order>THEN</order>
+			<order>SLEEP 1000</order>
+			<order>STEP_OVER</order>
 			<order>GET_TRIANGLE_IA</order>
 			<order>DYNAMIQUE_OVER</order>
 			<order>STORE_TRIANGLE_IA</order>
@@ -21,6 +33,10 @@
 	<elemScript><!--script récupèration triangle rouge sans mur -->
 		<id_script>2</id_script>
 		<orders>
+			<order>O_BRAS_OUVRIR_BAS</order>
+			<order>THEN</order>
+			<order>SLEEP 1000</order>
+			<order>STEP_OVER</order>
 			<order>GET_TRIANGLE_IA</order>
 			<order>DYNAMIQUE_OVER</order>
 			<order>STORE_TRIANGLE_IA</order>
@@ -30,6 +46,10 @@
 	<elemScript><!--script récupèration triangle jaune sans mur -->
 		<id_script>3</id_script>
 		<orders>
+			<order>O_BRAS_OUVRIR_BAS</order>
+			<order>THEN</order>
+			<order>SLEEP 1000</order>
+			<order>STEP_OVER</order>
 			<order>GET_TRIANGLE_IA</order>
 			<order>DYNAMIQUE_OVER</order>
 			<order>STORE_TRIANGLE_IA</order>
@@ -40,8 +60,69 @@
 		<id_script>4</id_script>
 		<orders>
 			<order>DYNAMIQUE_OVER</order>
-			<order>A_PWM 50 50 1000</order>
-			<order>A_PWM -50 -50 1000</order>
+			<order>A_PWM 50 50 750</order>
+			<order>A_PWM -50 -50 750</order>
+			<order>END</order>
+		</orders>
+	</elemScript>
+	<elemScript>
+		<id_script>5</id_script>
+		<orders>
+			<order>DYNAMIQUE_OVER</order>
+			<order>SLEEP 500</order>
+			<order>O_TIR_BALLE 1</order>
+			<order>THEN</order>
+			<order>O_TIR_BALLE 1</order>
+			<order>THEN</order>
+			<order>O_TIR_BALLE 1</order>
+			<order>THEN</order>
+			<order>O_TIR_BALLE 1</order>
+			<order>SLEEP 500</order>
+			<order>END</order>
+		</orders>
+	</elemScript>
+	<elemScript>
+		<id_script>6</id_script>
+		<orders>
+			<order>DYNAMIQUE_OVER</order>
+			<order>SLEEP 500</order>
+			<order>O_TIR_BALLE 1</order>
+			<order>THEN</order>
+			<order>O_TIR_BALLE 1</order>
+			<order>SLEEP 500</order>
+			<order>END</order>
+		</orders>
+	</elemScript>
+	<elemScript>
+		<id_script>7</id_script>
+		<orders>
+			<order>DYNAMIQUE_OVER</order>
+			<order>FUNNY_ACTION_LOCK</order>
+			<order>END</order>
+		</orders>
+	</elemScript>
+	<elemScript>
+		<id_script>8</id_script>
+		<orders>
+			<order>DYNAMIQUE_OVER</order>
+			<order>O_DROP_TRIANGLE 300 110</order>
+			<order>THEN</order>
+			<order>O_DROP_TRIANGLE 300 110</order>
+			<order>THEN</order>
+			<order>O_DROP_TRIANGLE 250 -50</order>
+			<order>THEN</order>
+			<order>A_ROT 1.57</order>
+			<order>A_PWM 50 50 150</order>
+			<order>A_ROT 1.57</order>
+			<order>O_RET</order>
+			<order>END</order>
+		</orders>
+	</elemScript>
+	<elemScript>
+		<id_script>9</id_script>
+		<orders>
+			<order>DYNAMIQUE_OVER</order>
+			<order>A_ROT 6.283</order>
 			<order>END</order>
 		</orders>
 	</elemScript>

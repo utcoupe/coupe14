@@ -13,6 +13,7 @@ from multiprocessing import Process, Pipe
 from define import *
 import test
 import main
+from constantes import *
 
 class ProcessIA():
 	"""
@@ -20,8 +21,18 @@ class ProcessIA():
 	"""
 	def __init__(self, color_and_robot_list):
 		self.__color = color_and_robot_list[0]
-		self.__bigrobot = color_and_robot_list[1]
-		self.__minirobot = color_and_robot_list[2]
+		if ENABLE_FLUSSMITTEL == True:
+			self.__bigrobot = color_and_robot_list[1]
+			if ENABLE_TIBOT == True:
+				self.__minirobot = color_and_robot_list[2]
+			else:
+				self.__minirobot = None
+		else:
+			self.__bigrobot =None
+			if ENABLE_TIBOT == True:
+				self.__minirobot = color_and_robot_list[1]
+			else:
+				self.__minirobot = None
 		self.__robots = color_and_robot_list
 		self.__hokuyo = Hokuyo(self.__robots[1:])
 		self.__communication = Communication(self.__bigrobot, self.__minirobot, self.__hokuyo, self)
