@@ -26,7 +26,7 @@
  * 
  * OPTIONS : '1' - '2 - '4' */
 
-#define ENCODER_EVAL 4
+#define ENCODER_EVAL 1
 
 #define FIXED_POINT_PRECISION 1000 //The robot's position is stocked with a precision of 1/FIXED_POINT_PRECISION ticks
 
@@ -36,8 +36,8 @@
 #define DUREE_CYCLE 5 //période de calcul, en ms
 #define FREQ (1/(DUREE_CYCLE/1000.0))
 
-#define ACC_MAX 40 //consigne*s-2
-#define RATIO_SPD_ROT_MAX 0.4
+#define ACC_MAX 120 //consigne*s-2
+#define RATIO_SPD_ROT_MAX 0.5
 
 /* CONSIGNE OFFSET
  * DEVRAIT ETRE A 0
@@ -50,7 +50,7 @@
  * envoyer des consignes en pwm au robot
  * partant de 0 et en augmentant progressivement
  * dès que le robot avance, la pwm min est trouvée */
-#define PWM_MIN 25
+#define PWM_MIN 20 
 
 #define CONSIGNE_MAX 100
 
@@ -61,32 +61,30 @@
 
 #define ENC_RESOLUTION 1024 //resolution du codeur
 
-#define ENC_LEFT_RADIUS 36.30 //rayon de la roue codeuse
+#define ENC_LEFT_RADIUS 36.50 //rayon de la roue codeuse
 #define ENC_RIGHT_RADIUS 36.50 //rayon de la roue codeuse
 #define ENTRAXE_ENC 189.7 // Distance entre chaque roue codeuse en mm
 
-#define ERROR_ANGLE 0.02 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
+#define ERROR_ANGLE 0.03 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
 #define ERROR_ANGLE_TO_GO 0.1 //erreur en angle(radians) maximale avant d'avancer
 #define ERROR_POS 10 // erreur en position (mm)  maximale pour considérer l'objectif comme atteint
 
 #define MAX_ANGLE 0.20  //~10° angle en dessous duquel on décrit une trajectoire curviligne (trop bas, le robot s'arretera constamment pour se recaler au lieu d'avancer, trop haut, les trajectoires seront très courbes voir meme fausses (overflow spd -> overflow pwm).
-#define ERREUR_MARCHE_ARRIERE PI
-#define D_MIN_ASSERV_ANGLE 40
-#define CONE_ALIGNEMENT (2*M_PI/3)
+#define CONE_ALIGNEMENT (2*M_PI)
 
 //Intégrales et dérivée sont calculée avec un intervalle de temps en SECONDES
 //Ne modifier que le nombre, laisser les DUREE_CYCLE
 
 
 //Le "I" devrait etre faible (ou nul), le "D" est à régler progressivement pour éviter le dépassement
-#define ANG_P 1000 //spd = P * E_ang(rad)
+#define ANG_P 300 //spd = P * E_ang(rad)
 #define ANG_I 0 //spd = I * I_ang(rad * s)
-#define ANG_D 180 //a regler par incrementation
+#define ANG_D 30 //a regler par incrementation
 #define ANG_AWU 0 //Anti-windup, en radian
 
-#define DIS_P 0.2 //spd = P * E_dis(mm)
+#define DIS_P 0.13 //spd = P * E_dis(mm)
 #define DIS_I 0 //spd = I * I_dis(mm * s)
-#define DIS_D 0.02 //a regler par incrementation
+#define DIS_D 0.01 //a regler par incrementation
 #define DIS_AWU 0 //Anti-windup, en mm
 
 //BLOCAGE
