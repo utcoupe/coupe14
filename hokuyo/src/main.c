@@ -2,7 +2,6 @@
 #include "global.h"
 #include "robot.h"
 #include "communication.h"
-#include "compat.h"
 
 #include <sys/types.h>
 #include <stdio.h>
