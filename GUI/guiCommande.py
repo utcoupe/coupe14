@@ -27,8 +27,8 @@ def gui(com):
 					address = 4
 				elif order[0] == 'O':
 					address = 3
-				elif order == 'T_GET_HOKUYO':
-					address = 6
+				elif order[0] == 'T':
+					address = 5
 
 				if order == 'k':# arret d'urgence
 					com.sendOrderAPI(4, 'A_CLEANG', *arguments)
