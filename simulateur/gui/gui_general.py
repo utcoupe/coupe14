@@ -90,7 +90,8 @@ class general(Frame):
 		for n in range(3):
 			bout = Button(Fbouton, text = liste_button[n])
 			if n == 0: #bouton start
-				bout.config(command=self.__minirobot_us.setStateJack)
+				if self.__minirobot_us is not None:
+					bout.config(command=self.__minirobot_us.setStateJack)
 			bout.grid(column = n, row = 0)
 		Fbouton.grid(column = 2, row = 0, sticky=N+S+W+E)
 
@@ -118,10 +119,18 @@ class general(Frame):
 		#! ajouter l'accès aux données de l'IA !
 		Fteam = LabelFrame(self, text="Team", bg="white")
 		labelfont = ('times', 20, 'bold')
-		if self.__bigrobot_us.getTeam() == RED:
-			equipe = Label(Fteam, text="Red", bg="red")
-		elif self.__bigrobot_us.getTeam() == YELLOW:
-			equipe = Label(Fteam, text="Yellow", bg="yellow")
+		if self.__bigrobot_us is not None:
+			if self.__bigrobot_us.getTeam() == RED:
+				equipe = Label(Fteam, text="Red", bg="red")
+			elif self.__bigrobot_us.getTeam() == YELLOW:
+				equipe = Label(Fteam, text="Yellow", bg="yellow")
+		elif self.__minirobot_us is not None:
+			if self.__minirobot_us.getTeam() == RED:
+				equipe = Label(Fteam, text="Red", bg="red")
+			elif self.__minirobot_us.getTeam() == YELLOW:
+				equipe = Label(Fteam, text="Yellow", bg="yellow")
+		else:
+			equipe = Label(Fteam, text="None", bg="grey")
 		equipe.config(font=labelfont, anchor=CENTER)
 		equipe.grid()
 		Fteam.grid(column = 1, row = 2, sticky=N+S)

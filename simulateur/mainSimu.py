@@ -26,7 +26,7 @@ import os
 DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(DIR_PATH, "..", "map"))
 sys.path.append(os.path.join(DIR_PATH, "..", "gui"))
-sys.path.append(os.path.join(DIR_PATH, "../../ia", "constantes"))
+sys.path.append(os.path.join(DIR_PATH, "../ia", "constantes"))
 
 
 import optparse
@@ -39,6 +39,7 @@ from map import maploader
 from objects import bigrobot, minirobot
 import processIA
 from constantes import *
+from gui import mainGUI
 
 
 if __name__ == "__main__":
@@ -50,7 +51,7 @@ if __name__ == "__main__":
 		"""
 
 		redIA = True
-		yellowIA= True
+		yellowIA= False
 
 #=========================================================
 #======= Pas besoin de toucher à la suite du code ========
@@ -83,18 +84,21 @@ if __name__ == "__main__":
 		robots_yellow = None
 
 		if redIA == True:
+			print('red ia')
 			if ENABLE_FLUSSMITTEL == True:
+				print('flussmittel')
 				if ENABLE_TIBOT == True:
+					print('ia red avec les 4 robots')
 					bigbotRed_flag = True
 					minibotRed_flag = True
 					robots_red = ("RED", bigbotRed, minibotRed, bigbotYellow, minibotYellow)
 				else:
 					bigbotRed_flag = True
-					robots_red = ("RED", bigbotRed, bigbotYellow, minibotYellow)
+					robots_red = ("RED", bigbotRed, None, bigbotYellow, minibotYellow)
 			else:
 				if ENABLE_TIBOT == True:
 					minibotRed_flag = True
-					robots_red = ("RED", minibotRed, bigbotYellow, minibotYellow)
+					robots_red = ("RED", None, minibotRed, bigbotYellow, minibotYellow)
 			#lancement de l'IA
 			processIA.ProcessIA(robots_red)
 		else:
@@ -109,11 +113,11 @@ if __name__ == "__main__":
 					robots_yellow = ("YELLOW", bigbotYellow, minibotYellow, bigbotRed, minibotRed)
 				else:
 					bigbotYellow_flag = True
-					robots_yellow = ("YELLOW", bigbotYellow, bigbotRed, minibotRed)
+					robots_yellow = ("YELLOW", bigbotYellow, None, bigbotRed, minibotRed)
 			else:
 				if ENABLE_TIBOT == True:
 					minibotYellow_flag = True
-					robots_yellow = ("YELLOW", minibotYellow, bigbotRed, minibotRed)
+					robots_yellow = ("YELLOW", None, minibotYellow, bigbotRed, minibotRed)
 			#lancement de l'IA
 			processIA.ProcessIA(robots_yellow)
 		else:

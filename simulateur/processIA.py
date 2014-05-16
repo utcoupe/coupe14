@@ -21,16 +21,16 @@ class ProcessIA():
 	"""
 	def __init__(self, color_and_robot_list):
 		self.__color = color_and_robot_list[0]
-		if ENABLE_FLUSSMITTEL == True:
+		if color_and_robot_list[1] is not None:
 			self.__bigrobot = color_and_robot_list[1]
-			if ENABLE_TIBOT == True:
+			if color_and_robot_list[2] is not None:
 				self.__minirobot = color_and_robot_list[2]
 			else:
 				self.__minirobot = None
 		else:
 			self.__bigrobot =None
-			if ENABLE_TIBOT == True:
-				self.__minirobot = color_and_robot_list[1]
+			if color_and_robot_list[2] is not None:
+				self.__minirobot = color_and_robot_list[2]
 			else:
 				self.__minirobot = None
 		self.__robots = color_and_robot_list
