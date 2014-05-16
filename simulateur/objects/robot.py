@@ -150,7 +150,7 @@ class Robot(EngineObjectPoly):
 		Ajoute l'ordre à la pile historique des ordres
 		"""
 		#filtrer les ordres useless
-		filtre_orders = ["PINGPING","PAUSE","RESUME","RESET_ID","GET_LAST_ID","A_GET_POS_ID","O_JACK_STATE"]
+		filtre_orders = ["PINGPING","PAUSE","RESUME","RESET_ID","GET_LAST_ID","A_GET_POS_ID","O_JACK_STATE","A_IS_BLOCKED"]
 		if order not in filtre_orders:
 			if len(args) == 0:
 				self.__time_stamp = (self.__get_milli() - self.__time_stamp_origine)/1000
