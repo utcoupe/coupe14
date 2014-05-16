@@ -1,9 +1,3 @@
-#include "lidar.h"
-#include "global.h"
-#include "robot.h"
-#include "communication.h"
-#include "compat.h"
-
 #include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,6 +5,12 @@
 #include <signal.h>
 #include <sys/time.h>
 #include <unistd.h>
+
+#include "global.h"
+#include "communication.h"
+#include "compat.h"
+#include "lidar.h"
+#include "robot.h"
 
 #ifdef SDL
 #include "gui.h"
@@ -29,6 +29,7 @@ static struct coord robots[MAX_ROBOTS];
 
 void exit_handler() {
 	printf("\n%sClosing lidar(s), please wait...\n", PREFIX);
+
 	struct itimerval it_val; //removing timer
 	it_val.it_value.tv_sec = 0;
 	it_val.it_value.tv_usec = 0;	
@@ -37,10 +38,11 @@ void exit_handler() {
 	if (setitimer(ITIMER_REAL, &it_val, NULL) == -1) {
 		perror("error calling setitimer()");
 	}
+
 	closeLidar(&l1);
 	closeLidar(&l2);
 	printf("%sExitting\n", PREFIX);
-	kill(getppid(), SIGUSR1); //Erreur envoyee au pere
+	//kill(getppid(), SIGUSR1); //Erreur envoyee au pere
 }
 
 static void catch_SIGINT(int signal){
@@ -65,16 +67,21 @@ void resetTimer(){
 	}
 }
 
-int main(int argc, char **argv){
-	atexit(exit_handler);
-	
+int main(int argc, char **argv){	
 	if(argc <= 1 || ( strcmp(argv[1], "red") != 0 && strcmp(argv[1], "yellow") ) ){
 		fprintf(stderr, "usage: hokuyo {red|yellow} [path_pipe]\n");
 		exit(EXIT_FAILURE);
 	}
 
+	atexit(exit_handler);
+
     if (signal(SIGALRM, catch_SIGALRM) == SIG_ERR) {
         fputs("An error occurred while setting a signal handler for SIGALRM.\n", stderr);
+        return EXIT_FAILURE;
+    }
+
+    if (signal(SIGINT, catch_SIGINT) == SIG_ERR) {
+        fputs("An error occurred while setting a signal handler for SIGINT.\n", stderr);
         return EXIT_FAILURE;
     }
 
@@ -120,6 +127,21 @@ int main(int argc, char **argv){
 	exit(EXIT_SUCCESS);
 }
 
+int getRobotsMerged(struct coord *points1, int n1, struct coord *points2, int n2, struct coord *robots){
+	int size1 = sizeof(struct coord)*n1, size2 = sizeof(struct coord)*n2;
+
+	struct coord *tmpPoints = malloc(size1+size2);
+	if(tmpPoints == NULL) exit(EXIT_FAILURE);
+
+	printf("getRobotMerged(): size1:%i, size2:%i\n", n1, n2);
+	memcpy( tmpPoints, points1, size1 );
+	memcpy( tmpPoints+n1, points2, size2 );
+	int r = getRobots(tmpPoints, n1+n2, robots);
+	free( tmpPoints );
+
+	return r;
+}
+
 void frame(){
 	resetTimer();
 	long timestamp;
@@ -131,9 +153,10 @@ void frame(){
 		printf("%s WatchDog exceeded: %li > %li\n", PREFIX, timestamp-lastTime, (long int)HOKUYO_WATCHDOG);
 		restartLidar(&l1);
 		restartLidar(&l2);
+		return ;
 	}
 	//printf("nPoints:%i\n", l1.fm.n);
-	int nRobots = getRobots(l1.points, l1.fm.n, robots);
+	int nRobots = getRobotsMerged(l1.points, l1.fm.n, l2.points, l2.fm.n, robots);
 	#ifdef SDL
 	blitMap();
 	blitLidar(l1.pos, l1Color);
@@ -143,12 +166,10 @@ void frame(){
 	blitPoints(l2.points, l2.fm.n, l2Color);
 	waitScreen();
 	#endif
-	printf("%li\n", timestamp);
 	fflush(stdout);
 	if (use_protocol){
 		pushResults(robots, nRobots, timestamp);
-	}
-	else{
+	} else {
 		printf("%s%li;%i", PREFIX, timestamp, nRobots);
 		for(int i=0; i<nRobots; i++){
 			printf(";%i:%i", robots[i].x, robots[i].y);

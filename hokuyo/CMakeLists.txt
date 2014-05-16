@@ -3,7 +3,9 @@ cmake_minimum_required(VERSION 2.8)
 project(hokuyo_client)
 
 FIND_PACKAGE(SDL REQUIRED)
-SET(CMAKE_C_FLAGS "-std=gnu99")
+SET(CMAKE_C_FLAGS "-std=gnu99 -pg -g")
+SET(CMAKE_EXE_LINKER_FLAGS "-pg -g")
+#SET(CMAKE_VERBOSE_MAKEFILE on)
 
 set(EXECUTABLE_OUTPUT_PATH bin/)
 set(EXEC_NAME hokuyo_client)

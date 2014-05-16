@@ -128,12 +128,9 @@ initLidar(enum lidarModel model, char* device, struct coord position, double ori
 }
 
 void closeLidar(struct lidar * l){
-	if (l != 0) {
-		if(l->model == hokuyo_urg){
-			if (l->lidarObject != 0) {
-				closeHokuyoUrg(l->lidarObject);
-			}
-		}
+	if (l != NULL && l->lidarObject != NULL) {
+		if(l->model == hokuyo_urg)
+			closeHokuyoUrg(l->lidarObject);
 	}
 }
 

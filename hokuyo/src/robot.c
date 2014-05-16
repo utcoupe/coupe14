@@ -2,47 +2,48 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
+
 
 int
 clusterize(struct coord *points, int n, int *group, int *groupNbPoints){
-	for(int i=0; i<n; i++){
-		group[i] = -1; 
-	}
 	int nbGroup = 0;
-	for(int i=MAX_AB_POINTS; i<n; i++) {
+	for(int i=1; i<n; i++) {
+		group[i] = -1;
 		//#ifndef DEBUG_DO_NOT_REMOVE_POINTS
 		if( points[i].x == 0 && points[i].y == 0) continue;
 		//#endif
 
 		int dmin = 35000, jmin = 0;
 		unsigned long d[MAX_AB_POINTS];
-		for(int j=1; j<=MAX_AB_POINTS; j++){
+		for(int j=0; j<i; j++){
 			#ifndef DEBUG_DO_NOT_REMOVE_POINTS
-			if( points[i-j].x == 0 && points[i-j].y == 0) continue;
+			if( points[j].x == 0 && points[j].y == 0) continue;
 			#endif
-			d[j-1] = pow(points[i].x-points[i-j].x, 2) + pow(points[i].y-points[i-j].y, 2);
-			if(d[j-1] < dmin){
-				dmin = d[j-1];
+			unsigned long d = pow(points[i].x-points[j].x, 2) + pow(points[i].y-points[j].y, 2);
+			if(d < dmin){
+				dmin = d;
 				jmin = j;
 			}
 		}
 		//printf("i:%i\n", i);
 		if(dmin < MAX_MIN_DIST*MAX_MIN_DIST){
 			//printf("i-jmin:%i\n", i-jmin);
-			if(group[i-jmin] == -1){
+			if(group[jmin] == -1){
 				//printf("group[%i]==%i, nbGroup==%i\n", i-jmin, group[i-jmin], nbGroup);
 				if(nbGroup+1 >= MAX_CLUSTERS) return MAX_CLUSTERS;				
 				groupNbPoints[nbGroup] = 0;
-				group[i-jmin] = nbGroup;
+				group[jmin] = nbGroup;
 				nbGroup++;
 			}
-			group[i] = group[i-jmin];
-			groupNbPoints[group[i-jmin]]++;
-			//printf("group= %i <- point[ %i ]; group_size= %i\n", group[i-jmin], i, groupNbPoints[group[i-jmin]]);
+			group[i] = group[jmin];
+			groupNbPoints[group[i]]++;
+			//printf("group= %i <- point[ %i ]; group_size= %i\n", group[i], i, groupNbPoints[group[i]]);
 		}
 	}
 	return nbGroup;
 }
+
 
 void
 bestClusters(int nbClusters, int *clustersNbPoints, int *bestClusters){
@@ -56,30 +57,38 @@ bestClusters(int nbClusters, int *clustersNbPoints, int *bestClusters){
 			}
 		}
 		//printf("BestGroup %i %i\n", currentMaxId, clustersNbPoints[currentMaxId]);
-		clustersNbPoints[currentMaxId] = 0;
+		clustersNbPoints[currentMaxId] = -clustersNbPoints[currentMaxId];
 		bestClusters[i] = currentMaxId;
+	}
+	for(int i=0; i<MAX_ROBOTS; i++){
+		clustersNbPoints[bestClusters[i]] = -clustersNbPoints[bestClusters[i]]; //needed, used by robotCenter
 	}
 }
 
 struct coord
-robotCenter(int * sizeSquarred, struct coord *points, int n, int *clusters, int clusterId){
-	int first = -1, second = -1, blast = 0, last = 0;
+robotCenter(int * sizeSquarred, struct coord *points, int n, int *clusters, int clusterId, int *clustersNbPoints){
+	struct coord center;
+	center.x = 0;
+	center.y = 0;
+	for(int i=0; i<n; i++){		
+		//printf("robot.c clusters[%i]=%i, clusterId=%i\n", i, clusters[i], clusterId);
+		if(clusters[i] != clusterId) continue;
+		center.x += points[i].x;
+		center.y += points[i].y;
+	}
+	//printf("robotCenter clustersNbPoints[%i]=%i\n", clusterId, clustersNbPoints[clusterId]);
+	center.x /= clustersNbPoints[clusterId];
+	center.y /= clustersNbPoints[clusterId];
+	unsigned long averageD = 0;
 	for(int i=0; i<n; i++){
 		if(clusters[i] != clusterId) continue;
-		
-		if(first < 0) first = i;
-		else if(second < 0) second = i;
-
-		blast = last;
-		last = i;
+		averageD += dist_squared(center, points[i]);
 	}
-	/*printf("group %i\tfirst %i :\tx:%i\ty:%i\n", clusterId, first, points[first].x, points[first].y);
-	printf("group %i\tlast  %i :\tx:%i\ty:%i\n", clusterId, last, points[last].x, points[last].y);*/
-	struct coord pos;
-	pos.x = ( points[first].x + points[second].x + points[blast].x + points[last].x ) / 4;
-	pos.y = ( points[first].y + points[second].y + points[blast].y + points[last].y ) / 4;
-	*sizeSquarred = pow(points[last].x-points[first].x, 2) + pow(points[last].y-points[first].y, 2); 
-	return pos;
+	averageD /= clustersNbPoints[clusterId];
+	*sizeSquarred = averageD;
+	if(averageD > INT_MAX) printf("ERROR: OVERFLOW\n");
+	
+	return center;
 }
 
 void
@@ -102,6 +111,7 @@ sortRobots(int n, int * sizes, struct coord * positions, struct coord *robots){
 int
 getRobots(struct coord *points, int n, struct coord *robots){
 	int clustersNbPoints[MAX_CLUSTERS];
+	//printf("robot.c malloc:%i\t%i\n", n, sizeof(int)*n);
 	int *clusters = malloc(sizeof(int)*n);
 	if(clusters == NULL) exit(EXIT_FAILURE);
 
@@ -127,7 +137,7 @@ getRobots(struct coord *points, int n, struct coord *robots){
 	struct coord positions[MAX_ROBOTS];
 
 	for(int i=0; i<nbClusters; i++){
-		positions[i] = robotCenter(&(size[i]), points, n, clusters, bestClustersId[i]);
+		positions[i] = robotCenter(&(size[i]), points, n, clusters, bestClustersId[i], clustersNbPoints);
 		//printf("%sCluster[%i] (%i,%i) size:%i\n", PREFIX, i, positions[i].x, positions[i].y, size[i]);
 	}
 	//printf("%sSort... nbClusters=%i\n", PREFIX, nbClusters);

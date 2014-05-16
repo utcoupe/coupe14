@@ -1,6 +1,8 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+//#define SDL
+
 #define PREFIX "[C-HK]  "
 
 
@@ -15,9 +17,10 @@
 #define MARKER_DETECTION_STEPS 20
 
 #define HOKUYO_WATCHDOG 120 /* ms */
+#define HOKUYO_NUMBER 2
 
 #define MAX_CLUSTERS 100 /*Ceux apres 100 seront abandonnés !*/
-#define MAX_AB_POINTS 15 /*Nombre de points abberants consecutifs max*/
+#define MAX_AB_POINTS 15 /*Nombre de points abberants consecutifs max, non pris en compte si HOKUYO_NUMBER > 1*/
 
 #define MAX_MIN_DIST 100	/*mm, distance max entre 2 points les plus proches dans un groupe*/
 
