@@ -53,6 +53,37 @@ class MiniRobot(Robot):
 
 		self.add_body_extension(self.avant)
 		self.__bras_used = None #pour savoir quel bras est sorti
+		self.__nbr_lances = 6
+		self.__filet = 1
+		self.__fresques = 2
+		self.__state_jack = 1  # jack in
+
+	def getStateJack(self):
+		return self.__state_jack
+
+	def setStateJack(self):
+		self.__state_jack = 0
+
+	def getNbrLances(self):
+		return self.__nbr_lances
+
+	def getFilet(self):
+		return self.__filet
+
+	def getNbrFresques(self):
+		return self.__fresques
+
+	def lancerBalle(self, nbr):
+		if self.__nbr_lances - nbr >= 0:
+			self.__nbr_lances -= nbr
+
+	def accrocherFresques(self):
+		if self.__fresques > 0:
+			self.__fresques -= 1
+
+	def tirFilet(self):
+		if self.__filet > 0:
+			self.__filet = 0
 
 	def ouvrirBras(self, position):
 		if position == 0:

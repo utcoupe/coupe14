@@ -35,6 +35,7 @@ class Engine:
 		self.physicsengine.add_collision_handler(COLLTYPE_BRAS_FERMER, COLLTYPE_FEU, self.__on_collision_bras_fermer_feu)
 		self.physicsengine.add_collision_handler(COLLTYPE_BRAS_PETIT, COLLTYPE_FEU, self.__on_collision_bras_petit_feu)
 		self.physicsengine.add_collision_handler(COLLTYPE_PETIT_ROBOT, COLLTYPE_WALL, self.graphicsengine.draw_collision)
+		self.physicsengine.add_collision_handler(COLLTYPE_PETIT_ROBOT, COLLTYPE_FRESQUE, self.__on_collision_mini_fresque)
 		self.e_stop = threading.Event()
 		self.objects = []
 		self.objects_to_remove = []
@@ -156,6 +157,20 @@ class Engine:
 						feu.coucher('g','open')
 					else:
 						feu.coucher('d','open')
+
+	def __on_collision_mini_fresque(self, space, arb):
+		"""
+		Quand le bras du petit robot touche un feu
+		"""
+		robot = self.find_obj_by_shape(arb.shapes[0])
+		if not robot:
+			print("bras not found")
+		else:
+			fresque = self.find_obj_by_shape(arb.shapes[1])
+			if not fresque:
+				print("Fresque not found")
+			else:
+				robot.accrocherFresques()
 
 	def stop(self):
 		self.e_stop.set()

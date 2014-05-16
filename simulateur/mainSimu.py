@@ -43,6 +43,19 @@ from constantes import *
 
 if __name__ == "__main__":
 
+#====================Activation des IA====================
+		"""
+		Mettre à Flase l'IA qu'on veut désactiver.
+		Ne pas toucher au reste du code.
+		"""
+
+		redIA = True
+		yellowIA= True
+
+#=========================================================
+#======= Pas besoin de toucher à la suite du code ========
+#=========================================================
+
 		engine = Engine()
 		match = match.Match()
 
@@ -60,21 +73,14 @@ if __name__ == "__main__":
 							   posinit = mm_to_px(3000-100,690),
 							   team = YELLOW)
 
-#====================Activation des IA====================
-		"""
-		Mettre à Flase l'IA qu'on veut désactiver.
-		Ne pas toucher au reste du code.
-		"""
-		redIA = True
-		yellowIA = False
-
-#=========================================================
 		#ne pas toucher des drapaux !
 		bigbotRed_flag = False
 		minibotRed_flag = False
 		bigbotYellow_flag = False
 		minibotYellow_flag = False
 
+		robots_red = None
+		robots_yellow = None
 
 		if redIA == True:
 			if ENABLE_FLUSSMITTEL == True:
@@ -89,8 +95,7 @@ if __name__ == "__main__":
 				if ENABLE_TIBOT == True:
 					minibotRed_flag = True
 					robots_red = ("RED", minibotRed, bigbotYellow, minibotYellow)
-			#robots_red = ("RED", bigbotRed, minibotRed, bigbotYellow, minibotYellow)
-			#mainGUI.GUISimu(robots_red)
+			#lancement de l'IA
 			processIA.ProcessIA(robots_red)
 		else:
 			bigbotRed_flag = True
@@ -109,8 +114,7 @@ if __name__ == "__main__":
 				if ENABLE_TIBOT == True:
 					minibotYellow_flag = True
 					robots_yellow = ("YELLOW", minibotYellow, bigbotRed, minibotRed)
-			#robots_yellow = ("YELLOW", bigbotYellow, minibotYellow, bigbotRed, minibotRed)
-			#mainGUI.GUISimu(robots_yellow)
+			#lancement de l'IA
 			processIA.ProcessIA(robots_yellow)
 		else:
 			bigbotYellow_flag = True
@@ -133,9 +137,14 @@ if __name__ == "__main__":
 		t.start()
 
 		#start de la GUI
-		#guiRed = mainGUI.GUISimu(robots_red)
-		#threading.Thread(target=guiRed.start).start()
-		#guiRed.start()
+		if robots_red != None:
+			gui = mainGUI.GUISimu(robots_red)
+			gui.start()
+		elif robots_yellow != None:
+			gui = mainGUI.GUISimu(robots_yellow)
+			gui.start()
+		else:
+			print('Manque IA pour démarrer la GUI')
 
 		while not engine.e_stop.is_set():
 				try:

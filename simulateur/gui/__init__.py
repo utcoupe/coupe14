@@ -15,6 +15,11 @@
 __author__ = "Thomas Fuhrmann"
 __copyright__ = "Copyright 2013, UTCoupe 2014"
 
+import sys
+import os
+DIR_PATH = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(DIR_PATH, "..", "gui"))
+
 from tkinter import *
 import gui_general
 import gui_robots
@@ -22,10 +27,10 @@ import gui_actions
 import gui_actionneurs
 
 if __name__ == '__main__':
-    fen = Tk()
-    fen.title("Test de GUI pour le simulateur")
-    wids = gui_general.general(fen)
-    robots = gui_robots.robots(fen)
-    actions = gui_actions.actions(fen)
-    effecteur = gui_actionneurs.actionneurs(fen)
-    fen.mainloop()
+	fen = Tk()
+	fen.title("Test de GUI pour le simulateur")
+	wids = gui_general.general(fen)
+	robots = gui_robots.robots(fen)
+	actions = gui_actions.actions(fen)
+	effecteur = gui_actionneurs.actionneurs(fen)
+	fen.mainloop()
