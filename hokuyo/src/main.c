@@ -45,7 +45,7 @@ int main(int argc, char **argv){
 		exit(EXIT_FAILURE);
 	}
 
-	if (signal(SIGALRM, catch_SIGALRM) == SIG_ERR) {
+	if (signal(SIGINT, catch_SIGINT) == SIG_ERR) {
         fputs("An error occurred while setting a signal handler for SIGINT.\n", stderr);
 		exit(EXIT_FAILURE);
     }
