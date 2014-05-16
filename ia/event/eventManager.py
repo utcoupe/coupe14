@@ -60,13 +60,10 @@ class EventManager():
 
 		#On attend le debut de la funny action
 		while self.__MetaData.getInFunnyAction() == False:
-			self.__logger.info("On est en fin de match")
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
 		#Pendant la funny action
 		while self.__MetaData.getInFunnyAction() == True:
-			print("Funny Action")
-			self.__logger.info("On est en funny action")
 			if self.__filet_fired == False and self.__Tibot is not None:
 				arg = [42,]# 42 est un nombre aleatoire
 				self.__Communication.sendOrderAPI("ADDR_TIBOT_OTHER", "O_TIR_FILET", *arg)
