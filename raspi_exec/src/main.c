@@ -31,6 +31,10 @@
 static char pipe_hok[255], pipe_cam[255];
 static pid_t pid_hokuyo = 0, pid_cameras = 0;
 
+void sig_handler() {
+	exit(EXIT_SUCCESS);
+}
+
 void exit_handler() {
 	static int done = 0;
 	if (!done) {
@@ -90,7 +94,7 @@ int main(int argc, char **argv) {
 		strcat(exec, "/hokuyo/hokuyo");
 
 		printf("%d - Hokuyo starting...\n", getpid());
-		execl(exec, "hokuyo", color, path, (char *)NULL);
+		//execl(exec, "hokuyo", color, path, (char *)NULL);
 	} else {
 		printf("%d - Spawned hokuyo, pid %d\n", getpid(), pid_hokuyo);
 
@@ -105,8 +109,8 @@ int main(int argc, char **argv) {
 			printf("%d - Cameras starting...\n", getpid());
 			execl(exec, "python3", file, path, color, (char *)NULL);
 		} else {
-			signal(SIGUSR1, exit_handler);
-			signal(SIGINT, exit_handler);
+			signal(SIGUSR1, sig_handler);
+			signal(SIGINT, sig_handler);
 			atexit(exit_handler);
 			printf("%d - Spawned cameras, pid %d\n", getpid(), pid_cameras);
 			//Suite du main
