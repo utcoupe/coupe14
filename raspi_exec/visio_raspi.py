@@ -94,9 +94,14 @@ if __name__ == '__main__':
 			tourelle = Tourelle()
 			v_centre = visio.Visio(path_to_exec, index, config_path, tourelle, True)
 			v_coin = visio.Visio(path_to_exec, index+1, config_path, tourelle, True)
+			print('[CAM ]  Successfully opened visio on ports', index, 'and', index+1)
 			success = True
 		except BaseException as e:
 			print("[CAM ]  Failed to open visio programs : "+str(e))
+			if v_centre is not None:
+				v_centre.close()
+			if v_coin is not None:
+				v_coin.close()
 			index += 1
 
 	if not success:
