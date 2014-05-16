@@ -67,13 +67,15 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 				memcpy(data, lastCamData, last_cam_nbr*sizeof(struct camData));
 				datas_left = last_cam_nbr;
 				pthread_mutex_unlock(&mutexCam);
+				current_index = 0;
 			}
-
 			datas_left--;
 			itob(data[current_index].x, ret);
 			itob(data[current_index].y, ret+2);
 			itob(datas_left, ret+4);
-			current_index++;
+			if (datas_left > 0) {
+				current_index++;
+			}
 			ret_size = 6;
 			break;
 			}

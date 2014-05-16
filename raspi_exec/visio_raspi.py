@@ -34,7 +34,7 @@ def compute(v_centre, v_coin):
 	inter = time.time()
 	print('[CAM ]  Got', len(triangles), 'triangles from centre in', inter - start, 'sec')
 	triangles_coin = v_coin.update()
-	print('[CAM ]  Got', len(triangles_coin), 'triangles from centre in', time.time() - inter, 'sec')
+	print('[CAM ]  Got', len(triangles_coin), 'triangles from coin in', time.time() - inter, 'sec')
 	for tri in triangles_coin:
 		for t in triangles:
 			if tri.dist2(t) < DIST_SAME_TRI:
@@ -54,8 +54,9 @@ def send(triangles, pipe):
 			int_color = 2
 		else:
 			int_color = -1
-		pipe.write(str(tri.coord[0]) + " " + str(tri.coord[1]) + " " + str(tri.angle) \
-					+ " " + str(tri.size) + " " + str(int_color) + " " + str(int(tri.isDown)) + "\n")
+		#pipe.write(str(tri.coord[0]) + " " + str(tri.coord[1]) + " " + str(tri.angle) \
+					#+ " " + str(tri.size) + " " + str(int_color) + " " + str(int(tri.isDown)) + "\n")
+	pipe.write("1 2 3 5000 1 0\n")
 	pipe.write('END\n')
 	pipe.flush()
 
