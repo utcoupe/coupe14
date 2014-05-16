@@ -34,6 +34,7 @@ class general(Frame):
 	def __init__(self, fenetre, bots, **kwargs):
 		"""
 		@param fenetre : frame de la fenêtre principale
+		@param bots : liste des robots (our_big,our_mini,en_big,en_mini)
 		"""
 		Frame.__init__(self, fenetre, width=300, height=700, bg="yellow")
 		#données
@@ -43,7 +44,7 @@ class general(Frame):
 		self.__bigrobot_us = bots[1]
 		self.__minirobot_us = bots[2]
 
-		#reste
+		#frames
 		self.grid()
 		self.mode()
 		self.boutons()
@@ -53,6 +54,9 @@ class general(Frame):
 		threading.Thread(target=self.__timeThread).start()
 
 	def __timeThread(self):
+		"""
+		Thread qui compte le temps (pour l'affichage)
+		"""
 		while 1:
 			self.__temps_ecoule.set(str(self.__time_count))
 			self.__temps_restant.set(str(90 - self.__time_count))
@@ -129,7 +133,7 @@ class general(Frame):
 		#! ajouter l'accès aux données de l'IA !
 		Fpoints = LabelFrame(self, text="Nombre de points", bg="pink")
 		labelfont = ('times', 20, 'bold')
-		points = Label(Fpoints, text="00")
+		points = Label(Fpoints, text="xx")
 		points.config(font=labelfont, anchor=CENTER)
 		points.grid(column=0, padx=35)
 		Fpoints.grid(column = 2, row = 2, sticky=N+S)

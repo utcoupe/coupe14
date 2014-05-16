@@ -27,17 +27,19 @@ class actions(Frame):
 	def __init__(self, fenetre, bots, **kwargs):
 		"""
 		@param fenetre : frame de la fenêtre principale
+		@param bots : liste des robots (our_big,our_mini,en_big,en_mini)
 		"""
 		Frame.__init__(self, fenetre, width=300, height=700, bg="green")
+		#données
 		self.__bigrobot_us = bots[1]
 		self.__minirobot_us = bots[2]
 		self.__bigrobot_en = bots[3]
 		self.__minirobot_en = bots[4]
+		self.__liste_todo_big = []
+		self.__liste_todo_mini = []
 
 		#view
 		self.grid()
-		self.__liste_todo_big = []
-		self.__liste_todo_mini = []
 		self.frame_actions(robot="big", liste="todo")
 		self.frame_actions(robot="mini", liste="todo")
 
@@ -45,6 +47,9 @@ class actions(Frame):
 		threading.Thread(target=self.__pullOrders).start()
 
 	def __pullOrders(self):
+		"""
+		Thread pour pull les données du robot
+		"""
 		while 1:
 			#pour le gros
 			if len(self.__liste_todo_big) == 0: #cas où la liste est vide
@@ -113,6 +118,9 @@ class actions(Frame):
 				return 1
 
 	def __listbox_cliqued(self, event):
+		"""
+		Permet de désactiver l'autoscroll des listbox
+		"""
 		self.__autoscroll_on = False
 
 	def liste_actions(self, robot, type_liste, parent):

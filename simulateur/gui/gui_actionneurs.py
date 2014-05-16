@@ -27,6 +27,7 @@ class actionneurs(LabelFrame):
 	def __init__(self, fenetre, bots, *args):
 		"""
 		@param fenetre : frame de la fenêtre principale
+		@param bots : liste des robots (our_big,our_mini,en_big,en_mini)
 		"""
 		LabelFrame.__init__(self, fenetre, text="Actionneurs et capteurs", width=300, height=100, bg="white")
 		self.grid(sticky=W+E)
@@ -38,16 +39,14 @@ class actionneurs(LabelFrame):
 		self.__balles_mini = StringVar()
 		self.__filet_mini = StringVar()
 		self.__fresques_mini = StringVar()
-		#Frobots_big = LabelFrame(self, text="Donnees bigrobot", bg="blue")
-		#self.display_actionneurs_big(0, Frobots_big)
 		self.display_actionneurs_big(0, self)
-		#Frobots_big.grid(column=0, row=0, sticky=E + W)
-		#Frobots_mini = LabelFrame(self, text="Donnees minirobot", bg="yellow")
 		self.display_actionneurs_mini(1, self)
-		#Frobots_mini.grid(column=1, row=0, sticky=E + W)
 		threading.Thread(target=self.__pullDataRobots).start()
 
 	def __pullDataRobots(self):
+		"""
+		Thread pour pull les données du robot
+		"""
 		while 1:
 			self.__feu_av_big.set('N feu av : ' + str(self.__bigrobot_us.getFeuxAvant()))
 			self.__feu_ar_big.set('N feu ar : ' + str(self.__bigrobot_us.getFeuxArriere()))
@@ -62,7 +61,6 @@ class actionneurs(LabelFrame):
 		@param colonne : numéro de la colonne
 		@param parent : frame parent
 		"""
-		#! ajouter l'accès aux données de l'IA !
 		Frobot = LabelFrame(self, text='Données gros', bg="blue")
 		self.__feu_av_big_label = Label(Frobot, textvariable=self.__feu_av_big)
 		self.__feu_av_big_label.grid(row=0)
@@ -76,7 +74,6 @@ class actionneurs(LabelFrame):
 		@param colonne : numéro de la colonne
 		@param parent : frame parent
 		"""
-		#! ajouter l'accès aux données de l'IA !
 		Frobot = LabelFrame(self, text='Données mini', bg="yellow")
 		self.__balles_mini_label = Label(Frobot, textvariable=self.__balles_mini)
 		self.__balles_mini_label.grid(row=0)
@@ -85,4 +82,3 @@ class actionneurs(LabelFrame):
 		self.__fresques_mini_label = Label(Frobot, textvariable=self.__fresques_mini)
 		self.__fresques_mini_label.grid(row=2)
 		Frobot.grid(column=colonne, row=0, in_=parent)
-		#ajouter les autres actions

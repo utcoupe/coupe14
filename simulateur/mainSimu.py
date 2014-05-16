@@ -44,6 +44,19 @@ from gui import mainGUI
 
 if __name__ == "__main__":
 
+#====================Activation des IA====================
+		"""
+		Mettre à Flase l'IA qu'on veut désactiver.
+		Ne pas toucher au reste du code.
+		"""
+
+		redIA = True
+		yellowIA= True
+
+#=========================================================
+#======= Pas besoin de toucher à la suite du code ========
+#=========================================================
+
 		engine = Engine()
 		match = match.Match()
 
@@ -60,17 +73,6 @@ if __name__ == "__main__":
 		minibotYellow = minirobot.MiniRobot(engine = engine,
 							   posinit = mm_to_px(3000-100,690),
 							   team = YELLOW)
-
-#====================Activation des IA====================
-		"""
-		Mettre à Flase l'IA qu'on veut désactiver.
-		Ne pas toucher au reste du code.
-		"""
-		redIA = True
-		yellowIA= True
-
-#=========================================================
-#=========================================================
 
 		#ne pas toucher des drapaux !
 		bigbotRed_flag = False

@@ -27,13 +27,14 @@ class robots(Frame):
 	def __init__(self, fenetre, bots, **kwargs):
 		"""
 		@param fenetre : frame de la fenêtre principale
+		@param bots : liste des robots (our_big,our_mini,en_big,en_mini)
 		"""
 		Frame.__init__(self, fenetre, width=300, height=700, bg="red")
+		#données
 		self.__bigrobot_us = bots[1]
 		self.__minirobot_us = bots[2]
 		self.__bigrobot_en = bots[3]
 		self.__minirobot_en = bots[4]
-		#données
 		self.fen = fenetre
 		self.__x_big = StringVar()
 		self.__y_big = StringVar()
@@ -54,6 +55,9 @@ class robots(Frame):
 		threading.Thread(target=self.__pullDataRobots).start()
 
 	def __pullDataRobots(self):
+		"""
+		Thread pour pull les données du robot
+		"""
 		while 1:
 			self.__x_big.set(str(self.__bigrobot_us.getXreal()))
 			self.__y_big.set(str(self.__bigrobot_us.getYreal()))
@@ -84,7 +88,6 @@ class robots(Frame):
 		@param colonne : numéro de la colonne
 		@param parent : frame parent
 		"""
-		#! ajouter l'accès aux données de l'IA !
 		Frobot = LabelFrame(self, text='Données gros')
 		self.__x_big_label = Label(Frobot, textvariable=self.__x_big)
 		self.__x_big_label.grid(row=0)
@@ -102,7 +105,6 @@ class robots(Frame):
 		@param colonne : numéro de la colonne
 		@param parent : frame parent
 		"""
-		#! ajouter l'accès aux données de l'IA !
 		Frobot = LabelFrame(self, text='Données mini')
 		self.__x_mini_label = Label(Frobot, textvariable=self.__x_mini)
 		self.__x_mini_label.grid(row=0)
@@ -129,7 +131,6 @@ class robots(Frame):
 		@param colonne : numéro de la colonne
 		@param parent : frame parent
 		"""
-		#! ajouter l'accès aux données de l'IA !
 		FrobotsE = LabelFrame(self, text='Big ennemy')
 		self.__x_big_en_label = Label(FrobotsE, textvariable=self.__x_big_en)
 		self.__x_big_en_label.grid(row=0)
@@ -143,7 +144,6 @@ class robots(Frame):
 		@param colonne : numéro de la colonne
 		@param parent : frame parent
 		"""
-		#! ajouter l'accès aux données de l'IA !
 		FrobotsE = LabelFrame(self, text='Mini ennemy')
 		self.__x_mini_en_label = Label(FrobotsE, textvariable=self.__x_mini_en)
 		self.__x_mini_en_label.grid(row=0)
