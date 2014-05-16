@@ -63,7 +63,7 @@ void com_loop(const char* cam_pipe, const char* hok_pipe) {
 		}
 
 		//Parse char hokuyo
-		c = getc(hok);
+		c = fgetc(hok);
 		if (c != EOF) {
 			if (i_hok < max_length) {
 				line_hokuyo[i_hok] = c;
