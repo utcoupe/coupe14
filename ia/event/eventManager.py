@@ -307,20 +307,26 @@ class EventManager():
 		collision_data = self.__Collision.getCollision(system)
 		if collision_data is not None:
 			distance = collision_data[1]
-			if distance < self.__MetaData.getCollisionThreshold():
-				first_id_to_remove = collision_data[0]
-				
-				action_en_cours, objectif = system.getQueuedObjectif()
-				if first_id_to_remove == objectif[0][0]:
+			
+			first_id_to_remove = collision_data[0]
+			
+			action_en_cours, objectif = system.getQueuedObjectif()
+			if first_id_to_remove == objectif[0][0]:
+				if distance < self.__MetaData.getCollisionThreshold():
 					id_canceled_list = system.removeObjectifAbove(first_id_to_remove)
-					self.__logger.info(str(system.getName())+" a annuler les ordres: " + str(id_canceled_list) + " et on broadcast A_CLEANG pour causes de collision dans " + str(distance) + " mm")
+					self.__logger.info(str(system.getName())+" a detecté une collision sur son ordre actuel first_id_to_remove "+str(first_id_to_remove)+" dans "+str(distance)+" et annule les ordres: " + str(id_canceled_list) + " et on broadcast A_CLEANG")
 					empty_arg = []
 					self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
 					system.setIdToReach("ANY")
 					self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
-				else:
+				elif  distance < COLLISION_WARNING_THRESHOLD:
+					self.__logger.debug(str(system.getName())+" a detecté une collision sur son ordre actuel first_id_to_remove "+str(first_id_to_remove)+" dans "+str(distance)+" mm, mais on continue")
+			else:
+				if distance < self.__MetaData.getCollisionThreshold():
 					id_canceled_list = system.removeObjectifAbove(first_id_to_remove)
-					self.__logger.info(str(system.getName())+" a enlever les ordres: " + str(id_canceled_list) + " de la file pour causes de collision dans " + str(distance) + " mm")
+					self.__SubProcessCommunicate.sendObjectifsCanceled(id_canceled_list)
+					self.__logger.info(str(system.getName())+" a detecté une collision sur un ordre dans la liste, first_id_to_remove "+str(first_id_to_remove)+" distance "+str(distance)+" mm, mais on continue")
 
-			elif  distance < COLLISION_WARNING_THRESHOLD:
-				self.__logger.debug(str(system.getName())+" a detecté une collision dans "+str(distance)+" mm, mais on continue")
+				elif  distance < COLLISION_WARNING_THRESHOLD:
+					pass
+					#osef...
