@@ -5,9 +5,16 @@ import gui_general
 import gui_robots
 import gui_actions
 import gui_actionneurs
+import sys
+import os
+DIR_PATH = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(DIR_PATH, "..", "objects"))
+sys.path.append(os.path.join(DIR_PATH, "..", "define"))
+from define import *
 
 class GUISimu():
 	def __init__(self, robots):
+		print('GUI trobots : ', robots)
 		self.__liste_robots = robots
 		self.__fen = Tk()
 		self.__fen.title("Test de GUI pour le simulateur")
