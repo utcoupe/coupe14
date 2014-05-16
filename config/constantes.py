@@ -12,7 +12,7 @@ TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux
 
 #====================Enable====================
 ENABLE_TOURELLE = 		False
-ENABLE_FLUSSMITTEL = 	False #permet de desactiver Flussmitel
+ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
 ENABLE_TIBOT = 			True
 
 #========================================Communication========================================
@@ -55,9 +55,9 @@ ID_ACTION_MAX =			29999
 
 #====================timeManager====================
 PERIODE_TIME_MANAGER =	100
-END_OF_MATCH = 			89500
-BEGIN_FUNNY_ACTION =	90000
-END_OF_FUNNY_ACTION = 	94000
+END_OF_MATCH = 			89000
+BEGIN_FUNNY_ACTION =	92000
+END_OF_FUNNY_ACTION = 	95000
 BEGIN_CHECK_COLLISION =	3000 #TODO
 
 #====================Goal====================
