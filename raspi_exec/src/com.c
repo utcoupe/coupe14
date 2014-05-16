@@ -10,11 +10,20 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+void setNonBlocking(FILE *f) {
+	int fd = fileno(f);
+	int flags;
+	flags = fcntl(fd, F_GETFL, 0);
+	flags |= O_NONBLOCK;
+	fcntl(fd, F_SETFL, flags);
+}
+
 void com_loop(const char* cam_pipe, const char* hok_pipe) {
 	FILE *cam = 0, *hok = 0;
 
 	printf("[MAIN]  Opening pipe : %s\n", hok_pipe);
 	hok = fopen(hok_pipe, "r");
+	setNonBlocking(hok);
 	if (hok == 0) {
 		perror("[MAIN]  Failed to open hokuyo pipe\n");
 		exit(EXIT_FAILURE);
@@ -24,6 +33,7 @@ void com_loop(const char* cam_pipe, const char* hok_pipe) {
 
 	printf("[MAIN]  Opening pipe : %s\n", cam_pipe);
 	cam = fopen(cam_pipe, "r");
+	setNonBlocking(cam);
 	if (cam == 0) {
 		perror("[MAIN]  Failed to open camera pipe\n");
 		exit(EXIT_FAILURE);
@@ -46,7 +56,7 @@ void com_loop(const char* cam_pipe, const char* hok_pipe) {
 			if (i_cam < max_length) {
 				line_camera[i_cam] = c;
 				i_cam++;
-			} else if (c != EOF && !ignore_cam) { //Affiche une message d'erreur, une seule fois
+			} else if (!ignore_cam) { //Affiche une message d'erreur, une seule fois
 				ignore_cam = 1;
 				printf("[MAIN]  Error : camera line too long for buffer, dropping line max=%d\n", max_length);
 			} 
@@ -95,6 +105,7 @@ void com_loop(const char* cam_pipe, const char* hok_pipe) {
 //x y a size color isdown
 //END\n
 void parseCamera(char *ori_line) {
+	printf("[MAIN]  parsing : %s", ori_line);
 	char *line = ori_line;
 	static int nbr_tri = 0;
 	static struct camData triangles[MAX_TRI];
@@ -150,6 +161,7 @@ void parseCamera(char *ori_line) {
 // Une ligne par set de data :
 // timestamp nbr_coords x1 y1 x2 y2 x3 y3
 void parseHokuyo(char *ori_line) {
+	printf("[MAIN]  parsing : %s", ori_line);
 	char * line = ori_line;
 	int nbr_robots = 0, nbr_robots_to_parse = 0;
 	long timestamp = 0;
