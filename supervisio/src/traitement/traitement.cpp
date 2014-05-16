@@ -107,12 +107,13 @@ void Visio::init_writer() {
 	strftime(buffer,80,"-%d-%m %I:%M:%S",timeinfo);
 	string date(buffer);
 	string path = path_to_conf+(string)"video"+(char)(index+'0')+"-"+date+(string)".avi";
-	cout << "Saving video to : " << path << endl;
 	int codec = CV_FOURCC('D', 'I', 'V', 'X'); //Marche
 	writer = VideoWriter(path, codec, cam_fps, size_frame);
 	if (!writer.isOpened()) {
 		cerr << "Failed to initialize writer, video can't be saved" << endl;
 		save_video = false;
+	} else {
+		cout << "Saving video to : " << path << endl;
 	}
 }
 
@@ -738,9 +739,11 @@ void Visio::transformPts(const vector<Point2f>& pts_in, vector<Point2f>& pts_out
 void Visio::refreshFrame() {
 	Mat img;
 	camera >> last_image;
+	float fps = (cam_fps*1.1); //10% de marge
 	frame_mutex.unlock();
 	isready = true;
 	while(1) {
+		usleep(1000000.0/fps);
 		camera.grab();
 		frame_mutex.lock();
 		camera.retrieve(last_image);
