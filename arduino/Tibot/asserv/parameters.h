@@ -62,7 +62,7 @@
 #define ENC_RESOLUTION 1024 //resolution du codeur
 
 #define ENC_LEFT_RADIUS 36.50 //rayon de la roue codeuse
-#define ENC_RIGHT_RADIUS 36.50 //rayon de la roue codeuse
+#define ENC_RIGHT_RADIUS 36.70 //rayon de la roue codeuse
 #define ENTRAXE_ENC 189.7 // Distance entre chaque roue codeuse en mm
 
 #define ERROR_ANGLE 0.03 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint

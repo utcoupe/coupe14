@@ -66,8 +66,6 @@ class Control{
 	PID PID_Distance;
 	//interface avec les PIDs
 	void setConsigne(float consigne_left, float consigne_right); //controles puis modification (renvoie l'overflow)
-	void check_rot_spd(float *consigneL, float *consigneR);
-	void check_rot_spd(float *consigne);
 	void check_acc(float *consigne, float last_consigne);
 	void check_dist_acc(float *consigne);
 	void check_rot_acc(float *consigne);

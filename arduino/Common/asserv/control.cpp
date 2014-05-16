@@ -271,27 +271,6 @@ void Control::check_max(float *consigne, float max) {
 		*consigne = -max;
 }
 
-void Control::check_rot_spd(float *consigneL, float *consigneR) {
-	//Check MAX ROT SPD
-	float rot = abs((*consigneR - *consigneL) / 2.0);
-	//Ratio consigne/max
-	float r = rot / (CONSIGNE_RANGE_MAX * max_rot_spd_ratio);
-	if (r > 1) { //Trop rapide
-		*consigneL /= r;
-		*consigneR /= r;
-	} 
-}
-
-void Control::check_rot_spd(float *consigne) {
-	//Check MAX ROT SPD
-	float rot = abs(*consigne);
-	//Ratio consigne/max
-	float r = rot / (CONSIGNE_RANGE_MAX * max_rot_spd_ratio);
-	if (r > 1) { //Trop rapide
-		*consigne /= r;
-	} 
-}
-
 void Control::check_rot_acc(float *consigne) {
 	check_acc(consigne, last_consigne_angle);
 }
@@ -321,8 +300,7 @@ void Control::controlPos(float da, float dd)
 	//Calcul des spd de distance
 	consigneDistance = PID_Distance.compute(dd); //erreur = distance au goal
 
-	check_max(&consigneAngle);
-	check_rot_spd(&consigneAngle);
+	check_max(&consigneAngle, CONSIGNE_RANGE_MAX * max_rot_spd_ratio);
 	check_rot_acc(&consigneAngle);
 
 	check_max(&consigneDistance, CONSIGNE_RANGE_MAX - abs(consigneAngle));
