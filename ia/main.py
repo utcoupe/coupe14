@@ -65,7 +65,7 @@ def startIa(pipe=None, ia_color="RED"):
 	EventManager = event.EventManager(Communication, Data)
 
 	if TEST_MODE == True:
-		self.MetaData.startMatch()
+		TimeManager.startMatch()
 
 	while Data.MetaData.getInGame() == False:
 		time.sleep(0.01)
