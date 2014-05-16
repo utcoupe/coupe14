@@ -16,7 +16,7 @@ void com_loop(const char* cam_pipe, const char* hok_pipe) {
 	printf("[MAIN]  Opening pipe : %s\n", hok_pipe);
 	hok = fopen(hok_pipe, "r");
 	if (hok == 0) {
-		printf("[MAIN]  Failed to open hokuyo pipe\n");
+		perror("[MAIN]  Failed to open hokuyo pipe\n");
 		exit(EXIT_FAILURE);
 	} else {
 		printf("[MAIN]  Pipe opened with hokuyo\n");
@@ -25,7 +25,7 @@ void com_loop(const char* cam_pipe, const char* hok_pipe) {
 	printf("[MAIN]  Opening pipe : %s\n", cam_pipe);
 	cam = fopen(cam_pipe, "r");
 	if (cam == 0) {
-		printf("[MAIN]  Failed to open camera pipe\n");
+		perror("[MAIN]  Failed to open camera pipe\n");
 		exit(EXIT_FAILURE);
 	} else {
 		printf("[MAIN]  Pipe opened with cameras\n");
@@ -84,8 +84,8 @@ void com_loop(const char* cam_pipe, const char* hok_pipe) {
 			i_hok = 0;
 		}
 	}
-	close(cam);
-	close(hok);
+	fclose(cam);
+	fclose(hok);
 }
 
 
