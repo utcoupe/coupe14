@@ -402,10 +402,21 @@ void Visio::loadParams(string filename) {
 		cerr << "ERROR : Couldn't find " << filename << endl;
 		return;
 	}
-	int h, w;
+	int h, w, temp_dist;
 	fs["min_size"] >> min_size;
 	fs["real_min_size"] >> real_min_size;
-	fs["distort_mode"] >> (int)distort;
+	fs["distort_mode"] >> temp_dist;
+	switch (temp_dist) {
+		case 1:
+			distort = image;
+			break;
+		case 2:
+			distort = points;
+			break;
+		default:
+			distort = none;
+			break;
+	}
 	fs["epsilon_poly"] >> epsilon_poly;
 	fs["max_diff_triangle_edge"] >> max_diff_triangle_edge;
 	fs["use_mask"] >> use_mask;
@@ -413,6 +424,7 @@ void Visio::loadParams(string filename) {
 	fs["width"] >> w;
 	fs["height"] >> h;
 	fs["fps"] >> cam_fps;
+	cout << "d"<<distort << endl;
 	size_frame = Size(w,h);
 	fs.release();
 	trans_calibrated = true;
