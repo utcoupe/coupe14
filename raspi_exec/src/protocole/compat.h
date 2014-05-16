@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #define LOCAL_ADDR ADDR_TOURELLE
-#define SERIAL_PATH "/dev/ttyUSB1"
+#define SERIAL_PATH "/dev/ttyUSB0"
 
 typedef enum bool 
 { 

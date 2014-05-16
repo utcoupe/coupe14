@@ -18,7 +18,6 @@ class Hokuyo:
 		self.__robots = robots
 		#return le nombre de millisecondes depuis le temps d'origine
 		self.__get_milli = lambda: int(round(time.time() * 1000))
-
 		self.__last_time_stamp = self.__get_milli()
 
 	def ping(self):
@@ -53,8 +52,9 @@ class Hokuyo:
 		ret.append(self.__get_milli()-self.__last_time_stamp)
 
 		for i in range(taille):
-			ret.append(self.__robots[i].getXreal())
-			ret.append(self.__robots[i].getYreal())
+			if self.__robots[i] is not None:
+				ret.append(self.__robots[i].getXreal())
+				ret.append(self.__robots[i].getYreal())
 		return ret
 
 	def __getTimeStamp(self):

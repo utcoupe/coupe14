@@ -94,7 +94,8 @@ void com_loop(const char* cam_pipe, const char* hok_pipe) {
 //x y a size color isdown
 //x y a size color isdown
 //END\n
-void parseCamera(char *line) {
+void parseCamera(char *ori_line) {
+	char *line = ori_line;
 	static int nbr_tri = 0;
 	static struct camData triangles[MAX_TRI];
 	if (strcmp(line, "END\n") == 0) { //Fin de frame
@@ -140,6 +141,7 @@ void parseCamera(char *line) {
 			nbr_tri++;
 		} else {
 			printf("[MAIN]  Failed to parse camera data, expected %d args, got %d\n", end, arg_type);
+			printf("[MAIN]  %s\n", ori_line);
 		}
 	}
 }
@@ -147,7 +149,8 @@ void parseCamera(char *line) {
 
 // Une ligne par set de data :
 // timestamp nbr_coords x1 y1 x2 y2 x3 y3
-void parseHokuyo(char *line) {
+void parseHokuyo(char *ori_line) {
+	char * line = ori_line;
 	int nbr_robots = 0, nbr_robots_to_parse = 0;
 	long timestamp = 0;
 	struct hokData robots[NBR_ROBOTS];
@@ -173,17 +176,18 @@ void parseHokuyo(char *line) {
 				robots[coord_index].y = atoi(arg);
 				nbr_robots++;
 			}
-		} else if (!ignore) { //Trop d'arguments !
-			printf("[MAIN]   Failed to parse hokuyo data : too many coords\n");
+		} else { //Trop d'arguments !
 			ignore = 1;
 		}
 		arg_nbr++;
 	}
 	if (coord_index != NBR_ROBOTS-1) {
-		printf("[MAIN]   Failed to parse hokuyo data : got only %d coords\n", coord_index+1);
 		ignore = 1;
 	}
 	if (!ignore) {
 		pushHokData(robots, timestamp);
+	} else {
+		printf("[MAIN]  Failed to parse hokuyo data, got %d args\n", arg_nbr);
+		printf("[MAIN]  %s\n", ori_line);
 	}
 }

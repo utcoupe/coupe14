@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from .robot import Robot
 import math
 import sys
 import os
@@ -12,9 +11,10 @@ sys.path.append(os.path.join(DIR_PATH, "..", "objects"))
 from define import *
 from engine.engineobject import EngineObjectPoly
 from objects import feu
+from objects import robot
 import time
 
-class BigRobot(Robot):
+class BigRobot(robot.Robot):
 	def __init__(self, *, engine, posinit, team):
 		self.bras = EngineObjectPoly(
 			engine 		= engine,
@@ -43,7 +43,7 @@ class BigRobot(Robot):
 			is_extension= True
 		)
 
-		Robot.__init__(self,
+		robot.Robot.__init__(self,
 			engine		 		= engine,
 			team				= team,
 			posinit				= posinit,
@@ -57,6 +57,7 @@ class BigRobot(Robot):
 		self.__nbrFeuArriere = 0 #normalement à 0, 1 pour les tests
 		self.__engine = engine
 		self.__feuHit = 0
+		self.setRobotType(BIG)
 
 	def getFeuxAvant(self):
 		return self.__nbrFeuAvant

@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
 			printf("%d - Spawned cameras, pid %d\n", getpid(), pid_cameras);
 			//Suite du main
 			printf("[MAIN]  Waiting for initialization\n");
-			sleep(5);
+			sleep(10);
 			
 			printf("[MAIN]  Starting main program\n");
 			com_loop(pipe_cam, pipe_hok);
