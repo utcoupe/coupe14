@@ -87,7 +87,6 @@ if __name__ == '__main__':
 
 	#clean des fichiers chiants
 	print('[CAM ]  Removing old videos')
-	os.system("rm " + path + "/config/raspi/pipe_*")
 	os.system("rm " + path + "/config/visio/visio_tourelle_red/video* " \
 					+ path + "/config/visio/visio_tourelle_yellow/video*")
 

@@ -424,7 +424,6 @@ void Visio::loadParams(string filename) {
 	fs["width"] >> w;
 	fs["height"] >> h;
 	fs["fps"] >> cam_fps;
-	cout << "d"<<distort << endl;
 	size_frame = Size(w,h);
 	fs.release();
 	trans_calibrated = true;
