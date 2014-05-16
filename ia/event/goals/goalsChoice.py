@@ -69,7 +69,7 @@ class GoalsChoice:
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 		best_length = float("Inf")
 
-		best_goal_filet = None
+		best_goal_filet = ([], None, None)
 		best_length_filet = float("Inf")
 		for goal in goals:
 			nb_elem_goal = goal.getLenElemGoal()

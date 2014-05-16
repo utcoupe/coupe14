@@ -93,6 +93,9 @@ class GoalsManager:
 
 		self.__loadBeginScript()
 
+	def restartObjectifSearch(self):
+		self.__queueBestGoals()
+
 	def __queueBestGoals(self):
 		if not self.__blocked_goals:
 			self.__logger.debug(str(self.__robot_name)+" Recherche d'un nouvel objectif")	
@@ -104,10 +107,11 @@ class GoalsManager:
 
 				if best_goal[1] != None:
 					self.__logger.info("On a choisi l'objectif goal_id "+str(best_goal[1].getId())+" elem_goal_id "+str(best_goal[2])+" avec le path "+str(best_goal[0]))
+					self.__SubProcessManager.setLastDateBlocked(None)
 					self.__addGoal(best_goal[0], best_goal[1], best_goal[2])
 				else:
-					time.sleep(5)#TODO diminuer
-					self.__queueBestGoals()
+					self.__SubProcessManager.setLastDateBlocked(int(time.time()*1000))
+					self.__logger.info(str(self.__robot_name)+" aucun objectif accessible")
 			else:
 				self.__logger.info(str(self.__robot_name)+" N'a plus aucun objectif disponible, GG (ou pas, y'a toujours un truc à faire) !")
 

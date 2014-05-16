@@ -23,7 +23,14 @@ class SubProcessManager():
 		while self.__data == {}:
 			self.readPipe(loop=False) #Normalement on ne peut pas recevoir over ni canaceled à ce stade
 		
+		self.__last_date_blocked = None
 		self.__GoalsManager = GoalsManager(self, connection, robot_name)
+
+	def getLastDateBlocked(self):
+		return self.__last_date_blocked
+
+	def setLastDateBlocked(self, date):
+		self.__last_date_blocked = date
 
 	def sendGoal(self, id_objectif_prev, id_objectif, elem_script):
 		self.__connection.send(("add", (self.__robot_name, id_objectif_prev, id_objectif, elem_script)))
@@ -45,6 +52,10 @@ class SubProcessManager():
 					self.__updateData(new_message[1])
 				else:
 					self.__processStatus(new_message)
+
+				#Relance de la recherche d'ordre dans le cas où le système se serait désamorcé
+				if self.getLastDateBlocked() is not None and (int(time.time()*1000) - self.getLastDateBlocked()) > OBJECTIF_SEARCH_PERIODE:
+					self.__GoalsManager.restartObjectifSearch()
 		else:
 			new_message = self.__connection.recv()
 			if new_message[0] == "data":
