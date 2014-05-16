@@ -60,21 +60,21 @@ class robots(Frame):
 		"""
 		while 1:
 			if self.__bigrobot_us is not None:
-				self.__x_big.set(str(self.__bigrobot_us.getXreal()))
-				self.__y_big.set(str(self.__bigrobot_us.getYreal()))
-				self.__a_big.set(str(round(self.__bigrobot_us.getAreal(),3)))
-				self.__id_big.set(str(self.__bigrobot_us.getLastId()))
+				self.__x_big.set('x : ' + str(self.__bigrobot_us.getXreal()))
+				self.__y_big.set('y : ' + str(self.__bigrobot_us.getYreal()))
+				self.__a_big.set('a : ' + str(round(self.__bigrobot_us.getAreal(),3)))
+				self.__id_big.set('ordre : ' + str(self.__bigrobot_us.getLastId()))
 			if self.__minirobot_us is not None:
-				self.__x_mini.set(str(self.__minirobot_us.getXreal()))
-				self.__y_mini.set(str(self.__minirobot_us.getYreal()))
-				self.__a_mini.set(str(round(self.__minirobot_us.getAreal(),3)))
-				self.__id_mini.set(str(self.__minirobot_us.getLastId()))
+				self.__x_mini.set('x : ' + str(self.__minirobot_us.getXreal()))
+				self.__y_mini.set('y : ' + str(self.__minirobot_us.getYreal()))
+				self.__a_mini.set('a : ' + str(round(self.__minirobot_us.getAreal(),3)))
+				self.__id_mini.set('ordre : ' + str(self.__minirobot_us.getLastId()))
 			if self.__bigrobot_en is not None:
-				self.__x_big_en.set(str(self.__bigrobot_en.getXreal()))
-				self.__y_big_en.set(str(self.__bigrobot_en.getYreal()))
+				self.__x_big_en.set('x : ' + str(self.__bigrobot_en.getXreal()))
+				self.__y_big_en.set('y : ' + str(self.__bigrobot_en.getYreal()))
 			if self.__minirobot_en is not None:
-				self.__x_mini_en.set(str(self.__minirobot_en.getXreal()))
-				self.__y_mini_en.set(str(self.__minirobot_en.getYreal()))
+				self.__x_mini_en.set('x : ' + str(self.__minirobot_en.getXreal()))
+				self.__y_mini_en.set('y : ' + str(self.__minirobot_en.getYreal()))
 			time.sleep(0.25)
 
 	def robots_us(self):
