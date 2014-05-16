@@ -33,11 +33,21 @@ class GoalsChoice:
 		# Variables TIBOT
 
 	def getBestGoal(self, goals):
+		if self.__robot_name == "FLUSSMITTEL":
+			best_goal = self.__getBestGoalFlussmittel(data, goalsLib, our_color, back_triangle_stack, front_triangle_stack)
+		elif self.__robot_name == "TIBOT":
+			best_goal = self.__getBestGoalTibot(data, goalsLib, our_color, back_triangle_stack, front_triangle_stack)
+		else:
+			self.__logger.info("Robot "+str(self.__robot_name)+" inconnu.")
+			best_goal = ([], None, None) #type (path, goal, id_elem_goal)
+
+		return best_goal
+
+	def __getBestGoalFlussmittel(self, data, goalsLib, our_color, back_triangle_stack, front_triangle_stack):
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 		best_length = float("Inf")
 
-		if self.__robot_name == "FLUSSMITTEL":
-			for goal in goals:
+		for goal in goals:
 				if len(self.__front_triangle_stack) == MAX_FRONT_TRIANGLE_STACK:
 					if goal.getType() != "STORE_TRIANGLE":
 						continue
@@ -53,31 +63,31 @@ class GoalsChoice:
 							best_length = length
 							best_goal = (path, goal, idd)
 
-		elif self.__robot_name == "TIBOT":
-			best_goal_filet = None
-			best_length_filet = float("Inf")
-			for goal in goals:
-				nb_elem_goal = goal.getLenElemGoal()
-				for idd in range(nb_elem_goal):
-					path = self.__goalsLib.getOrderTrajectoire(goal, idd)
-					if path != []:
-						length = self.__goalsLib.pathLen(path)
-						if goal.getType() != "FILET":
-							if length < best_length:
-								best_length = length
-								best_goal = (path, goal, idd)
-						else:
-							if length < best_length_filet:
-								best_length_filet = length
-								best_goal_filet = (path, goal, idd)
+		return best_goal
+
+	def __getBestGoalTibot(self, data, goalsLib, our_color, back_triangle_stack, front_triangle_stack):
+		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
+		best_length = float("Inf")
+
+		best_goal_filet = None
+		best_length_filet = float("Inf")
+		for goal in goals:
+			nb_elem_goal = goal.getLenElemGoal()
+			for idd in range(nb_elem_goal):
+				path = self.__goalsLib.getOrderTrajectoire(goal, idd)
+				if path != []:
+					length = self.__goalsLib.pathLen(path)
+					if goal.getType() != "FILET":
+						if length < best_length:
+							best_length = length
+							best_goal = (path, goal, idd)
+					else:
+						if length < best_length_filet:
+							best_length_filet = length
+							best_goal_filet = (path, goal, idd)
 
 
-			if best_goal[1] == None and best_goal_filet[1] != None:
-				best_goal = best_goal_filet
-
-
-
-		else:
-			self.__logger.info("Robot "+str(self.__robot_name)+" inconnu.")
+		if best_goal[1] == None and best_goal_filet[1] != None:
+			best_goal = best_goal_filet
 
 		return best_goal
