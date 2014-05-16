@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
 	strcpy(pipe_hok, path);
 	strcat(pipe_hok, "/config/raspi/pipe_hokuyo");
 
-	printf("%d - Initializing fifo for cameras\n", getpid());
+	printf("%d - Initializing fifo for cameras : %s\n", getpid(), pipe_hok);
 	mkfifo(pipe_hok, 0666);
 
 	//Path cam
@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
 	strcpy(pipe_cam, path);
 	strcat(pipe_cam, "/config/raspi/pipe_cameras");
 
-	printf("%d - Initializing fifo for hokuyo\n", getpid());
+	printf("%d - Initializing fifo for hokuyo : %s\n", getpid(), pipe_cam);
 	//Ouvrir fifo
 	mkfifo(pipe_cam, 0666);
 
