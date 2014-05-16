@@ -48,11 +48,13 @@ class actionneurs(LabelFrame):
 		Thread pour pull les données du robot
 		"""
 		while 1:
-			self.__feu_av_big.set('N feu av : ' + str(self.__bigrobot_us.getFeuxAvant()))
-			self.__feu_ar_big.set('N feu ar : ' + str(self.__bigrobot_us.getFeuxArriere()))
-			self.__balles_mini.set('Nbr lances : ' + str(self.__minirobot_us.getNbrLances()))
-			self.__filet_mini.set('Filet : ' + str(self.__minirobot_us.getFilet()))
-			self.__fresques_mini.set('Nbr fresques : ' + str(self.__minirobot_us.getNbrFresques()))
+			if self.__bigrobot_us is not None:
+				self.__feu_av_big.set('N feu av : ' + str(self.__bigrobot_us.getFeuxAvant()))
+				self.__feu_ar_big.set('N feu ar : ' + str(self.__bigrobot_us.getFeuxArriere()))
+			if self.__minirobot_us is not None:
+				self.__balles_mini.set('Nbr lances : ' + str(self.__minirobot_us.getNbrLances()))
+				self.__filet_mini.set('Filet : ' + str(self.__minirobot_us.getFilet()))
+				self.__fresques_mini.set('Nbr fresques : ' + str(self.__minirobot_us.getNbrFresques()))
 			time.sleep(1)
 
 	def display_actionneurs_big(self, colonne, parent):

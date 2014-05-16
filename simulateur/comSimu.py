@@ -155,6 +155,10 @@ class Communication():
 		elif (order == "RESUME"):
 			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, empty_return)
 
+		elif order == "A_IS_BLOCKED":
+			pos = (0,)
+			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, pos)
+
 		else:
 			#on ajoute l'ordre reçu à la structure de renvoie
 			self.__addOrder("ADDR_FLUSSMITTEL_ASSERV", order, empty_return) # WTF ????
@@ -282,6 +286,10 @@ class Communication():
 
 		elif (order == "RESUME"):
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, empty_return)
+
+		elif order == "A_IS_BLOCKED":
+			pos = (0,)
+			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
 
 		else:
 			if (order == "PINGPING"):

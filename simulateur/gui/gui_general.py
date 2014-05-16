@@ -43,6 +43,7 @@ class general(Frame):
 		self.__temps_restant= StringVar()
 		self.__bigrobot_us = bots[1]
 		self.__minirobot_us = bots[2]
+		self.__match_started = False
 
 		#frames
 		self.grid()
@@ -51,7 +52,6 @@ class general(Frame):
 		self.temps()
 		self.team()
 		self.nbrPts()
-		threading.Thread(target=self.__timeThread).start()
 
 	def __timeThread(self):
 		"""
@@ -90,9 +90,15 @@ class general(Frame):
 		for n in range(3):
 			bout = Button(Fbouton, text = liste_button[n])
 			if n == 0: #bouton start
-				bout.config(command=self.__minirobot_us.setStateJack)
+				if self.__minirobot_us is not None:
+					bout.config(command=self.__startMatch)
 			bout.grid(column = n, row = 0)
 		Fbouton.grid(column = 2, row = 0, sticky=N+S+W+E)
+
+	def __startMatch(self):
+		if self.__match_started is False:
+			threading.Thread(target=self.__timeThread).start()
+			self.__minirobot_us.setStateJack()
 
 	def temps(self):
 		"""
@@ -118,10 +124,18 @@ class general(Frame):
 		#! ajouter l'accès aux données de l'IA !
 		Fteam = LabelFrame(self, text="Team", bg="white")
 		labelfont = ('times', 20, 'bold')
-		if self.__bigrobot_us.getTeam() == RED:
-			equipe = Label(Fteam, text="Red", bg="red")
-		elif self.__bigrobot_us.getTeam() == YELLOW:
-			equipe = Label(Fteam, text="Yellow", bg="yellow")
+		if self.__bigrobot_us is not None:
+			if self.__bigrobot_us.getTeam() == RED:
+				equipe = Label(Fteam, text="Red", bg="red")
+			elif self.__bigrobot_us.getTeam() == YELLOW:
+				equipe = Label(Fteam, text="Yellow", bg="yellow")
+		elif self.__minirobot_us is not None:
+			if self.__minirobot_us.getTeam() == RED:
+				equipe = Label(Fteam, text="Red", bg="red")
+			elif self.__minirobot_us.getTeam() == YELLOW:
+				equipe = Label(Fteam, text="Yellow", bg="yellow")
+		else:
+			equipe = Label(Fteam, text="None", bg="grey")
 		equipe.config(font=labelfont, anchor=CENTER)
 		equipe.grid()
 		Fteam.grid(column = 1, row = 2, sticky=N+S)

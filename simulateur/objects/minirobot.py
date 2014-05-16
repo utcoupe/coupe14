@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from .robot import Robot
 import sys
 import os
 DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(DIR_PATH, "..", "define"))
 sys.path.append(os.path.join(DIR_PATH, "..", "engine"))
+sys.path.append(os.path.join(DIR_PATH, "..", "objects"))
 
 from define import *
 from engine.engineobject import EngineObjectPoly
+from objects import robot
 
 
-class MiniRobot(Robot):
+class MiniRobot(robot.Robot):
 	def __init__(self, *, engine, posinit, team):
 		#extension pour donner un signe distinctif au robot pour reconnaitre l'avant
 		self.avant = EngineObjectPoly(
@@ -41,7 +42,7 @@ class MiniRobot(Robot):
 			is_extension= True
 		)
 
-		Robot.__init__(self,
+		robot.Robot.__init__(self,
 			engine 				= engine,
 			team				= team,
 			posinit				= posinit,
@@ -57,6 +58,7 @@ class MiniRobot(Robot):
 		self.__filet = 1
 		self.__fresques = 2
 		self.__state_jack = 1  # jack in
+		self.setRobotType(MINI)
 
 	def getStateJack(self):
 		return self.__state_jack

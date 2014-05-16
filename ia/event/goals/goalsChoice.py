@@ -34,16 +34,16 @@ class GoalsChoice:
 
 	def getBestGoal(self, goals):
 		if self.__robot_name == "FLUSSMITTEL":
-			best_goal = self.__getBestGoalFlussmittel(data, goalsLib, our_color, back_triangle_stack, front_triangle_stack)
+			best_goal = self.__getBestGoalFlussmittel(goals)
 		elif self.__robot_name == "TIBOT":
-			best_goal = self.__getBestGoalTibot(data, goalsLib, our_color, back_triangle_stack, front_triangle_stack)
+			best_goal = self.__getBestGoalTibot(goals)
 		else:
 			self.__logger.info("Robot "+str(self.__robot_name)+" inconnu.")
 			best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 
 		return best_goal
 
-	def __getBestGoalFlussmittel(self, data, goalsLib, our_color, back_triangle_stack, front_triangle_stack):
+	def __getBestGoalFlussmittel(self, goals):
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 		best_length = float("Inf")
 
@@ -65,7 +65,7 @@ class GoalsChoice:
 
 		return best_goal
 
-	def __getBestGoalTibot(self, data, goalsLib, our_color, back_triangle_stack, front_triangle_stack):
+	def __getBestGoalTibot(self, goals):
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 		best_length = float("Inf")
 

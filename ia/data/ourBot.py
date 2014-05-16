@@ -32,6 +32,7 @@ class OurBot():
 		self.__last_id_executed_other = ID_ACTION_MAX
 		self.__last_id_executed_asserv = ID_ACTION_MAX
 		self.__bras_status = None
+		self.__asservBlocked = False
 
 		self.__last_id_action_stacked = IdRot()
 
@@ -186,6 +187,9 @@ class OurBot():
 		self.__positionX = x
 		self.__positionY = y
 		self.__angle = angle
+
+	def setAsservBloqued(self, isBlocked):
+		self.__asservBlocked = isBlocked
 
 	def __castOrders(self, action_data):
 		data_objectif = deque()

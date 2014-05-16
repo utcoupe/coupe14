@@ -30,14 +30,20 @@ class PullData():
 		self.__id_flussmittel_other_asked_date = 0
 		self.__data_flussmittel_asserv_asked = False
 		self.__data_flussmittel_asserv_asked_date = 0
+		self.__data_flussmittel_asserv_bloqued_asked = False
+		self.__data_flussmittel_asserv_bloqued_asked_date = 0
+
 		self.__id_tibot_other_asked = False
 		self.__id_tibot_other_asked_date = 0
 		self.__data_tibot_asserv_asked = False
 		self.__data_tibot_asserv_asked_date = 0
-		self.tourelle_asked = False
-		self.tourelle_asked_date = 0
+		self.__data_tibot_asserv_bloqued_asked = False
+		self.__data_tibot_asserv_bloqued_asked_date = 0
 		self.__jack_asked = False
 		self.__jack_asked_date = 0
+
+		self.tourelle_asked = False
+		self.tourelle_asked_date = 0
 
 		self.__ThreadPull = threading.Thread(target=self.__gestion)
 
@@ -69,6 +75,11 @@ class PullData():
 				self.__data_flussmittel_asserv_asked = True
 				self.__data_flussmittel_asserv_asked_date = date
 
+			if self.__data_flussmittel_asserv_bloqued_asked == False and (date - self.__data_flussmittel_asserv_bloqued_asked_date) > (PULL_PERIODE*10):
+				self.Communication.sendOrderAPI(self.address_flussmittel_asserv, 'A_IS_BLOCKED', *arguments)
+				self.__data_flussmittel_asserv_bloqued_asked = True
+				self.__data_flussmittel_asserv_bloqued_asked_date = date
+
 		if self.Tibot is not None:
 			if self.__id_tibot_other_asked == False and (date - self.__id_tibot_other_asked_date) > PULL_PERIODE:
 				self.Communication.sendOrderAPI(self.address_tibot_other, 'GET_LAST_ID', *arguments)
@@ -79,6 +90,11 @@ class PullData():
 				self.Communication.sendOrderAPI(self.address_tibot_asserv, 'A_GET_POS_ID', *arguments)
 				self.__data_tibot_asserv_asked = True
 				self.__data_tibot_asserv_asked_date = date
+
+			if self.__data_tibot_asserv_bloqued_asked == False and (date - self.__data_tibot_asserv_bloqued_asked_date) > PULL_PERIODE:
+				self.Communication.sendOrderAPI(self.address_tibot_asserv, 'A_IS_BLOCKED', *arguments)
+				self.__data_tibot_asserv_bloqued_asked = True
+				self.__data_tibot_asserv_bloqued_asked_date = date
 				
 		if self.Tourelle is not None:
 			if self.tourelle_asked == False and (date - self.tourelle_asked_date) > PULL_PERIODE:
@@ -111,6 +127,8 @@ class PullData():
 				system = self.Flussmittel
 				if order == 'A_GET_POS_ID':
 					self.__data_flussmittel_asserv_asked = False
+				elif order == 'A_IS_BLOCKED':
+					self.__data_flussmittel_asserv_bloqued_asked = False
 
 			elif address == self.address_tibot_other:
 				system = self.Tibot
@@ -121,6 +139,8 @@ class PullData():
 				system = self.Tibot
 				if order == 'A_GET_POS_ID':
 					self.__data_tibot_asserv_asked = False
+				elif order == 'A_IS_BLOCKED':
+					self.__data_tibot_asserv_bloqued_asked = False
 					
 			elif address == self.address_tourelle:
 				system = self.Tourelle
@@ -130,7 +150,6 @@ class PullData():
 				self.__logger.error("un systeme non initilisé nous envoi des données")
 
 			if order == "O_JACK_STATE":
-				print(arguments)
 				if arguments[0] == 0:
 					self.MetaData.startMatch()
 				else:
@@ -141,6 +160,8 @@ class PullData():
 						system.setPositionAndId(address, arguments)
 					elif order == 'GET_LAST_ID':
 						system.setLastId(address, arguments[0])
+					elif order == 'A_IS_BLOCKED':
+						system.setAsservBloqued(arguments[0])
 					elif order == 'O_GET_BRAS_STATUS':
 						system.setBrasStatus( arguments[0])
 					elif order == 'T_GET_HOKUYO':

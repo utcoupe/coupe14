@@ -52,42 +52,44 @@ class actions(Frame):
 		"""
 		while 1:
 			#pour le gros
-			if len(self.__liste_todo_big) == 0: #cas où la liste est vide
-				for item in self.__liste_todo_big:
+			if self.__bigrobot_us is not None:
+				if len(self.__liste_todo_big) == 0: #cas où la liste est vide
+					for item in self.__liste_todo_big:
+						self.__listebox_big.insert(END, item)
+				#liste complète du robot
+				big_all = self.__bigrobot_us.getSaveOrder()
+				diff_taille_big = len(big_all) - len(self.__liste_todo_big)
+				to_ret_big = [] #liste de la différence entre la liste affichée et celle du robot
+				taille_big_liste = len(self.__liste_todo_big)
+				for i in range(diff_taille_big):
+					#on les ajoute à la liste des ajouts
+					self.__liste_todo_big.append(big_all[taille_big_liste + i - 1])
+					to_ret_big.append(big_all[taille_big_liste + i - 1])
+				for item in to_ret_big:
+					#on les ajoute à la GUI
 					self.__listebox_big.insert(END, item)
-			#liste complète du robot
-			big_all = self.__bigrobot_us.getSaveOrder()
-			diff_taille_big = len(big_all) - len(self.__liste_todo_big)
-			to_ret_big = [] #liste de la différence entre la liste affichée et celle du robot
-			taille_big_liste = len(self.__liste_todo_big)
-			for i in range(diff_taille_big):
-				#on les ajoute à la liste des ajouts
-				self.__liste_todo_big.append(big_all[taille_big_liste + i - 1])
-				to_ret_big.append(big_all[taille_big_liste + i - 1])
-			for item in to_ret_big:
-				#on les ajoute à la GUI
-				self.__listebox_big.insert(END, item)
-			#autoscroll
-			if self.__autoscroll_on == True:
-				self.__listebox_big.select_set(END)
-				self.__listebox_big.yview(END)
+				#autoscroll
+				if self.__autoscroll_on == True:
+					self.__listebox_big.select_set(END)
+					self.__listebox_big.yview(END)
 			#pour le petit test
-			if len(self.__liste_todo_mini) == 0:
-				for item in self.__liste_todo_mini:
+			if self.__minirobot_us is not None:
+				if len(self.__liste_todo_mini) == 0:
+					for item in self.__liste_todo_mini:
+						self.__listebox_mini.insert(END, item)
+				mini_all = self.__minirobot_us.getSaveOrder()
+				diff_taille_mini = len(mini_all) - len(self.__liste_todo_mini)
+				to_ret_mini = []
+				taille_mini_liste = len(self.__liste_todo_mini)
+				for i in range(diff_taille_mini):
+					self.__liste_todo_mini.append(mini_all[taille_mini_liste + i - 1])
+					to_ret_mini.append(mini_all[taille_mini_liste + i - 1])
+				for item in to_ret_mini:
 					self.__listebox_mini.insert(END, item)
-			mini_all = self.__minirobot_us.getSaveOrder()
-			diff_taille_mini = len(mini_all) - len(self.__liste_todo_mini)
-			to_ret_mini = []
-			taille_mini_liste = len(self.__liste_todo_mini)
-			for i in range(diff_taille_mini):
-				self.__liste_todo_mini.append(mini_all[taille_mini_liste + i - 1])
-				to_ret_mini.append(mini_all[taille_mini_liste + i - 1])
-			for item in to_ret_mini:
-				self.__listebox_mini.insert(END, item)
-			#autoscroll
-			if self.__autoscroll_on == True:
-				self.__listebox_mini.select_set(END)
-				self.__listebox_mini.yview(END)
+				#autoscroll
+				if self.__autoscroll_on == True:
+					self.__listebox_mini.select_set(END)
+					self.__listebox_mini.yview(END)
 			time.sleep(0.5)
 
 	def frame_actions(self, robot, liste):
