@@ -43,6 +43,7 @@ class general(Frame):
 		self.__temps_restant= StringVar()
 		self.__bigrobot_us = bots[1]
 		self.__minirobot_us = bots[2]
+		self.__match_started = False
 
 		#frames
 		self.grid()
@@ -51,7 +52,6 @@ class general(Frame):
 		self.temps()
 		self.team()
 		self.nbrPts()
-		threading.Thread(target=self.__timeThread).start()
 
 	def __timeThread(self):
 		"""
@@ -91,9 +91,14 @@ class general(Frame):
 			bout = Button(Fbouton, text = liste_button[n])
 			if n == 0: #bouton start
 				if self.__minirobot_us is not None:
-					bout.config(command=self.__minirobot_us.setStateJack)
+					bout.config(command=self.__startMatch)
 			bout.grid(column = n, row = 0)
 		Fbouton.grid(column = 2, row = 0, sticky=N+S+W+E)
+
+	def __startMatch(self):
+		if self.__match_started is False:
+			threading.Thread(target=self.__timeThread).start()
+			self.__minirobot_us.setStateJack()
 
 	def temps(self):
 		"""
