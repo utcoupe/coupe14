@@ -27,19 +27,23 @@ class Communication():
 		@param args suivent l'ordre
 		"""
 		if (address == "ADDR_FLUSSMITTEL_OTHER"):
+			self.__bigrobot.saveOrder(order, arguments)
 			self.__traitementFlussmittelOthers(order, arguments)
 		elif (address == "ADDR_FLUSSMITTEL_ASSERV"):
+			self.__bigrobot.saveOrder(order, arguments)
 			self.__traitementFlussmittelAsserv(order, arguments)
 		elif (address == "ADDR_FLUSSMITTEL_CAM"):
 			self.__traitementFlussmittelCam(order, arguments)
 		elif (address == "ADDR_TIBOT_OTHER"):
+			self.__minirobot.saveOrder(order, arguments)
 			self.__traitementTibotOthers(order, arguments)
 		elif (address == "ADDR_TIBOT_ASSERV"):
+			self.__minirobot.saveOrder(order, arguments)
 			self.__traitementTibotAsserv(order, arguments)
 		elif (address == "ADDR_TOURELLE"):
 			self.__traitementHokuyo(order, arguments)
 		else:
-			print('ordre non valide'+str(address))
+			print('ordre non valide '+str(address))
 
 	def __traitementFlussmittelOthers(self, order, args):
 		"""
@@ -211,11 +215,12 @@ class Communication():
 			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
 		elif (order == "O_TIR_BALLE"):
-			#args : nbr de balles à tirer
+			self.__minirobot.lancerBalle(args[1]) #args = nbr balles à lancer
 			self.__minirobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
 		elif (order == "O_TIR_FILET"):
+			self.__minirobot.tirFilet()
 			self.__minirobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
@@ -229,6 +234,10 @@ class Communication():
 			self.__minirobot.ouvrirBras(args[1])
 			self.__minirobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
+
+		elif order == "O_JACK_STATE":
+			pos = (self.__minirobot.getStateJack(),)
+			self.__addOrder("ADDR_TIBOT_OTHER", order, pos)
 
 		else:
 			print('Error : mauvais paramètre traitement Tibot other ! order '+str(order)+" args "+str(args))

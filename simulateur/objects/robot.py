@@ -35,13 +35,18 @@ class Robot(EngineObjectPoly):
 		self.__asserv = Asserv(self)
 		self._visio = Visio(self)
 		self.__others = Others(self)
-
+		self.__stack_orders = [] #pile d'ordres historique
 
 	#données du robot utiles au simulateur
 		self.__mod_teleport = False # quand on clique ça téléporte au lieu d'envoyer un ordre à l'asservissement
 		self.__mod_recul = False # marche arrière ou marche avant ?
 		self.__max_speed = 1000 # vitesse maximale (quand pwm=255)
 		self.__stop = False
+
+		#décompte du temps pour avoir le timestamp
+		self.__get_milli = lambda: int(round(time.time() * 1000))
+		self.__time_stamp = self.__get_milli()
+		self.__time_stamp_origine = self.__get_milli()
 
 		#utilité ?
 		self.__current_team = RED
@@ -101,10 +106,20 @@ class Robot(EngineObjectPoly):
 		return self.getXreal(), self.getYreal(), self.getAreal(), self.__asserv.getLastIdAction()
 
 	def getLastIdAsserv(self):
-		return self.__asserv.getLastIdAction()
+		id_ret = self.__asserv.getLastIdAction()
+		self.__add_timestamp_order(id_ret)
+		return id_ret
 
 	def getLastIdOther(self):
-		return self.__others.getLastIdAction()
+		id_ret = self.__others.getLastIdAction()
+		self.__add_timestamp_order(id_ret)
+		return id_ret
+
+	def getLastId(self):
+		if self.getLastIdAsserv() > self.getLastIdOther():
+			return self.getLastIdAsserv()
+		else:
+			return self.getLastIdOther()
 
 	def setLastIdActionAsserv(self, id):
 		self.__asserv.setLastIdAction(id)
@@ -123,6 +138,46 @@ class Robot(EngineObjectPoly):
 
 	def getTeam(self):
 		return self.__team
+
+	def saveOrder(self, order, args):
+		"""
+		Ajoute l'ordre à la pile historique des ordres
+		"""
+		#filtrer les ordres useless
+		filtre_orders = ["PINGPING","PAUSE","RESUME","RESET_ID","GET_LAST_ID","A_GET_POS_ID"]
+		if order not in filtre_orders:
+			if len(args) == 0:
+				self.__time_stamp = (self.__get_milli() - self.__time_stamp_origine)/1000
+				self.__stack_orders.append((self.__time_stamp,order,args))
+			else:
+				self.__stack_orders.append((0,order,args))
+
+	def __add_timestamp_order(self,id):
+		"""
+		Va ajouter le timestamp de l'action effectuée à l'action stockée dans la pile historique
+		@param id : identifiant de l'ordre qui vient d'être exécuté
+		"""
+		id_tuple = self.__search_tuple_by_id(id)
+		if id_tuple > 0:
+			self.__time_stamp = (self.__get_milli() - self.__time_stamp_origine)/1000
+			tmp_list = list(self.__stack_orders[id_tuple])
+			tmp_list[0] = self.__time_stamp
+			self.__stack_orders[id_tuple] = tuple(tmp_list)
+
+	def __search_tuple_by_id(self,id):
+		count = 0
+		for tuple_ordre in self.__stack_orders:
+			if tuple_ordre[0] == 0:
+				if tuple_ordre[2][0] == id:
+					return count
+				else:
+					count += 1
+			else:
+				count += 1
+		return -1
+
+	def getSaveOrder(self):
+		return self.__stack_orders
 
 	def addGoal(self, newGoal):
 		self.__goals.append(newGoal)
