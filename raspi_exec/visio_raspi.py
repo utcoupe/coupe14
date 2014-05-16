@@ -61,15 +61,14 @@ def close():
 	sys.exit()
 
 if __name__ == '__main__':
-	index = 0
 	print("[CAM ]  Starting cam client")
 	try:
 		path = sys.argv[1]
 		color = sys.argv[2]
 		try:
-			index = sys.argv[3]
+			index = int(sys.argv[3])
 		except:
-			pass
+			index = 0
 	except:
 		print('[CAM ]  Not enough arguments : visio_raspi path_pipe color')
 		close()
@@ -93,6 +92,8 @@ if __name__ == '__main__':
 					+ path + "/config/visio/visio_tourelle_yellow/video*")
 
 	print("[CAM ]  Executing visio with config at", config_path, "on port video" + str(index))
+	v_centre = None
+	v_coin = None
 	try:
 		tourelle = Tourelle()
 		v_centre = visio.Visio(path_to_exec, index, config_path, tourelle, True)
