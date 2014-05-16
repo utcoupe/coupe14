@@ -29,8 +29,12 @@ class Tourelle(dict):
 
 
 def compute(v_centre, v_coin):
+	start = time.time()
 	triangles = v_centre.update()
-	triangles_coin = v_centre.update()
+	inter = time.time()
+	print('[CAM ]  Got', len(triangles), 'triangles from centre in', inter - start, 'sec')
+	triangles_coin = v_coin.update()
+	print('[CAM ]  Got', len(triangles_coin), 'triangles from centre in', time.time() - inter, 'sec')
 	for tri in triangles_coin:
 		for t in triangles:
 			if tri.dist2(t) < DIST_SAME_TRI:
