@@ -49,10 +49,11 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 			pthread_mutex_unlock(&mutexHok);
 
 			ltob(timestamp, ret);
-			ret+=4;
+			ret+=4; //1 long
 			for (i=0; i<NBR_ROBOTS; i++) {
-				itob(data[i].x, ret+2*(2*i));
-				itob(data[i].y, ret+2*((2*i)+1));
+				itob(data[i].x, ret);
+				itob(data[i].y, ret+2);
+				ret += 4; //2 int
 			}
 			ret_size = 20;
 			break;
@@ -64,7 +65,13 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 
 			if (datas_left == 0) { //Debut de trasnmission, copie des datas
 				pthread_mutex_lock(&mutexCam);
-				memcpy(data, lastCamData, last_cam_nbr*sizeof(struct camData));
+				if (last_cam_nbr > 0) {
+					memcpy(data, lastCamData, last_cam_nbr*sizeof(struct camData));
+				} else {
+					data[0].x = -1;
+					data[0].y = -1;
+				}
+
 				datas_left = last_cam_nbr;
 				pthread_mutex_unlock(&mutexCam);
 				current_index = 0;
@@ -75,6 +82,8 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 			itob(datas_left, ret+4);
 			if (datas_left > 0) {
 				current_index++;
+			} else {
+				datas_left = 0;
 			}
 			ret_size = 6;
 			break;

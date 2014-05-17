@@ -34,6 +34,9 @@ void pushResults(struct coord *coords, int nbr, long timestamp) {
 	for(i=0; i<nbr; i++) {
 		fprintf(pipe, " %d %d", coords[i].x, coords[i].y);
 	}
+	for (i=nbr; i<MAX_ROBOTS; i++) {
+		fprintf(pipe, " -1 -1");
+	}
 	fprintf(pipe, "\n");
 	fflush(pipe);
 }
