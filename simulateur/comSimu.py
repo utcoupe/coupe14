@@ -108,6 +108,10 @@ class Communication():
 		elif (order == "RESUME"):
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
 
+		elif order == "O_JACK_STATE":
+			pos = (self.__bigrobot.getStateJack(),)
+			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
+
 		else:
 			print('Error : mauvais paramètre traitement Flussmittel other ! order '+str(order)+" args "+str(args))
 
