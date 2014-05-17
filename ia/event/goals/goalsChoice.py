@@ -7,7 +7,7 @@ import logging
 from math import *
 
 from .goal import *
-from .ElemGoal import *
+from .elemGoal import *
 from .navigation import *
 from .goalsLibrary import *
 
