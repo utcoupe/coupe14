@@ -122,13 +122,13 @@
 		<id_script>9</id_script>
 		<orders>
 			<order>STEP_OVER</order>
-			<order>GET_TRIANGLE_IA</order>
+			<order>GET_TRIANGLE_IA_TORCHE</order>
 			<order>STORE_TRIANGLE_IA</order>
 			<order>STEP_OVER</order>
-			<order>GET_TRIANGLE_IA</order>
+			<order>GET_TRIANGLE_IA_TORCHE</order>
 			<order>STORE_TRIANGLE_IA</order>
 			<order>STEP_OVER</order>
-			<order>GET_TRIANGLE_IA</order>
+			<order>GET_TRIANGLE_IA_TORCHE</order>
 			<order>DYNAMIQUE_OVER</order>
 			<order>STORE_TRIANGLE_IA</order>
 			<order>END</order>
