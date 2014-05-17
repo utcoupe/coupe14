@@ -73,7 +73,7 @@ class PullData():
 				self.__id_flussmittel_other_asked_date = date
 
 			if self.__jack_flussmittel_asked == False and (date - self.__jack_flussmittel_asked_date) > PULL_PERIODE:
-				self.Communication.sendOrderAPI(self.address_tibot_other, 'O_JACK_STATE', *arguments)
+				self.Communication.sendOrderAPI(self.address_flussmittel_other, 'O_JACK_STATE', *arguments)
 				self.__jack_flussmittel_asked = True
 				self.__jack_flussmittel_asked_date = date
 
@@ -165,6 +165,7 @@ class PullData():
 					self.MetaData.startMatch()
 				else:
 					self.__jack_tibot_asked = False
+					self.__jack_flussmittel_asked = False
 			else:
 				if system is not None:
 					if order == 'A_GET_POS_ID':
