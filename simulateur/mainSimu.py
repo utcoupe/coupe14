@@ -84,11 +84,8 @@ if __name__ == "__main__":
 		robots_yellow = None
 
 		if redIA == True:
-			print('red ia')
 			if ENABLE_FLUSSMITTEL == True:
-				print('flussmittel')
 				if ENABLE_TIBOT == True:
-					print('ia red avec les 4 robots')
 					bigbotRed_flag = True
 					minibotRed_flag = True
 					robots_red = ("RED", bigbotRed, minibotRed, bigbotYellow, minibotYellow)

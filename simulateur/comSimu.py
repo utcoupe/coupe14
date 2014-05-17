@@ -51,19 +51,17 @@ class Communication():
 		"""
 		empty_return = ()
 		if (order == "O_BRAS_OUVRIR_BAS"):
-			self.__bigrobot.activerBrasOuvrir()
 			self.__bigrobot.setlastIdActionOther(args[0])
+			self.__bigrobot.activerBrasOuvrir()
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
 
 		elif (order == "O_BRAS_OUVRIR_HAUT"):
-			#TODO ouvrir le bras sans toucher les triangles
-			#self.__bigrobot.activerBrasOuvrir()
 			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
 
 		elif (order == "O_BRAS_FERMER"):
-			self.__bigrobot.activerBrasFermer()
 			self.__bigrobot.setlastIdActionOther(args[0])
+			self.__bigrobot.activerBrasFermer()
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
 
 		elif (order == "GET_LAST_ID"):
@@ -76,12 +74,12 @@ class Communication():
 
 		elif (order == "O_RET"):
 			self.__bigrobot.setlastIdActionOther(args[0])
-			self.__bigrobot.releaseFeuArriere() #pour les tests
+			self.__bigrobot.releaseFeuArriere()
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
 
 		elif (order == "O_GET_TRIANGLE"):
-			self.__bigrobot.activerVisio()
 			self.__bigrobot.setlastIdActionOther(args[0])
+			self.__bigrobot.activerVisio()
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
 
 		elif (order == "O_STORE_TRIANGLE"):
@@ -90,9 +88,9 @@ class Communication():
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, empty_return)
 
 		elif (order == "O_GET_BRAS_STATUS"):
+			self.__bigrobot.setlastIdActionOther(args[0])
 			pos = (self.__bigrobot.getFeuHit(),)
 			self.__bigrobot.setFeuHit(0) #remise à 0 du flag
-			self.__bigrobot.setlastIdActionOther(args[0])
 			self.__addOrder("ADDR_FLUSSMITTEL_OTHER", order, pos)
 
 		elif (order == "O_DROP_TRIANGLE"):
@@ -219,13 +217,13 @@ class Communication():
 			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
 		elif (order == "O_TIR_BALLE"):
-			self.__minirobot.lancerBalle(args[1]) #args = nbr balles à lancer
 			self.__minirobot.setlastIdActionOther(args[0])
+			self.__minirobot.lancerBalle(args[1]) #args = nbr balles à lancer
 			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
 		elif (order == "O_TIR_FILET"):
-			self.__minirobot.tirFilet()
 			self.__minirobot.setlastIdActionOther(args[0])
+			self.__minirobot.tirFilet()
 			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
 		elif (order == "O_BALAI"):
@@ -235,8 +233,8 @@ class Communication():
 			1 : bras à droite des fresques
 			-1 : bras à gauche des fresques
 			"""
-			self.__minirobot.ouvrirBras(args[1])
 			self.__minirobot.setlastIdActionOther(args[0])
+			self.__minirobot.ouvrirBras(args[1])
 			self.__addOrder("ADDR_TIBOT_OTHER", order, empty_return)
 
 		elif order == "O_JACK_STATE":

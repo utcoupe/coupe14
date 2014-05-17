@@ -48,7 +48,7 @@ class Robot(EngineObjectPoly):
 		self.__time_stamp = self.__get_milli()
 		self.__time_stamp_origine = self.__get_milli()
 
-		#utilité ?
+		#!!! ne pas modifier ces variables, elles sont utilisés pour l'interaction avec l'utilisateur !
 		self.__current_team = RED
 		self.__current_robot = BIG
 
@@ -58,10 +58,10 @@ class Robot(EngineObjectPoly):
 		self.__engine = engine
 
 	def getRobotType(self):
-		return self.__current_robot
+		return self.__typerobot
 
 	def setRobotType(self, type):
-		self.__current_robot = type
+		self.__typerobot = type
 
 	def getXreal(self):
 		"""
