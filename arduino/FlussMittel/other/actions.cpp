@@ -79,18 +79,20 @@ void initAct() {
 }
 
 void callbackRet(int use) {
-	static long time_end = 0;
-	static bool active = false;
-	long now = timeMillis();
-	if (use) { //Set timer
-		time_end = now + DELAY_RET;
-		servoRet.write(ANGLE_RET);
-		active = true;
-	} else if (active) { //update regulier
-		if (now >= time_end) {
-			servoRet.write(180);
-			setLastId();
-			active = false;
+	if (use_act) {
+		static long time_end = 0;
+		static bool active = false;
+		long now = timeMillis();
+		if (use == ACTIVATE) { //Set timer
+			time_end = now + DELAY_RET;
+			servoRet.write(ANGLE_RET);
+			active = true;
+		} else if (active) { //update regulier
+			if (now >= time_end && use_act) {
+				servoRet.write(180);
+				setLastId();
+				active = false;
+			}
 		}
 	}
 }
