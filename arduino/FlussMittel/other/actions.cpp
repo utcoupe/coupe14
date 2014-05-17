@@ -417,7 +417,7 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 				//Remonter asc
 				if (got_tri) {
 					if (!block) { //On continue
-						int hauteur = MAX(getCurrentHauteur() + MARGE_PREHENSION, abs(depot) + MARGE_DEPOT);
+						int hauteur = MIN(HAUTEUR_MAX, MAX(MAX(getCurrentHauteur() + MARGE_PREHENSION, h + MARGE_PREHENSION), asb(depot) + MARGE8DEPOT);
 						if (depot < 0) {
 							hauteur = HAUTEUR_MAX;
 							servoRet.write(180);
