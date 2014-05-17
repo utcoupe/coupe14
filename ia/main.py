@@ -64,12 +64,13 @@ def startIa(pipe=None, ia_color="RED"):
 	TimeManager = event.TimeManager(Communication, Data)
 	EventManager = event.EventManager(Communication, Data)
 
-	if TEST_MODE == True:
-		TimeManager.startMatch()
-
 	while Data.MetaData.getInGame() == False:
 		time.sleep(0.01)
 	TimeManager.startMatch()
+
+	#On attend sagement la fin
+	while True:
+		time.sleep(0.1)
 
 
 #si on lance l'IA via le main.py

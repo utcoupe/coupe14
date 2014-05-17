@@ -19,8 +19,7 @@ class GoalsLibrary:
 		self.__blocked_goals = blocked_goals
 		self.__PathFinding = pathfinding
 
-	def getOrderTrajectoire(self, goal, elem_goal_id, position_depart_speciale=None):
-		"""Il faut mettre à jour les polygones avant d'utiliser cette fonction"""
+	def getPositionLastGoal(self, position_depart_speciale=None):
 		if position_depart_speciale is not None:
 			position_last_goal = position_depart_speciale
 			self.__logger.debug("Position from position_depart_speciale" + str(position_last_goal))
@@ -32,6 +31,10 @@ class GoalsLibrary:
 			position_last_goal = self.__data[self.__robot_name]["getPositionAndAngle"]
 			self.__logger.debug("Position from data" + str(position_last_goal))
 
+		return position_last_goal
+
+	def getOrderTrajectoire(self, goal, elem_goal_id, position_last_goal):
+		"""Il faut mettre à jour les polygones avant d'utiliser cette fonction"""
 		position_to_reach = goal.getElemGoalOfId(elem_goal_id).getPositionAndAngle()
 		path = self.__PathFinding.getPath((position_last_goal[0], position_last_goal[1]), (position_to_reach[0], position_to_reach[1]), enable_smooth=True)
 

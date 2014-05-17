@@ -265,19 +265,23 @@ class OurBot():
 				self.__actions_en_cours = None
 				id_canceled_list.append(id)
 
+		obj_temp = deque()
+		find = False
 		#on vide les objectifs en attente
 		for objectif in self.__objectifs:
-			id = objectif[0]
-			if id_objectif == id:
-				removed_objectif = self.__objectifs.pop()
-				if removed_objectif[0] == id_objectif:
-					#Si on l'a déjà mis depuis action en cours on ne le rajoute pas
-					if id_canceled_list == []:
-						id_canceled_list.append(removed_objectif[0])
-				while removed_objectif[0] != id_objectif:
-					id_canceled_list.append(removed_objectif[0])
-					removed_objectif = self.__objectifs.pop()
-				break
+			if objectif[0] == id_objectif:
+				find = True
+
+			if find == True:
+				id_removed = objectif[0]
+				if id_removed not in id_canceled_list:
+					id_canceled_list.append(id_removed)
+			else:
+				obj_temp.append(objectif)
+
+		#on remet les elements à ne pas supprimer
+		self.__objectifs.clear()
+		self.__objectifs.extend(obj_temp)
 		return id_canceled_list
 	
 

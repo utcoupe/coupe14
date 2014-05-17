@@ -13,6 +13,8 @@ PATH_CONFIG = "/config/visio/visio_tourelle_"
 PATH_TO_EXEC = "/supervisio/visio"
 PATH_PIPE = "/config/raspi/pipe_cameras"
 DIST_SAME_TRI = 100
+ENABLE_COIN = True
+ENABLE_CENTRE = True
 
 
 class Tourelle(dict):
@@ -28,11 +30,10 @@ class Tourelle(dict):
 		return (0, 0, 0)
 
 
-def compute(v_centre, v_coin):
-	triangles = v_centre.update()
-	triangles_coin = v_centre.update()
-	for tri in triangles_coin:
-		for t in triangles:
+def merge(tri_centre, tri_coin):
+	triangles = tri_centre
+	for tri in tri_coin:
+		for t in tri_centre:
 			if tri.dist2(t) < DIST_SAME_TRI:
 				triangles.append(tri)
 				break
@@ -90,14 +91,18 @@ if __name__ == '__main__':
 	os.system("rm " + path + "/config/visio/visio_tourelle_red/video* " \
 					+ path + "/config/visio/visio_tourelle_yellow/video*")
 
-	print("[CAM ]  Executing visio with config at", config_path, "on port video" + str(index))
+	print("[CAM ]  Executing visio with config at", config_path)
 	v_centre = None
 	v_coin = None
 	try:
 		tourelle = Tourelle()
-		v_centre = visio.Visio(path_to_exec, index, config_path, tourelle, True)
-		v_coin = visio.Visio(path_to_exec, index+1, config_path, tourelle, True)
-		print('[CAM ]  Successfully opened visio on ports', index, 'and', index+1)
+		if ENABLE_CENTRE:
+			v_centre = visio.Visio(path_to_exec, index, config_path, tourelle, True)
+			print('[CAM ]  Successfully opened visio on port', index)
+			index += 1
+		if ENABLE_COIN:
+			v_coin = visio.Visio(path_to_exec, index, config_path, tourelle, True)
+			print('[CAM ]  Successfully opened visio on port', index)
 		success = True
 	except BaseException as e:
 		print("[CAM ]  Failed to open visio programs : "+str(e))
@@ -122,9 +127,12 @@ if __name__ == '__main__':
 		start = time.time()
 		triangles = []
 		try:
-			triangles = compute(v_centre, v_coin)
+			if v_centre is not None:
+				merge(v_centre.update(), triangles)
+			if v_coin is not None :
+				merge(v_coin.update(), triangles)
+			print("Detected", len(triangles), "in", (time.time() - start), "seconds")
 			send(triangles, pipe)
-			#print("Detected", len(triangles), "in", (time.time() - start), "seconds")
 		except BaseException as e:
 			conti = False
 			print("Failed to compute and send triangles :", str(e))
@@ -132,6 +140,8 @@ if __name__ == '__main__':
 			triangles = []
 
 	print('Closing')
-	v_coin.close()
-	v_centre.close()
+	if v_centre is not None:
+		v_centre.close()
+	if v_coin is not None :
+		v_coin.close()
 	close()
