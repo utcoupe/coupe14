@@ -107,10 +107,10 @@ class GoalsManager:
 
 				if best_goal[1] != None:
 					self.__logger.info("On a choisi l'objectif goal_id "+str(best_goal[1].getId())+" elem_goal_id "+str(best_goal[2])+" avec le path "+str(best_goal[0]))
-					self.__SubProcessManager.setLastDateBlocked(None)
+					self.__SubProcessManager.setLastDateNoGoal(None)
 					self.__addGoal(best_goal[0], best_goal[1], best_goal[2])
 				else:
-					self.__SubProcessManager.setLastDateBlocked(int(time.time()*1000))
+					self.__SubProcessManager.setLastDateNoGoal(int(time.time()*1000))
 					self.__logger.info(str(self.__robot_name)+" aucun objectif accessible")
 			else:
 				self.__logger.info(str(self.__robot_name)+" N'a plus aucun objectif disponible, GG (ou pas, y'a toujours un truc à faire) !")
@@ -624,7 +624,8 @@ class GoalsManager:
 			for goal in self.__available_goals:
 				if goal.getId() == id_objectif:
 					find = True
-					path = self.__goalsLib.getOrderTrajectoire(goal, elem_goal_id, position_depart_speciale)
+					position_last_goal = self.__goalsLib.getPositionLastGoal(position_depart_speciale)
+					path = self.__goalsLib.getOrderTrajectoire(goal, elem_goal_id, position_last_goal)
 					if path != []:
 						self.__addGoal(path, goal, elem_goal_id, prev_action=prev_action)
 					else:
