@@ -35,7 +35,9 @@ class ElemGoal:
 				action = self.__elem_action_temp.popleft()
 
 	def resetElemAction(self):
-		self.__elem_action_temp = copy.deepcopy(self.__elem_action_base)
+		#TODO verifier qu'il faut bien retirer cette ligne
+		#self.__elem_action_temp = copy.deepcopy(self.__elem_action_base)
+		pass
 
 	def getPositionAndAngle(self):
 		return (self.__x, self.__y, self.__angle)
