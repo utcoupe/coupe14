@@ -138,7 +138,6 @@ class EventManager():
 
 	def __checkEvent(self):
 		self.__checkBrasStatus()
-
 		
 		new_data = ()
 		if self.__Flussmittel is not None:

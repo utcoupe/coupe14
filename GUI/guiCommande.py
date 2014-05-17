@@ -44,6 +44,10 @@ def gui(com):
 				elif order == 'r':
 					arguments = [0, 0, 0.0]
 					com.sendOrderAPI(4, 'A_SET_POS', *arguments)
+				elif order == 't':
+					arguments = []
+					com.sendOrderAPI(5, 'T_GET_CAM', *arguments)
+					com.sendOrderAPI(5, 'T_GET_HOKUYO', *arguments)
 
 				elif order == 's':
 					arguments = [0,2000,0]

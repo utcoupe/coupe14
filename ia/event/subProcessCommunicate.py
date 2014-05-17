@@ -27,6 +27,7 @@ class SubProcessCommunicate():
 		
 	def readOrders(self):
 		"""retourne les données des subprocess"""
+		self.__updateSubProcessData()
 		input_list = deque()
 		if self.__Data.Flussmittel is not None:
 			input_list.extend(self.__subprocess_flussmittel.readPackets())

@@ -11,7 +11,7 @@ TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux
 
 
 #====================Enable====================
-ENABLE_TOURELLE = 		False
+ENABLE_TOURELLE = 		True
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
 ENABLE_TIBOT = 			True
 
@@ -62,6 +62,7 @@ BEGIN_CHECK_COLLISION =	3000 #TODO
 
 #====================Goal====================
 FINISHED_THRESHOLD = 	50
+OBJECTIF_SEARCH_PERIODE = 1000
 
 #====================pullData====================
 PULL_SYSTEM_PERIODE = 	10 #période du système de pull en ms
@@ -71,10 +72,10 @@ PULL_PERIODE = 			100
 #====================NAVIGATION================
 EMPTY_FIFO = 			True
 POINTS_PAR_CERCLE = 	8
-MARGE_PASSAGE_PATH = 	0
+MARGE_PASSAGE_PATH = 	10
 MARGE_COLLISION =		-20
-COLLISION_THRESHOLD =	150
-COLLISION_WARNING_THRESHOLD = 500
+COLLISION_THRESHOLD =	400
+COLLISION_WARNING_THRESHOLD = 800
 
 
 #=======================================Systemes physiques========================================

@@ -430,7 +430,7 @@ class CommunicationGlobale():
 							index += size
 						elif returnType == 'long':
 							size = 32
-							retour = conversion.binaryToInt(argumentData[index:index+size])
+							retour = conversion.binaryToLong(argumentData[index:index+size])
 							arguments.append(retour)
 							index += size
 						else:

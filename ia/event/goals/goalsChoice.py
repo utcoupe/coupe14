@@ -46,6 +46,7 @@ class GoalsChoice:
 	def __getBestGoalFlussmittel(self, goals):
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 		best_length = float("Inf")
+		position_last_goal = self.__goalsLib.getPositionLastGoal()
 
 		for goal in goals:
 				if len(self.__front_triangle_stack) == MAX_FRONT_TRIANGLE_STACK:
@@ -56,7 +57,7 @@ class GoalsChoice:
 						continue
 				nb_elem_goal = goal.getLenElemGoal()
 				for idd in range(nb_elem_goal):
-					path = self.__goalsLib.getOrderTrajectoire(goal, idd)
+					path = self.__goalsLib.getOrderTrajectoire(goal, idd, position_last_goal)
 					if path != []:
 						length = self.__goalsLib.pathLen(path)
 						if length < best_length:
@@ -68,13 +69,14 @@ class GoalsChoice:
 	def __getBestGoalTibot(self, goals):
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 		best_length = float("Inf")
-
-		best_goal_filet = None
+		best_goal_filet = ([], None, None)
 		best_length_filet = float("Inf")
+		position_last_goal = self.__goalsLib.getPositionLastGoal()
+
 		for goal in goals:
 			nb_elem_goal = goal.getLenElemGoal()
 			for idd in range(nb_elem_goal):
-				path = self.__goalsLib.getOrderTrajectoire(goal, idd)
+				path = self.__goalsLib.getOrderTrajectoire(goal, idd, position_last_goal)
 				if path != []:
 					length = self.__goalsLib.pathLen(path)
 					if goal.getType() != "FILET":
