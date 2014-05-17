@@ -133,6 +133,7 @@ class GoalsManager:
 				self.__blocked_goals.remove(objectif)
 				self.__dynamique_finished_goals.append(objectif)
 				self.__logger.info(str(self.__robot_name)+" L'objectif "+str(objectif.getName())+" d'id "+str(objectif.getId())+" est a terminé ses actions dynamiques")
+				self.__queueBestGoals()
 				break
 
 	def goalCanceledIdFromEvent(self, id_objectif):
@@ -190,7 +191,7 @@ class GoalsManager:
 			self.__id_objectif_send.append(goal.getId())
 		else:
 			#TODO, ce cas peut-il vrament arrivé ?
-			self.__logger.warning("On va rechercher un nouvel ordre")
+			self.__logger.error("On va rechercher un nouvel ordre, ce cas peut-il vrament arrivé")
 			self.__queueBestGoals()
 
 	def __cancelGoal(self, goal, fromEvent=False):
@@ -213,6 +214,7 @@ class GoalsManager:
 				self.__front_triangle_stack.clear()
 				self.__back_triangle_stack.clear()
 			self.__logger.info('Goal ' + str(goal.getName()) + " d'id "+str(goal.getId())+" is finished")
+			#Dans le cas où on aurait oublier le DYNAMIQUE_OVER
 			self.__queueBestGoals()
 		#Dans le cas où c'est l'autre robot qui à fait l'objectif
 		elif goal in self.__available_goals:
