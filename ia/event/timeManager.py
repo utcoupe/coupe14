@@ -19,7 +19,6 @@ class TimeManager():
 		self.__date_match_begin = None
 		self.__wait_dico = {}
 
-		self.__broadcastStopOrder()
 		self.__sendResetBot()
 		Data.startPullData()
 
@@ -65,17 +64,12 @@ class TimeManager():
 		empty_arg = []
 
 		if self.__Flussmittel is not None:
-			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressOther(), 'PAUSE', *empty_arg)
 			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'PAUSE', *empty_arg)
-			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_CLEANG', *empty_arg)
-			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressOther(), 'RESUME', *empty_arg)
-			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'RESUME', *empty_arg)
+			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressOther(), 'PAUSE', *empty_arg)
+
 		if self.__Tibot is not None:
-			self.__Communication.sendOrderAPI(self.__Tibot.getAddressOther(), 'PAUSE', *empty_arg)
 			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'PAUSE', *empty_arg)
-			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_CLEANG', *empty_arg)
-			self.__Communication.sendOrderAPI(self.__Tibot.getAddressOther(), 'RESUME', *empty_arg)
-			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'RESUME', *empty_arg)
+			self.__Communication.sendOrderAPI(self.__Tibot.getAddressOther(), 'PAUSE', *empty_arg)
 
 		self.__logger.info("On arrete les robtos avec broadcastStopOrder")
 
@@ -88,8 +82,6 @@ class TimeManager():
 				self.__logger.error("On a pas initialisé la position de Flussmittel")
 			self.__Flussmittel.setPosition(position_arg[0], position_arg[1], position_arg[2])
 			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'A_SET_POS', *position_arg)
-			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressAsserv(), 'RESET_ID', *empty_arg)
-			self.__Communication.sendOrderAPI(self.__Flussmittel.getAddressOther() , 'RESET_ID', *empty_arg)
 
 
 		if self.__Tibot is not None:
@@ -98,7 +90,5 @@ class TimeManager():
 				self.__logger.error("On a pas initialisé la position de Tibot")
 			self.__Tibot.setPosition(position_arg[0], position_arg[1], position_arg[2])
 			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'A_SET_POS', *position_arg)
-			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'RESET_ID', *empty_arg)
-			self.__Communication.sendOrderAPI(self.__Tibot.getAddressOther() , 'RESET_ID', *empty_arg)
 
 

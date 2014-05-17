@@ -8,7 +8,7 @@ from math import *
 
 from collections import deque
 from .goal import *
-from .ElemGoal import *
+from .elemGoal import *
 from .navigation import *
 
 class GoalsLibrary:

@@ -20,18 +20,13 @@ class ElemGoal:
 		self.__already_step_over = False
 
 	def getFirstElemAction(self):
-		if self.__elem_action_temp:
-			action_list = []
-			continu = True
-			for action in self.__elem_action_temp:
-				if continu:
-					action_list.append(action)
-				if action[0] == "END" or action[0] == "STEP_OVER":
-					continu = False
-					break
-			return action_list
-		else:
-			return []
+		action_list = []
+		for action in self.__elem_action_temp:
+			action_list.append(action)
+			if action[0] == "END" or action[0] == "STEP_OVER":
+				break
+		return action_list
+
 
 	def removeFirstElemAction(self):
 		if self.__elem_action_temp:

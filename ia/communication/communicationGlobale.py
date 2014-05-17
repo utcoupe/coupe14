@@ -56,7 +56,6 @@ class CommunicationGlobale():
 			self.returnSize[order] = size
 
 		
-		
 		self.ordreLog = [[(-1,"")]*64 for x in range(self.nbAddress+1)] #stock un historique des ordres envoyés, double tableau de tuple (ordre,data)
 		self.arduinoIdReady = [False]*(self.nbAddress+1)
 		self.lastConfirmationDate = [-1]*(self.nbAddress+1)#date de la dernière confirmation(en milliseconde)
