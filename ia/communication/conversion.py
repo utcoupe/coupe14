@@ -32,7 +32,7 @@ def binaryToInt(string):
 	temp += string[0:8]
 
 	resultat = int(temp, 2)
-	if resultat>32767:
+	if resultat > 32767:
 		resultat -= 65536
 	return resultat
 
@@ -42,8 +42,8 @@ def binaryToLong(string):
 	retour += string[8:16]
 	retour += string[0:8]
 
-	resultat = int(retour, 2)
-	if resultat>2147483647: #si le nombre est négatif
+	resultat = long(retour, 2)
+	if resultat > 2147483647: #si le nombre est négatif
 		resultat -= 4294967295
 	return resultat
 
