@@ -21,7 +21,7 @@ AF_Stepper stepper_motor(200, 2);
 AF_DCMotor pump_motor(2, MOTOR12_64KHZ);
 AccelStepper stepperAsc(forwardstep, backwardstep);
 
-static int goal_hauteur = 0, step = -1, current_alpha = 0, current_theta = 0;
+static int goal_hauteur = 0, step = -1, current_alpha = 0, current_theta = 0, tri_in_depot = 0;
 static bool block = false;
 static bool call_critical = false;
 static enum action action_en_cours = None;
@@ -240,6 +240,7 @@ void cmdBrasDepot(double a, int l) {
 				break;
 			case 6:
 				pump(false);
+				tri_in_depot--;
 				time_end = timeMicros() + (long)DELAY_STOP_PUMP*1000;
 				step++;
 				break;
@@ -277,7 +278,7 @@ void cmdTriPush() {
 
 		switch(step) {
 			case 0: {
-				hauteur_revele = getCurrentHauteur() + MARGE_PREHENSION; //On remontera toujours par rapport à la position actulle, pour eviter de pousser un triangles (petite perte pour grande securité)
+				hauteur_revele = getCurrentStockHeight() + MARGE_PREHENSION; //On remontera toujours par rapport à la position actulle, pour eviter de pousser un triangles (petite perte pour grande securité)
 				int hauteur = MIN(HAUTEUR_MAX, MAX(hauteur_revele, HAUTEUR_PUSH_TRI));
 				cmdAsc(hauteur);
 				step++;
@@ -417,7 +418,7 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 				//Remonter asc
 				if (got_tri) {
 					if (!block) { //On continue
-						int hauteur = MAX(getCurrentHauteur() + MARGE_PREHENSION, abs(depot) + MARGE_DEPOT);
+						int hauteur = MIN(HAUTEUR_MAX, MAX(MAX(getCurrentHauteur() + MARGE_PREHENSION, h + MARGE_PREHENSION), abs(depot) + MARGE_DEPOT));
 						if (depot < 0) {
 							hauteur = HAUTEUR_MAX;
 							servoRet.write(180);
@@ -451,6 +452,7 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 				//Lacher pompe
 				pump(false);
 				if (depot > 0) { //Depot a l'avant
+					tri_in_depot++;
 					step = 6;
 				} else { //Depot a l'arriere
 					step = 5;
@@ -571,6 +573,10 @@ void criticalCmdBras(int n_theta, int n_alpha) {
 
 int getCurrentHauteur() {
 	return stepperAsc.currentPosition() / H_TO_STEP;
+}
+
+int getCurrentStockHeight() {
+	return (tri_in_depot * 30) + HAUTEUR_MIN;
 }
 
 void ascInt() {

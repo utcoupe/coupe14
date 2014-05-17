@@ -268,10 +268,11 @@ class GoalsManager:
 	def __manageStepOver(self, objectif, id_objectif, skip_get_triangle=False):
 		action_list = objectif.getElemGoalLocked().getFirstElemAction()
 		if action_list:
-			if action_list[0][0] == "GET_TRIANGLE_IA" and self.__robot_name == "FLUSSMITTEL":#Redondant normalement
+			if (action_list[0][0] == "GET_TRIANGLE_IA" or action_list[0][0] == "GET_TRIANGLE_IA_TORCHE")  and self.__robot_name == "FLUSSMITTEL":#Redondant normalement
+				get_triangle_mode = action_list[0][0]
 				if skip_get_triangle == True:
 					position = None # 1=front and -1=back
-					hauteur = None #hauteur en mm
+					hauteur_drop = None #hauteur en mm
 					nb_front_stack = len(self.__front_triangle_stack) 
 					nb_back_stack = len(self.__back_triangle_stack)
 					stack_full = False
@@ -281,7 +282,7 @@ class GoalsManager:
 						if nb_front_stack < MAX_FRONT_TRIANGLE_STACK:
 							self.__front_triangle_stack.append(self.__last_camera_color)
 							position = 1
-							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE
+							hauteur_drop = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE
 						else:
 							self.__logger.error("On a pas la place pour stocker ce triangle à l'avant, ca cas ne devrait pas arriver !")
 							stack_full = True
@@ -291,13 +292,13 @@ class GoalsManager:
 						if (nb_front_stack < MAX_FRONT_TRIANGLE_STACK) and (nb_back_stack < MAX_BACK_TRIANGLE_STACK):
 							self.__back_triangle_stack.append(self.__last_camera_color)
 							position = -1
-							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
+							hauteur_drop = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
 						elif (nb_front_stack < MAX_FRONT_TRIANGLE_STACK) and (nb_back_stack >= MAX_BACK_TRIANGLE_STACK):
 							self.__back_triangle_stack.popleft()
 							script_to_send.append( ("O_RET", ()) )
 							self.__back_triangle_stack.append(self.__last_camera_color)
 							position = -1
-							hauteur = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
+							hauteur_drop = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
 						else:
 							self.__logger.error("On a pas la place pour stocker ce triangle ni à l'avant ni à l'arrière, ce cas ne devrait pas arriver !")
 							stack_full = True
@@ -307,8 +308,8 @@ class GoalsManager:
 						script_base = action_list
 						for action in script_base:
 							if action[0] == "STORE_TRIANGLE_IA":
-								script_to_send.append( ("O_STORE_TRIANGLE", (int(position*hauteur),)) )
-							elif action[0] == "GET_TRIANGLE_IA":
+								script_to_send.append( ("O_STORE_TRIANGLE", (int(position*hauteur_drop),)) )
+							elif action[0] == "GET_TRIANGLE_IA" or action[0] == "GET_TRIANGLE_IA_TORCHE":
 								pass
 							else:
 								script_to_send.append(action)
@@ -317,7 +318,7 @@ class GoalsManager:
 
 				else:
 					if TEST_MODE == False:
-						limite_essai_viso = 5
+						limite_essai_viso = 10
 						triangle_find = False
 						triangle_list = []
 						while limite_essai_viso != 0 and triangle_find == False:
@@ -370,7 +371,10 @@ class GoalsManager:
 						else:
 							if self.__positionReady(data_camera[1], data_camera[2]):
 								script_get_triangle = deque()
-								script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], HAUTEUR_TORCHE+3*HAUTEUR_TRIANGLE)) ) #TODO hauteur par triangle dans le cas des triangles au sol
+								if get_triangle_mode == "GET_TRIANGLE_IA":
+									script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], HAUTEUR_TRIANGLE)) )
+								elif get_triangle_mode == "GET_TRIANGLE_IA_TORCHE":
+									script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], HAUTEUR_TORCHE+3*HAUTEUR_TRIANGLE)) )
 								script_get_triangle.append( ("THEN", ()) )
 								script_get_triangle.append( ("O_GET_BRAS_STATUS", ()) )
 								script_get_triangle.append( ("THEN", (),) )
