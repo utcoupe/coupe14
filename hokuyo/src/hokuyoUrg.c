@@ -2,8 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <urg_sensor.h>
-#include <urg_serial_utils.h>
+#include <urg_ctrl.h>
 #include "global.h"
 
 
@@ -13,26 +12,25 @@ initHokuyoUrg(char* device, double angleMin, double angleMax){
 	urg = malloc(sizeof(urg_t));
 	if( urg == NULL ) exit(EXIT_FAILURE);
 
-	int error = urg_open(urg, URG_SERIAL, device, BAUDRATE_HOKUYOURG);
+	int error = urg_connect(urg, device, BAUDRATE_HOKUYOURG);
 
 	if(error < 0){
-		urg_close(urg);
-		fprintf(stderr, "%s%s :: %s on %s\n", PREFIX, "connection failed on open", urg_error(urg), device);
+		urg_disconnect(urg);
+		fprintf(stderr, "%sconnection failed on %s\n",PREFIX, device);
 		exit(EXIT_FAILURE);
 	}
 	
 	printf("%sConnection établie à %s\n", PREFIX, device);
 
 	printf("%sHokuyo init from %f to %f\n", PREFIX, angleMin*180/PI, angleMax*180/PI);
-    urg_set_scanning_parameter(urg, urg_rad2step(urg, angleMin), urg_rad2step(urg, angleMax), 0);//scan en continu, on ne garde que les point entre angleMin et angleMax
+	urg_setCaptureTimes(urg, UrgInfinityTimes);
+    error = urg_requestData(urg, URG_MD, urg_rad2index(urg, angleMin), urg_rad2index(urg, angleMax));//scan en continu, on ne garde que les point entre angleMin et angleMax
 	
 	printf("%sParameters set #1\n", PREFIX);
 
-	error = urg_start_measurement(urg, URG_DISTANCE, URG_SCAN_INFINITY, 0);
-
 	if(error < 0){
-		urg_close(urg);
-		fprintf(stderr, "%s%s :: %s on %s\n", "connection failed on starting", PREFIX, urg_error(urg), device);
+		urg_disconnect(urg);
+		fprintf(stderr, "%sconnection failed on starting on %s\n", PREFIX, device);
 		exit(EXIT_FAILURE);
 	}
 	
@@ -40,49 +38,20 @@ initHokuyoUrg(char* device, double angleMin, double angleMax){
 }
 
 void
-resetHokuyoUrg(void* urg, double angleMin, double angleMax){
-	urg_stop_measurement((urg_t*)urg);
+resetHokuyoUrg(urg_t* urg, double angleMin, double angleMax){
 	printf("%sHokuyo reinit from %f to %f\n", PREFIX, angleMin*180/PI, angleMax*180/PI);
-	urg_set_scanning_parameter((urg_t*)urg, urg_rad2step(urg, angleMin), urg_rad2step(urg, angleMax), 0);
+	urg_setCaptureTimes(urg, UrgInfinityTimes);
+    int error = urg_requestData(urg, URG_MD, urg_rad2index(urg, angleMin), urg_rad2index(urg, angleMax));//scan en continu, on ne garde que les point entre angleMin et angleMax
 	printf("%sParameters set #2\n", PREFIX);
-
-	int error = urg_start_measurement((urg_t*)urg, URG_DISTANCE, URG_SCAN_INFINITY, 0);
 	if(error < 0){
-		urg_close(urg);
-		fprintf(stderr, "%s%s :: %s\n", "connection failed on resetting", PREFIX, urg_error((urg_t*)urg));
+		urg_disconnect(urg);
+		fprintf(stderr, "%sconnection failed on resetting\n", PREFIX);
 		exit(EXIT_FAILURE);
 	}
 }
 
-void
-closeHokuyoUrg(void* urg){
-	urg_close((urg_t*)urg);
-}
-
-void
-restartHokuyoUrg(void* urg){
-	int error = urg_start_measurement((urg_t*)urg, URG_DISTANCE, URG_SCAN_INFINITY, 0);
-	if(error < 0){
-		urg_close(urg);
-		fprintf(stderr, "%s%s :: %s\n", "connection failed on restarting", PREFIX, urg_error((urg_t*)urg));
-		exit(EXIT_FAILURE);
-	};
-	printf("%sHokuyo succesfully restarted !\n", PREFIX);
-}
-
 int
-getnPointsHokuyoUrg(void* urg){
-	return urg_get_distance((urg_t*)urg, NULL, NULL);
+getnPointsHokuyoUrg(urg_t* urg){
+	long int temp[MAX_DATA];
+	return  urg_receiveData(urg, temp, MAX_DATA);
 }
-
-double
-getAngleFromIndexHokuyoUrg(void* urg, int index){
-	return urg_index2rad((urg_t*)urg, index);
-}
-
-void
-getDistancesHokuyoUrg(void* urg, long* buffer){
-	urg_get_distance((urg_t*)urg, buffer, NULL);
-}
-
-

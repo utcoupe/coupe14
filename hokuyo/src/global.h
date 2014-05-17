@@ -13,14 +13,22 @@
 #define MARKER_DETECTION_ZONE_SIZE 500/*mm*/
 #define MARKER_DETECTION_STEPS 20
 
-#define HOKUYO_WATCHDOG 150 /* ms */
-
 #define MAX_CLUSTERS 100 /*Ceux apres 100 seront abandonnés !*/
 #define MAX_AB_POINTS 15 /*Nombre de points abberants consecutifs max*/
 
 #define MAX_MIN_DIST 100	/*mm, distance max entre 2 points les plus proches dans un groupe*/
 
+#define HOK1_X -25
+#define HOK1_Y -25
+#define HOK1_A 0
+#define HOK1_AMIN 0
+#define HOK1_AMAX PI/2
 
+#define HOK2_X 3025
+#define HOK2_Y 1000
+#define HOK2_A PI
+#define HOK2_AMIN (PI/2)
+#define HOK2_AMAX (3*PI/2)
 //#define DEBUG_DO_NOT_REMOVE_POINTS
 #define MAX_DISTANCE sqrt(TAILLE_TABLE_X*TAILLE_TABLE_X + TAILLE_TABLE_Y*TAILLE_TABLE_Y)
 #define DISTANCE_TO_EDGE_MIN 80 /*mm*/

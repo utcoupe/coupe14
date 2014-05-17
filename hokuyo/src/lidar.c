@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <urg_utils.h>
 #include <math.h>
 #include <err.h>
+#include <urg_ctrl.h>
 #include "hokuyoUrg.h"
 #include "global.h"
 #include "robot.h"
@@ -30,7 +30,7 @@ theta(struct coord lidar, struct coord marker){
 struct coord* getPointsCalibrate(struct lidar* l, char calibration);
 
 struct lidar
-initLidarAndCalibrate(enum lidarModel model, char* device, struct coord position, double orientation, double angleMin, double angleMax){
+initLidarAndCalibrate(char* device, struct coord position, double orientation, double angleMin, double angleMax){
 	struct coord markerPos;
 	markerPos.x = MARKER_R_POS_X;
 	markerPos.y = MARKER_R_POS_Y;
@@ -39,9 +39,8 @@ initLidarAndCalibrate(enum lidarModel model, char* device, struct coord position
 	distanceThMin = pow(sqrt(distanceThMin)-MARKER_DETECTION_ZONE_SIZE/2,2);
 	double thetaTh = theta(position, markerPos);
 	printf("%sthetha TH:%f  -> %f\n", PREFIX, thetaTh, thetaTh*180/PI);
-	//printf("detectionMinAngle:%f\tdetectionMaxAngle%f\n", (thetaTh-MARKER_DETECTION_ANGLE/2)*180/PI, (thetaTh+MARKER_DETECTION_ANGLE/2)*180/PI );
 	
-	struct lidar l = initLidar(model, device, position, orientation, thetaTh-MARKER_DETECTION_ANGLE/2, thetaTh+MARKER_DETECTION_ANGLE);
+	struct lidar l = initLidar(device, position, orientation, thetaTh-MARKER_DETECTION_ANGLE/2, thetaTh+MARKER_DETECTION_ANGLE);
 
 	long sumMarkerPos_x = 0, sumMarkerPos_y = 0;
 	int nbClustersFound = 0;
@@ -76,8 +75,7 @@ initLidarAndCalibrate(enum lidarModel model, char* device, struct coord position
 	double *angles = malloc(sizeof(double)*nAngles);
 	if(angles == NULL) exit(EXIT_FAILURE);
 	for(int i=0; i<nAngles; i++){
-		angles[i] = getAngleFromIndexHokuyoUrg(l.lidarObject, i) + l.orientation;
-		//printf("angleFromhokuyo:%f\tangle[%i]:%f\n", getAngleFromIndexHokuyoUrg(l.lidarObject, i)*180/PI, i, angles[i]*180/PI);
+		angles[i] = urg_index2rad(l.lidarObject, i) + l.orientation;
 	}
 	freeFastmath(l.fm);
 	l.fm = initFastmath( nAngles, angles );
@@ -94,30 +92,31 @@ initLidarAndCalibrate(enum lidarModel model, char* device, struct coord position
 }
 
 struct lidar
-initLidar(enum lidarModel model, char* device, struct coord position, double orientation, double angleMin, double angleMax){
+initLidar(char* device, struct coord position, double orientation, double angleMin, double angleMax){
 	struct lidar l;
-	l.model = model;
 	l.pos = position;
 	l.orientation = orientation;
 
 	printf("%sorientation:%f\n", PREFIX, orientation*180/PI);
 
-	if(model == hokuyo_urg){
-
-		l.lidarObject = initHokuyoUrg(device, angleMin - orientation, angleMax - orientation);
-
-		int nAngles = getnPointsHokuyoUrg(l.lidarObject);
-		double *angles = malloc(sizeof(double)*nAngles);
-		if(angles == NULL) exit(EXIT_FAILURE);
-		for(int i=0; i<nAngles; i++){
-			angles[i] = getAngleFromIndexHokuyoUrg(l.lidarObject, i) + orientation;
-			//printf("angleFromhokuyo:%f\tangle[%i]:%f\n", getAngleFromIndexHokuyoUrg(l.lidarObject, i)*180/PI, i, angles[i]*180/PI);
-		}
-
-		l.fm = initFastmath( nAngles, angles );
-
-		free(angles);
+	if (angleMin > angleMax) {
+		double temp = angleMin;
+		angleMin = angleMax;
+		angleMax = temp;
 	}
+
+	l.lidarObject = initHokuyoUrg(device, angleMin - orientation, angleMax - orientation);
+
+	int nAngles = getnPointsHokuyoUrg(l.lidarObject);
+	double *angles = malloc(sizeof(double)*nAngles);
+	if(angles == NULL) exit(EXIT_FAILURE);
+	for(int i=0; i<nAngles; i++){
+		angles[i] = urg_index2rad(l.lidarObject, i) + l.orientation;
+	}
+
+	l.fm = initFastmath( nAngles, angles );
+
+	free(angles);
 	
 	l.points = malloc(sizeof(struct coord)*l.fm.n);
 	if(l.points == NULL) exit(EXIT_FAILURE);	
@@ -125,22 +124,6 @@ initLidar(enum lidarModel model, char* device, struct coord position, double ori
 	maxDistance = MAX_DISTANCE;
 
 	return l;
-}
-
-void closeLidar(struct lidar * l){
-	if (l != 0) {
-		if(l->model == hokuyo_urg){
-			if (l->lidarObject != 0) {
-				closeHokuyoUrg(l->lidarObject);
-			}
-		}
-	}
-}
-
-void restartLidar(struct lidar * l){
-	if(l->model == hokuyo_urg){
-		restartHokuyoUrg(l->lidarObject);
-	}
 }
 
 char
@@ -179,7 +162,7 @@ getPointsCalibrate(struct lidar* l, char calibration){
 	}
 
 
-	getDistancesHokuyoUrg(l->lidarObject, buffer);
+	urg_receiveData(l->lidarObject, buffer, MAX_DATA);
 	for(int i=0; i<(l->fm.n); i++){
 
 		#ifndef DEBUG_DO_NOT_REMOVE_POINTS
