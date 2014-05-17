@@ -596,7 +596,7 @@
 				<id>3</id>
 				<x_elem>-235</x_elem>
 				<y_elem>-235</y_elem>
-				<angle>0.785</angle>
+				<angle>0.685</angle>
 				<points>3</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -631,7 +631,7 @@
 				<id>1</id>
 				<x_elem>-235</x_elem>
 				<y_elem>235</y_elem>
-				<angle>5.498</angle>
+				<angle>-1.05</angle>
 				<points>3</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -655,7 +655,7 @@
 				<id>3</id>
 				<x_elem>-235</x_elem>
 				<y_elem>-235</y_elem>
-				<angle>0.785</angle>
+				<angle>0.685</angle>
 				<points>3</points>
 				<priority>1</priority>
 				<duration>1</duration>
