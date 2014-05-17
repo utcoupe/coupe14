@@ -15,6 +15,7 @@
 
 extern Servo servoRet;
 extern bool got_tri, use_act;
+extern int jack_state;
 
 static int last_id = 0;
 static int next_last_id = 0;
@@ -72,6 +73,10 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 			int x = btoi(argv+2), y = btoi(argv+4);
 			getBrasDepot(x, y);
 		}
+		break;
+	case O_JACK_STATE:
+		ret_size = 2;
+		itob(jack_state, ret);
 		break;
 	case PAUSE:
 		use_act = false;
