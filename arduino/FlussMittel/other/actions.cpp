@@ -27,6 +27,7 @@ static bool call_critical = false;
 static enum action action_en_cours = None;
 
 bool use_act = true;
+int jack_state = 1;
 
 volatile bool next_step = true; //Blocage entre les etapes
 volatile bool got_tri = false; //True si triangle en suspension
@@ -36,6 +37,18 @@ void updateAct() {
 		updateBras();
 		callbackRet();
 	}
+	updateJackState();
+}
+
+void updateJackState() {
+	static int last_state = 0;
+	int state = digitalRead(PIN_JACK);
+	if (state == HIGH && last_state == HIGH) {
+		jack_state = 0; //PAS DE JACK
+	} else {
+		jack_state = 1;
+	}
+	last_state = state;
 }
 
 void initPins(){

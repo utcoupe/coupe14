@@ -10,6 +10,7 @@ enum action {
 };
 
 void updateAct();
+void updateJackState();
 void initPins();
 void initAct();
 void callbackRet(int use=0);
@@ -30,6 +31,7 @@ void cmdBrasVentouse(double angle = 1, int length = -1, int height = -1, int n_d
 void cmdTriPush();
 void cmdTriBordure();
 int getCurrentHauteur();
+int getCurrentStockHeight();
 void ascInt();
 void pump(bool etat);
 void topStop();
