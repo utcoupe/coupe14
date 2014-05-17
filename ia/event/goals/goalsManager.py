@@ -14,7 +14,7 @@ import inspect, os
 from math import *
 
 from .goal import *
-from .ElemGoal import *
+from .elemGoal import *
 from .navigation import *
 from .visio import *
 from .goalsLibrary import *
@@ -132,6 +132,8 @@ class GoalsManager:
 			if objectif.getId() == id_objectif:
 				self.__blocked_goals.remove(objectif)
 				self.__dynamique_finished_goals.append(objectif)
+				self.__logger.info(str(self.__robot_name)+" L'objectif "+str(objectif.getName())+" d'id "+str(objectif.getId())+" est a terminé ses actions dynamiques")
+				self.__queueBestGoals()
 				break
 
 	def goalCanceledIdFromEvent(self, id_objectif):
@@ -189,7 +191,7 @@ class GoalsManager:
 			self.__id_objectif_send.append(goal.getId())
 		else:
 			#TODO, ce cas peut-il vrament arrivé ?
-			self.__logger.warning("On va rechercher un nouvel ordre")
+			self.__logger.error("On va rechercher un nouvel ordre, ce cas peut-il vrament arrivé")
 			self.__queueBestGoals()
 
 	def __cancelGoal(self, goal, fromEvent=False):
@@ -212,6 +214,7 @@ class GoalsManager:
 				self.__front_triangle_stack.clear()
 				self.__back_triangle_stack.clear()
 			self.__logger.info('Goal ' + str(goal.getName()) + " d'id "+str(goal.getId())+" is finished")
+			#Dans le cas où on aurait oublier le DYNAMIQUE_OVER
 			self.__queueBestGoals()
 		#Dans le cas où c'est l'autre robot qui à fait l'objectif
 		elif goal in self.__available_goals:
@@ -407,8 +410,10 @@ class GoalsManager:
 								else:
 									self.__logger.warning("Impossible d'attendre le triangle d'après Alexis, data_camera: "+str(data_camera))
 									self.__deleteGoal(objectif)
-							
+			
+			#Si ce sont des actions simples, on ne devrait pas utliser STEP_OVER pour ça, mais plutôt THEN		
 			else:
+				self.__logger.warning("Attention, les actons sont simples, action_list "+str(action_list)+" on ne devrait pas utliser STEP_OVER pour ça, mais plutôt THEN")
 				self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), action_list)
 				objectif.getElemGoalLocked().removeFirstElemAction()
 		else:
