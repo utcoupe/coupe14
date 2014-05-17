@@ -97,6 +97,7 @@ class Engine:
 			else:
 				id_tmp = robot.getLastIdOther()
 				if id_tmp > self.__id_action_robot:
+					robot.setFeuHit(1) #positionne un flag pour dire qu'on a touché un triangle
 					feu = torche.prendreFeu()
 					if feu == 'R':
 						if robot.getTeam() == RED:

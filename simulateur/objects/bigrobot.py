@@ -78,25 +78,31 @@ class BigRobot(robot.Robot):
 		"""
 		Active la reconnaissance de triangles dans la zone de portée du bras
 		"""
+		save_pos = self.getPosition()
 		self.add_body_extension(self.bras)
 		time.sleep(0.5) #temps où le bras apparaitra
 		self.remove_body_extension(self.bras)
+		self.setPosition(save_pos[0],save_pos[1],save_pos[2])
 
 	def activerBrasOuvrir(self):
 		"""
 		Simule le bras qui sort avec un BRAS_OUVRIR
 		"""
+		save_pos = self.getPosition()
 		self.add_body_extension(self.bras_ouvrir)
 		time.sleep(0.1) #temps où le bras apparaitra
 		self.remove_body_extension(self.bras_ouvrir)
+		self.setPosition(save_pos[0],save_pos[1],save_pos[2])
 
 	def activerBrasFermer(self):
 		"""
 		Simule le bras qui rentre avec un BRAS_FERMER
 		"""
+		save_pos = self.getPosition()
 		self.add_body_extension(self.bras_fermer)
 		time.sleep(0.1) #temps où le bras apparaitra
 		self.remove_body_extension(self.bras_fermer)
+		self.setPosition(save_pos[0],save_pos[1],save_pos[2])
 
 	def storeFeu(self, sens):
 		"""
