@@ -67,12 +67,19 @@ class SubProcessCommunicate():
 
 	def sendObjectifsCanceled(self, id_canceled_list):
 		self.__updateSubProcessData()
-		if self.__Data.Flussmittel is not None:
-			for id_canceled in id_canceled_list:
+		for id_canceled in id_canceled_list:
+			if self.__Data.Flussmittel is not None:
 				self.__subprocess_flussmittel.sendPacket(("CANCELED", id_canceled))
-		if self.__Data.Tibot is not None:
-			for id_canceled in id_canceled_list:
+			if self.__Data.Tibot is not None:
 				self.__subprocess_tibot.sendPacket(("CANCELED", id_canceled))
+
+	def sendObjectifsDeleted(self, id_deleted_objectif):
+		self.__updateSubProcessData()
+		for id_deleted in id_deleted_objectif:
+			if self.__Data.Flussmittel is not None:
+				self.__subprocess_flussmittel.sendPacket(("DELETED", id_canceled))
+			if self.__Data.Tibot is not None:
+				self.__subprocess_tibot.sendPacket(("DELETED", id_canceled))
 
 	def sendBrasStatus(self, etat, id_objectif):
 		self.__updateSubProcessData()
