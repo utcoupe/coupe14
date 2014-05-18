@@ -10,7 +10,7 @@
 
 
 void* initHokuyoUrg(char* device, double angleMin, double angleMax);
-void resetHokuyoUrg(urg_t* urg, double angleMin, double angleMax);
+void resetHokuyoUrg(urg_t* urg, char *device, double angleMin, double angleMax);
 int getnPointsHokuyoUrg(urg_t* urg);
 
 

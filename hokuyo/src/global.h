@@ -1,6 +1,8 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+#define SDL
+
 #define PREFIX "[C-HK]  "
 
 #define TAILLE_TABLE_X 3000
@@ -20,15 +22,16 @@
 
 #define HOK1_X -25
 #define HOK1_Y -25
-#define HOK1_A 0
+#define HOK1_A (PI/4)
 #define HOK1_AMIN 0
-#define HOK1_AMAX PI/2
+#define HOK1_AMAX (PI/2)
 
 #define HOK2_X 3025
 #define HOK2_Y 1000
 #define HOK2_A PI
 #define HOK2_AMIN (PI/2)
-#define HOK2_AMAX (3*PI/2)
+#define HOK2_AMAX (-PI/2)
+
 //#define DEBUG_DO_NOT_REMOVE_POINTS
 #define MAX_DISTANCE sqrt(TAILLE_TABLE_X*TAILLE_TABLE_X + TAILLE_TABLE_Y*TAILLE_TABLE_Y)
 #define DISTANCE_TO_EDGE_MIN 80 /*mm*/

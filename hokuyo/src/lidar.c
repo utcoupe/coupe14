@@ -13,16 +13,23 @@
 static long maxDistance;
 static long distanceThMin, distanceThMax;
 
+double inZeroTwoPi(double a) {
+	while (a < 0) {
+		a += 2*PI;
+	}
+	while (a >= 2*PI) {
+		a -= 2*PI;
+	}
+	return a;
+}
+
 double
 theta(struct coord lidar, struct coord marker){
 	struct coord delta;
-	delta.x = lidar.x - marker.x;
-	delta.y = lidar.y - marker.y;
+	delta.x = marker.x - lidar.x;
+	delta.y = marker.y - lidar.y;
 
-	//printf("dx=%i\tdy=%i\n", delta.x, delta.y);
-	if(delta.x == 0) return PI/2;
-
-	return atan((double)delta.y / (double)delta.x); // -(-) -> +
+	return inZeroTwoPi(atan2(delta.y, delta.x));
 }
 
 
@@ -31,16 +38,20 @@ struct coord* getPointsCalibrate(struct lidar* l, char calibration);
 
 struct lidar
 initLidarAndCalibrate(char* device, struct coord position, double orientation, double angleMin, double angleMax){
+	angleMax = inZeroTwoPi(angleMax);
+	angleMin = inZeroTwoPi(angleMin);
+
 	struct coord markerPos;
 	markerPos.x = MARKER_R_POS_X;
 	markerPos.y = MARKER_R_POS_Y;
 	distanceThMin = dist_squared(position, markerPos);
 	distanceThMax = pow(sqrt(distanceThMin)+MARKER_DETECTION_ZONE_SIZE/2,2);
 	distanceThMin = pow(sqrt(distanceThMin)-MARKER_DETECTION_ZONE_SIZE/2,2);
-	double thetaTh = (angleMax+angleMin)/2.0;
+	//double thetaTh = (angleMax+angleMin)/2.0;
+	double thetaTh = theta(position, markerPos);
 	printf("%sthetha TH:%f  -> %f\n", PREFIX, thetaTh, thetaTh*180/PI);
 	
-	struct lidar l = initLidar(device, position, orientation, thetaTh-MARKER_DETECTION_ANGLE/2, thetaTh+MARKER_DETECTION_ANGLE);
+	struct lidar l = initLidar(device, position, orientation, thetaTh-MARKER_DETECTION_ANGLE, thetaTh+MARKER_DETECTION_ANGLE);
 
 	long sumMarkerPos_x = 0, sumMarkerPos_y = 0;
 	int nbClustersFound = 0;
@@ -70,7 +81,7 @@ initLidarAndCalibrate(char* device, struct coord position, double orientation, d
 	printf("%snew orientation:%f\n", PREFIX, l.orientation*180/PI);
 
 	///////
-	resetHokuyoUrg(l.lidarObject, angleMin-l.orientation, angleMax-l.orientation);
+	resetHokuyoUrg(l.lidarObject, device, angleMin-l.orientation, angleMax-l.orientation);
 	int nAngles = getnPointsHokuyoUrg(l.lidarObject);
 	double *angles = malloc(sizeof(double)*nAngles);
 	if(angles == NULL) exit(EXIT_FAILURE);
@@ -93,17 +104,13 @@ initLidarAndCalibrate(char* device, struct coord position, double orientation, d
 
 struct lidar
 initLidar(char* device, struct coord position, double orientation, double angleMin, double angleMax){
+	angleMax = inZeroTwoPi(angleMax);
+	angleMin = inZeroTwoPi(angleMin);
 	struct lidar l;
 	l.pos = position;
 	l.orientation = orientation;
 
 	printf("%sorientation:%f\n", PREFIX, orientation*180/PI);
-
-	if (angleMin > angleMax) {
-		double temp = angleMin;
-		angleMin = angleMax;
-		angleMax = temp;
-	}
 
 	l.lidarObject = initHokuyoUrg(device, angleMin - orientation, angleMax - orientation);
 
