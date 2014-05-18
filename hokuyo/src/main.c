@@ -42,6 +42,7 @@ static void catch_SIGINT(int signal){
 }
 
 int main(int argc, char **argv){
+	bool nocalib = false;
 	atexit(exit_handler);
 	
 	if(argc <= 1 || ( strcmp(argv[1], "red") != 0 && strcmp(argv[1], "yellow") ) ){
@@ -86,13 +87,20 @@ int main(int argc, char **argv){
 	char *path = 0;
 	if (argc == 3) {
 		path = argv[2];
-		use_protocol = 1;
+		if (strcmp(path, "nocalib") == 0) {
+			nocalib = true;
+		} else {
+			use_protocol = 1;
+		}
 	}
 
-	l1 = initLidar("/dev/ttyACM0", posl1, angle1, a1min, a1max);
-	//l1 = initLidarAndCalibrate("/dev/ttyACM0", posl1, angle1, a1min, a1max);
-	l2 = initLidar("/dev/ttyACM1", posl2, angle2, a2min, a2max);
-	//l2 = initLidarAndCalibrate("/dev/ttyACM1", posl2, angle2, a2min, a2max);
+	if (nocalib) {
+		l1 = initLidar("/dev/ttyACM0", posl1, angle1, a1min, a1max);
+		l2 = initLidar("/dev/ttyACM1", posl2, angle2, a2min, a2max);
+	} else {
+		l1 = initLidarAndCalibrate("/dev/ttyACM0", posl1, angle1, a1min, a1max);
+		l2 = initLidarAndCalibrate("/dev/ttyACM1", posl2, angle2, a2min, a2max);
+	}
 
 
 	#ifdef SDL

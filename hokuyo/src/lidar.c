@@ -37,7 +37,7 @@ initLidarAndCalibrate(char* device, struct coord position, double orientation, d
 	distanceThMin = dist_squared(position, markerPos);
 	distanceThMax = pow(sqrt(distanceThMin)+MARKER_DETECTION_ZONE_SIZE/2,2);
 	distanceThMin = pow(sqrt(distanceThMin)-MARKER_DETECTION_ZONE_SIZE/2,2);
-	double thetaTh = theta(position, markerPos);
+	double thetaTh = (angleMax+angleMin)/2.0;
 	printf("%sthetha TH:%f  -> %f\n", PREFIX, thetaTh, thetaTh*180/PI);
 	
 	struct lidar l = initLidar(device, position, orientation, thetaTh-MARKER_DETECTION_ANGLE/2, thetaTh+MARKER_DETECTION_ANGLE);
