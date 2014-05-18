@@ -49,20 +49,23 @@ class GoalsChoice:
 		position_last_goal = self.__goalsLib.getPositionLastGoal()
 
 		for goal in goals:
-				if len(self.__front_triangle_stack) == MAX_FRONT_TRIANGLE_STACK:
-					if goal.getType() != "STORE_TRIANGLE":
-						continue
-				else:
-					if goal.getType() == "STORE_TRIANGLE":
-						continue
-				nb_elem_goal = goal.getLenElemGoal()
-				for idd in range(nb_elem_goal):
-					path = self.__goalsLib.getOrderTrajectoire(goal, idd, position_last_goal)
-					if path != []:
-						length = self.__goalsLib.pathLen(path)
-						if length < best_length:
-							best_length = length
-							best_goal = (path, goal, idd)
+			if len(self.__front_triangle_stack) >= MAX_FRONT_TRIANGLE_STACK:
+				if len(self.__front_triangle_stack) > MAX_FRONT_TRIANGLE_STACK:
+					self.__logger.error("On a stocké plus de triangle qu'on a de place")
+
+				if goal.getType() != "STORE_TRIANGLE":
+					continue
+			else:
+				if goal.getType() == "STORE_TRIANGLE":
+					continue
+			nb_elem_goal = goal.getLenElemGoal()
+			for idd in range(nb_elem_goal):
+				path = self.__goalsLib.getOrderTrajectoire(goal, idd, position_last_goal)
+				if path != []:
+					length = self.__goalsLib.pathLen(path)
+					if length < best_length:
+						best_length = length
+						best_goal = (path, goal, idd)
 
 		return best_goal
 

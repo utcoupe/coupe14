@@ -63,7 +63,8 @@ def load_library(libname, debug_lib=True):
     
     
     if debug_lib:
-        print ("Loading chipmunk for %s (%sbit) [%s]" % (s, arch, libfn))
+        #print ("Loading chipmunk for %s (%sbit) [%s]" % (s, arch, libfn))
+        pass
     try:
         lib = platform_specific_functions()['library_loader'].LoadLibrary(libfn)
     except OSError: 

@@ -91,14 +91,21 @@ class general(Frame):
 			bout = Button(Fbouton, text = liste_button[n])
 			if n == 0: #bouton start
 				if self.__minirobot_us is not None:
-					bout.config(command=self.__startMatch)
+					bout.config(command=self.__startMatchMini)
+				elif self.__bigrobot_us is not None:
+					bout.config(command=self.__startMatchBig)
 			bout.grid(column = n, row = 0)
 		Fbouton.grid(column = 2, row = 0, sticky=N+S+W+E)
 
-	def __startMatch(self):
+	def __startMatchMini(self):
 		if self.__match_started is False:
 			threading.Thread(target=self.__timeThread).start()
 			self.__minirobot_us.setStateJack()
+
+	def __startMatchBig(self):
+		if self.__match_started is False:
+			threading.Thread(target=self.__timeThread).start()
+			self.__bigrobot_us.setStateJack()
 
 	def temps(self):
 		"""

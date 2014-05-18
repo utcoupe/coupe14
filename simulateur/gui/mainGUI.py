@@ -14,10 +14,10 @@ from define import *
 
 class GUISimu():
 	def __init__(self, robots):
-		print('GUI trobots : ', robots)
+		#print('GUI trobots : ', robots)
 		self.__liste_robots = robots
 		self.__fen = Tk()
-		self.__fen.title("Test de GUI pour le simulateur")
+		self.__fen.title("GUI trop stylée pour le simulateur")
 		#taille de la fenêtre et position sur l'écran (par défaut en haut à droite
 		w_fen = self.__fen.winfo_screenwidth()
 		h_fen = self.__fen.winfo_screenheight()

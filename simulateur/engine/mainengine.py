@@ -31,6 +31,7 @@ class Engine:
 		self.physicsengine.add_collision_handler(COLLTYPE_GROS_ROBOT, COLLTYPE_WALL, self.graphicsengine.draw_collision)
 		self.physicsengine.add_collision_handler(COLLTYPE_GROS_ROBOT, COLLTYPE_FEU, self.__on_collision_gros_feu)
 		self.physicsengine.add_collision_handler(COLLTYPE_BRAS, COLLTYPE_FEU, self.__on_collision_bras_feu)
+		self.physicsengine.add_collision_handler(COLLTYPE_BRAS, COLLTYPE_TORCHE, self.__on_collision_bras_torche)
 		self.physicsengine.add_collision_handler(COLLTYPE_BRAS_OUVRIR, COLLTYPE_FEU, self.__on_collision_bras_ouvrir_feu)
 		self.physicsengine.add_collision_handler(COLLTYPE_BRAS_FERMER, COLLTYPE_FEU, self.__on_collision_bras_fermer_feu)
 		self.physicsengine.add_collision_handler(COLLTYPE_BRAS_PETIT, COLLTYPE_FEU, self.__on_collision_bras_petit_feu)
@@ -39,7 +40,7 @@ class Engine:
 		self.e_stop = threading.Event()
 		self.objects = []
 		self.objects_to_remove = []
-		self.e_stop = threading.Event()
+		self.__id_action_robot = 0
 
 	def init(self, match):
 		self.match = match
@@ -55,7 +56,7 @@ class Engine:
 
 	def __on_collision_gros_feu(self, space, arb):
 		"""
-		Quand lle gros robot touche un feu
+		Quand le gros robot touche un feu
 		"""
 		robot = self.find_obj_by_shape(arb.shapes[0])
 		if not robot:
@@ -65,7 +66,6 @@ class Engine:
 			if not feu:
 				print("Feu not found")
 			else:
-				#print('feu eteindre')
 				pass
 
 	def __on_collision_bras_feu(self, space, arb):
@@ -82,6 +82,34 @@ class Engine:
 			else:
 				robot.setFeuHit(1) #positionne un flag pour dire qu'on a touché un triangle
 				feu.eteindre() #supprime le feu de la map
+
+	def __on_collision_bras_torche(self, space, arb):
+		"""
+		Quand le bras du gros robot touche un feu
+		"""
+		robot = self.find_obj_by_shape(arb.shapes[0])
+		if not robot:
+			print("bras not found")
+		else:
+			torche = self.find_obj_by_shape(arb.shapes[1])
+			if not torche:
+				print("Torche not found")
+			else:
+				id_tmp = robot.getLastIdOther()
+				if id_tmp > self.__id_action_robot:
+					robot.setFeuHit(1) #positionne un flag pour dire qu'on a touché un triangle
+					feu = torche.prendreFeu()
+					if feu == 'R':
+						if robot.getTeam() == RED:
+							robot.storeFeu(1)
+						elif robot.getTeam() == YELLOW:
+							robot.storeFeu(-1)
+					elif feu == 'Y':
+						if robot.getTeam() == RED:
+							robot.storeFeu(-1)
+						elif robot.getTeam() == YELLOW:
+							robot.storeFeu(1)
+					self.__id_action_robot = id_tmp
 
 	def __on_collision_bras_ouvrir_feu(self, space, arb):
 		"""

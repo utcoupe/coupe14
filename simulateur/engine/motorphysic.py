@@ -47,7 +47,7 @@ class MotorPhysic:
 
 	def create_body_circle(self, mass, posinit, radius):
 		inertia = pm.moment_for_circle(mass, 0, radius, (0,0))
-		print("mass = ", mass, "posinit = ", posinit, "inertia = ", inertia)
+		#print("mass = ", mass, "posinit = ", posinit, "inertia = ", inertia)
 		body = pm.Body(mass, inertia)
 		body.position = Vec2d(posinit)
 		return body
