@@ -5,6 +5,7 @@ goal<-ElemGoal<-script
 """
 
 from .constantes import *
+from collections import deque
 
 class Goal:
 	def __init__(self, id, name, type, concerned_robot, x, y):
@@ -58,6 +59,28 @@ class Goal:
 	def switchColor(self):
 		for elem_goal_temp in self.__elem_goal:
 			elem_goal_temp.switchColor()
+
+	#Gestion des actions elementaires
+	def getFirstElemAction(self):
+		action_objectif = self.__elem_goal_locked.getNextElemAction()
+		action_list = deque()
+		for action in action_objectif:
+			action_list.append(action)
+			if action[0] == "END" or action[0] == "STEP_OVER":
+				break
+		return action_list
+
+	def removeFirstElemAction(self):
+		for elem in self.__elem_goal:
+			action_objectif = elem.getNextElemAction()
+			if action_objectif:
+				action = action_objectif.popleft()
+				while action[0] != "END" and action[0] != "STEP_OVER":
+					action = action_objectif.popleft()
+
+	def resetElemAction(self):
+		#TODO verifier qu'on ne veut pas reset les objectifs
+		pass
 
 
 	"""def toXml(self):

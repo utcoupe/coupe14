@@ -132,6 +132,9 @@ class GoalsManager:
 			if objectif.getId() == id_objectif:
 				self.__blocked_goals.remove(objectif)
 				self.__dynamique_finished_goals.append(objectif)
+				if objectif.getType() == "STORE_TRIANGLE":
+					self.__front_triangle_stack.clear()
+					self.__back_triangle_stack.clear()
 				self.__logger.info(str(self.__robot_name)+" L'objectif "+str(objectif.getName())+" d'id "+str(objectif.getId())+" est a terminé ses actions dynamiques")
 				self.__queueBestGoals()
 				break
@@ -178,9 +181,15 @@ class GoalsManager:
 			#on ajoute attend d'être arrivé pour lancer les actions
 			orders.append( ("THEN", ()) )
 			
-			first_action_elem = goal.getElemGoalLocked().getFirstElemAction()
-			orders.extend(first_action_elem)
-			goal.getElemGoalLocked().removeFirstElemAction()
+			first_action_elem = goal.getFirstElemAction()
+
+			#Hack pour le cas des torches qui sont des actions qu'on peut faire en plusieurs fois
+			if first_action_elem:
+				if first_action_elem[0][0] == "GET_TRIANGLE_IA_TORCHE":
+					orders.append( ("STEP_OVER", ()) )
+				else:
+					orders.extend(first_action_elem)
+					goal.removeFirstElemAction()
 
 			#on envoi le tout
 			if self.__id_objectif_send:
@@ -199,7 +208,7 @@ class GoalsManager:
 		self.__available_goals.append(goal)
 		self.__logger.info('Goal ' + goal.getName() + ' has been canceled and is now released')
 		self.__removeLastValueOfDeque(self.__id_objectif_send, goal.getId())
-		goal.getElemGoalLocked().resetElemAction()
+		goal.resetElemAction()
 
 		if not fromEvent:
 			self.__SubProcessManager.sendDeleteGoal(goal.getId())
@@ -210,9 +219,6 @@ class GoalsManager:
 		if goal in self.__dynamique_finished_goals:	
 			self.__dynamique_finished_goals.remove(goal)
 			self.__finished_goals.append(goal)
-			if goal.getType() == "STORE_TRIANGLE":
-				self.__front_triangle_stack.clear()
-				self.__back_triangle_stack.clear()
 			self.__logger.info('Goal ' + str(goal.getName()) + " d'id "+str(goal.getId())+" is finished")
 			#Dans le cas où on aurait oublier le DYNAMIQUE_OVER
 			self.__queueBestGoals()
@@ -266,7 +272,7 @@ class GoalsManager:
 
 
 	def __manageStepOver(self, objectif, id_objectif, skip_get_triangle=False):
-		action_list = objectif.getElemGoalLocked().getFirstElemAction()
+		action_list = objectif.getFirstElemAction()
 		if action_list:
 			if (action_list[0][0] == "GET_TRIANGLE_IA" or action_list[0][0] == "GET_TRIANGLE_IA_TORCHE")  and self.__robot_name == "FLUSSMITTEL":#Redondant normalement
 				get_triangle_mode = action_list[0][0]
@@ -314,7 +320,7 @@ class GoalsManager:
 							else:
 								script_to_send.append(action)
 						self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_to_send)
-						objectif.getElemGoalLocked().removeFirstElemAction()
+						objectif.removeFirstElemAction()
 
 				else:
 					if TEST_MODE == False:
@@ -419,7 +425,7 @@ class GoalsManager:
 			else:
 				self.__logger.warning("Attention, les actons sont simples, action_list "+str(action_list)+" on ne devrait pas utliser STEP_OVER pour ça, mais plutôt THEN")
 				self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), action_list)
-				objectif.getElemGoalLocked().removeFirstElemAction()
+				objectif.removeFirstElemAction()
 		else:
 			self.__logger.warning("Pb, Il y a un STEP_OVER directement suivit d'un END ?")
 

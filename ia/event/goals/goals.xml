@@ -81,7 +81,7 @@
 		<elem_goals>
 			<elem_goal>
 				<id>1</id>
-				<x_elem>-250</x_elem>
+				<x_elem>-270</x_elem>
 				<y_elem>200</y_elem>
 				<angle>-0.96</angle>
 				<points>1</points>
@@ -290,7 +290,7 @@
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x_elem>250</x_elem>
+				<x_elem>270</x_elem>
 				<y_elem>-200</y_elem>
 				<angle>-0.96</angle>
 				<points>1</points>
@@ -448,14 +448,14 @@
 		<type>STORE_TRIANGLE</type>
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x_objectif>1500</x_objectif>
-		<y_objectif>1050</y_objectif>
+		<y_objectif>950</y_objectif>
 		<angle_objectif>0.0</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x_elem>330</x_elem>
-				<y_elem>150</y_elem>
-				<angle>-3.14</angle>
+				<x_elem>350</x_elem>
+				<y_elem>300</y_elem>
+				<angle>3.14</angle>
 				<points>0</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -465,9 +465,9 @@
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
-				<x_elem>-150</x_elem>
-				<y_elem>330</y_elem>
-				<angle>-1.57</angle>
+				<x_elem>300</x_elem>
+				<y_elem>-350</y_elem>
+				<angle>1.57</angle>
 				<points>0</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -477,8 +477,8 @@
 			</elem_goal>
 			<elem_goal>
 				<id>2</id>
-				<x_elem>-330</x_elem>
-				<y_elem>-150</y_elem>
+				<x_elem>-350</x_elem>
+				<y_elem>-300</y_elem>
 				<angle>0.0</angle>
 				<points>0</points>
 				<priority>1</priority>
@@ -489,9 +489,9 @@
 			</elem_goal>
 			<elem_goal>
 				<id>3</id>
-				<x_elem>150</x_elem>
-				<y_elem>-330</y_elem>
-				<angle>1.57</angle>
+				<x_elem>-300</x_elem>
+				<y_elem>350</y_elem>
+				<angle>-1.57</angle>
 				<points>0</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -508,13 +508,13 @@
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x_objectif>0</x_objectif>
 		<y_objectif>0</y_objectif>
-		<angle_objectif>-3.14</angle_objectif>
+		<angle_objectif>0.0</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
 				<x_elem>430</x_elem>
-				<y_elem>300</y_elem>
-				<angle>0</angle>
+				<y_elem>310</y_elem>
+				<angle>-3.14</angle>
 				<points>0</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -535,7 +535,7 @@
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x_elem>-300</x_elem>
+				<x_elem>-310</x_elem>
 				<y_elem>430</y_elem>
 				<angle>-1.57</angle>
 				<points>0</points>
@@ -550,7 +550,7 @@
 	<goal>
 		<id>17</id>
 		<name>Torche côté gauche</name>
-		<type>torche</type>
+		<type>TORCHE</type>
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x_objectif>900</x_objectif>
 		<y_objectif>900</y_objectif>
@@ -570,18 +570,6 @@
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
-				<x_elem>-235</x_elem>
-				<y_elem>235</y_elem>
-				<angle>-1.05</angle>
-				<points>3</points>
-				<priority>1</priority>
-				<duration>1</duration>
-				<color>RYR</color>
-				<script_only>False</script_only>
-				<id_script>9</id_script>
-			</elem_goal>
-			<elem_goal>
-				<id>2</id>
 				<x_elem>235</x_elem>
 				<y_elem>-235</y_elem>
 				<angle>2.356</angle>
@@ -593,10 +581,22 @@
 				<id_script>9</id_script>
 			</elem_goal>
 			<elem_goal>
-				<id>3</id>
+				<id>2</id>
 				<x_elem>-235</x_elem>
 				<y_elem>-235</y_elem>
 				<angle>0.685</angle>
+				<points>3</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<color>RYR</color>
+				<script_only>False</script_only>
+				<id_script>9</id_script>
+			</elem_goal>
+			<elem_goal>
+				<id>4</id>
+				<x_elem>-235</x_elem>
+				<y_elem>235</y_elem>
+				<angle>-1.05</angle>
 				<points>3</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -609,7 +609,7 @@
 	<goal>
 		<id>18</id>
 		<name>Torche côté droit</name>
-		<type>torche</type>
+		<type>TORCHE</type>
 		<concerned_robot>FLUSSMITTEL</concerned_robot>
 		<x_objectif>2100</x_objectif>
 		<y_objectif>900</y_objectif>
@@ -623,43 +623,43 @@
 				<points>3</points>
 				<priority>1</priority>
 				<duration>1</duration>
-				<color>YRY</color>
+				<color>RYR</color>
 				<script_only>False</script_only>
 				<id_script>9</id_script>
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
-				<x_elem>-235</x_elem>
-				<y_elem>235</y_elem>
-				<angle>-1.05</angle>
-				<points>3</points>
-				<priority>1</priority>
-				<duration>1</duration>
-				<color>YRY</color>
-				<script_only>False</script_only>
-				<id_script>9</id_script>
-			</elem_goal>
-			<elem_goal>
-				<id>2</id>
 				<x_elem>235</x_elem>
 				<y_elem>-235</y_elem>
 				<angle>2.356</angle>
 				<points>3</points>
 				<priority>1</priority>
 				<duration>1</duration>
-				<color>YRY</color>
+				<color>RYR</color>
 				<script_only>False</script_only>
 				<id_script>9</id_script>
 			</elem_goal>
 			<elem_goal>
-				<id>3</id>
+				<id>2</id>
 				<x_elem>-235</x_elem>
 				<y_elem>-235</y_elem>
 				<angle>0.685</angle>
 				<points>3</points>
 				<priority>1</priority>
 				<duration>1</duration>
-				<color>YRY</color>
+				<color>RYR</color>
+				<script_only>False</script_only>
+				<id_script>9</id_script>
+			</elem_goal>
+			<elem_goal>
+				<id>4</id>
+				<x_elem>-235</x_elem>
+				<y_elem>235</y_elem>
+				<angle>-1.05</angle>
+				<points>3</points>
+				<priority>1</priority>
+				<duration>1</duration>
+				<color>RYR</color>
 				<script_only>False</script_only>
 				<id_script>9</id_script>
 			</elem_goal>

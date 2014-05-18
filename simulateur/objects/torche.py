@@ -23,10 +23,10 @@ class Torche(EngineObjectCircle):
 		self.__nbr_feu = 3
 		self.__ordre_feu = []
 		if posinit[0] == 225:
-			print('torche rouge')
+			#print('torche rouge')
 			self.__ordre_feu = ['R','Y','R']
 		elif posinit[0] == 525:
-			print('torche jaune')
+			#print('torche jaune')
 			self.__ordre_feu = ['Y','R','Y']
 
 	def prendreFeu(self):
