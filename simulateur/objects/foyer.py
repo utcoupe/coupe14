@@ -39,7 +39,8 @@ class FoyerBord(EngineObjectPoly):
 			posinit			= posinit,
 			color			= "brown",
 			mass 			= MASS_INF,
-			poly_points		= points
+			poly_points		= points,
+			layers			= 1
 		)
 		self.__nbFeu = 0
 

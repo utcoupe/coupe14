@@ -64,3 +64,13 @@ fastSin(struct fastmathTrigo f, int index)
 {
 	return f.sin[index];
 }
+
+double modTwoPi(double a) {
+	while (a <= -PI ) {
+		a += 2*PI;
+	}
+	while (a >= PI) {
+		a -= 2*PI;
+	}
+	return a;
+}

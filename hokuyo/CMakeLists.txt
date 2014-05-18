@@ -6,7 +6,7 @@ FIND_PACKAGE(SDL REQUIRED)
 SET(CMAKE_C_FLAGS "-std=gnu99")
 
 set(EXECUTABLE_OUTPUT_PATH bin/)
-set(EXEC_NAME hokuyo_client)
+set(EXEC_NAME hokuyo)
 
 #Configurationdel'exécutable
 
@@ -23,8 +23,10 @@ add_executable(
 
 
 INCLUDE_DIRECTORIES( ${SDL_INCLUDE_DIR} )
-include_directories( /usr/local/include/urg_c )
-target_link_libraries( hokuyo_client
-	urg_c 
+include_directories( /usr/local/include/c_urg )
+target_link_libraries( hokuyo
+	c_urg 
+	c_urg_connection 
+	c_urg_system 
 	SDL 
 	m )

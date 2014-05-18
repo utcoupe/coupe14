@@ -1,0 +1,8 @@
+urg_errno.lo: urg_errno.c /usr/include/stdc-predef.h \
+ /usr/include/x86_64-linux-gnu/bits/predefs.h urg_errno.h
+
+/usr/include/stdc-predef.h:
+
+/usr/include/x86_64-linux-gnu/bits/predefs.h:
+
+urg_errno.h:
