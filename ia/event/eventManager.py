@@ -222,7 +222,7 @@ class EventManager():
 		data_action_temp.clear()
 		data_action_temp.extend(data_action)
 
-		print(str(Objet.getName()) + " charge les actions dans eventManager: " + str((id_objectif, data_action)))
+		#print(str(Objet.getName()) + " charge les actions dans eventManager: " + str((id_objectif, data_action)))
 
 		last_order = data_action.pop()
 		if data_action:

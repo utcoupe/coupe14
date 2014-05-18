@@ -19,25 +19,8 @@ class ElemGoal:
 		self.__elem_action_temp = copy.deepcopy(elem_action)
 		self.__already_step_over = False
 
-	def getFirstElemAction(self):
-		action_list = []
-		for action in self.__elem_action_temp:
-			action_list.append(action)
-			if action[0] == "END" or action[0] == "STEP_OVER":
-				break
-		return action_list
-
-
-	def removeFirstElemAction(self):
-		if self.__elem_action_temp:
-			action = self.__elem_action_temp.popleft()
-			while action[0] != "END" and action[0] != "STEP_OVER":
-				action = self.__elem_action_temp.popleft()
-
-	def resetElemAction(self):
-		#TODO verifier qu'il faut bien retirer cette ligne
-		#self.__elem_action_temp = copy.deepcopy(self.__elem_action_base)
-		pass
+	def getNextElemAction(self):
+		return self.__elem_action_temp
 
 	def getPositionAndAngle(self):
 		return (self.__x, self.__y, self.__angle)

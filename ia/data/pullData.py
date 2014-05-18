@@ -9,9 +9,10 @@ import logging
 from constantes import *
 
 class PullData():
-	def __init__(self, Communication, Flussmittel, Tibot, SmallEnemyBot, BigEnemyBot, ComputeHokuyoData, Tourelle, MetaData):
+	def __init__(self, Communication, arduino_constantes, Flussmittel, Tibot, SmallEnemyBot, BigEnemyBot, ComputeHokuyoData, Tourelle, MetaData):
 		self.__logger = logging.getLogger(__name__.split('.')[0])
 		self.Communication = Communication
+		self.__arduino_constantes = arduino_constantes
 		self.Flussmittel = Flussmittel[0]
 		self.address_flussmittel_other = Flussmittel[1]
 		self.address_flussmittel_asserv = Flussmittel[2]
@@ -160,12 +161,17 @@ class PullData():
 				system = None
 				self.__logger.error("un systeme non initilisé nous envoi des données")
 
+
 			if order == "O_JACK_STATE":
 				if arguments[0] == 0:
 					self.MetaData.startMatch()
+					self.__jack_tibot_asked = True
+					self.__jack_flussmittel_asked = True
 				else:
 					self.__jack_tibot_asked = False
 					self.__jack_flussmittel_asked = False
+
+
 			else:
 				if system is not None:
 					if order == 'A_GET_POS_ID':
@@ -180,7 +186,8 @@ class PullData():
 						system.majPositionHokuyo(arguments)
 					elif order == 'T_GET_CAM':
 						system.majCam(arguments)
-					elif order == 'A_GOTO':
+					#si le système n'a pas de retour
+					elif self.__arduino_constantes['returnSize'][order] == 0:
 						pass	
 					else:
 						self.__logger.warning("ce retour n'est pas implementé, address " + str(address) + " ordre " + str(order) + " arguments " + str(arguments))

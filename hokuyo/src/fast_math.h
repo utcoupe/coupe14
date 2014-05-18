@@ -23,5 +23,6 @@ void freeFastmath(struct fastmathTrigo s);
 
 double fastCos(struct fastmathTrigo f, int index);
 double fastSin(struct fastmathTrigo f, int index);
+double modTwoPi(double a);
 
 #endif
