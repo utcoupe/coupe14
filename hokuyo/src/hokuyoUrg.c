@@ -4,10 +4,13 @@
 #include <stdio.h>
 #include <urg_ctrl.h>
 #include "global.h"
+#include "fast_math.h"
 
 
 void*
 initHokuyoUrg(char* device, double angleMin, double angleMax){
+	angleMax = modTwoPi(angleMax);
+	angleMin = modTwoPi(angleMin);
 	urg_t *urg;
 	urg = malloc(sizeof(urg_t));
 	if( urg == NULL ) exit(EXIT_FAILURE);
@@ -39,6 +42,8 @@ initHokuyoUrg(char* device, double angleMin, double angleMax){
 
 void
 resetHokuyoUrg(urg_t* urg, char *device, double angleMin, double angleMax){
+	angleMax = modTwoPi(angleMax);
+	angleMin = modTwoPi(angleMin);
 	printf("%sHokuyo reinit from %f to %f\n", PREFIX, angleMin*180/PI, angleMax*180/PI);
 	urg_disconnect(urg);
 	urg_connect(urg, device, BAUDRATE_HOKUYOURG);

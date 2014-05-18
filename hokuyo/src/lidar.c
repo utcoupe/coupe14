@@ -9,19 +9,10 @@
 #include "hokuyoUrg.h"
 #include "global.h"
 #include "robot.h"
+#include "fast_math.h"
 
 static long maxDistance;
 static long distanceThMin, distanceThMax;
-
-double inZeroTwoPi(double a) {
-	while (a < 0) {
-		a += 2*PI;
-	}
-	while (a >= 2*PI) {
-		a -= 2*PI;
-	}
-	return a;
-}
 
 double
 theta(struct coord lidar, struct coord marker){
@@ -29,7 +20,7 @@ theta(struct coord lidar, struct coord marker){
 	delta.x = marker.x - lidar.x;
 	delta.y = marker.y - lidar.y;
 
-	return inZeroTwoPi(atan2(delta.y, delta.x));
+	return modTwoPi(atan2(delta.y, delta.x));
 }
 
 
@@ -38,8 +29,9 @@ struct coord* getPointsCalibrate(struct lidar* l, char calibration);
 
 struct lidar
 initLidarAndCalibrate(char* device, struct coord position, double orientation, double angleMin, double angleMax){
-	angleMax = inZeroTwoPi(angleMax);
-	angleMin = inZeroTwoPi(angleMin);
+	angleMax = modTwoPi(angleMax);
+	angleMin = modTwoPi(angleMin);
+	orientation = modTwoPi(orientation);
 
 	struct coord markerPos;
 	markerPos.x = MARKER_R_POS_X;
@@ -104,8 +96,9 @@ initLidarAndCalibrate(char* device, struct coord position, double orientation, d
 
 struct lidar
 initLidar(char* device, struct coord position, double orientation, double angleMin, double angleMax){
-	angleMax = inZeroTwoPi(angleMax);
-	angleMin = inZeroTwoPi(angleMin);
+	angleMax = modTwoPi(angleMax);
+	angleMin = modTwoPi(angleMin);
+	orientation = modTwoPi(orientation);
 	struct lidar l;
 	l.pos = position;
 	l.orientation = orientation;
