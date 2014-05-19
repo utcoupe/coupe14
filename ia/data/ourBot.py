@@ -154,6 +154,9 @@ class OurBot():
 	def getNextIdToStack(self):
 		return self.__last_id_action_stacked.idIncrementation()
 
+	def getAsservBloqued(self):
+		return self.__asservBlocked
+
 	def setFinEnCours(self, booll):
 		self.__fin_en_cours = booll
 
@@ -189,7 +192,10 @@ class OurBot():
 		self.__angle = angle
 
 	def setAsservBloqued(self, isBlocked):
-		self.__asservBlocked = isBlocked
+		if isBlocked:
+			self.__asservBlocked = True
+		else:
+			self.__asservBlocked = False
 
 	def __castOrders(self, action_data):
 		data_objectif = deque()
@@ -237,6 +243,10 @@ class OurBot():
 		first_objectif[1].extend(self.__castOrders(action_data))
 		self.__logger.debug( str(self.getName()) + " order next STEP_OVER queued: " + str(first_objectif))
 		
+	def removeAllGoals(self):
+		if self.__objectifs:
+			first_id = self.__objectifs[0][0]
+		return self.removeObjectifAbove(first_id)
 
 	def removeActionBellow(self, lastIddExecuted):
 		"""enleve les actions terminé de la liste des actions en cours """

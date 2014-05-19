@@ -90,6 +90,8 @@ class SubProcessManager():
 			self.__GoalsManager.goalCanceledIdFromEvent(id_objectif)
 		elif etat == "BLOCKED":
 			self.__GoalsManager.blockGoalFromId(id_objectif)
+		elif etat == "DELETED":
+			self.__GoalsManager.goalDeletedIdFromEvent(id_objectif)
 		else:
 			self.__logger.error("Status non géré status "+str(status))
 

@@ -20,6 +20,20 @@
 
 #define MAX_MIN_DIST 100	/*mm, distance max entre 2 points les plus proches dans un groupe*/
 
+/*
+#define HOK1_X 3025
+#define HOK1_Y -25
+#define HOK1_A (3*PI/4)
+#define HOK1_AMIN (PI/2)
+#define HOK1_AMAX PI
+
+#define HOK2_X 25
+#define HOK2_Y 1000
+#define HOK2_A 0
+#define HOK2_AMIN (-PI/2)
+#define HOK2_AMAX (PI/2)
+*/
+
 #define HOK1_X -25
 #define HOK1_Y -25
 #define HOK1_A (PI/4)

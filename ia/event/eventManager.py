@@ -138,6 +138,7 @@ class EventManager():
 
 	def __checkEvent(self):
 		self.__checkBrasStatus()
+		self.__checkAsservBlocked()
 		
 		new_data = ()
 		if self.__Flussmittel is not None:
@@ -329,3 +330,21 @@ class EventManager():
 				elif  distance < COLLISION_WARNING_THRESHOLD:
 					pass
 					#osef...
+
+
+	def __checkAsservBlocked(self):
+		if self.__Flussmittel is not None:
+			self.__checkOneAsservBlocked(self.__Flussmittel)
+		if self.__Tibot is not None:
+			self.__checkOneAsservBlocked(self.__Tibot)
+
+
+
+	def __checkOneAsservBlocked(self, system):
+		if system.getAsservBloqued():
+			empty_arg = []
+			self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
+			system.setIdToReach("ANY")
+			id_list = system.removeAllGoals()
+			self.__SubProcessCommunicate.sendObjectifsDeleted(id_list[0])
+			self.__SubProcessCommunicate.sendObjectifsCanceled(id_list[1:])

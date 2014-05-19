@@ -227,6 +227,12 @@ class GoalsManager:
 			self.__available_goals.remove(goal)
 			self.__finished_goals.append(goal)
 
+	def goalDeletedIdFromEvent(self, id_to_delete):
+		for goal in (self.__available_goals + self.__blocked_goals + self.__dynamique_finished_goals + self.__finished_goals):
+			if goal.getId() == id_to_delete:
+				self.__deleteGoal(goal)
+
+
 	def __deleteGoal(self, goal):
 		success = False
 

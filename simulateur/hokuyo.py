@@ -36,7 +36,7 @@ class Hokuyo:
 	def getHokuyo(self):
 		"""
 		Renvoie la position de tous les robots
-		@return int temps entre 2 envoie de données
+		@return int le temps depuis le lancement du programme en millisecondes
 		@return int position x de notre gros robot
 		@return int position y de notre gros robot
 		@return int position x de notre petit robot
@@ -51,10 +51,13 @@ class Hokuyo:
 		ret = list()
 		ret.append(self.__get_milli()-self.__last_time_stamp)
 
-		for i in range(taille):
-			if self.__robots[i] is not None:
+		for i in range(4):
+			if i < taille and self.__robots[i] is not None:
 				ret.append(self.__robots[i].getXreal())
 				ret.append(self.__robots[i].getYreal())
+			else:
+				ret.append(-1)
+				ret.append(-1)
 		return ret
 
 	def __getTimeStamp(self):
