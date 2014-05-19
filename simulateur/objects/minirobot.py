@@ -57,14 +57,7 @@ class MiniRobot(robot.Robot):
 		self.__nbr_lances = 6
 		self.__filet = 1
 		self.__fresques = 2
-		self.__state_jack = 1  # jack in
 		self.setRobotType(MINI)
-
-	def getStateJack(self):
-		return self.__state_jack
-
-	def setStateJack(self):
-		self.__state_jack = 0
 
 	def getNbrLances(self):
 		return self.__nbr_lances

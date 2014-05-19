@@ -25,7 +25,9 @@ import sys
 import os
 DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(DIR_PATH, "../..", "define"))
+sys.path.append(os.path.join(DIR_PATH, "../../..", "GUI"))
 from define import *
+import GUI.viznavgraph.viznavgraph as nav
 
 class general(Frame):
 	""" Frame qui regroupe les widgets du frame général.
@@ -43,6 +45,9 @@ class general(Frame):
 		self.__temps_restant= StringVar()
 		self.__bigrobot_us = bots[1]
 		self.__minirobot_us = bots[2]
+		self.__bigrobot_en = bots[3]
+		self.__minirobot_en = bots[4]
+		self.__bots = bots
 		self.__match_started = False
 
 		#frames
@@ -77,8 +82,14 @@ class general(Frame):
 							   text = liste_mode[n],
 							   variable = self.choix_mode,
 							   value = liste_mode[n])
+			if n == 3:
+				bout.config(command=self.__startViz)
 			bout.grid(column = n, row = 0)
 		Fmode.grid(column = 0, row = 0, sticky=N+S+W+E, columnspan=2)
+
+	def __startViz(self):
+		print('dans startViz')
+		nav.startVizNavGraph(self.__bots)
 
 	def boutons(self):
 		"""
@@ -101,11 +112,13 @@ class general(Frame):
 		if self.__match_started is False:
 			threading.Thread(target=self.__timeThread).start()
 			self.__minirobot_us.setStateJack()
+			self.__minirobot_en.setStateJack()
 
 	def __startMatchBig(self):
 		if self.__match_started is False:
 			threading.Thread(target=self.__timeThread).start()
 			self.__bigrobot_us.setStateJack()
+			self.__bigrobot_en.setStateJack()
 
 	def temps(self):
 		"""
