@@ -33,6 +33,7 @@ class Tourelle():
 		timestamp = arguments[0]
 		position_hokuyo = []
 
+		print(arguments)
 		for i in range(1,9,2):
 			if arguments[i] == 0 and arguments[i+1] == 0:
 				break
