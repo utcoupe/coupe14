@@ -108,6 +108,9 @@ class Robot(EngineObjectPoly):
 	def getPosition(self):
 		return self.getXreal(), self.getYreal(), self.getAreal()
 
+	def getPositionXY(self):
+		return self.getXreal(), self.getYreal()
+
 	def getPositionId(self):
 		return self.getXreal(), self.getYreal(), self.getAreal(), self.__asserv.getLastIdAction()
 
