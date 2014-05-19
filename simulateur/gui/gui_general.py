@@ -45,6 +45,8 @@ class general(Frame):
 		self.__temps_restant= StringVar()
 		self.__bigrobot_us = bots[1]
 		self.__minirobot_us = bots[2]
+		self.__bigrobot_en = bots[3]
+		self.__minirobot_en = bots[4]
 		self.__bots = bots
 		self.__match_started = False
 
@@ -110,11 +112,13 @@ class general(Frame):
 		if self.__match_started is False:
 			threading.Thread(target=self.__timeThread).start()
 			self.__minirobot_us.setStateJack()
+			self.__minirobot_en.setStateJack()
 
 	def __startMatchBig(self):
 		if self.__match_started is False:
 			threading.Thread(target=self.__timeThread).start()
 			self.__bigrobot_us.setStateJack()
+			self.__bigrobot_en.setStateJack()
 
 	def temps(self):
 		"""
