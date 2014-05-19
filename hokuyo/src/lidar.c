@@ -73,7 +73,7 @@ initLidarAndCalibrate(char* device, struct coord position, double orientation, d
 	printf("%snew orientation:%f\n", PREFIX, l.orientation*180/PI);
 
 	///////
-	resetHokuyoUrg(l.lidarObject, device, angleMin-l.orientation, angleMax-l.orientation);
+	resetHokuyoUrg(l.lidarObject, device, modTwoPi(angleMin-l.orientation), modTwoPi(angleMax-l.orientation));
 	int nAngles = getnPointsHokuyoUrg(l.lidarObject);
 	double *angles = malloc(sizeof(double)*nAngles);
 	if(angles == NULL) exit(EXIT_FAILURE);

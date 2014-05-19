@@ -11,6 +11,11 @@ void*
 initHokuyoUrg(char* device, double angleMin, double angleMax){
 	angleMax = modTwoPi(angleMax);
 	angleMin = modTwoPi(angleMin);
+	if (angleMin > angleMax) {
+		double temp = angleMax;
+		angleMax = angleMin;
+		angleMin = temp;
+	}
 	urg_t *urg;
 	urg = malloc(sizeof(urg_t));
 	if( urg == NULL ) exit(EXIT_FAILURE);
@@ -44,6 +49,11 @@ void
 resetHokuyoUrg(urg_t* urg, char *device, double angleMin, double angleMax){
 	angleMax = modTwoPi(angleMax);
 	angleMin = modTwoPi(angleMin);
+	if (angleMin > angleMax) {
+		double temp = angleMax;
+		angleMax = angleMin;
+		angleMin = temp;
+	}
 	printf("%sHokuyo reinit from %f to %f\n", PREFIX, angleMin*180/PI, angleMax*180/PI);
 	urg_disconnect(urg);
 	urg_connect(urg, device, BAUDRATE_HOKUYOURG);
