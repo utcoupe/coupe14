@@ -54,7 +54,7 @@ class BigRobot(robot.Robot):
 			extension_objects	= [],
 		)
 		self.__nbrFeuAvant = 0
-		self.__nbrFeuArriere = 0 #normalement à 0, 1 pour les tests
+		self.__nbrFeuArriere = 0
 		self.__engine = engine
 		self.__feuHit = 0
 		self.setRobotType(BIG)
