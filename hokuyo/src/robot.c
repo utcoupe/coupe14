@@ -135,6 +135,7 @@ getRobots(struct coord *points, int n, struct coord *robots){
 
 
 	free(clusters);
+	clusters = 0;
 	return nbClusters;
 }
 
