@@ -34,8 +34,11 @@ class GoalsManager:
 		self.__SubProcessManager 	= SubProcessManager
 		self.__id_objectif_send = deque()
 
+		# FLUSSMITTEL
 		self.__back_triangle_stack = deque()
 		self.__front_triangle_stack = deque()
+		# TIBOT
+		self.__balles_lancees = 0
 
 		self.__data = self.__SubProcessManager.getData()
 		self.__our_color = self.__data["METADATA"]["getOurColor"]
@@ -45,7 +48,7 @@ class GoalsManager:
 		self.__loadGoals(base_dir+"/goals.xml")
 
 		self.__goalsLib = GoalsLibrary(self.__robot_name, self.__data, self.__blocked_goals, self.__PathFinding)
-		self.__goalsChoice = GoalsChoice(self.__robot_name, self.__data, self.__goalsLib, self.__our_color, self.__back_triangle_stack, self.__front_triangle_stack)
+		self.__goalsChoice = GoalsChoice(self.__robot_name, self.__data, self.__goalsLib, self.__our_color, self.__back_triangle_stack, self.__front_triangle_stack, self.__balles_lancees)
 
 
 		# Pour tester le déplacement du robot dans le simu lorsqu'il ne peut pas attraper un triangle
@@ -222,6 +225,11 @@ class GoalsManager:
 			self.__logger.info('Goal ' + str(goal.getName()) + " d'id "+str(goal.getId())+" is finished")
 			#Dans le cas où on aurait oublier le DYNAMIQUE_OVER
 			self.__queueBestGoals()
+			# Gestion du nombre de balles de Tibot
+			if goal.getType() == "BALLES":
+				self.__balles_lancees += goal.getElemGoalLocked().getPoints()
+				if self.__balles_lancees > 6:
+					self.__logger.error("On a lancé " + str(self.__balles_lancees) + "(> 6) balles, c'pas normal !")
 		#Dans le cas où c'est l'autre robot qui à fait l'objectif
 		elif goal in self.__available_goals:
 			self.__available_goals.remove(goal)

@@ -12,25 +12,25 @@ from .navigation import *
 from .goalsLibrary import *
 
 class GoalsChoice:
-	def __init__(self, robot_name, data, goalsLib, our_color, back_triangle_stack, front_triangle_stack):
+	def __init__(self, robot_name, data, goalsLib, our_color, back_triangle_stack, front_triangle_stack, balles_lancees):
 		self.__logger = logging.getLogger(__name__)
 
 		self.__robot_name = robot_name
 		self.__data = data
 		self.__goalsLib = goalsLib
 		self.__our_color = our_color
-		self.__back_triangle_stack = back_triangle_stack
-		self.__front_triangle_stack = front_triangle_stack
-
 
 		# Variables FLUSSMITTEL
-		self.__NB_TRIANGLES_AVANT_FM = 0
-		self.__NB_TRIANGLES_ARRIERE_FM = 0
+		self.__back_triangle_stack = back_triangle_stack
+		self.__front_triangle_stack = front_triangle_stack
+		"""
 		self.__ZONE_DEPOT_CENTRALE_VIDE = 0
 		self.__ZONE_DEPOT_GAUCHE_VIDE = 0
 		self.__ZONE_DEPOT_DROITE_VIDE = 0
+		"""
 
 		# Variables TIBOT
+		self.__balles_lancees = balles_lancees
 
 	def getBestGoal(self, goals):
 		if self.__robot_name == "FLUSSMITTEL":
@@ -42,6 +42,8 @@ class GoalsChoice:
 			best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 
 		return best_goal
+
+	#FLUSSMITTEL
 
 	def __getBestGoalFlussmittel(self, goals):
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
@@ -68,6 +70,8 @@ class GoalsChoice:
 						best_goal = (path, goal, idd)
 
 		return best_goal
+
+	#TIBOT
 
 	def __getBestGoalTibot(self, goals):
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
