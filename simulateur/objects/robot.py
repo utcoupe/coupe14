@@ -47,6 +47,7 @@ class Robot(EngineObjectPoly):
 		self.__get_milli = lambda: int(round(time.time() * 1000))
 		self.__time_stamp = self.__get_milli()
 		self.__time_stamp_origine = self.__get_milli()
+		self.__state_jack = 1  # jack in
 
 		#!!! ne pas modifier ces variables, elles sont utilisés pour l'interaction avec l'utilisateur !
 		self.__current_team = RED
@@ -62,6 +63,12 @@ class Robot(EngineObjectPoly):
 
 	def setRobotType(self, type):
 		self.__typerobot = type
+
+	def getStateJack(self):
+		return self.__state_jack
+
+	def setStateJack(self):
+		self.__state_jack = 0
 
 	def getXreal(self):
 		"""
@@ -107,6 +114,9 @@ class Robot(EngineObjectPoly):
 
 	def getPosition(self):
 		return self.getXreal(), self.getYreal(), self.getAreal()
+
+	def getPositionXY(self):
+		return self.getXreal(), self.getYreal()
 
 	def getPositionId(self):
 		return self.getXreal(), self.getYreal(), self.getAreal(), self.__asserv.getLastIdAction()

@@ -185,7 +185,7 @@ class GoalsManager:
 
 			#Hack pour le cas des torches qui sont des actions qu'on peut faire en plusieurs fois
 			if first_action_elem:
-				if first_action_elem[0][0] == "GET_TRIANGLE_IA_TORCHE":
+				if first_action_elem[0][0] == "GET_TRIANGLE_IA_TORCHE" or first_action_elem[0][0] == "GET_TRIANGLE_IA":
 					orders.append( ("STEP_OVER", ()) )
 				else:
 					orders.extend(first_action_elem)

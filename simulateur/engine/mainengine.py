@@ -97,18 +97,9 @@ class Engine:
 			else:
 				id_tmp = robot.getLastIdOther()
 				if id_tmp > self.__id_action_robot:
-					robot.setFeuHit(1) #positionne un flag pour dire qu'on a touché un triangle
 					feu = torche.prendreFeu()
-					if feu == 'R':
-						if robot.getTeam() == RED:
-							robot.storeFeu(1)
-						elif robot.getTeam() == YELLOW:
-							robot.storeFeu(-1)
-					elif feu == 'Y':
-						if robot.getTeam() == RED:
-							robot.storeFeu(-1)
-						elif robot.getTeam() == YELLOW:
-							robot.storeFeu(1)
+					print('id other pour récup feu : ', id_tmp, ' feu : ',feu)
+					robot.setFeuHit(1) #positionne un flag pour dire qu'on a touché un triangle
 					self.__id_action_robot = id_tmp
 
 	def __on_collision_bras_ouvrir_feu(self, space, arb):

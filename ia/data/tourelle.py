@@ -23,6 +23,8 @@ class Tourelle():
 
 		#Variables
 		self.__old_data = []
+		self.__compteur_inversion = 0
+
 		
 	"""
 	def getLastDataPosition(self):
@@ -34,26 +36,47 @@ class Tourelle():
 		position_hokuyo = []
 
 		for i in range(1,9,2):
-			if arguments[i] == 0 and arguments[i+1] == 0:
+			if arguments[i] == -1 and arguments[i+1] == -1:
 				break
 			position_hokuyo.append(Position(arguments[i], arguments[i+1]))
 
 		position_enemy = self.__fitreNosRobots(position_hokuyo) 
 		if position_enemy != None:
 			if len(position_enemy) == NUMBER_OF_ENEMY:
-				i = 0
-				if self.BigEnemyBot is not None:
-					self.BigEnemyBot.setPosition(position_enemy[i])
-					i += 1
-				if self.SmallEnemyBot is not None:
-					self.SmallEnemyBot.setPosition(position_enemy[i])
-					i += 1
+
+				#Si on voit les deux robots, on vérfie qu'ils ne sont pas inversés
+				if len(position_enemy) == 2:
+					position_enemy = self.__checkRobotsPosition(position_enemy)
+				if position_enemy is not None:
+					i = 0
+					if self.BigEnemyBot is not None:
+						self.BigEnemyBot.setPosition(position_enemy[i])
+						i += 1
+					if self.SmallEnemyBot is not None:
+						self.SmallEnemyBot.setPosition(position_enemy[i])
+						i += 1
 			else:
 				self.__logger.warning("On a trouvé qu'un seul robot adverse dans les données hokuyo, du coup on les drop.")
 		else:
 			self.__logger.warning("On a trouvé aucun enemy donc on drop les données hokuyo.")
-		
+	
+	def __checkRobotsPosition(self, position_enemy):
+		temp = self.BigEnemyBot.getPosition()
+		ia_position_big_ennemy = Position(temp[0], temp[1])
 
+		temp = self.SmallEnemyBot.getPosition()
+		ia_position_small_ennemy = Position(temp[0], temp[1])
+
+		if ia_position_big_ennemy.distanceSquarred(position_enemy[0]) > ia_position_big_ennemy.distanceSquarred(position_enemy[1]) or ia_position_small_ennemy.distanceSquarred(position_enemy[1]) > ia_position_small_ennemy.distanceSquarred(position_enemy[0]):
+			if self.__compteur_inversion < 3:
+				self.__logger.warning("L'hokuyo semble avoir confondu le petit et le gros robots adverse ia_position_big_ennemy "+str(ia_position_big_ennemy)+" position_enemy[0] "+str(position_enemy[0])+" ia_position_small_ennemy "+str(ia_position_small_ennemy)+" position_enemy[1] "+str(position_enemy[1]))
+				self.__compteur_inversion += 1
+				return None
+			else:
+				self.__logger.warning("On accepte finalement les données hokuyo, donc on inverse la position des robots ennemy dans l'IA")
+		
+		self.__compteur_inversion = 0
+		return position_enemy
 
 	def __fitreNosRobots(self, position_hokuyo):
 		"""return une liste de robots ennemies, il peut manquer un robots, si il n'y en a aucun on return None"""

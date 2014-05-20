@@ -54,17 +54,10 @@ class BigRobot(robot.Robot):
 			extension_objects	= [],
 		)
 		self.__nbrFeuAvant = 0
-		self.__nbrFeuArriere = 0 #normalement à 0, 1 pour les tests
+		self.__nbrFeuArriere = 0
 		self.__engine = engine
 		self.__feuHit = 0
-		self.__state_jack = 1  # jack in
 		self.setRobotType(BIG)
-
-	def getStateJack(self):
-		return self.__state_jack
-
-	def setStateJack(self):
-		self.__state_jack = 0
 
 	def getFeuxAvant(self):
 		return self.__nbrFeuAvant
