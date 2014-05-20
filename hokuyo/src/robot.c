@@ -135,13 +135,86 @@ getRobots(struct coord *points, int n, struct coord *robots){
 
 
 	free(clusters);
+	clusters = 0;
 	return nbClusters;
 }
 
 
+int mergeRobots(struct coord *r1, int n1, struct coord *r2, int n2, struct coord *result) {
+	struct corres { //permet d'établir des correspondances entre les index
+		int r1;
+		int r2;
+	};
+	//Brute force ici, on aura max 4 robots de chaque hokuyo, 4x4 = 16 cas, ca reste peu
+	//Calcul de la distance entre chaque combinaison de coords
+	int distR1R2[MAX_ROBOTS][MAX_ROBOTS], i, j;
+	struct corres dist_indexes[MAX_ROBOTS*MAX_ROBOTS]; //Tableau d'index de distR1R2, sert a trier les distances
+	struct corres merged[MAX_ROBOTS]; //Correspondances finales et retenues
+	int changed = 0;
 
+	//Calcul des distaces
+	for (i=0; i<n1; i++) {
+		for (j=0; j<n2; j++) {
+			distR1R2[i][j] = dist_squared(r1[i], r2[j]);
+		}
+	}
 
+	//Tri du tableau de correspondance des distances par ordre croissant
+	//TODO verifier le fonctionnement
+	for (i=0; i<n1*n2; i++) {
+		dist_indexes[i] = (struct corres){ i/n2, i%n2 };
+	}
+	do {
+		changed = 0;
+		for (i=1; i<n1*n2; i++) {
+			if (distR1R2[dist_indexes[i-1].r1][dist_indexes[i-1].r2] > distR1R2[dist_indexes[i].r1][dist_indexes[i].r2]) {
+				struct corres temp = dist_indexes[i];
+				dist_indexes[i] = dist_indexes[i-1];
+				dist_indexes[i-1] = temp;
+				changed = 1;
+			}
+		}
+	} while (changed);
 
+	//Choix des correspondances en prenant la premiere qui vientdu plus petit au plus grand
+	int used_R1_index[MAX_ROBOTS], used_R2_index[MAX_ROBOTS], nbr_found = 0;
+	for (i=1; i<n1*n2; i++) {
+		struct corres c = dist_indexes[i];
+		if (!isIn(c.r1, used_R1_index, MAX_ROBOTS) && //Aucun des deux robots n'est deja selectionné
+			!isIn(c.r2, used_R2_index, MAX_ROBOTS)) { //On ajout la correspondace
 
+			merged[nbr_found] = c;
+			used_R1_index[nbr_found] = c.r1;
+			used_R2_index[nbr_found] = c.r2;
+			nbr_found++;
+		}
+	}
 
+	for (i=0; i<nbr_found; i++) {
+		struct corres c = merged[i];
+		result[i] = (struct coord) {(r1[c.r1].x + r2[c.r2].x) / 2, (r1[c.r1].y + r2[c.r2].y) / 2 };
+	}
 
+	int diff = n1 - n2; //Si on a des robots detectés par un hokuyo mais pas par l'autre
+	if (diff > 0) { //Plus de r1 que de r2
+		for (i=n2; i<n1; i++) {
+			result[nbr_found++] = r1[i];
+		}
+	} else if (diff < 0) { //Plus de r2 que de r1
+		for (i=n1; i<n2; i++) {
+			result[nbr_found++] = r2[i];
+		}
+	}
+	return nbr_found;
+}
+
+int isIn(int e, int *tab, int tab_size) {
+	int i, ret = 0;
+	for (i=0; i<tab_size; i++) {
+		if (tab[i] == e) {
+			ret = 1; //Found
+			break;
+		}
+	}
+	return ret;
+}
