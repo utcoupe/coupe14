@@ -21,11 +21,11 @@ void frame();
 static int use_protocol = 0;
 static struct lidar l1, l2;
 #ifdef SDL
-static struct color l1Color, l2Color;
+static struct color l1Color, l2Color, lColor;
 #endif
 
 long startTime, lastTime = 0;
-static struct coord robots1[MAX_ROBOTS], robots2[MAX_ROBOTS];
+static struct coord robots[MAX_ROBOTS], robots1[MAX_ROBOTS], robots2[MAX_ROBOTS];
 
 void exit_handler() {
 	printf("\n%sClosing lidar(s), please wait...\n", PREFIX);
@@ -106,6 +106,7 @@ int main(int argc, char **argv){
 	#ifdef SDL
 	l1Color = newColor(255, 0, 0);
 	l2Color = newColor(0, 0, 255);
+	lColor = newColor(255, 0, 255);
 	initSDL();
 	#endif
 
@@ -129,18 +130,20 @@ void frame(){
 	printf("%sDuration : %lims\n", PREFIX, timestamp-lastTime);
 	int nRobots1 = getRobots(l1.points, l1.fm.n, robots1);
 	int nRobots2 = getRobots(l2.points, l2.fm.n, robots2);
+	int nRobots = mergeRobots(robots1, nRobots1, robots2, nRobots2, robots);
 	#ifdef SDL
 	blitMap();
 	blitLidar(l1.pos, l1Color);
 	blitLidar(l2.pos, l2Color);
 	blitRobots(robots1, nRobots1);
 	blitRobots(robots2, nRobots2);
+	blitRobots(robots, nRobots);
 	blitPoints(l1.points, l1.fm.n, l1Color);
 	blitPoints(l2.points, l2.fm.n, l2Color);
 	waitScreen();
 	#endif
 	if (use_protocol){
-		//pushResults(robots1, nRobots1, timestamp);
+		pushResults(robots, nRobots, timestamp);
 	}
 	else{
 		printf("%sHOK1 - %li;%i", PREFIX, timestamp, nRobots1);
@@ -151,6 +154,11 @@ void frame(){
 		printf("%sHOK2 - %li;%i", PREFIX, timestamp, nRobots2);
 		for(int i=0; i<nRobots2; i++){
 			printf(";%i:%i", robots2[i].x, robots2[i].y);
+		}
+		printf("\n");
+		printf("%sALL  - %li;%i", PREFIX, timestamp, nRobots);
+		for(int i=0; i<nRobots; i++){
+			printf(";%i:%i", robots[i].x, robots[i].y);
 		}
 		printf("\n");
 	}
