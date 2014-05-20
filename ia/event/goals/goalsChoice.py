@@ -47,7 +47,7 @@ class GoalsChoice:
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 		best_length = float("Inf")
 		position_last_goal = self.__goalsLib.getPositionLastGoal()
-
+		
 		for goal in goals:
 			if len(self.__front_triangle_stack) >= MAX_FRONT_TRIANGLE_STACK:
 				if len(self.__front_triangle_stack) > MAX_FRONT_TRIANGLE_STACK:
