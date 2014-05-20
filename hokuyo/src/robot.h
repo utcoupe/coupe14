@@ -9,6 +9,7 @@
 
 
 int getRobots(struct coord *points, int n, struct coord *robots);
+int isIn(int e, int *tab, int tab_size);
 
 
 
