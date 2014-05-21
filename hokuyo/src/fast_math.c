@@ -49,7 +49,9 @@ void
 freeFastmath(struct fastmathTrigo s)
 {
 	free(s.cos);
+	s.cos = 0;
 	free(s.sin);
+	s.sin = 0;
 }
 
 double

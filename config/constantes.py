@@ -13,7 +13,7 @@ TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux
 #====================Enable====================
 ENABLE_TOURELLE = 		True
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
-ENABLE_TIBOT =			False	
+ENABLE_TIBOT =			True
 
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB1"
@@ -111,10 +111,8 @@ LARGEUR_TIBOT = 		200
 LONGUEUR_TIBOT = 		150
 
 #====================ENEMYs====================
-FIRST_POSITION_BIG_RED_ENNEMY = (-1000, -1000)
-FIRST_POSITION_SMALL_RED_ENNEMY = (-1000, -1000)
-FIRST_POSITION_BIG_YELLOW_ENNEMY = (-1000, -1000)
-FIRST_POSITION_SMALL_YELLOW_ENNEMY = (-1000, -1000)
+FIRST_POSITION_BIG_RED_ENNEMY = (187, 1870)
+FIRST_POSITION_SMALL_RED_ENNEMY = (193, 1542)
 
 #====================BIG ENEMY====================
 #Si un seul adversaire, on utilise les constantes de BIG ENEMY

@@ -84,10 +84,12 @@ initLidarAndCalibrate(char* device, struct coord position, double orientation, d
 	l.fm = initFastmath( nAngles, angles );
 
 	free(l.points);
+	l.points = 0;
 	l.points = malloc(sizeof(struct coord)*l.fm.n);
 	if(l.points == NULL) exit(EXIT_FAILURE);
 
 	free(angles);
+	angles = 0;
 
 
 
@@ -201,6 +203,7 @@ getPointsCalibrate(struct lidar* l, char calibration){
 		printf("%i\t%ld\t%i\t%i\n", i, buffer[i], l->points[i].x, l->points[i].y);
 	}//*/
 	free(buffer);
+	buffer = 0;
 	return l->points;
 }
 

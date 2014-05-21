@@ -49,15 +49,18 @@ class Hokuyo:
 		taille =len(self.__robots)
 
 		ret = list()
+		void_ret = list()
 		ret.append(self.__get_milli()-self.__last_time_stamp)
 
-		for i in range(4):
-			if i < taille and self.__robots[i] is not None:
+		for i in range(taille):
+			if self.__robots[i] is not None:
 				ret.append(self.__robots[i].getXreal())
 				ret.append(self.__robots[i].getYreal())
 			else:
-				ret.append(-1)
-				ret.append(-1)
+				void_ret.append(-1)
+				void_ret.append(-1)
+
+		ret.extend(void_ret)
 		return ret
 
 	def __getTimeStamp(self):

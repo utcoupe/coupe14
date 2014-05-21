@@ -9,7 +9,7 @@ sys.path.append(os.path.join(FILE_DIR, "../../libs"))
 import time
 import threading
 
-from .graphview import *
+from graphview import *
 from event.goals import navigation
 
 class Bot(dict):

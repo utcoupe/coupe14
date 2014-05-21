@@ -14,20 +14,22 @@ class EnemyBot():
 		self.__name = name #type "SMALL" ou "BIG"
 
 		#Valeurs récupérées (read-only)
-		if ia_color == "RED":
-			if name == "BIG":
+		
+		if name == "BIG":
+			if ia_color == "YELLOW":
 				self.__positionX = FIRST_POSITION_BIG_RED_ENNEMY[0]
 				self.__positionY = FIRST_POSITION_BIG_RED_ENNEMY[1]
 			else:
+				self.__positionX = 3000-FIRST_POSITION_BIG_RED_ENNEMY[0]
+				self.__positionY = FIRST_POSITION_BIG_RED_ENNEMY[1]
+		else:
+			if ia_color == "YELLOW":
 				self.__positionX = FIRST_POSITION_SMALL_RED_ENNEMY[0]
 				self.__positionY = FIRST_POSITION_SMALL_RED_ENNEMY[1]
-		else:
-			if name == "BIG":
-				self.__positionX = FIRST_POSITION_BIG_YELLOW_ENNEMY[0]
-				self.__positionY = FIRST_POSITION_BIG_YELLOW_ENNEMY[1]
 			else:
-				self.__positionX = FIRST_POSITION_SMALL_YELLOW_ENNEMY[0]
-				self.__positionY = FIRST_POSITION_SMALL_YELLOW_ENNEMY[1]
+				self.__positionX = 3000 - FIRST_POSITION_SMALL_RED_ENNEMY[0]
+				self.__positionY = FIRST_POSITION_SMALL_RED_ENNEMY[1]
+
 
 
 	def getPosition(self):

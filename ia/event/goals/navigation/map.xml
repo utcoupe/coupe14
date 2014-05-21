@@ -16,8 +16,8 @@
 <circle x="3000" y="700" rayon="150" n="10"/>
 
 <!-- TORCHES -->
-<circle x="900" y="900" rayon="80" n="10"/>
-<circle x="2100" y="900" rayon="80" n="10"/>
+<circle x="900" y="900" rayon="80" n="20"/>
+<circle x="2100" y="900" rayon="80" n="20"/>
 
 
 <!-- DEPOT FRUIT ROUGE -->

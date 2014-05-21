@@ -28,6 +28,9 @@ class ElemGoal:
 	def getColor(self):
 		return self.__color
 
+	def getPoints(self):
+		return self.__points
+
 	def switchColor(self):
 		if self.__color == "RED":
 			self.__color = "YELLOW"

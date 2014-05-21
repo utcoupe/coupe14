@@ -24,10 +24,9 @@ import time
 import sys
 import os
 DIR_PATH = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(DIR_PATH, "../..", "define"))
-sys.path.append(os.path.join(DIR_PATH, "../../..", "GUI"))
+sys.path.append(os.path.join(DIR_PATH, "../../GUI/viznavgraph"))
 from define import *
-import GUI.viznavgraph.viznavgraph as nav
+import viznavgraph as nav
 
 class general(Frame):
 	""" Frame qui regroupe les widgets du frame général.
