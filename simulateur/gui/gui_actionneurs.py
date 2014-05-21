@@ -108,7 +108,7 @@ class actionneurs(LabelFrame):
 		self.__bigrobot_us.setAsservBlocked(0)
 
 	def __setFailPrehens(self):
-		self.__bigrobot_us.setFeuHit(0)
+		self.__bigrobot_us.forceFailFeuHit(True)
 
 	def __setGoodPrehens(self):
-		self.__bigrobot_us.setFeuHit(1)
+		self.__bigrobot_us.forceFailFeuHit(False)
