@@ -38,7 +38,7 @@ class GoalsManager:
 		self.__back_triangle_stack = deque()
 		self.__front_triangle_stack = deque()
 		# TIBOT
-		self.__balles_lancees = 0
+		self.__balles_lancees = [0]
 
 		self.__data = self.__SubProcessManager.getData()
 		self.__our_color = self.__data["METADATA"]["getOurColor"]
@@ -135,9 +135,16 @@ class GoalsManager:
 			if objectif.getId() == id_objectif:
 				self.__blocked_goals.remove(objectif)
 				self.__dynamique_finished_goals.append(objectif)
+
 				if objectif.getType() == "STORE_TRIANGLE":
 					self.__front_triangle_stack.clear()
 					self.__back_triangle_stack.clear()
+				# Gestion du nombre de balles de Tibot
+				elif objectif.getType() == "BALLES":
+					self.__balles_lancees[0] += objectif.getElemGoalLocked().getPoints()
+					if self.__balles_lancees[0] > 6:
+						self.__logger.error("On a lancé " + str(self.__balles_lancees[0]) + "(> 6) balles, c'pas normal !")
+
 				self.__logger.info(str(self.__robot_name)+" L'objectif "+str(objectif.getName())+" d'id "+str(objectif.getId())+" est a terminé ses actions dynamiques")
 				self.__queueBestGoals()
 				break
@@ -225,11 +232,7 @@ class GoalsManager:
 			self.__logger.info('Goal ' + str(goal.getName()) + " d'id "+str(goal.getId())+" is finished")
 			#Dans le cas où on aurait oublier le DYNAMIQUE_OVER
 			self.__queueBestGoals()
-			# Gestion du nombre de balles de Tibot
-			if goal.getType() == "BALLES":
-				self.__balles_lancees += goal.getElemGoalLocked().getPoints()
-				if self.__balles_lancees > 6:
-					self.__logger.error("On a lancé " + str(self.__balles_lancees) + "(> 6) balles, c'pas normal !")
+		
 		#Dans le cas où c'est l'autre robot qui à fait l'objectif
 		elif goal in self.__available_goals:
 			self.__available_goals.remove(goal)

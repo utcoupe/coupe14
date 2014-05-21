@@ -31,11 +31,11 @@ class GoalsChoice:
 
 		# Priorité
 		if self.__our_color == "RED":
-			self.__prio_Tibot_goals = ["Fresque", "BALLES GAUCHE", "BALLES DROITE", "TIR_FILET"] # goal.name
-			self.__prio_Tibot_balles = {"BALLES GAUCHE": 4, "BALLES DROITE": 2} # elem_goal.points
+			self.__prio_tibot_goals = ["Fresque", "BALLES GAUCHE", "BALLES DROITE", "TIR_FILET"] # goal.name
+			self.__prio_tibot_balles = {"BALLES GAUCHE": 4, "BALLES DROITE": 2} # elem_goal.points
 		else: # Yellow, idem qu'au dessus pour les variables
-			self.__prio_Tibot = ["Fresque", "BALLES DROITE", "BALLES GAUCHE", "TIR_FILET"]
-			self.__prio_Tibot_balles = {"BALLES GAUCHE": 2, "BALLES DROITE": 4}
+			self.__prio_tibot_goals = ["Fresque", "BALLES DROITE", "BALLES GAUCHE", "TIR_FILET"]
+			self.__prio_tibot_balles = {"BALLES GAUCHE": 2, "BALLES DROITE": 4}
 
 		# Variables TIBOT
 		self.__balles_lancees = balles_lancees
