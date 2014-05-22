@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <Servo.h>
 
-#define PIN_SERVO
+#define PIN_SERVO 43
 
 Servo s;
 void setup(){
@@ -10,8 +10,10 @@ void setup(){
 
 void loop() {
 	int i;
-	for (i=0; i<180; i+=10) {
+	s.write(150);
+	/*
+	for (i=180; i>=0; i-=10) {
 		s.write(i);
-		delay(10);
-	}
+		delay(1000);
+	}*/
 }
