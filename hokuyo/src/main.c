@@ -3,6 +3,7 @@
 #include "robot.h"
 #include "communication.h"
 #include "compat.h"
+#include "robots2hok.h"
 
 #include <sys/types.h>
 #include <urg_ctrl.h>
