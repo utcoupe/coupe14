@@ -206,9 +206,12 @@ class EventManager():
 	def __checkBrasStatus(self):
 		if self.__Flussmittel is not None:
 			bras_status = self.__Flussmittel.getBrasStatus()
+			objectif = self.__Flussmittel.getQueuedObjectif()[1]
 			if bras_status is not None:
 				self.__Flussmittel.setBrasStatus(None)
-				self.__SubProcessCommunicate.sendBrasStatus(bras_status, self.__Flussmittel.getQueuedObjectif()[1][0][0])
+				if objectif:
+					self.__SubProcessCommunicate.sendBrasStatus(bras_status, objectif[0][0])
+
 
 	def __pushOrders(self, Objet, data): 
 		id_objectif = data[0]
@@ -333,9 +336,10 @@ class EventManager():
 
 	def __checkOneAsservBlocked(self, system):
 		if system.getAsservBloqued():
-			empty_arg = []
-			self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
 			system.setIdToReach("ANY")
 			id_list = system.removeAllGoals()
-			self.__SubProcessCommunicate.sendObjectifsDeleted(id_list[0])
-			self.__SubProcessCommunicate.sendObjectifsCanceled(id_list[1:])
+			if id_list:
+				empty_arg = []
+				self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
+				self.__SubProcessCommunicate.sendObjectifsDeleted( (id_list[0],) )
+				self.__SubProcessCommunicate.sendObjectifsCanceled( id_list[1:] )

@@ -246,7 +246,9 @@ class OurBot():
 	def removeAllGoals(self):
 		if self.__objectifs:
 			first_id = self.__objectifs[0][0]
-		return self.removeObjectifAbove(first_id)
+			return self.removeObjectifAbove(first_id)
+		else:
+			return []
 
 	def removeActionBellow(self, lastIddExecuted):
 		"""enleve les actions terminé de la liste des actions en cours """

@@ -164,7 +164,7 @@ class GoalsManager:
 	def goalCanceledIdFromEvent(self, id_objectif):
 		for objectif in self.__blocked_goals:
 			if objectif.getId() == id_objectif:
-				self.__cancelGoal(objectif, True)
+				self.__cancelGoal(objectif, fromEvent = True)
 				break
 
 	def goalFinishedId(self, id_objectif):
@@ -225,7 +225,7 @@ class GoalsManager:
 			self.__logger.error("On va rechercher un nouvel ordre, ce cas peut-il vrament arrivé")
 			self.__queueBestGoals()
 
-	def __cancelGoal(self, goal, fromEvent=False):
+	def __cancelGoal(self, goal, fromEvent = False):
 		self.__blocked_goals.remove(goal)#On ne peut pas enlever les ordres dans self.__dynamique_finished_goals
 		self.__available_goals.append(goal)
 		self.__logger.info('Goal ' + goal.getName() + ' has been canceled and is now released')
@@ -260,10 +260,10 @@ class GoalsManager:
 	def goalDeletedIdFromEvent(self, id_to_delete):
 		for goal in (self.__available_goals + self.__blocked_goals + self.__dynamique_finished_goals + self.__finished_goals):
 			if goal.getId() == id_to_delete:
-				self.__deleteGoal(goal)
+				self.__deleteGoal(goal, fromEvent = True)
 
 
-	def __deleteGoal(self, goal):
+	def __deleteGoal(self, goal, fromEvent = False):
 		success = False
 
 		if goal in self.__available_goals:
@@ -280,7 +280,8 @@ class GoalsManager:
 			success = True
 
 		self.__removeLastValueOfDeque(self.__id_objectif_send, goal.getId())
-		self.__SubProcessManager.sendDeleteGoal(goal.getId())
+		if fromEvent == False:
+			self.__SubProcessManager.sendDeleteGoal(goal.getId())
 		if success:
 			self.__logger.info('Goal ' + goal.getName() + ' is delete')
 		else:
