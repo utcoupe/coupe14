@@ -30,6 +30,7 @@ class actionneurs(LabelFrame):
 		@param bots : liste des robots (our_big,our_mini,en_big,en_mini)
 		"""
 		LabelFrame.__init__(self, fenetre, text="Actionneurs et capteurs", width=300, height=100, bg="white")
+		self.boutons()
 		self.grid(sticky=W+E)
 		#données
 		self.__bigrobot_us = bots[1]
@@ -84,3 +85,30 @@ class actionneurs(LabelFrame):
 		self.__fresques_mini_label = Label(Frobot, textvariable=self.__fresques_mini)
 		self.__fresques_mini_label.grid(row=2)
 		Frobot.grid(column=colonne, row=0, in_=parent)
+
+	def boutons(self):
+		"""
+		Création des boutons blocage asserv et échec préhension
+		"""
+		Fbouton = LabelFrame(self, text="Bouton de contrôle")
+		bout_bloc_asserv = Button(Fbouton, text = "Blocage asserv", command=self.__setAsservBlocked)
+		bout_bloc_asserv.grid(column = 0, row = 0)
+		bout_fail_prehension = Button(Fbouton, text = "Fail préhension", command=self.__setFailPrehens)
+		bout_fail_prehension.grid(column = 0, row = 1)
+		bout_debloc_asserv = Button(Fbouton, text = "Déblocage asserv", command=self.__setAsservDeblocked)
+		bout_debloc_asserv.grid(column = 1, row = 0)
+		bout_prehension_ok = Button(Fbouton, text = "Préhension bonne", command=self.__setGoodPrehens)
+		bout_prehension_ok.grid(column = 1, row = 1)
+		Fbouton.grid(column = 2, row = 0, sticky=N+S+W+E)
+
+	def __setAsservBlocked(self):
+		self.__bigrobot_us.setAsservBlocked(1)
+
+	def __setAsservDeblocked(self):
+		self.__bigrobot_us.setAsservBlocked(0)
+
+	def __setFailPrehens(self):
+		self.__bigrobot_us.forceFailFeuHit(True)
+
+	def __setGoodPrehens(self):
+		self.__bigrobot_us.forceFailFeuHit(False)

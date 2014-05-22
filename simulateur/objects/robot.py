@@ -48,6 +48,7 @@ class Robot(EngineObjectPoly):
 		self.__time_stamp = self.__get_milli()
 		self.__time_stamp_origine = self.__get_milli()
 		self.__state_jack = 1  # jack in
+		self.__asserv_blocked = 0  #passage à 1 si l'asserv est bloqué
 
 		#!!! ne pas modifier ces variables, elles sont utilisés pour l'interaction avec l'utilisateur !
 		self.__current_team = RED
@@ -69,6 +70,12 @@ class Robot(EngineObjectPoly):
 
 	def setStateJack(self):
 		self.__state_jack = 0
+
+	def getAsservBlocked(self):
+		return self.__asserv_blocked
+
+	def setAsservBlocked(self,status):
+		self.__asserv_blocked = status
 
 	def getXreal(self):
 		"""

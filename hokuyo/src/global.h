@@ -20,6 +20,8 @@
 
 #define MAX_MIN_DIST 100	/*mm, distance max entre 2 points les plus proches dans un groupe*/
 
+#define MERGE_POINTS_BEFORE_CLUSTERIZING true
+
 /*
 #define HOK1_X 3025
 #define HOK1_Y -25

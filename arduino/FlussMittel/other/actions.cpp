@@ -65,10 +65,10 @@ void initPins(){
 	pinMode(PIN_SERVO_BRAS_DIST, OUTPUT);
 	servoBrasDist.attach(PIN_SERVO_BRAS_DIST);
        
-	pinMode(PIN_STEPPER_STEP, OUTPUT);
-	pinMode(PIN_STEPPER_DIR, OUTPUT);
 	pinMode(PIN_INTERRUPT_BRAS, INPUT_PULLUP);
 	pinMode(PIN_INT_HAUT_ASC, INPUT_PULLUP);
+
+	pinMode(PIN_VALVE, OUTPUT);
 }
 
 void initAct() {
@@ -83,12 +83,10 @@ void initAct() {
 	while (digitalRead(PIN_INT_HAUT_ASC) == 1) {
 		updateBras();
 	}
-	stepperAsc.setCurrentPosition(HAUTEUR_MAX*H_TO_STEP + MARGE_SECU_TOP);
 	topStop();
 	pump(false);
 	cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
 	servoRet.write(180); 
-	//attachInterrupt(INT_ASC_HAUT, topStop, FALLING); //Commenté à cause des micro-interuptions
 }
 
 void callbackRet(int use) {
@@ -179,25 +177,29 @@ void deposeTri(int dep) {
 }
 
 void updateBras() {
-	stepperAsc.run();
-	if (call_critical) {
-		criticalCmdBras();
-	}
-	switch(action_en_cours) {
-		case BrasVentouse:
-			cmdBrasVentouse();
-			break;
-		case TriBordure:
-			cmdTriBordure();
-			break;
-		case TriPush:
-			cmdTriPush();
-			break;
-		case BrasDepot:
-			cmdBrasDepot();
-			break;
-		default:
-			break;
+	if (false && digitalRead(PIN_INT_HAUT_ASC) == LOW) {
+		topStop();
+	} else {
+		stepperAsc.run();
+		if (call_critical) {
+			criticalCmdBras();
+		}
+		switch(action_en_cours) {
+			case BrasVentouse:
+				cmdBrasVentouse();
+				break;
+			case TriBordure:
+				cmdTriBordure();
+				break;
+			case TriPush:
+				cmdTriPush();
+				break;
+			case BrasDepot:
+				cmdBrasDepot();
+				break;
+			default:
+				break;
+		}
 	}
 }
 
@@ -510,25 +512,25 @@ void cmdBrasServ(double a, int l) {
 	call_critical = false;
 	//COMMANDE
 	int d = (l - BRAS_OFFSET_DIST)/ 10.0;
-	double alpha = 0.2472*pow(d,4) - 2.759*pow(d,3) + 7.843*pow(d,2) + 6.942*d; //regression polynomiale
-	int theta = -a*180.0/M_PI - BRAS_OFFSET_ANGLE;
+	double alpha = -1.97e-2*pow(d,4) + 2.87e-1*pow(d,3) - 1.15*pow(d,2) - 5.25*d + 150; //regression polynomiale
+	int theta = ANGLE_ANGLE_MAX + (a*180.0/M_PI + BRAS_OFFSET_ANGLE);
 
 	//TESTS SECU
 	if (theta > ANGLE_ANGLE_MAX) {
 		theta = ANGLE_ANGLE_MAX;
 		digitalWrite(PIN_DEBUG_LED, LOW);
-	} else if (theta < 0) {
-		theta = 0;
+	} else if (theta < ANGLE_ANGLE_MIN) {
+		theta = ANGLE_ANGLE_MIN;
 		digitalWrite(PIN_DEBUG_LED, LOW);
 	}
 	if (alpha > ANGLE_DIST_MAX) {
 		alpha = ANGLE_DIST_MAX;
 		digitalWrite(PIN_DEBUG_LED, LOW);
-	} else if (alpha < 0) {
-		alpha = 0;
+	} else if (alpha < ANGLE_DIST_MIN) {
+		alpha = ANGLE_DIST_MIN;
 		digitalWrite(PIN_DEBUG_LED, LOW);
 	}
-	if (theta > ANGLE_INSIDE_ROBOT || current_theta > ANGLE_INSIDE_ROBOT) {
+	if (theta < ANGLE_INSIDE_ROBOT || current_theta < ANGLE_INSIDE_ROBOT) {
 		//ATTENTION : on va ou viens de l'interieur du robot
 		call_critical = true;
 		criticalCmdBras(theta, alpha);
@@ -553,7 +555,7 @@ void criticalCmdBras(int n_theta, int n_alpha) {
 	}
 	switch (step) {
 		case 0: {
-			servoBrasDist.write(0);
+			servoBrasDist.write(ANGLE_DIST_MAX);
 			current_alpha = 0;
 			long new_time = timeMicros();
 			if ((new_time - time) > (long)SECU_DELAY_REPLI_BRAS*1000) {
@@ -574,7 +576,8 @@ void criticalCmdBras(int n_theta, int n_alpha) {
 			break;
 		case 2:
 			//Cas spécial : dépot à l'arriere: on a le droit de deployer le bras
-			if (theta >= (ANGLE_DEPOT_RET*180/M_PI - BRAS_OFFSET_ANGLE - 10) || theta <= ANGLE_INSIDE_ROBOT) {
+			int angle_arriere = ANGLE_ANGLE_MAX + (ANGLE_DEPOT_RET*180.0/M_PI + BRAS_OFFSET_ANGLE + 10);
+			if (theta <= angle_arriere || theta >= ANGLE_INSIDE_ROBOT) {
 				servoBrasDist.write(alpha);
 				current_alpha = alpha;
 			}
@@ -617,13 +620,16 @@ void ascInt() {
 
 void pump(bool etat) {
 	if (etat) {
+		digitalWrite(PIN_VALVE, LOW);
 		pump_motor.setSpeed(PWM_PUMP);
 	} else {
+		digitalWrite(PIN_VALVE, HIGH);
 		pump_motor.setSpeed(0);
 	}
 }
 
 void topStop() {
+	stepperAsc.setCurrentPosition(HAUTEUR_MAX*H_TO_STEP + MARGE_SECU_TOP);
 	stepperAsc.moveTo(HAUTEUR_MAX*H_TO_STEP);
 	stepperAsc.runToPosition();
 }

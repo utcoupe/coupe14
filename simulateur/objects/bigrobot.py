@@ -57,6 +57,7 @@ class BigRobot(robot.Robot):
 		self.__nbrFeuArriere = 0
 		self.__engine = engine
 		self.__feuHit = 0
+		self.__feuHit_forced = False
 		self.setRobotType(BIG)
 
 	def getFeuxAvant(self):
@@ -66,13 +67,19 @@ class BigRobot(robot.Robot):
 		return self.__nbrFeuArriere
 
 	def setFeuHit(self, value):
-		self.__feuHit = value
+		if self.__feuHit_forced == False:
+			self.__feuHit = value
+		elif self.__feuHit_forced == True:
+			self.__feuHit = 0
 
 	def getFeuHit(self):
 		"""
 		feuHit fonctionne comme un flag, une fois qu'il est lu sa valeur revient par défaut
 		"""
 		return self.__feuHit
+
+	def forceFailFeuHit(self, value):
+		self.__feuHit_forced = value
 
 	def activerVisio(self):
 		"""

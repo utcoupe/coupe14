@@ -3,6 +3,7 @@
 
 #include "fast_math.h"
 #include "global.h"
+#include "lidar.h"
 
 struct lidar {
 	void *lidarObject;
@@ -14,6 +15,10 @@ struct lidar {
 	struct coord *points;
 };
 
+struct coordList_t {
+	struct coord *points;
+	int n;
+};
 
 
 struct lidar initLidar(char* device, struct coord position, double orientation, double angleMin, double angleMax);
