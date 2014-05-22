@@ -36,3 +36,6 @@ class ElemGoal:
 			self.__color = "YELLOW"
 		else:
 			self.__color = "RED"
+
+	def reset_elem_action(self):
+		self.__elem_action_temp = copy.deepcopy(self.__elem_action_base)

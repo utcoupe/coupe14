@@ -50,6 +50,7 @@ class GoalsManager:
 		self.__goalsLib = GoalsLibrary(self.__robot_name, self.__data, self.__blocked_goals, self.__PathFinding)
 		self.__goalsChoice = GoalsChoice(self.__robot_name, self.__data, self.__goalsLib, self.__our_color, self.__back_triangle_stack, self.__front_triangle_stack, self.__balles_lancees)
 
+		self.__tibot_ready_for_filet = False
 
 		# Pour tester le déplacement du robot dans le simu lorsqu'il ne peut pas attraper un triangle
 		if TEST_MODE == True:
@@ -106,17 +107,28 @@ class GoalsManager:
 
 			#On cherche l'elem goal le plus proche par bruteforce
 			if self.__available_goals:
-				best_goal = self.__goalsChoice.getBestGoal(self.__available_goals) #best_goal type (path, goal, id_elem_goal)
+				best_goal = self.__goalsChoice.getBestGoal(self.__available_goals, self. __tibot_ready_for_filet) #best_goal type (path, goal, id_elem_goal)
 
 				if best_goal[1] != None:
-					self.__logger.info("On a choisi l'objectif goal_id "+str(best_goal[1].getId())+" elem_goal_id "+str(best_goal[2])+" avec le path "+str(best_goal[0]))
+
+					if self. __tibot_ready_for_filet == True:
+						self.__logger.info("Finalement, on va refaire un objectif avant le filet")
+						for goal_temp in self.__finished_goals:
+							if goal_temp.getType == "FILET":
+								self.__finished_goals.remove(goal_temp)
+								self.__available_goals.append(goal_temp)
+								break
+						self. __tibot_ready_for_filet = False
+
+					self.__logger.info("On a choisi l'objectif "+str(best_goal[1].getName())+" goal_id "+str(best_goal[1].getId())+" elem_goal_id "+str(best_goal[2])+" avec le path "+str(best_goal[0]))
 					self.__SubProcessManager.setLastDateNoGoal(None)
 					self.__addGoal(best_goal[0], best_goal[1], best_goal[2])
 				else:
 					self.__SubProcessManager.setLastDateNoGoal(int(time.time()*1000))
-					self.__logger.info(str(self.__robot_name)+" aucun objectif accessible")
+					self.__logger.info(str(self.__robot_name)+" aucun objectifs accessibles")
 			else:
 				self.__logger.info(str(self.__robot_name)+" N'a plus aucun objectif disponible, GG (ou pas, y'a toujours un truc à faire) !")
+
 
 	#GOAL management from ID
 	def blockGoalFromId(self, id_objectif):
@@ -145,7 +157,7 @@ class GoalsManager:
 					if self.__balles_lancees[0] > 6:
 						self.__logger.error("On a lancé " + str(self.__balles_lancees[0]) + "(> 6) balles, c'pas normal !")
 
-				self.__logger.info(str(self.__robot_name)+" L'objectif "+str(objectif.getName())+" d'id "+str(objectif.getId())+" est a terminé ses actions dynamiques")
+				self.__logger.info(str(self.__robot_name)+" L'objectif "+str(objectif.getName())+" d'id "+str(objectif.getId())+" a terminé ses actions dynamiques")
 				self.__queueBestGoals()
 				break
 
@@ -170,10 +182,10 @@ class GoalsManager:
 			self.__available_goals.remove(goal)
 			self.__blocked_goals.append(goal)
 			goal.setElemGoalLocked(goal.getElemGoalOfId(elem_goal_id))
-			self.__logger.info('Goal '+goal.getName()+' id: '+str(goal.getId())+' is blocked')
+			self.__logger.info(str(self.__robot_name)+' Goal '+goal.getName()+' id: '+str(goal.getId())+" elem_goal_id "+str(elem_goal_id)+' is blocked')
 			return True
 		else:
-			self.__logger.warning('Goal '+goal.getName()+' id: '+str(goal.getId())+" n'a pas pu être bloqué")
+			self.__logger.warning(str(self.__robot_name)+' Goal '+goal.getName()+' id: '+str(goal.getId())+" elem_goal_id "+str(elem_goal_id)+" n'a pas pu être bloqué")
 			return False
 
 	def __addGoal(self, tuple_trajectoire_list, goal, elem_goal_id, prev_action=None):
@@ -218,7 +230,9 @@ class GoalsManager:
 		self.__available_goals.append(goal)
 		self.__logger.info('Goal ' + goal.getName() + ' has been canceled and is now released')
 		self.__removeLastValueOfDeque(self.__id_objectif_send, goal.getId())
-		goal.resetElemAction()
+		#On ne reset pas les torches, comme ça on sait combien de triangle on doit en extraire
+		if goal.getType() != "TORCHE":
+			goal.resetElemAction()
 
 		if not fromEvent:
 			self.__SubProcessManager.sendDeleteGoal(goal.getId())
@@ -230,6 +244,9 @@ class GoalsManager:
 			self.__dynamique_finished_goals.remove(goal)
 			self.__finished_goals.append(goal)
 			self.__logger.info('Goal ' + str(goal.getName()) + " d'id "+str(goal.getId())+" is finished")
+			if goal.getType() == "FILET":
+				self.__tibot_ready_for_filet = True
+				self.__logger.info("Tibot est en position pour tirer le filet.")
 			#Dans le cas où on aurait oublier le DYNAMIQUE_OVER
 			self.__queueBestGoals()
 		

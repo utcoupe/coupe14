@@ -204,7 +204,7 @@ class OurBot():
 			order = elm_action[0]
 			action += (order,)
 
-			if order not in ("SLEEP", "THEN", "STEP_OVER", "END", "DYNAMIQUE_OVER", "IA_GET_BRAS_STATUS", "FUNNY_ACTION_LOCK"):
+			if order not in ("SLEEP", "THEN", "STEP_OVER", "END", "DYNAMIQUE_OVER", "IA_GET_BRAS_STATUS"):
 				argument_type_list = self.__arduino_constantes['ordersArguments'][order]
 				arguments_temp = ()
 				for i, argument_type in enumerate(argument_type_list):

@@ -79,8 +79,8 @@ class Goal:
 					action = action_objectif.popleft()
 
 	def resetElemAction(self):
-		#TODO verifier qu'on ne veut pas reset les objectifs
-		pass
+		for elem in self.__elem_goal:
+			elem.reset_elem_action()
 
 
 	"""def toXml(self):

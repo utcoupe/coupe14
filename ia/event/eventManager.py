@@ -27,7 +27,6 @@ class EventManager():
 		self.__MetaData = Data.MetaData
 
 		self.__last_hokuyo_data = None
-		self.__tibot_locked = False
 		self.__filet_fired = False
 
 		self.__last_flussmittel_order_finished = ID_ACTION_MAX	#id_action
@@ -282,13 +281,10 @@ class EventManager():
 					else:
 						self.__Communication.sendOrderAPI(address[1], action[1], *arg)
 
-				elif action[1] == "FUNNY_ACTION_LOCK":
-					self.__logger.info("Tibot est prêt pour la funny action.")
-
 				else:
 					self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
 
-				self.__logger.debug(str(address) + " envoi de l'ordre: " + str(action))
+				#self.__logger.debug(str(address) + " envoi de l'ordre: " + str(action))
 
 
 	def __testCollision(self):
