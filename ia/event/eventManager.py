@@ -27,7 +27,6 @@ class EventManager():
 		self.__MetaData = Data.MetaData
 
 		self.__last_hokuyo_data = None
-		self.__tibot_locked = False
 		self.__filet_fired = False
 
 		self.__last_flussmittel_order_finished = ID_ACTION_MAX	#id_action
@@ -207,9 +206,12 @@ class EventManager():
 	def __checkBrasStatus(self):
 		if self.__Flussmittel is not None:
 			bras_status = self.__Flussmittel.getBrasStatus()
+			objectif = self.__Flussmittel.getQueuedObjectif()[1]
 			if bras_status is not None:
 				self.__Flussmittel.setBrasStatus(None)
-				self.__SubProcessCommunicate.sendBrasStatus(bras_status, self.__Flussmittel.getQueuedObjectif()[1][0][0])
+				if objectif:
+					self.__SubProcessCommunicate.sendBrasStatus(bras_status, objectif[0][0])
+
 
 	def __pushOrders(self, Objet, data): 
 		id_objectif = data[0]
@@ -282,13 +284,10 @@ class EventManager():
 					else:
 						self.__Communication.sendOrderAPI(address[1], action[1], *arg)
 
-				elif action[1] == "FUNNY_ACTION_LOCK":
-					self.__logger.info("Tibot est prêt pour la funny action.")
-
 				else:
 					self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
 
-				self.__logger.debug(str(address) + " envoi de l'ordre: " + str(action))
+				#self.__logger.debug(str(address) + " envoi de l'ordre: " + str(action))
 
 
 	def __testCollision(self):
@@ -337,9 +336,10 @@ class EventManager():
 
 	def __checkOneAsservBlocked(self, system):
 		if system.getAsservBloqued():
-			empty_arg = []
-			self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
 			system.setIdToReach("ANY")
 			id_list = system.removeAllGoals()
-			self.__SubProcessCommunicate.sendObjectifsDeleted(id_list[0])
-			self.__SubProcessCommunicate.sendObjectifsCanceled(id_list[1:])
+			if id_list:
+				empty_arg = []
+				self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
+				self.__SubProcessCommunicate.sendObjectifsDeleted( (id_list[0],) )
+				self.__SubProcessCommunicate.sendObjectifsCanceled( id_list[1:] )

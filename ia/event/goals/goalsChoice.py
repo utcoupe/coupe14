@@ -40,11 +40,11 @@ class GoalsChoice:
 		# Variables TIBOT
 		self.__balles_lancees = balles_lancees
 
-	def getBestGoal(self, goals):
+	def getBestGoal(self, goals, filet_locked=False):
 		if self.__robot_name == "FLUSSMITTEL":
 			best_goal = self.__getBestGoalFlussmittel(goals)
 		elif self.__robot_name == "TIBOT":
-			best_goal = self.__getBestGoalTibot(goals)
+			best_goal = self.__getBestGoalTibot(goals, filet_locked)
 		else:
 			self.__logger.info("Robot "+str(self.__robot_name)+" inconnu.")
 			best_goal = ([], None, None) #type (path, goal, id_elem_goal)
@@ -80,8 +80,7 @@ class GoalsChoice:
 		return best_goal
 
 	#TIBOT
-
-	def __getBestGoalTibot(self, goals):
+	def __getBestGoalTibot(self, goals, filet_locked):
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 		best_length = float("Inf")
 		best_goal_filet = ([], None, None)
@@ -92,6 +91,7 @@ class GoalsChoice:
 			nb_elem_goal = goal.getLenElemGoal()
 			for idd in range(nb_elem_goal):
 				path = self.__goalsLib.getOrderTrajectoire(goal, idd, position_last_goal)
+				self.__logger.debug("Calcul de trajectoire pour goalName "+str(goal.getName())+" id_elem "+str(idd)+" path "+str(path))
 				if path != []:
 					length = self.__goalsLib.pathLen(path)
 					if goal.getType() != "FILET":
@@ -103,8 +103,12 @@ class GoalsChoice:
 							best_length_filet = length
 							best_goal_filet = (path, goal, idd)
 
-
-		if best_goal[1] == None and best_goal_filet[1] != None:
+		#Si on est à plus de 80s de jeu, on force le choix du filet
+		if (best_goal[1] == None or self.__data["METADATA"]["getGameClock"] > 80000) and best_goal_filet[1] != None:
 			best_goal = best_goal_filet
+
+		#Si on a le temps de refaire un objectif avant le filet, on le fait
+		if filet_locked == True and self.__data["METADATA"]["getGameClock"] > 60000:
+			return ([], None, None)
 
 		return best_goal

@@ -77,9 +77,9 @@ class SubProcessCommunicate():
 		self.__updateSubProcessData()
 		for id_deleted in id_deleted_objectif:
 			if self.__Data.Flussmittel is not None:
-				self.__subprocess_flussmittel.sendPacket(("DELETED", id_canceled))
+				self.__subprocess_flussmittel.sendPacket(("DELETED", id_deleted))
 			if self.__Data.Tibot is not None:
-				self.__subprocess_tibot.sendPacket(("DELETED", id_canceled))
+				self.__subprocess_tibot.sendPacket(("DELETED", id_deleted))
 
 	def sendBrasStatus(self, etat, id_objectif):
 		self.__updateSubProcessData()
