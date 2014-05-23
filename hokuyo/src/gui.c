@@ -85,7 +85,8 @@ blitLidar(struct coord positionLidar, struct color c){
 }
 
 void
-blitRobots(struct robot *robots, int nRobots){
+blitRobots(struct robot *robots, int nRobots, struct color c){
+	SDL_FillRect(gui.robot, NULL, SDL_MapRGB(gui.ecran->format, c.r, c.g, c.b));
 	int i, maxsize = 0;
 	for (i=0; i<nRobots; i++) {
 		if (robots[i].size > maxsize) {

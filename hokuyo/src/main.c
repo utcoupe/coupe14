@@ -86,7 +86,7 @@ int main(int argc, char **argv){
 	}
 
 	char *path = 0;
-	if (argc == 3) {
+	if (argc >= 3) {
 		path = argv[2];
 		if (strcmp(path, "nocalib") == 0) {
 			nocalib = true;
@@ -126,9 +126,11 @@ int main(int argc, char **argv){
 void frame(){
 	long timestamp;
 	getPoints(&l1);
+	timestamp = timeMillis() - startTime;
+	printf("%sDuration1 : %lims\n", PREFIX, timestamp-lastTime);
 	getPoints(&l2);
 	timestamp = timeMillis() - startTime;
-	printf("%sDuration : %lims\n", PREFIX, timestamp-lastTime);
+	printf("%sDuration2 : %lims\n", PREFIX, timestamp-lastTime);
 	int nRobots1 = getRobots(l1.points, l1.fm.n, robots1);
 	int nRobots2 = getRobots(l2.points, l2.fm.n, robots2);
 	int nRobots = mergeRobots(robots1, nRobots1, robots2, nRobots2, robots);
@@ -136,9 +138,9 @@ void frame(){
 	blitMap();
 	blitLidar(l1.pos, l1Color);
 	blitLidar(l2.pos, l2Color);
-	blitRobots(robots1, nRobots1);
-	blitRobots(robots2, nRobots2);
-	blitRobots(robots, nRobots);
+	blitRobots(robots1, nRobots1, l1Color);
+	blitRobots(robots2, nRobots2, l2Color);
+	blitRobots(robots, nRobots, lColor);
 	blitPoints(l1.points, l1.fm.n, l1Color);
 	blitPoints(l2.points, l2.fm.n, l2Color);
 	waitScreen();
