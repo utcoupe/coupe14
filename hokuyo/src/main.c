@@ -26,7 +26,7 @@ static struct color l1Color, l2Color, lColor;
 #endif
 
 long startTime, lastTime = 0;
-static struct coord robots[MAX_ROBOTS], robots1[MAX_ROBOTS], robots2[MAX_ROBOTS];
+static struct robot robots[MAX_ROBOTS], robots1[MAX_ROBOTS], robots2[MAX_ROBOTS];
 
 void exit_handler() {
 	printf("\n%sClosing lidar(s), please wait...\n", PREFIX);
@@ -149,17 +149,17 @@ void frame(){
 	else{
 		printf("%sHOK1 - %li;%i", PREFIX, timestamp, nRobots1);
 		for(int i=0; i<nRobots1; i++){
-			printf(";%i:%i", robots1[i].x, robots1[i].y);
+			printf(";%i:%i -- %i", robots1[i].pt.x, robots1[i].pt.y, robots1[i].size);
 		}
 		printf("\n");
 		printf("%sHOK2 - %li;%i", PREFIX, timestamp, nRobots2);
 		for(int i=0; i<nRobots2; i++){
-			printf(";%i:%i", robots2[i].x, robots2[i].y);
+			printf(";%i:%i -- %i", robots2[i].pt.x, robots2[i].pt.y, robots2[i].size);
 		}
 		printf("\n");
 		printf("%sALL  - %li;%i", PREFIX, timestamp, nRobots);
 		for(int i=0; i<nRobots; i++){
-			printf(";%i:%i", robots[i].x, robots[i].y);
+			printf(";%i:%i -- %i", robots[i].pt.x, robots[i].pt.y, robots[i].size);
 		}
 		printf("\n");
 	}

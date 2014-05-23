@@ -49,13 +49,13 @@ initLidarAndCalibrate(char* device, struct coord position, double orientation, d
 	int nbClustersFound = 0;
 	for(int i=0; i<MARKER_DETECTION_STEPS; i++){
 		getPointsCalibrate(&l, 1);
-		struct coord clusters[MAX_ROBOTS];
+		struct robot clusters[MAX_ROBOTS];
 		int nClusters = getRobots(l.points, l.fm.n, clusters);
 		if(nClusters != 1){
 			printf("%scould not calibrate !!! (%i clusters found in zone on iteration %i)\n", PREFIX, nClusters, i);
 		}else{
-			sumMarkerPos_x += clusters[0].x;
-			sumMarkerPos_y += clusters[0].y;
+			sumMarkerPos_x += clusters[0].pt.x;
+			sumMarkerPos_y += clusters[0].pt.y;
 			nbClustersFound++;
 		}
 	}

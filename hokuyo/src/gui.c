@@ -1,6 +1,7 @@
 #include "gui.h"
 #include <SDL.h>
 #include "stdio.h"
+#include "robot.h"
 
 struct GUI_data{
 	SDL_Surface *ecran, *terrain, *lidar, *robot, *point, *marker;
@@ -84,9 +85,16 @@ blitLidar(struct coord positionLidar, struct color c){
 }
 
 void
-blitRobots(struct coord *robots, int nRobots){
-	for(int i=0; i<nRobots; i++){
-		SDL_Rect p = getPixelCoord(robots[i].x-GUI_ROBOT_SIZE/2, robots[i].y+GUI_ROBOT_SIZE/2);
+blitRobots(struct robot *robots, int nRobots){
+	int i, maxsize = 0;
+	for (i=0; i<nRobots; i++) {
+		if (robots[i].size > maxsize) {
+			maxsize = robots[i].size;
+		}
+	}
+	for(i=0; i<nRobots; i++){
+		int size_to_blit = GUI_ROBOT_SIZE * ((float)robots[i].size / (float)maxsize);
+		SDL_Rect p = getPixelCoord(robots[i].pt.x-size_to_blit/2, robots[i].pt.y+size_to_blit/2);
 		SDL_BlitSurface(gui.robot, NULL, gui.ecran, &p );
 	}
 }

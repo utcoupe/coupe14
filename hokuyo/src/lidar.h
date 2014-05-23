@@ -3,7 +3,6 @@
 
 #include "fast_math.h"
 #include "global.h"
-#include "lidar.h"
 
 struct lidar {
 	void *lidarObject;

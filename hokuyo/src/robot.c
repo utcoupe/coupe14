@@ -83,24 +83,27 @@ robotCenter(int * sizeSquarred, struct coord *points, int n, int *clusters, int 
 }
 
 void
-sortRobots(int n, int * sizes, struct coord * positions, struct coord *robots){
+sortRobots(int n, struct robot *robots){
+	struct robot *r = malloc(n*sizeof(struct robot));
+	memcpy(r, robots, n*sizeof(struct robot));
 	//tri très optimisé ^^
 	for(int i=0; i<n; i++){
 		int maxSize = 0, maxId = 0;
 		for(int j=0; j<n; j++){
-			if(sizes[j] > maxSize){
-				maxSize = sizes[j];
+			if(r[j].size > maxSize){
+				maxSize = r[j].size;
 				maxId = j;
 			}
 		}
-		sizes[maxId] = 0;
-		robots[i] = positions[maxId];
+		robots[i].pt = r[maxId].pt;
+		robots[i].size = r[maxId].size;
+		r[maxId].size = 0;
 		//printf("%sbiggest cluster:(%i, %i) size=%i\n", PREFIX, robots[i].x, robots[i].y, maxSize);
 	}
 }
 
 int
-getRobots(struct coord *points, int n, struct coord *robots){
+getRobots(struct coord *points, int n, struct robot *robots){
 	int clustersNbPoints[MAX_CLUSTERS];
 	int *clusters = malloc(sizeof(int)*n);
 	if(clusters == NULL) exit(EXIT_FAILURE);
@@ -123,15 +126,13 @@ getRobots(struct coord *points, int n, struct coord *robots){
 	}
 
 	//calcul du centre du robot et de sa taille
-	int size[MAX_ROBOTS];
-	struct coord positions[MAX_ROBOTS];
 
 	for(int i=0; i<nbClusters; i++){
-		positions[i] = robotCenter(&(size[i]), points, n, clusters, bestClustersId[i]);
+		robots[i].pt = robotCenter(&(robots[i].size), points, n, clusters, bestClustersId[i]);
 		//printf("%sCluster[%i] (%i,%i) size:%i\n", PREFIX, i, positions[i].x, positions[i].y, size[i]);
 	}
 	//printf("%sSort... nbClusters=%i\n", PREFIX, nbClusters);
-	sortRobots(nbClusters, size, positions, robots);
+	sortRobots(nbClusters, robots);
 
 
 	free(clusters);
@@ -140,7 +141,7 @@ getRobots(struct coord *points, int n, struct coord *robots){
 }
 
 
-int mergeRobots(struct coord *r1, int n1, struct coord *r2, int n2, struct coord *result) {
+int mergeRobots(struct robot *r1, int n1, struct robot *r2, int n2, struct robot *result) {
 	struct corres { //permet d'établir des correspondances entre les index
 		int r1;
 		int r2;
@@ -155,7 +156,7 @@ int mergeRobots(struct coord *r1, int n1, struct coord *r2, int n2, struct coord
 	//Calcul des distaces
 	for (i=0; i<n1; i++) {
 		for (j=0; j<n2; j++) {
-			distR1R2[i][j] = dist_squared(r1[i], r2[j]);
+			distR1R2[i][j] = dist_squared(r1[i].pt, r2[j].pt);
 		}
 	}
 
@@ -192,7 +193,8 @@ int mergeRobots(struct coord *r1, int n1, struct coord *r2, int n2, struct coord
 
 	for (i=0; i<nbr_found; i++) {
 		struct corres c = merged[i];
-		result[i] = (struct coord) {(r1[c.r1].x + r2[c.r2].x) / 2, (r1[c.r1].y + r2[c.r2].y) / 2 };
+		result[i] = (struct robot) { (struct coord) {(r1[c.r1].pt.x + r2[c.r2].pt.x) / 2, (r1[c.r1].pt.y + r2[c.r2].pt.y) / 2 },
+										(int)( (r1[c.r1].size + r2[c.r2].size) / 2) };
 	}
 
 	int diff = n1 - n2; //Si on a des robots detectés par un hokuyo mais pas par l'autre
@@ -205,6 +207,7 @@ int mergeRobots(struct coord *r1, int n1, struct coord *r2, int n2, struct coord
 			result[nbr_found++] = r2[i];
 		}
 	}
+	sortRobots(nbr_found, result);
 	return nbr_found;
 }
 
