@@ -33,6 +33,7 @@ class OurBot():
 		self.__last_id_executed_asserv = ID_ACTION_MAX
 		self.__bras_status = None
 		self.__asservBlocked = False
+		self.__unblockDate = None
 
 		self.__last_id_action_stacked = IdRot()
 
@@ -156,6 +157,12 @@ class OurBot():
 
 	def getAsservBloqued(self):
 		return self.__asservBlocked
+
+	def getUnblockDate(self):
+		return self.__unblockDate
+
+	def setUnblockDate(self, date):
+		self.__unblockDate = date
 
 	def setFinEnCours(self, booll):
 		self.__fin_en_cours = booll

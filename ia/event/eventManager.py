@@ -336,10 +336,14 @@ class EventManager():
 
 	def __checkOneAsservBlocked(self, system):
 		if system.getAsservBloqued():
-			system.setIdToReach("ANY")
-			id_list = system.removeAllGoals()
-			if id_list:
-				empty_arg = []
-				self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
-				self.__SubProcessCommunicate.sendObjectifsDeleted( (id_list[0],) )
-				self.__SubProcessCommunicate.sendObjectifsCanceled( id_list[1:] )
+			current_date = int(time.time()*1000)
+			unblockDate = system.getUnblockDate()
+			if unblockDate is None or (current_date - unblockDate) > DELAY_IGNORE_ASSER_BLOCKED:
+				system.setUnblockDate(current_date)
+				system.setIdToReach("ANY")
+				id_list = system.removeAllGoals()
+				if id_list:
+					empty_arg = []
+					self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
+					self.__SubProcessCommunicate.sendObjectifsDeleted( (id_list[0],) )
+					self.__SubProcessCommunicate.sendObjectifsCanceled( id_list[1:] )
