@@ -560,7 +560,7 @@
 				<id>0</id>
 				<x_elem>235</x_elem>
 				<y_elem>235</y_elem>
-				<angle>3.8</angle> <!-- old : 3.927 -->
+				<angle>3.5</angle> <!-- old : 3.927 -->
 				<points>3</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -572,7 +572,7 @@
 				<id>1</id>
 				<x_elem>235</x_elem>
 				<y_elem>-235</y_elem>
-				<angle>2.356</angle>
+				<angle>2.2</angle>
 				<points>3</points>
 				<priority>1</priority>
 				<duration>1</duration>
