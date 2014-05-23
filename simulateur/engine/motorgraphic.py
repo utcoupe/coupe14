@@ -65,7 +65,7 @@ class MotorGraphic():
 			self.draw_obj(obj)
 		### Draw collisions
 		for p,r in self.collisions_to_draw:
-			pg.draw.circle(self.screen, THECOLORS["red"], p, r, 0)
+			pg.draw.circle(self.screen, THECOLORS["blue"], p, r, 0)
 		self.collisions_to_draw = []
 		### Flip screen
 		#print("avant flip screen")

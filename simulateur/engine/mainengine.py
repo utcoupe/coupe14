@@ -87,6 +87,7 @@ class Engine:
 		"""
 		Quand le bras du gros robot touche un feu
 		"""
+		self.graphicsengine.draw_collision(space,arb)
 		robot = self.find_obj_by_shape(arb.shapes[0])
 		if not robot:
 			print("bras not found")
@@ -98,7 +99,6 @@ class Engine:
 				id_tmp = robot.getLastIdOther()
 				if id_tmp > self.__id_action_robot:
 					feu = torche.prendreFeu()
-					print('id other pour récup feu : ', id_tmp, ' feu : ',feu)
 					robot.setFeuHit(1) #positionne un flag pour dire qu'on a touché un triangle
 					self.__id_action_robot = id_tmp
 
