@@ -33,7 +33,7 @@ void drawObject(int x, int y, Mat &frame, string addtxt, Scalar color, bool fill
 		Size size_text = getTextSize(write, 1, 1, 1, &baseline);
 		rectangle(frame, pt + Point(0, baseline), pt + Point(size_text.width, -size_text.height), CV_RGB(0,0,0), CV_FILLED);
 	}
-	putText(frame, write,pt,1,5,color,2);
+	putText(frame, write,pt,1,3,color,2);
 
 }
 

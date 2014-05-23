@@ -9,7 +9,7 @@ try:
 except:
 	index = 0
 
-v = Visio('../../../../supervisio/visio', index, '../../../../config/visio/visio_tourelle_red/', None, False)
+v = Visio('../../../../supervisio/visio', index, '../../../../config/visio/visio_robot/', None, False)
 #v2 = Visio('../../../../supervisio/visio', index+1, '../../../../config/visio/visio_tourelle_red/', None, False)
 print('Visio started')
 

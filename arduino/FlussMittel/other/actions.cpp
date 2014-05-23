@@ -86,7 +86,7 @@ void initAct() {
 	topStop();
 	pump(false);
 	cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
-	cmdAsc(HAUTEUR_MIN);
+	cmdAsc(HAUTEUR_GARDE_DEPOT);
 	while (!next_step)
 		stepperAsc.run();
 	next_step = true;
@@ -429,7 +429,7 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 			case 1:
 				//ouvrir bras, descendre asc
 				cmdBrasServ(a, l);
-				time_end = timeMicros() + (long)(SECU_DELAY_ROT_BRAS)*1000;
+				time_end = timeMicros() + (long)(SECU_DELAY_ROT_BRAS+SECU_DELAY_REPLI_BRAS)*1000;
 				step++;
 				break;
 			case 2:
@@ -601,12 +601,21 @@ int getCurrentStockHeight() {
 }
 
 void ascInt() {
+	static long start_time = -1;
 	if (stepperAsc.distanceToGo() == 0) {
 		if (step == 3 && action_en_cours == BrasVentouse) {
-			got_tri = false;
-		} 
-		Timer1.detachInterrupt();
-		next_step = true;
+			if (start_time == -1) {
+				start_time = timeMicros();
+			} else if (timeMicros() - start_time > (long)500*1000) {
+				got_tri = false;
+				Timer1.detachInterrupt();
+				next_step = true;
+				start_time = -1;
+			}
+		} else {
+			Timer1.detachInterrupt();
+			next_step = true;
+		}
 	}
 	if (digitalRead(PIN_INTERRUPT_BRAS) == 0) {
 		//On touche un triangle

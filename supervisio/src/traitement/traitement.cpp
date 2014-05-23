@@ -278,8 +278,8 @@ bool Visio::computeTransformMatrix(const Mat &img, const vector<Point2f> real_po
 
 bool Visio::camPerspective() {
 	//TODO choix position
-	int xsize = 130, ysize = 210;
-	int x = 185, y = 105;
+	int xsize = 163, ysize = 261;
+	int x = 234, y = ysize/2;
 	namedWindow("parameters");
 	createTrackbar("x_size", "parameters", &xsize, 600);
 	createTrackbar("y_size", "parameters", &ysize, 600);
