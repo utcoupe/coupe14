@@ -41,7 +41,6 @@ import processIA
 from constantes import *
 from gui import mainGUI
 
-
 if __name__ == "__main__":
 
 #====================Activation des IA====================
@@ -139,13 +138,9 @@ if __name__ == "__main__":
 
 		#start de la GUI
 		if robots_red != None:
-			gui = mainGUI.GUISimu(robots_red)
-			gui.start()
+			threading.Thread(target=mainGUI.GUISimu,args=(robots_red,)).start()
 		elif robots_yellow != None:
-			gui = mainGUI.GUISimu(robots_yellow)
-			gui.start()
-		else:
-			print('Manque IA pour démarrer la GUI')
+			threading.Thread(target=mainGUI.GUISimu,args=(robots_yellow,)).start()
 
 		while not engine.e_stop.is_set():
 				try:

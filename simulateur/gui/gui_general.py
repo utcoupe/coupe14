@@ -87,7 +87,6 @@ class general(Frame):
 		Fmode.grid(column = 0, row = 0, sticky=N+S+W+E, columnspan=2)
 
 	def __startViz(self):
-		print('dans startViz')
 		nav.startVizNavGraph(self.__bots)
 
 	def boutons(self):
