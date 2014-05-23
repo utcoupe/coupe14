@@ -29,7 +29,7 @@ static enum action action_en_cours = None;
 bool use_act = true;
 int jack_state = 1;
 
-volatile bool next_step = true; //Blocage entre les etapes
+volatile bool next_step = false; //Blocage entre les etapes
 volatile bool got_tri = false; //True si triangle en suspension
 
 void updateAct() {
@@ -86,6 +86,10 @@ void initAct() {
 	topStop();
 	pump(false);
 	cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
+	cmdAsc(HAUTEUR_MIN);
+	while (!next_step)
+		stepperAsc.run();
+	next_step = true;
 	servoRet.write(180); 
 }
 
@@ -399,7 +403,7 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 	}
 
 	//Mise à jour du depot en cours
-	if (n_depot != 0 && step <= 2) {
+	if (n_depot != 0 && step <= 3) {
 		depot = n_depot;
 	}
 
@@ -425,17 +429,21 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 			case 1:
 				//ouvrir bras, descendre asc
 				cmdBrasServ(a, l);
+				time_end = timeMicros() + (long)(SECU_DELAY_ROT_BRAS)*1000;
+				step++;
+				break;
+			case 2:
 				cmdAsc(HAUTEUR_MIN);
 				pump(true);
 				step++;
 				break;
-			case 2: 
+			case 3: 
 				//Remonter asc
 				if (got_tri) {
 					if (!block) { //On continue
 						int hauteur = MIN(HAUTEUR_MAX, MAX(MAX(getCurrentHauteur() + MARGE_PREHENSION, h + MARGE_PREHENSION), abs(depot) + MARGE_DEPOT));
 						if (depot < 0) {
-							hauteur = HAUTEUR_MAX;
+							hauteur = MAX(hauteur, HAUTEUR_DEPOT_ARRIERE);
 							servoRet.write(180);
 						}
 						step++;
@@ -446,11 +454,11 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 					}
 				} else { //Pas de triangles
 					pump(false);
-					step=5;
+					step=6;
 					cmdAsc(HAUTEUR_MAX);
 				}
 				break;
-			case 3:
+			case 4:
 				//On rentre le bras
 				//Se placer au bon rangement
 				if (depot > 0) { //Depot a l'arriere
@@ -459,31 +467,28 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 				}
 				else {
 					cmdBrasServ(ANGLE_DEPOT_RET, LONGUEUR_DEPOT_RET);
-					time_end = timeMicros() + (long)(DELAY_REPLI_BRAS_AVANT_POMPE+SECU_DELAY_ROT_BRAS)*1000;
+					time_end = timeMicros() + (long)(DELAY_REPLI_BRAS_ARRIERE_POMPE+SECU_DELAY_ROT_BRAS)*1000;
 				}
 				step++;
 				break;
-			case 4:
+			case 5:
 				//Lacher pompe
 				pump(false);
 				if (depot > 0) { //Depot a l'avant
 					tri_in_depot++;
-					step = 6;
+					step = 7;
 				} else { //Depot a l'arriere
-					step = 5;
+					step = 6;
 				}
 				time_end = timeMicros() + (long)DELAY_STOP_PUMP*1000;
 				break;
-			case 5:
+			case 6:
 				//Remise du bras au niveau du depot avant
 				cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
 				time_end = timeMicros() + (long)DELAY_REPLI_BRAS2*1000; 
 				step++;
 				break;
-			case 6:
-				if (depot < 0 && got_tri) {
-					servoRet.write(165);
-				}
+			case 7:
 				got_tri = false;
 				setLastId(); //Fin de depot
 				cmdAsc(HAUTEUR_GARDE_DEPOT); //On descend le bras pour bloquer les triangles
@@ -597,7 +602,7 @@ int getCurrentStockHeight() {
 
 void ascInt() {
 	if (stepperAsc.distanceToGo() == 0) {
-		if (step == 2 && action_en_cours == BrasVentouse) {
+		if (step == 3 && action_en_cours == BrasVentouse) {
 			got_tri = false;
 		} 
 		Timer1.detachInterrupt();
@@ -605,11 +610,11 @@ void ascInt() {
 	}
 	if (digitalRead(PIN_INTERRUPT_BRAS) == 0) {
 		//On touche un triangle
-		if ((action_en_cours == BrasVentouse && step == 2)) {
+		if ((action_en_cours == BrasVentouse && step == 3)) {
 			Timer1.detachInterrupt();
 			next_step = true;
 			got_tri = true;
-			stepperAsc.move(0);
+			stepperAsc.move(20);
 		} else if ((action_en_cours == BrasDepot && step == 1) || (action_en_cours == None && step == -1)) {
 			Timer1.detachInterrupt();
 			next_step = true;
@@ -629,9 +634,11 @@ void pump(bool etat) {
 }
 
 void topStop() {
+	stepperAsc.setAcceleration(30000);
 	stepperAsc.setCurrentPosition(HAUTEUR_MAX*H_TO_STEP + MARGE_SECU_TOP);
 	stepperAsc.moveTo(HAUTEUR_MAX*H_TO_STEP);
 	stepperAsc.runToPosition();
+	stepperAsc.setAcceleration(AMAX_STEPPER);
 }
 
 void forwardstep() {  

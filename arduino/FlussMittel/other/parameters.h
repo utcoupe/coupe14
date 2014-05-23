@@ -7,11 +7,11 @@
 
 //DIMENSIONS
 
-#define BRAS_OFFSET_DIST 124 //Distance in mm
+#define BRAS_OFFSET_DIST 140 //Distance in mm
 #define BRAS_OFFSET_ANGLE 20 //Angle offset in degrees
 
-#define HAUTEUR_MAX 153 //En mm
-#define HAUTEUR_MIN 15 //en mm
+#define HAUTEUR_MAX 157 //En mm
+#define HAUTEUR_MIN 25 //en mm
 
 #define X_BRAS 128
 #define Y_BRAS 130
@@ -19,12 +19,12 @@
 //STEPPER
 
 #define PERIOD_STEPPER 200
-#define VMAX_STEPPER 400 
+#define VMAX_STEPPER 300 
 #define AMAX_STEPPER 30000 
 
 //SECU BRAS : en degree commande
 
-#define ANGLE_DIST_MAX 150
+#define ANGLE_DIST_MAX 140
 #define ANGLE_DIST_MIN 70
 
 #define ANGLE_ANGLE_MAX 180 
@@ -44,17 +44,19 @@
 #define MARGE_DEPOT 80
 #define MARGE_PREHENSION 40
 #define HAUTEUR_GARDE_DEPOT HAUTEUR_MIN
+#define HAUTEUR_DEPOT_ARRIERE 130
 
 #define ANGLE_DEPOT (-(100.0/180.0)*M_PI)
 #define LONGUEUR_DEPOT LONGUEUR_MIN
 
-#define ANGLE_DEPOT_RET (-(155.0/180.0)*M_PI) 
-#define LONGUEUR_DEPOT_RET 210
+#define ANGLE_DEPOT_RET (-(150.0/180.0)*M_PI) 
+#define LONGUEUR_DEPOT_RET 225
 
 
 //PREHENSION
 
-#define DELAY_REPLI_BRAS_AVANT_POMPE 1500
+#define DELAY_REPLI_BRAS_AVANT_POMPE 800
+#define DELAY_REPLI_BRAS_ARRIERE_POMPE 1200
 #define DELAY_REPLI_BRAS2 100
 #define DELAY_STOP_PUMP 300
 
