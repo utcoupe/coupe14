@@ -27,6 +27,7 @@ DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(DIR_PATH, "../../GUI/viznavgraph"))
 from define import *
 import viznavgraph as nav
+import threading
 
 class general(Frame):
 	""" Frame qui regroupe les widgets du frame général.
@@ -87,7 +88,8 @@ class general(Frame):
 		Fmode.grid(column = 0, row = 0, sticky=N+S+W+E, columnspan=2)
 
 	def __startViz(self):
-		nav.startVizNavGraph(self.__bots)
+		threading.Thread(target=nav.startVizNavGraph,args=(self.__bots,BIG)).start()
+		threading.Thread(target=nav.startVizNavGraph,args=(self.__bots,MINI)).start()
 
 	def boutons(self):
 		"""
