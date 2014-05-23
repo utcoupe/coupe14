@@ -5,15 +5,15 @@ Ce fichier regroupe toutes les constantes de l'IA
 
 import math
 
-TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
 
 #====================Enable====================
-ENABLE_TOURELLE =		True	
+ENABLE_TOURELLE =		False
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
-ENABLE_TIBOT =			True	
+ENABLE_TIBOT =			False
 
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB1"
@@ -52,6 +52,7 @@ NUMBER_OF_ENEMY = 		2 #TODO
 #====================eventManager====================
 PERIODE_EVENT_MANAGER =	2
 ID_ACTION_MAX =			29999
+DELAY_IGNORE_ASSER_BLOCKED = 2000
 
 #====================timeManager====================
 PERIODE_TIME_MANAGER =	100
@@ -76,6 +77,11 @@ MARGE_PASSAGE_PATH = 	10
 MARGE_COLLISION =		-20
 COLLISION_THRESHOLD =	400
 COLLISION_WARNING_THRESHOLD = 800
+
+
+
+
+
 
 
 #=======================================Systemes physiques========================================
@@ -109,6 +115,11 @@ CENTRE_BRAS_Y = 130
 START_POSITION_RED_TIBOT = (193, 1542, -0.42203)
 LARGEUR_TIBOT = 		200
 LONGUEUR_TIBOT = 		150
+
+
+
+
+
 
 #====================ENEMYs====================
 FIRST_POSITION_BIG_RED_ENNEMY = (187, 1870)
