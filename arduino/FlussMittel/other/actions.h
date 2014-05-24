@@ -23,7 +23,7 @@ void getTriBordure();
 void getTriBordureRepliBras();
 void deposeTri(int dep);
 void cmdBrasServ(double a, int l);
-void criticalCmdBras(int n_theta = -1, int n_alpha = -1);
+void criticalCmdBras(int n_theta = -1, int n_alpha = -1, int direction = 2);
 void cmdAsc(int h);
 void updateBras();
 void cmdBrasDepot(double a = -1, int l=-1);
