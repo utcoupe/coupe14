@@ -535,10 +535,14 @@ void cmdBrasServ(double a, int l) {
 		alpha = ANGLE_DIST_MIN;
 		digitalWrite(PIN_DEBUG_LED, LOW);
 	}
-	if (theta < ANGLE_INSIDE_ROBOT || current_theta < ANGLE_INSIDE_ROBOT) {
+	if (theta < ANGLE_INSIDE_ROBOT) {
 		//ATTENTION : on va ou viens de l'interieur du robot
 		call_critical = true;
-		criticalCmdBras(theta, alpha);
+		criticalCmdBras(theta, alpha, 2);
+	} else	if (current_theta < ANGLE_INSIDE_ROBOT) {
+		//ATTENTION : on va ou viens de l'interieur du robot
+		call_critical = true;
+		criticalCmdBras(theta, alpha, 1);
 	} else {
 		//ORDRE
 		servoBrasAngle.write(theta);
@@ -548,12 +552,18 @@ void cmdBrasServ(double a, int l) {
 	}
 }
 
-void criticalCmdBras(int n_theta, int n_alpha) {
+//Direction : 1 : int vers ext
+// 2: ext ver int
+void criticalCmdBras(int n_theta, int n_alpha, int direction) {
 	static int theta, alpha;
 	static int step = 0;
 	static long time = 0;
 	if (n_theta >= 0) {
-		step = 0;
+		if (direction == 1) {
+			step = 1;
+		} else {
+			step = 0;
+		}
 		time = timeMicros();
 		theta = n_theta;
 		alpha = n_alpha;

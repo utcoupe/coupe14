@@ -7,14 +7,55 @@ import sys
 FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(FILE_DIR,"../../libs"))
 
-from .constantes import *
+from constantes import *
 from geometry import Segment
 
 
 class Collision:
-	def __init__(self, robot_list):
+	def __init__(self, flussmittel, tibot, big_enemy_bot, small_enemy_bot):
 		self.__log = logging.getLogger(__name__)
-		self.__flussmittel, self.__tibot, self.__big_enemy_bot, self.__small_enemy_bot = robot_list
+		
+		self.__flussmittel = flussmittel
+		self.__tibot = tibot
+		self.__big_enemy_bot = big_enemy_bot
+		self.__small_enemy_bot = small_enemy_bot
+
+	def isCollisionFromGoalsManager(self, robot_name, path):
+		if robot_name == "FLUSSMITTEL":
+			robot = self.__flussmittel
+		else:
+			robot = self.__tibot
+
+		#on etablit la liste des robots autres que celui pour lequel on calcule la trajectoire
+		robot_list = [self.__big_enemy_bot, self.__small_enemy_bot]
+		if robot_name == "FLUSSMITTEL" and self.__tibot != {}:
+			robot_list.insert(0, self.__tibot)
+		elif robot_name == "TIBOT" and self.__flussmittel != {}:
+			robot_list.insert(0, self.__flussmittel)
+
+		traj = path
+		checked_traj = [traj[0]]  # cela correspond a la trajectoire parcourue sans collision
+
+		for a, b in zip(traj[:-1], traj[1:]):  # on parcours chaque segment de trajectoire
+			for robot_el in robot_list:  # on regarde si l'un des robot est sur ce segment
+				#pour la collision, on trace un cercle de rayon (obstacle + rayon du robot) pour tenir compte de la taille des robots
+				collision_pts_on_line = self.__circle_inter_line(robot_el["getPosition"], int(robot_el["getRayon"]) + int(robot["getRayon"]) + int(MARGE_COLLISION), a, b)  # s'il y a intersection
+				collision_pts = self.__p_in_seg((a, b), collision_pts_on_line)  # on se restreint aux points sur le segment 
+				if collision_pts:  # s'il y a intersection
+					# cas particulier : 1er segment de trajectoire
+					if len(checked_traj) == 1 and self.__p_in_circle(robot_el["getPosition"], int(robot_el["getRayon"]) + int(robot["getRayon"]) + int(MARGE_COLLISION), a):
+						distance_to_collision = 0
+						#self.__log.debug("Collision (1er segment) sur l'id %s a %s mm" % (id, distance_to_collision))
+						return False
+
+					checked_traj.append(self.__get_closest(checked_traj[-1], collision_pts))  # on ajoute le premier pt d'intersection
+					distance_to_collision = self.__traj_length(checked_traj)  # on calcule la longueur restante avant collision de centre à centre
+					#distance_to_collision = distance_to_collision - robot_el.getRayon() - robot.getRayon() #longueur restante avant collision entre les bords du robot
+					#self.__log.debug("Collision sur l'id %s a %s mm" % (id, distance_to_collision))
+					return False
+			checked_traj.append(b)  # on ajoute le point de depart a la trajctoire verifiee
+
+		return True
 
 	def getCollision(self, robot):
 		#on etablit la liste des robots autres que celui pour lequel on calcule la trajectoire

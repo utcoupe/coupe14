@@ -13,12 +13,17 @@ import sys
 import inspect, os
 from math import *
 
+FILE_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(FILE_DIR,".."))
+
 from .goal import *
 from .elemGoal import *
 from .navigation import *
 from .visio import *
 from .goalsLibrary import *
 from .goalsChoice import *
+from collision import *
+
 
 class GoalsManager:
 	def __init__(self, SubProcessManager, connection, robot_name):
@@ -42,13 +47,18 @@ class GoalsManager:
 
 		self.__data = self.__SubProcessManager.getData()
 		self.__our_color = self.__data["METADATA"]["getOurColor"]
-		self.__PathFinding = PathFinding((self.__data["FLUSSMITTEL"], self.__data["TIBOT"], self.__data["BIGENEMYBOT"], self.__data["SMALLENEMYBOT"]))
+		if self.__robot_name == "FLUSSMITTEL":
+			self.__PathFinding = PathFinding((self.__data["FLUSSMITTEL"], self.__data["TIBOT"], self.__data["BIGENEMYBOT"], self.__data["SMALLENEMYBOT"]))
+		else:
+			self.__PathFinding = PathFinding((self.__data["TIBOT"], self.__data["FLUSSMITTEL"], self.__data["BIGENEMYBOT"], self.__data["SMALLENEMYBOT"]))
 
+		
 		self.__loadElemScript(base_dir+"/elemScripts.xml")
 		self.__loadGoals(base_dir+"/goals.xml")
 
+		self.__Collision = Collision(self.__data["FLUSSMITTEL"], self.__data["TIBOT"], self.__data["BIGENEMYBOT"], self.__data["SMALLENEMYBOT"])
 		self.__goalsLib = GoalsLibrary(self.__robot_name, self.__data, self.__blocked_goals, self.__PathFinding)
-		self.__goalsChoice = GoalsChoice(self.__robot_name, self.__data, self.__goalsLib, self.__our_color, self.__back_triangle_stack, self.__front_triangle_stack, self.__balles_lancees)
+		self.__goalsChoice = GoalsChoice(self.__robot_name, self.__data, self.__goalsLib, self.__Collision, self.__our_color, self.__back_triangle_stack, self.__front_triangle_stack, self.__balles_lancees)
 
 		self.__tibot_ready_for_filet = False
 

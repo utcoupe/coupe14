@@ -19,6 +19,7 @@ class GoalsLibrary:
 		self.__blocked_goals = blocked_goals
 		self.__PathFinding = pathfinding
 
+
 	def getPositionLastGoal(self, position_depart_speciale=None):
 		if position_depart_speciale is not None:
 			position_last_goal = position_depart_speciale

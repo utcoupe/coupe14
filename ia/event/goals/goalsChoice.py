@@ -12,12 +12,13 @@ from .navigation import *
 from .goalsLibrary import *
 
 class GoalsChoice:
-	def __init__(self, robot_name, data, goalsLib, our_color, back_triangle_stack, front_triangle_stack, balles_lancees):
+	def __init__(self, robot_name, data, goalsLib, Collision, our_color, back_triangle_stack, front_triangle_stack, balles_lancees):
 		self.__logger = logging.getLogger(__name__)
 
 		self.__robot_name = robot_name
 		self.__data = data
 		self.__goalsLib = goalsLib
+		self.__Collision = Collision
 		self.__our_color = our_color
 
 		# Variables FLUSSMITTEL
@@ -72,10 +73,13 @@ class GoalsChoice:
 			for idd in range(nb_elem_goal):
 				path = self.__goalsLib.getOrderTrajectoire(goal, idd, position_last_goal)
 				if path != []:
-					length = self.__goalsLib.pathLen(path)
-					if length < best_length:
-						best_length = length
-						best_goal = (path, goal, idd)
+					if self.__Collision.isCollisionFromGoalsManager("FLUSSMITTEL", path):
+						length = self.__goalsLib.pathLen(path)
+						if length < best_length:
+							best_length = length
+							best_goal = (path, goal, idd)
+					else:
+						self.__logger.error("Le pathfinding nous a indiqué un chemin invalide goal "+str(goal.getName())+" elem_id "+str(idd)+"  path "+str(path))
 
 		return best_goal
 
@@ -93,15 +97,18 @@ class GoalsChoice:
 				path = self.__goalsLib.getOrderTrajectoire(goal, idd, position_last_goal)
 				self.__logger.debug("Calcul de trajectoire pour goalName "+str(goal.getName())+" id_elem "+str(idd)+" path "+str(path))
 				if path != []:
-					length = self.__goalsLib.pathLen(path)
-					if goal.getType() != "FILET":
-						if length < best_length:
-							best_length = length
-							best_goal = (path, goal, idd)
+					if self.__Collision.isCollisionFromGoalsManager("TIBOT", path):
+						length = self.__goalsLib.pathLen(path)
+						if goal.getType() != "FILET":
+							if length < best_length:
+								best_length = length
+								best_goal = (path, goal, idd)
+						else:
+							if length < best_length_filet:
+								best_length_filet = length
+								best_goal_filet = (path, goal, idd)
 					else:
-						if length < best_length_filet:
-							best_length_filet = length
-							best_goal_filet = (path, goal, idd)
+						self.__logger.error("Le pathfinding nous a indiqué un chemin invalide goal "+str(goal.getName())+" elem_id "+str(idd)+"  path "+str(path))
 
 		#Si on est à plus de 80s de jeu, on force le choix du filet
 		if (best_goal[1] == None or self.__data["METADATA"]["getGameClock"] > 80000) and best_goal_filet[1] != None:

@@ -38,7 +38,7 @@ class EventManager():
 		self.__resume_date_tibot = 0
 
 		self.__SubProcessCommunicate = SubProcessCommunicate(Data)
-		self.__Collision = Collision((self.__Flussmittel, self.__Tibot, self.__BigEnemyBot, self.__SmallEnemyBot))
+		self.__Collision = Collision(self.__Flussmittel, self.__Tibot, self.__BigEnemyBot, self.__SmallEnemyBot)
 
 		self.__managerThread = threading.Thread(target=self.__managerLoop)
 		self.__managerThread.start()
