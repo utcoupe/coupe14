@@ -42,8 +42,11 @@ class GoalsManager:
 
 		self.__data = self.__SubProcessManager.getData()
 		self.__our_color = self.__data["METADATA"]["getOurColor"]
-		self.__PathFinding = PathFinding((self.__data["FLUSSMITTEL"], self.__data["TIBOT"], self.__data["BIGENEMYBOT"], self.__data["SMALLENEMYBOT"]))
-
+		if self.__robot_name == "FLUSSMITTEL":
+			self.__PathFinding = PathFinding((self.__data["FLUSSMITTEL"], self.__data["TIBOT"], self.__data["BIGENEMYBOT"], self.__data["SMALLENEMYBOT"]))
+		else:
+			self.__PathFinding = PathFinding((self.__data["TIBOT"], self.__data["FLUSSMITTEL"], self.__data["BIGENEMYBOT"], self.__data["SMALLENEMYBOT"]))
+			
 		self.__loadElemScript(base_dir+"/elemScripts.xml")
 		self.__loadGoals(base_dir+"/goals.xml")
 
