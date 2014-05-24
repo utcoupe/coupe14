@@ -20,6 +20,7 @@ import data
 from constantes import *
 import event
 import gpio
+import sys
 
 #lancement de l'IA via le subprocess simu
 def startIa(pipe=None, ia_color="RED"):
