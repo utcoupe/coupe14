@@ -1,7 +1,6 @@
 #include "communication.h"
 #include "fast_math.h"
 #include "global.h"
-#include "robot.h"
 
 #include <stdlib.h>
 #include <sys/types.h>
@@ -26,14 +25,14 @@ void init_protocol(char *path) {
 }
 
 //t x1 y1 x2 y2 x3 y3 x4 y4\n
-void pushResults(struct robot *coords, int nbr, long timestamp) {
+void pushResults(Cluster_t *coords, int nbr, long timestamp) {
 	if (nbr != MAX_ROBOTS) {
 		printf("%sExpected %d robots, got %d\n", PREFIX, MAX_ROBOTS, nbr);
 	}
 	int i=0;
 	fprintf(pipe, "%ld", timestamp);
 	for(i=0; i<nbr; i++) {
-		fprintf(pipe, " %d %d", coords[i].pt.x, coords[i].pt.y);
+		fprintf(pipe, " %d %d", coords[i].center.x, coords[i].center.y);
 	}
 	for (i=nbr; i<MAX_ROBOTS; i++) {
 		fprintf(pipe, " -1 -1");

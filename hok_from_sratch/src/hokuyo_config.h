@@ -1,26 +1,21 @@
 #ifndef HOKUYO_CONFIG_H
 #define HOKUYO_CONFIG_H
 
-typedef struct Pt {
-	int x, y;
-} Pt_t;
+#include "fast_math.h"
+#include <urg_ctrl.h>
 
 typedef struct Hokuyo {
 	urg_t* urg;
 	Pt_t pt;
 	double orientation, cone; //Scanne dans ori-cone;ori+cone
-	int imin, imax;
+	int imin, imax, nb_data;
 	const char *path;
+	double error;
+	struct fastmathTrigo fm;
 } Hok_t;
 
-typedef struct Calib {
-	double error;
-} Calib_t;
-
 Hok_t initHokuyo(const char *path, double ori, double cone, Pt_t pt);
-Hok_t getCalibParams(Hok_t hok);
-Calib_t calibrate(Hok_t hok);
-Hok_t correctFromResults(Hok_t hok, Calib_t res);
+Hok_t calibrate(Hok_t hok);
 Hok_t applySymetry(Hok_t hok);
 
 #endif

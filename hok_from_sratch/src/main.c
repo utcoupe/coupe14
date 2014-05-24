@@ -6,6 +6,9 @@
 #include <unistd.h>
 
 #include "hokuyo_config.h"
+#include "utils.h"
+#include "compat.h"
+#include "communication.h"
 
 #ifdef SDL
 #include "gui.h"
@@ -31,8 +34,10 @@ static void catch_SIGINT(int signal){
 }
 
 int main(int argc, char **argv){
-	bool nocalib = false;
+	int calib = 1, symetry = 0;
 	char *path = 0;
+	hok1.urg = 0;
+	hok2.urg = 0;
 
 	atexit(exit_handler);
 	
@@ -42,28 +47,34 @@ int main(int argc, char **argv){
 	}
 
 	if (signal(SIGINT, catch_SIGINT) == SIG_ERR) {
-        fpritnf(stderr, "An error occurred while setting a signal handler for SIGINT.\n");
+        fprintf(stderr, "An error occurred while setting a signal handler for SIGINT.\n");
 		exit(EXIT_FAILURE);
     }
+	
+	if (strcmp(argv[1], "yellow") == 0) {
+		symetry = 1;
+	}
 
 	if (argc >= 3) {
 		path = argv[2];
 		if (strcmp(path, "nocalib") == 0) {
-			nocalib = true;
+			calib = 0;
 		} else {
 			use_protocol = 1;
 		}
 	}
 
-	/*
-	if (nocalib) {
-		l1 = initLidar("/dev/ttyACM0", posl1, angle1, a1min, a1max);
-		l2 = initLidar("/dev/ttyACM1", posl2, angle2, a2min, a2max);
-	} else {
-		l1 = initLidarAndCalibrate("/dev/ttyACM0", posl1, angle1, a1min, a1max);
-		l2 = initLidarAndCalibrate("/dev/ttyACM1", posl2, angle2, a2min, a2max);
-	}*/
-
+	hok1 = initHokuyo("/dev/ttyACM0", HOK1_A, HOK1_CONE, (Pt_t){HOK1_X, HOK1_Y} );
+	hok2 = initHokuyo("/dev/ttyACM1", HOK2_A, HOK2_CONE, (Pt_t){HOK2_X, HOK2_Y} );
+	if (symetry) {
+		hok1 = applySymetry(hok1);
+		hok2 = applySymetry(hok2);
+	}
+	
+	if (calib) {
+		hok1 = calibrate(hok1);
+		hok2 = calibrate(hok2);
+	}
 
 	#ifdef SDL
 	struct color l1Color = {255, 0, 255}, l2Color = {0, 0, 255}, lColor {255, 0, 255};
@@ -74,7 +85,6 @@ int main(int argc, char **argv){
 		init_protocol(path);
 	}
 
-	startTime = timeMillis();
 	printf("%sRunning ! ...\n", PREFIX);
 	while(1){
 		frame();
@@ -84,47 +94,55 @@ int main(int argc, char **argv){
 
 void frame(){
 	long timestamp;
-	timestamp = timeMillis() - startTime;
-	/*
-	getPoints(&l1);
-	getPoints(&l2);
-	printf("%sDuration1 : %lims\n", PREFIX, timestamp-lastTime);
-	timestamp = timeMillis() - startTime;
-	printf("%sDuration2 : %lims\n", PREFIX, timestamp-lastTime);
-	int nRobots1 = getRobots(l1.points, l1.fm.n, robots1);
-	int nRobots2 = getRobots(l2.points, l2.fm.n, robots2);
-	int nRobots = mergeRobots(robots1, nRobots1, robots2, nRobots2, robots);
+	static long lastTime = 0;
+	Pt_t pts1[MAX_DATA], pts2[MAX_DATA];
+	Cluster_t robots1[MAX_CLUSTERS], robots2[MAX_CLUSTERS];
+	int nPts1, nPts2, nRobots1, nRobots2;
+
+	nPts1 = getPoints(hok1, pts1, Normal);
+	nPts2 = getPoints(hok2, pts2, Normal);
+
+	timestamp = timeMillis() - lastTime;
+	printf("%sDuration : %lims\n", PREFIX, timestamp-lastTime);
+
+	nRobots1 = getClustersFromPts(pts1, nPts1, robots1);
+	nRobots2 = getClustersFromPts(pts2, nPts2, robots2);
+	
 	#ifdef SDL
 	blitMap();
-	blitLidar(l1.pos, l1Color);
-	blitLidar(l2.pos, l2Color);
+	blitLidar(hok1.pt, l1Color);
+	blitLidar(hok2.pt, l2Color);
 	blitRobots(robots1, nRobots1, l1Color);
 	blitRobots(robots2, nRobots2, l2Color);
-	blitRobots(robots, nRobots, lColor);
-	blitPoints(l1.points, l1.fm.n, l1Color);
-	blitPoints(l2.points, l2.fm.n, l2Color);
+	blitPoints(pts1, nPts1, l1Color);
+	blitPoints(pts2, nPts2, l2Color);
 	waitScreen();
 	#endif
+
 	if (use_protocol){
-		pushResults(robots, nRobots, timestamp);
+		//pushResults(robots, nRobots, timestamp);
 	}
 	else{
 		printf("%sHOK1 - %li;%i", PREFIX, timestamp, nRobots1);
 		for(int i=0; i<nRobots1; i++){
-			printf(";%i:%i -- %i", robots1[i].pt.x, robots1[i].pt.y, robots1[i].size);
+			printf(";%i:%i -- %i", robots1[i].center.x, robots1[i].center.y, robots1[i].size);
 		}
 		printf("\n");
 		printf("%sHOK2 - %li;%i", PREFIX, timestamp, nRobots2);
 		for(int i=0; i<nRobots2; i++){
-			printf(";%i:%i -- %i", robots2[i].pt.x, robots2[i].pt.y, robots2[i].size);
+			printf(";%i:%i -- %i", robots2[i].center.x, robots2[i].center.y, robots2[i].size);
 		}
 		printf("\n");
+		/*
 		printf("%sALL  - %li;%i", PREFIX, timestamp, nRobots);
 		for(int i=0; i<nRobots; i++){
-			printf(";%i:%i -- %i", robots[i].pt.x, robots[i].pt.y, robots[i].size);
+			printf(";%i:%i -- %i", robots[i].center.x, robots[i].center.y, robots[i].size);
 		}
-		printf("\n");
+		printf("\n");*/
 	}
+	/*
+	int nRobots = mergeRobots(robots1, nRobots1, robots2, nRobots2, robots);
+	blitRobots(robots, nRobots, lColor);
 	*/
 	lastTime = timestamp;
 }

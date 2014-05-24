@@ -2,9 +2,9 @@
 #define COMMUNICATION_H
 
 #include "fast_math.h"
-#include "robot.h"
+#include "utils.h"
 
 void init_protocol();
-void pushResults(struct robot *coords, int nbr, long timestamp);
+void pushResults(Cluster_t *coords, int nbr, long timestamp);
 
 #endif

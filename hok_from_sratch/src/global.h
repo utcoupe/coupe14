@@ -1,11 +1,39 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+#include "fast_math.h"
+#include <math.h>
+
 #define PREFIX "[C-HK]  "
 
-const int TABLE_X = 3000, TABLE_Y = 2000;
-const int MAX_DATA = 1024;
-const double CONE_CALIB  = (10.0/180)*M_PI;
+#define TABLE_X 3000
+#define TABLE_Y 2000
+#define MAX_DATA 1024
+#define MAX_CLUSTERS 20
+#define MAX_ROBOTS 4
+#define BORDER_MARGIN 50
+
+
+#define CONE_CALIB  (10.0/180)*M_PI
+#define DIST_CALIB 100
+#define CALIB_MEASURES 10
+#define CALIB_X (TABLE_X/2)
+#define CALIB_Y (TABLE_Y/2)
+#define CALIB_PT (Pt_t) { CALIB_X, CALIB_Y }
+
+#define HOK1_X -25
+#define HOK1_Y -25 
+#define HOK1_A M_PI/4
+#define HOK1_CONE M_PI/4
+
+#define HOK2_X 3025 
+#define HOK2_Y 1000 
+#define HOK2_A M_PI
+#define HOK2_CONE M_PI/2
+
+
+#define CLUSTER_POINTS_BACKWARDS 15
+#define MAX_DIST 50
 
 
 #endif
