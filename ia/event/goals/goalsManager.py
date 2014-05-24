@@ -113,7 +113,7 @@ class GoalsManager:
 	def __queueBestGoals(self):
 		if not self.__blocked_goals:
 			self.__logger.debug(str(self.__robot_name)+" Recherche d'un nouvel objectif")	
-			self.__PathFinding.update(self.__data[self.__robot_name])
+			self.__PathFinding.update()
 
 			#On cherche l'elem goal le plus proche par bruteforce
 			if self.__available_goals:
@@ -447,7 +447,7 @@ class GoalsManager:
 
 									# Si on a besoin d'avancer, on vérifie avec le pathfinding
 									if x != 0 or y != 0:
-										self.__PathFinding.update(self.__data[self.__robot_name])
+										self.__PathFinding.update()
 										path = self.__PathFinding.getPath((x_abs, y_abs), (x+x_abs, y+y_abs), enable_smooth=True)
 										if len(path) == 2:
 											script_get_triangle.append( ("A_GOTOA", (path[1][0], path[1][1], a+a_abs)) ) 
@@ -459,7 +459,7 @@ class GoalsManager:
 										else:
 											self.__logger.warning("Impossible d'attendre le triangle d'après PathFinding, data_camera: "+str(data_camera)+" path: "+str(path)+" x+x_abs: "+str(x+x_abs)+" y+y_abs "+str(y+y_abs)+" a+a_abs "+str(a+a_abs))
 											self.__deleteGoal(objectif)
-									 # Sinon on a besoin de juste tourner
+									# Sinon on a besoin de juste tourner
 									else:
 										script_get_triangle.append( ("A_ROT", (a+a_abs,)) ) 
 										script_get_triangle.append( ("STEP_OVER", (),) )
@@ -650,7 +650,7 @@ class GoalsManager:
 		dom = parseString(fd.read())
 		fd.close()
 
-		self.__PathFinding.update(self.__data[self.__robot_name])
+		self.__PathFinding.update()
 
 		for xml_goal in dom.getElementsByTagName('objectif'):
 			id_objectif	= int(xml_goal.getElementsByTagName('id_objectif')[0].firstChild.nodeValue)

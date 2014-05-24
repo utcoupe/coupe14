@@ -19,10 +19,10 @@ class Bot(dict):
 
 def startVizNavGraph(liste_bots,type_bot):
 	filename = os.path.join(FILE_DIR, "../../ia/event/goals/navigation/map.xml")
-	try:
+	"""try:
 		offset = sys.argv[1]
 	except:
-		offset = 0
+		offset = 0"""
 	start = time.time()
 	#used = celui pour lequel on fait le calcule de trajectoire
 	#other = l'autre de notre équipe
@@ -31,13 +31,13 @@ def startVizNavGraph(liste_bots,type_bot):
 	used_bot = Bot()
 	if type_bot == BIG:
 		other_bot["getPosition"] = liste_bots[2].getPositionXY()
-		other_bot["getRayon"] = 120
+		other_bot["getRayon"] = 135
 		used_bot["getPosition"] = liste_bots[1].getPositionXY()
 		used_bot["getRayon"] = 200
 	elif type_bot == MINI:
-		used_bot["getPosition"] = liste_bots[2].getPositionXY()
-		used_bot["getRayon"] = 120
-		other_bot["getPosition"] = liste_bots[1].getPositionXY()
+		used_bot["getPosition"] = liste_bots[1].getPositionXY()
+		used_bot["getRayon"] = 135
+		other_bot["getPosition"] = liste_bots[2].getPositionXY()
 		other_bot["getRayon"] = 200
 	ennemy1 = Bot()
 	ennemy2 = Bot()
