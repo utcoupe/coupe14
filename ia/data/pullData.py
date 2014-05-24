@@ -181,7 +181,7 @@ class PullData():
 					elif order == 'A_IS_BLOCKED':
 						system.setAsservBloqued(arguments[0])
 					elif order == 'O_GET_BRAS_STATUS':
-						system.setBrasStatus( arguments[0])
+						system.setBrasStatus(arguments[0])
 					elif order == 'T_GET_HOKUYO':
 						system.majPositionHokuyo(arguments)
 					elif order == 'T_GET_CAM':
