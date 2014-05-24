@@ -290,7 +290,7 @@ class Communication():
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, empty_return)
 
 		elif order == "A_IS_BLOCKED":
-			pos = (0,)
+			pos = (self.__minirobot.getAsservBlocked(),)
 			self.__addOrder("ADDR_TIBOT_ASSERV", order, pos)
 
 		else:

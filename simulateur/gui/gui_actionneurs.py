@@ -126,7 +126,7 @@ class actionneurs(LabelFrame):
 		Fbouton.grid(column = 3, row = 0, sticky=N+S+W+E)
 
 	def __setAsservBlockedMini(self):
-		self.__bigrobot_us.setAsservBlocked(1)
+		self.__minirobot_us.setAsservBlocked(1)
 
 	def __setAsservDeblockedMini(self):
-		self.__bigrobot_us.setAsservBlocked(0)
+		self.__minirobot_us.setAsservBlocked(0)
