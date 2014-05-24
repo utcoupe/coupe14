@@ -7,11 +7,11 @@
 
 //DIMENSIONS
 
-#define BRAS_OFFSET_DIST 140 //Distance in mm
-#define BRAS_OFFSET_ANGLE 20 //Angle offset in degrees
+#define BRAS_OFFSET_DIST 154 //Distance in mm
+#define BRAS_OFFSET_ANGLE 5 //Angle offset in degrees
 
 #define HAUTEUR_MAX 157 //En mm
-#define HAUTEUR_MIN 25 //en mm
+#define HAUTEUR_MIN 15 //en mm
 
 #define X_BRAS 128
 #define Y_BRAS 130
@@ -24,14 +24,14 @@
 
 //SECU BRAS : en degree commande
 
-#define ANGLE_DIST_MAX 140
+#define ANGLE_DIST_MAX 130
 #define ANGLE_DIST_MIN 70
 
 #define ANGLE_ANGLE_MAX 180 
 #define ANGLE_ANGLE_MIN 40
 #define ANGLE_INSIDE_ROBOT 110
 #define SECU_DELAY_REPLI_BRAS 200 //ms
-#define SECU_DELAY_ROT_BRAS 500 //ms
+#define SECU_DELAY_ROT_BRAS 400 //ms
 
 //BRAS
 
@@ -43,13 +43,13 @@
 
 #define MARGE_DEPOT 80
 #define MARGE_PREHENSION 40
-#define HAUTEUR_GARDE_DEPOT HAUTEUR_MIN
+#define HAUTEUR_GARDE_DEPOT HAUTEUR_MIN + 10
 #define HAUTEUR_DEPOT_ARRIERE 130
 
-#define ANGLE_DEPOT (-(100.0/180.0)*M_PI)
+#define ANGLE_DEPOT (-(95.0/180.0)*M_PI)
 #define LONGUEUR_DEPOT LONGUEUR_MIN
 
-#define ANGLE_DEPOT_RET (-(150.0/180.0)*M_PI) 
+#define ANGLE_DEPOT_RET (-(140.0/180.0)*M_PI) 
 #define LONGUEUR_DEPOT_RET 225
 
 

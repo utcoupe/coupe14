@@ -69,7 +69,7 @@ initLidarAndCalibrate(char* device, struct coord position, double orientation, d
 
 	double thetaR = theta(position, markerRPos);
 	printf("%sthetha R:%f  -> %f\tcalculated on %i iterations\n", PREFIX, thetaR, thetaR*180/PI, nbClustersFound);
-	l.orientation += thetaTh - thetaR;
+	l.orientation = modTwoPi(l.orientation + thetaTh - thetaR);
 	printf("%snew orientation:%f\n", PREFIX, l.orientation*180/PI);
 
 	///////
@@ -82,11 +82,6 @@ initLidarAndCalibrate(char* device, struct coord position, double orientation, d
 	}
 	freeFastmath(l.fm);
 	l.fm = initFastmath( nAngles, angles );
-
-	free(l.points);
-	l.points = 0;
-	l.points = malloc(sizeof(struct coord)*l.fm.n);
-	if(l.points == NULL) exit(EXIT_FAILURE);
 
 	free(angles);
 	angles = 0;
@@ -120,9 +115,6 @@ initLidar(char* device, struct coord position, double orientation, double angleM
 
 	free(angles);
 	
-	l.points = malloc(sizeof(struct coord)*l.fm.n);
-	if(l.points == NULL) exit(EXIT_FAILURE);	
-
 	maxDistance = MAX_DISTANCE;
 
 	return l;
@@ -158,14 +150,11 @@ invalidPointCalibration(struct coord lidar, struct coord p){
 
 struct coord*
 getPointsCalibrate(struct lidar* l, char calibration){
-	long* buffer = malloc(sizeof(long)*l->fm.n);
-	if( buffer == NULL ){
-		err(1, "buffer malloc");
-	}
-
-
+	long buffer[MAX_DATA];
+	int i;
 	urg_receiveData(l->lidarObject, buffer, MAX_DATA);
-	for(int i=0; i<(l->fm.n); i++){
+	
+	for(i=0; i<(l->fm.n); i++){
 
 		#ifndef DEBUG_DO_NOT_REMOVE_POINTS
 		if(invalidDistance(buffer[i])){
@@ -178,6 +167,7 @@ getPointsCalibrate(struct lidar* l, char calibration){
 
 		l->points[i].x = fastCos(l->fm, i)*buffer[i] + l->pos.x;
 		l->points[i].y = fastSin(l->fm, i)*buffer[i] + l->pos.y;
+
 
 		if(calibration){
 			if(invalidPointCalibration(l->pos, l->points[i])){
@@ -202,8 +192,6 @@ getPointsCalibrate(struct lidar* l, char calibration){
 	for(int i=0; i<l->fm.n; i++){
 		printf("%i\t%ld\t%i\t%i\n", i, buffer[i], l->points[i].x, l->points[i].y);
 	}//*/
-	free(buffer);
-	buffer = 0;
 	return l->points;
 }
 

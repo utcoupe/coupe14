@@ -6,8 +6,9 @@
 #include "global.h"
 #include "fast_math.h"
 
+int imin, imax;
 
-void*
+urg_t*
 initHokuyoUrg(char* device, double angleMin, double angleMax){
 	angleMax = modTwoPi(angleMax);
 	angleMin = modTwoPi(angleMin);
@@ -49,6 +50,7 @@ void
 resetHokuyoUrg(urg_t* urg, char *device, double angleMin, double angleMax){
 	angleMax = modTwoPi(angleMax);
 	angleMin = modTwoPi(angleMin);
+	int error = 0;
 	if (angleMin > angleMax) {
 		double temp = angleMax;
 		angleMax = angleMin;
@@ -56,9 +58,14 @@ resetHokuyoUrg(urg_t* urg, char *device, double angleMin, double angleMax){
 	}
 	printf("%sHokuyo reinit from %f to %f\n", PREFIX, angleMin*180/PI, angleMax*180/PI);
 	urg_disconnect(urg);
-	urg_connect(urg, device, BAUDRATE_HOKUYOURG);
+	error = urg_connect(urg, device, BAUDRATE_HOKUYOURG);
+	if(error < 0){
+		urg_disconnect(urg);
+		fprintf(stderr, "%sconnection failed on %s\n",PREFIX, device);
+		exit(EXIT_FAILURE);
+	}
 	urg_setCaptureTimes(urg, UrgInfinityTimes);
-    int error = urg_requestData(urg, URG_MD, urg_rad2index(urg, angleMin), urg_rad2index(urg, angleMax));//scan en continu, on ne garde que les point entre angleMin et angleMax
+    error = urg_requestData(urg, URG_MD, urg_rad2index(urg, angleMin), urg_rad2index(urg, angleMax));//scan en continu, on ne garde que les point entre angleMin et angleMax
 	printf("%sParameters set #2\n", PREFIX);
 	if(error < 0){
 		urg_disconnect(urg);

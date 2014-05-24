@@ -1,17 +1,19 @@
 #ifndef LIDAR_H
 #define LIDAR_H
 
+#include <urg_ctrl.h>
+#include "hokuyoUrg.h"
 #include "fast_math.h"
 #include "global.h"
 
 struct lidar {
-	void *lidarObject;
+	urg_t *lidarObject;
 
 	struct coord pos;
 	double orientation;
 	struct fastmathTrigo fm;
 
-	struct coord *points;
+	struct coord points[MAX_DATA];
 };
 
 struct coordList_t {

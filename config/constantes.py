@@ -11,7 +11,7 @@ TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux
 
 
 #====================Enable====================
-ENABLE_TOURELLE =		False
+ENABLE_TOURELLE =		True
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
 ENABLE_TIBOT =			True
 
@@ -73,7 +73,7 @@ PULL_PERIODE = 			100
 #====================NAVIGATION================
 EMPTY_FIFO = 			True
 POINTS_PAR_CERCLE = 	8
-MARGE_PASSAGE_PATH = 	10
+MARGE_PASSAGE_PATH = 	2
 MARGE_COLLISION =		-20
 COLLISION_THRESHOLD =	400
 COLLISION_WARNING_THRESHOLD = 800

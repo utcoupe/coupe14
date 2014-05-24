@@ -3,11 +3,19 @@
 <size width="3000" height="2000" w_tiles="100" />
 
 <!-- DEPOT CENTRE -->
-<circle x="1500" y="950" rayon="150" n="12"/>
+<polygon>
+	<vertex x="1500" y="800" />
+	<vertex x="1600" y="850" />
+	<vertex x="1600" y="1050" />
+	<vertex x="1500" y="1100" />
+	<vertex x="1400" y="1050" />
+	<vertex x="1400" y="850" />
+</polygon>
+
 
 <!-- DEPOTS -->
-<circle x="0" y="0" rayon="150" n="4"/>
-<circle x="3000" y="0" rayon="150" n="4"/>
+<circle x="0" y="0" rayon="250" n="4"/>
+<circle x="3000" y="0" rayon="250" n="4"/>
 
 <!-- ARBRES -->
 <circle x="0" y="700" rayon="150" n="10"/>
@@ -16,8 +24,18 @@
 <circle x="3000" y="700" rayon="150" n="10"/>
 
 <!-- TORCHES -->
-<circle x="900" y="900" rayon="80" n="20"/>
-<circle x="2100" y="900" rayon="80" n="20"/>
+<polygon>
+	<vertex x="899" y="900" />
+	<vertex x="900" y="899" />
+	<vertex x="901" y="900" />
+	<vertex x="900" y="901" />
+</polygon>
+<polygon>
+	<vertex x="2099" y="900" />
+	<vertex x="2100" y="899" />
+	<vertex x="2101" y="900" />
+	<vertex x="2100" y="901" />
+</polygon>
 
 
 <!-- DEPOT FRUIT ROUGE -->
