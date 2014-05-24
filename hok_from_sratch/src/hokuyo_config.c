@@ -34,7 +34,7 @@ Hok_t initHokuyo(const char *path, double ori, double cone, Pt_t pt) {
 		fprintf(stderr, "%sRequesting data failed on %s\n",PREFIX, path);
 		exit(EXIT_FAILURE);
 	}
-	printf("%sRequesting data from %s OK\n", PREFIX, path);
+	printf("%sRequesting data on indexes %d to %d from %s OK\n", PREFIX, hok.imin, hok.imax, path);
 
 	hok.nb_data = urg_dataMax(hok.urg);
 	double *angles = malloc(hok.nb_data * sizeof(double));
@@ -60,7 +60,7 @@ Hok_t calibrate(Hok_t hok) {
 	long sumx = 0, sumy = 0;
 
 	for (i=0; i<CALIB_MEASURES; i++) {
-		int n = getPoints(hok, points, Normal);
+		int n = getPoints(hok, points);
 		int nb_cluster = getClustersFromPts(points, n, clusters);
 
 		if (nb_cluster == 1) {

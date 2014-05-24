@@ -5,11 +5,12 @@
 #include <math.h>
 
 #define PREFIX "[C-HK]  "
+#define SDL
 
 #define TABLE_X 3000
 #define TABLE_Y 2000
 #define MAX_DATA 1024
-#define MAX_CLUSTERS 20
+#define MAX_CLUSTERS 50
 #define MAX_ROBOTS 4
 #define BORDER_MARGIN 50
 
@@ -23,17 +24,17 @@
 
 #define HOK1_X -25
 #define HOK1_Y -25 
-#define HOK1_A M_PI/4
-#define HOK1_CONE M_PI/4
+#define HOK1_A (M_PI/4)
+#define HOK1_CONE (M_PI/4)
 
 #define HOK2_X 3025 
 #define HOK2_Y 1000 
 #define HOK2_A M_PI
-#define HOK2_CONE M_PI/2
+#define HOK2_CONE (M_PI/2)
 
 
 #define CLUSTER_POINTS_BACKWARDS 15
-#define MAX_DIST 50
+#define MAX_DIST 200
 
 
 #endif
