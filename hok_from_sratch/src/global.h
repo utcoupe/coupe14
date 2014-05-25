@@ -35,6 +35,8 @@
 
 #define CLUSTER_POINTS_BACKWARDS 15
 #define MAX_DIST 200
+#define MAX_SIZE_TO_MERGE 200
+#define NB_PTS_MIN 3
 
 
 #endif

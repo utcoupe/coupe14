@@ -6,6 +6,7 @@
 #include <string.h>
 
 #define max(a, b) a>b?a:b
+#define min(a, b) a<b?a:b
 
 
 int getPoints(Hok_t hok, Pt_t* pt_list) {
@@ -61,7 +62,18 @@ int getClustersFromPts(Pt_t *pt_list, int nb_pts, Cluster_t* clusters) {
 			}
 		}
 
-		printf("a\n");
+		i = 0;
+		while (i < nbCluster) {
+			if (clusters[i].nb < NB_PTS_MIN) {
+				for (j=i+1; j<nbCluster; j++) {
+					clusters[j-1] = clusters[j];
+				}
+				nbCluster--;
+			} else {
+				i++;
+			}
+		}
+
 
 		for (i=0; i<nbCluster; i++) {
 			clusters[i].size = sqrt(dist_squared(clusters[i].pts[0], clusters[i].pts[clusters[i].nb-1]));
@@ -80,10 +92,10 @@ int getClustersFromPts(Pt_t *pt_list, int nb_pts, Cluster_t* clusters) {
 }
 
 int sortAndSelectRobots(int n, Cluster_t *robots){
-	int i;
+	int i, nbr_robots = min(n, MAX_ROBOTS);
 	Cluster_t *r = malloc(n*sizeof(Cluster_t));
 	memcpy(r, robots, n*sizeof(Cluster_t));
-	for(i=0; i<MAX_ROBOTS; i++){
+	for(i=0; i<nbr_robots; i++){
 		int maxSize = 0, maxId = 0;
 		for(int j=0; j<n; j++){
 			if(r[j].size > maxSize){
@@ -120,6 +132,7 @@ int mergeRobots(Cluster_t *r1, int n1, Cluster_t *r2, int n2, Cluster_t *result)
 	for (i=0; i<n1*n2; i++) {
 		dist_indexes[i] = (struct corres){ i/n2, i%n2 };
 	}
+
 	do {
 		changed = 0;
 		for (i=1; i<n1*n2; i++) {
@@ -132,12 +145,30 @@ int mergeRobots(Cluster_t *r1, int n1, Cluster_t *r2, int n2, Cluster_t *result)
 		}
 	} while (changed);
 
+	printf("Distances \n");
+	for (i=0; i<n1*n2; i++) {
+		int ind1 = dist_indexes[i].r1;
+		int ind2 = dist_indexes[i].r2;
+		printf("%d ", distR1R2[ind1][ind2]);
+	}
+	printf("\n");
+
+
 	//Choix des correspondances en prenant la premiere qui vientdu plus petit au plus grand
 	int used_R1_index[MAX_ROBOTS], used_R2_index[MAX_ROBOTS], nbr_found = 0;
-	for (i=1; i<n1*n2; i++) {
+	for (i=0; i<MAX_ROBOTS; i++) {
+		used_R1_index[i] = -1;
+		used_R2_index[i] = -1;
+	}
+	for (i=0; i<n1*n2; i++) {
 		struct corres c = dist_indexes[i];
-		if (!isIn(c.r1, used_R1_index, MAX_ROBOTS) && //Aucun des deux robots n'est deja selectionné
-			!isIn(c.r2, used_R2_index, MAX_ROBOTS)) { //On ajout la correspondace
+
+		if (distR1R2[c.r1][c.r2] > MAX_SIZE_TO_MERGE*MAX_SIZE_TO_MERGE) {
+			break;
+		}
+
+		if (!isIn(c.r1, used_R1_index, n1) && //Aucun des deux robots n'est deja selectionné
+			!isIn(c.r2, used_R2_index, n2)) { //On ajout la correspondace
 
 			merged[nbr_found] = c;
 			used_R1_index[nbr_found] = c.r1;
@@ -145,23 +176,56 @@ int mergeRobots(Cluster_t *r1, int n1, Cluster_t *r2, int n2, Cluster_t *result)
 			nbr_found++;
 		}
 	}
+	printf("used: \n");
+	for (i=0; i<nbr_found; i++) {
+		printf("r1:%d r2:%d\n", used_R1_index[i], used_R2_index[i]);
+	}
 
 	for (i=0; i<nbr_found; i++) {
 		struct corres c = merged[i];
-		result[i] = (Cluster_t) { (Pt_t) {(r1[c.r1].center.x + r2[c.r2].center.x) / 2, (r1[c.r1].center.y + r2[c.r2].center.y) / 2 },
-										(int)( (r1[c.r1].size + r2[c.r2].size) / 2) };
+		Cluster_t clu;
+		clu.nb = 0;
+		clu.center = (Pt_t) {(r1[c.r1].center.x + r2[c.r2].center.x) / 2, (r1[c.r1].center.y + r2[c.r2].center.y) / 2 };
+		clu.size = (r1[c.r1].size + r2[c.r2].size) / 2;
+		result[i] = clu;
+	}
+	printf("Found %d pairs\n", nbr_found);
+
+	int nbr_left = n1 + n2 - 2*nbr_found, clust_counter = 0;
+	Cluster_t clust_left[MAX_ROBOTS*MAX_ROBOTS];
+	for (i=0; i<n1; i++) {
+		if (!isIn(i, used_R1_index, nbr_found)) {
+			clust_left[clust_counter++] = r1[i];
+		}
+	}
+	clust_counter = 0;
+	for (i=0; i<n2; i++) {
+		if (!isIn(i, used_R2_index, nbr_found)) {
+			clust_left[clust_counter++] = r2[i];
+		}
 	}
 
-	int diff = n1 - n2; //Si on a des robots detectés par un hokuyo mais pas par l'autre
-	if (diff > 0) { //Plus de r1 que de r2
-		for (i=n2; i<n1; i++) {
-			result[nbr_found++] = r1[i];
+	for (i=n1*n2-1; i>=0; i--) {
+		struct corres c = dist_indexes[i];
+
+		if (!isIn(c.r1, used_R1_index, nbr_found)) { 
+			result[nbr_found] = r1[c.r1];
+			used_R1_index[nbr_found] = c.r1;
+			nbr_found++;
 		}
-	} else if (diff < 0) { //Plus de r2 que de r1
-		for (i=n1; i<n2; i++) {
-			result[nbr_found++] = r2[i];
+		
+		if (!isIn(c.r2, used_R2_index, nbr_found)) {
+			result[nbr_found] = r2[c.r2];
+			used_R2_index[nbr_found] = c.r2;
+			nbr_found++;
 		}
 	}
+	printf("used: \n");
+	for (i=0; i<nbr_found; i++) {
+		printf("r1:%d r2:%d\n", used_R1_index[i], used_R2_index[i]);
+	}
+	printf("Found %d in the end\n", nbr_found);
+
 	nbr_found = sortAndSelectRobots(nbr_found, result);
 	return nbr_found;
 }

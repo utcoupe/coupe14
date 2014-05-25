@@ -73,8 +73,13 @@ int main(int argc, char **argv){
 	}
 	
 	if (calib) {
-		hok1 = calibrate(hok1);
-		hok2 = calibrate(hok2);
+		int error = 0;
+		do {
+			error = calibrate(&hok1);
+		} while (error < 0);
+		do {
+			error = calibrate(&hok2);
+		} while (error < 0);
 	}
 
 	#ifdef SDL

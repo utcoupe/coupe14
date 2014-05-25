@@ -15,7 +15,7 @@ typedef struct Hokuyo {
 } Hok_t;
 
 Hok_t initHokuyo(const char *path, double ori, double cone, Pt_t pt);
-Hok_t calibrate(Hok_t hok);
+int calibrate(Hok_t *hok);
 Hok_t applySymetry(Hok_t hok);
 
 #endif
