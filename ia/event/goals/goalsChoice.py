@@ -113,7 +113,7 @@ class GoalsChoice:
 				already_done_goal.resetElemAction()
 				self.__balle_goal_already_swapped = True
 
-
+		#Choisi l'objectif le plus proche
 		for goal in self.__available_goals:
 			nb_elem_goal = goal.getLenElemGoal()
 			for idd in range(nb_elem_goal):
