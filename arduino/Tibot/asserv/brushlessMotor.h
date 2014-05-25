@@ -7,28 +7,28 @@
 
 #include "parameters.h"
 
-#define MOTOR1_EN 34
-#define MOTOR2_EN 30
+#define MOTOR1_EN 30
+#define MOTOR2_EN 34
 
-#define MOTOR1_SPD 2
-#define MOTOR2_SPD 3
+#define MOTOR1_SPD 3
+#define MOTOR2_SPD 2
 
-#define MOTOR1_RDY 36
-#define MOTOR2_RDY 32
+#define MOTOR1_RDY 32
+#define MOTOR2_RDY 36
 
 #define MOTOR_LEFT 1
 #define MOTOR_RIGHT 2
 
 //Pins codeurs liés à la shield
-#define PIN_ENC_LEFT_A 19
-#define PIN_ENC_LEFT_B 18
+#define PIN_ENC_LEFT_A 18
+#define PIN_ENC_LEFT_B 19
 #define PIN_ENC_LEFT_0 0
 #define PIN_ENC_RIGHT_A 20
 #define PIN_ENC_RIGHT_B 21
 #define PIN_ENC_RIGHT_0 0
 
-#define INTERRUPT_ENC_LEFT_A 4
-#define INTERRUPT_ENC_LEFT_B 5
+#define INTERRUPT_ENC_LEFT_A 5
+#define INTERRUPT_ENC_LEFT_B 4
 #define INTERRUPT_ENC_LEFT_0 0
 #define INTERRUPT_ENC_RIGHT_A 3
 #define INTERRUPT_ENC_RIGHT_B 2

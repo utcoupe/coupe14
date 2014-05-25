@@ -28,7 +28,7 @@
 
 #define ENCODER_EVAL 1
 
-#define FIXED_POINT_PRECISION 1000 //The robot's position is stocked with a precision of 1/FIXED_POINT_PRECISION mm 
+#define FIXED_POINT_PRECISION 100000 //The robot's position is stocked with a precision of 1/FIXED_POINT_PRECISION mm 
 
 #define GESTION_3EME_FIL false
 

@@ -28,7 +28,7 @@
 
 #define ENCODER_EVAL 1
 
-#define FIXED_POINT_PRECISION 1000 //The robot's position is stocked with a precision of 1/FIXED_POINT_PRECISION ticks
+#define FIXED_POINT_PRECISION 100000 //The robot's position is stocked with a precision of 1/FIXED_POINT_PRECISION ticks
 
 #define GESTION_3EME_FIL false
 
@@ -37,7 +37,7 @@
 #define FREQ (1/(DUREE_CYCLE/1000.0))
 
 #define ACC_MAX 120 //consigne*s-2
-#define RATIO_SPD_ROT_MAX 0.5
+#define RATIO_SPD_ROT_MAX 0.6
 
 /* CONSIGNE OFFSET
  * DEVRAIT ETRE A 0
@@ -52,7 +52,7 @@
  * dès que le robot avance, la pwm min est trouvée */
 #define PWM_MIN 20 
 
-#define CONSIGNE_MAX 100
+#define CONSIGNE_MAX 127
 
 #define CONSIGNE_RANGE_MAX (CONSIGNE_MAX - PWM_MIN)
 
@@ -61,9 +61,9 @@
 
 #define ENC_RESOLUTION 1024 //resolution du codeur
 
-#define ENC_LEFT_RADIUS 36.50 //rayon de la roue codeuse
-#define ENC_RIGHT_RADIUS 36.70 //rayon de la roue codeuse
-#define ENTRAXE_ENC 189.7 // Distance entre chaque roue codeuse en mm
+#define ENC_LEFT_RADIUS 36.23 //rayon de la roue codeuse
+#define ENC_RIGHT_RADIUS 36.23 //rayon de la roue codeuse
+#define ENTRAXE_ENC 189.0 // Distance entre chaque roue codeuse en mm
 
 #define ERROR_ANGLE 0.03 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
 #define ERROR_ANGLE_TO_GO 0.1 //erreur en angle(radians) maximale avant d'avancer

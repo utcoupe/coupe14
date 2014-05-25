@@ -15,23 +15,23 @@
 
 #define WIDTH 640
 #define HEIGHT 480
-#define CAM_FPS 20
+#define CAM_FPS 30
 
 #define EPSILON_POLY 0.04
 #define MAX_DIFF_TRI_EDGE 50
 
-#define YEL_HUE_MIN 20
-#define YEL_HUE_MAX 40
-#define YEL_SAT_MIN 35
+#define YEL_HUE_MIN 10
+#define YEL_HUE_MAX 50
+#define YEL_SAT_MIN 90
 #define YEL_SAT_MAX 255
-#define YEL_VAL_MIN 60
+#define YEL_VAL_MIN 90
 #define YEL_VAL_MAX 255
 
-#define RED_HUE_MIN 0
-#define RED_HUE_MAX 20
-#define RED_SAT_MIN 80
+#define RED_HUE_MIN 160
+#define RED_HUE_MAX 10
+#define RED_SAT_MIN 90
 #define RED_SAT_MAX 255
-#define RED_VAL_MIN 60
+#define RED_VAL_MIN 90
 #define RED_VAL_MAX 255
 
 #define ENABLE_BLK 0
