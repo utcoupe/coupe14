@@ -373,7 +373,7 @@ class GoalsManager:
 							self.__vision.update()
 							triangle_list_temp = self.__vision.getTriangles()
 							if triangle_list_temp != []:
-								triangle_list_multiple.append(triangle_list_temp)
+								list_of_triangle_list.append(triangle_list_temp)
 
 						if len(list_of_triangle_list) >= NB_VISIO_DATA_NEEDED:
 							data_camera = self.__getBestDataTriangleOfList(list_of_triangle_list)
