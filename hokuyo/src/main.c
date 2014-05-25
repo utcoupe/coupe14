@@ -1,11 +1,3 @@
-#include "lidar.h"
-#include "global.h"
-#include "robot.h"
-#include "communication.h"
-#include "compat.h"
-#include "robots2hok.h"
-
-#include <sys/types.h>
 #include <urg_ctrl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,27 +5,27 @@
 #include <signal.h>
 #include <unistd.h>
 
+#include "hokuyo_config.h"
+#include "utils.h"
+#include "compat.h"
+#include "communication.h"
+
 #ifdef SDL
 #include "gui.h"
 #endif
 
 void frame();
 
+static Hok_t hok1, hok2;
 static int use_protocol = 0;
-static struct lidar l1, l2;
-#ifdef SDL
-static struct color l1Color, l2Color, lColor;
-#endif
-
-long startTime, lastTime = 0;
-static struct robot robots[MAX_ROBOTS], robots1[MAX_ROBOTS], robots2[MAX_ROBOTS];
+static long timeStart = 0;
 
 void exit_handler() {
 	printf("\n%sClosing lidar(s), please wait...\n", PREFIX);
-	if (l1.lidarObject != 0)
-		urg_disconnect(l1.lidarObject);
-	if (l2.lidarObject != 0)
-		urg_disconnect(l2.lidarObject);
+	if (hok1.urg != 0)
+		urg_disconnect(hok1.urg);
+	if (hok2.urg != 0)
+		urg_disconnect(hok2.urg);
 	printf("%sExitting\n", PREFIX);
 	//kill(getppid(), SIGUSR1); //Erreur envoyee au pere
 }
@@ -43,7 +35,11 @@ static void catch_SIGINT(int signal){
 }
 
 int main(int argc, char **argv){
-	bool nocalib = false;
+	int calib = 1, symetry = 0;
+	char *path = 0;
+	hok1.urg = 0;
+	hok2.urg = 0;
+
 	atexit(exit_handler);
 	
 	if(argc <= 1 || ( strcmp(argv[1], "red") != 0 && strcmp(argv[1], "yellow") ) ){
@@ -52,62 +48,41 @@ int main(int argc, char **argv){
 	}
 
 	if (signal(SIGINT, catch_SIGINT) == SIG_ERR) {
-        fputs("An error occurred while setting a signal handler for SIGINT.\n", stderr);
+        fprintf(stderr, "An error occurred while setting a signal handler for SIGINT.\n");
 		exit(EXIT_FAILURE);
     }
-
-	struct coord posl1, posl2;
-	float angle1, angle2, a1min, a2min, a1max, a2max;
-
-	posl1.y = HOK1_Y;
-	if( strcmp(argv[1], "red") == 0 ){
-		a1min = HOK1_AMIN;
-		a1max = HOK1_AMAX;
-		angle1 = HOK1_A;
-		posl1.x = HOK1_X;	
-	}else{
-		angle1 = PI - HOK1_A;
-		a1min = PI - HOK1_AMIN;
-		a1max = PI - HOK1_AMAX;
-		posl1.x = TAILLE_TABLE_X-HOK1_X;
+	
+	if (strcmp(argv[1], "yellow") == 0) {
+		symetry = 1;
 	}
 
-	posl2.y = HOK2_Y;
-	if( strcmp(argv[1], "red") == 0 ){
-		angle2 = HOK2_A;
-		a2min = HOK2_AMIN;
-		a2max = HOK2_AMAX;
-		posl2.x = HOK2_X;
-	}else{
-		angle2 = PI - HOK2_A;
-		a2min = PI - HOK2_AMIN;
-		a2max = PI - HOK2_AMAX;
-		posl2.x = TAILLE_TABLE_X - HOK2_X;	
-	}
-
-	char *path = 0;
 	if (argc >= 3) {
 		path = argv[2];
 		if (strcmp(path, "nocalib") == 0) {
-			nocalib = true;
+			calib = 0;
 		} else {
 			use_protocol = 1;
 		}
 	}
 
-	if (nocalib) {
-		l1 = initLidar("/dev/ttyACM0", posl1, angle1, a1min, a1max);
-		l2 = initLidar("/dev/ttyACM1", posl2, angle2, a2min, a2max);
-	} else {
-		l1 = initLidarAndCalibrate("/dev/ttyACM0", posl1, angle1, a1min, a1max);
-		l2 = initLidarAndCalibrate("/dev/ttyACM1", posl2, angle2, a2min, a2max);
+	hok1 = initHokuyo("/dev/ttyACM0", HOK1_A, HOK1_CONE, (Pt_t){HOK1_X, HOK1_Y} );
+	hok2 = initHokuyo("/dev/ttyACM1", HOK2_A, HOK2_CONE, (Pt_t){HOK2_X, HOK2_Y} );
+	if (symetry) {
+		hok1 = applySymetry(hok1);
+		hok2 = applySymetry(hok2);
+	}
+	
+	if (calib) {
+		int error = 0;
+		do {
+			error = calibrate(&hok1);
+		} while (error < 0);
+		do {
+			error = calibrate(&hok2);
+		} while (error < 0);
 	}
 
-
 	#ifdef SDL
-	l1Color = newColor(255, 0, 0);
-	l2Color = newColor(0, 0, 255);
-	lColor = newColor(255, 0, 255);
 	initSDL();
 	#endif
 
@@ -115,8 +90,8 @@ int main(int argc, char **argv){
 		init_protocol(path);
 	}
 
-	startTime = timeMillis();
 	printf("%sRunning ! ...\n", PREFIX);
+	timeStart = timeMillis();
 	while(1){
 		frame();
 	}
@@ -125,43 +100,63 @@ int main(int argc, char **argv){
 
 void frame(){
 	long timestamp;
-	getPoints(&l1);
-	timestamp = timeMillis() - startTime;
-	printf("%sDuration1 : %lims\n", PREFIX, timestamp-lastTime);
-	getPoints(&l2);
-	timestamp = timeMillis() - startTime;
-	printf("%sDuration2 : %lims\n", PREFIX, timestamp-lastTime);
-	int nRobots1 = getRobots(l1.points, l1.fm.n, robots1);
-	int nRobots2 = getRobots(l2.points, l2.fm.n, robots2);
-	int nRobots = mergeRobots(robots1, nRobots1, robots2, nRobots2, robots);
+	static long lastTime = 0;
+	Pt_t pts1[MAX_DATA], pts2[MAX_DATA];
+	Cluster_t robots1[MAX_CLUSTERS], robots2[MAX_CLUSTERS], robots[MAX_ROBOTS];
+	int nPts1, nPts2, nRobots1 = 0, nRobots2 = 0, nRobots;
+
+	printf("%sGetting points\n", PREFIX);
+
+	nPts1 = getPoints(hok1, pts1);
+	nPts2 = getPoints(hok2, pts2);
+
+	printf("%sGot %d and %d points\n", PREFIX, nPts1, nPts2);
+
+	
+	timestamp = timeMillis() - timeStart;
+	printf("%sDuration : %lims\n", PREFIX, timestamp-lastTime);
+
+	nRobots1 = getClustersFromPts(pts1, nPts1, robots1);
+	nRobots2 = getClustersFromPts(pts2, nPts2, robots2);
+
+	printf("%sCalculated %d and %d clusters\n", PREFIX, nRobots1, nRobots2);
+
+	nRobots1 = sortAndSelectRobots(nRobots1, robots1);
+	nRobots2 = sortAndSelectRobots(nRobots2, robots2);
+
+	nRobots = mergeRobots(robots1, nRobots1, robots2, nRobots2, robots);
+	printf("%sGot %d robots\n", PREFIX, nRobots);
+	
 	#ifdef SDL
+	struct color l1Color = {255, 0, 0}, l2Color = {0, 0, 255}, lColor = {255, 0, 255};
 	blitMap();
-	blitLidar(l1.pos, l1Color);
-	blitLidar(l2.pos, l2Color);
+	blitLidar(hok1.pt, l1Color);
+	blitLidar(hok2.pt, l2Color);
 	blitRobots(robots1, nRobots1, l1Color);
 	blitRobots(robots2, nRobots2, l2Color);
 	blitRobots(robots, nRobots, lColor);
-	blitPoints(l1.points, l1.fm.n, l1Color);
-	blitPoints(l2.points, l2.fm.n, l2Color);
+	blitPoints(pts1, nPts1, l1Color);
+	blitPoints(pts2, nPts2, l2Color);
 	waitScreen();
 	#endif
+
 	if (use_protocol){
-		pushResults(robots, nRobots, timestamp);
+		//pushResults(robots, nRobots, timestamp);
 	}
 	else{
-		printf("%sHOK1 - %li;%i", PREFIX, timestamp, nRobots1);
-		for(int i=0; i<nRobots1; i++){
-			printf(";%i:%i -- %i", robots1[i].pt.x, robots1[i].pt.y, robots1[i].size);
-		}
-		printf("\n");
-		printf("%sHOK2 - %li;%i", PREFIX, timestamp, nRobots2);
+		printf("%sHOK2 - %li;%i\n", PREFIX, timestamp, nRobots2);
 		for(int i=0; i<nRobots2; i++){
-			printf(";%i:%i -- %i", robots2[i].pt.x, robots2[i].pt.y, robots2[i].size);
+			printf(";;%i:%i", robots2[i].center.x, robots2[i].center.y);
 		}
 		printf("\n");
-		printf("%sALL  - %li;%i", PREFIX, timestamp, nRobots);
+		printf("%sHOK1 - %li;%i\n", PREFIX, timestamp, nRobots1);
+		for(int i=0; i<nRobots1; i++){
+			printf(";;%i:%i", robots1[i].center.x, robots1[i].center.y);
+		}
+		printf("\n");
+		printf("%sALL  - %li;%i\n", PREFIX, timestamp, nRobots);
 		for(int i=0; i<nRobots; i++){
-			printf(";%i:%i -- %i", robots[i].pt.x, robots[i].pt.y, robots[i].size);
+			printf(";;%i:%i", robots[i].center.x, robots[i].center.y);
 		}
 		printf("\n");
 	}

@@ -25,16 +25,16 @@
 
 <!-- TORCHES -->
 <polygon>
-	<vertex x="899" y="900" />
-	<vertex x="900" y="899" />
-	<vertex x="901" y="900" />
-	<vertex x="900" y="901" />
+	<vertex x="899" y="901" /><!-- <vertex x="899" y="900" /> -->
+	<vertex x="899" y="899" /><!-- <vertex x="900" y="899" /> -->
+	<vertex x="901" y="899" /><!-- <vertex x="901" y="900" /> -->
+	<vertex x="901" y="901" /><!-- <vertex x="900" y="901" /> -->
 </polygon>
 <polygon>
-	<vertex x="2099" y="900" />
-	<vertex x="2100" y="899" />
-	<vertex x="2101" y="900" />
-	<vertex x="2100" y="901" />
+	<vertex x="2099" y="901" /><!-- <vertex x="2099" y="900" /> -->
+	<vertex x="2099" y="899" /><!-- <vertex x="2100" y="899" /> -->
+	<vertex x="2101" y="899" /><!-- <vertex x="2101" y="900" /> -->
+	<vertex x="2101" y="901" /><!-- <vertex x="2100" y="901" /> -->
 </polygon>
 
 
