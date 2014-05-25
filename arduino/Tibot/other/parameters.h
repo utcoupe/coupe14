@@ -22,9 +22,9 @@
 #define POS_BALLES_L0 23 
 #define POS_BALLES_R1 18
 #define POS_BALLES_L1 11
-#define POS_BALLES_R2 22
-#define POS_BALLES_L2 6
-#define POS_BALLES_R3 25
+#define POS_BALLES_R2 27
+#define POS_BALLES_L2 8
+#define POS_BALLES_R3 30
 #define POS_BALLES_L3 3
 
 #define POS_BALAI_INIT 70 
