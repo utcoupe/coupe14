@@ -43,7 +43,6 @@ class GoalsManager:
 		self.__back_triangle_stack = deque()
 		self.__front_triangle_stack = deque()
 		# TIBOT
-		self.__balles_lancees = [0]
 
 		self.__data = self.__SubProcessManager.getData()
 		self.__our_color = self.__data["METADATA"]["getOurColor"]
@@ -58,7 +57,7 @@ class GoalsManager:
 
 		self.__Collision = Collision(self.__data["FLUSSMITTEL"], self.__data["TIBOT"], self.__data["BIGENEMYBOT"], self.__data["SMALLENEMYBOT"])
 		self.__goalsLib = GoalsLibrary(self.__robot_name, self.__data, self.__blocked_goals, self.__PathFinding)
-		self.__goalsChoice = GoalsChoice(self.__robot_name, self.__data, self.__goalsLib, self.__Collision, self.__our_color, self.__back_triangle_stack, self.__front_triangle_stack, self.__balles_lancees)
+		self.__goalsChoice = GoalsChoice(self.__robot_name, self.__data, self.__goalsLib, self.__Collision, self.__our_color, self.__back_triangle_stack, self.__front_triangle_stack, self.__available_goals, self.__finished_goals)
 
 		self.__tibot_ready_for_filet = False
 
@@ -117,7 +116,7 @@ class GoalsManager:
 
 			#On cherche l'elem goal le plus proche par bruteforce
 			if self.__available_goals:
-				best_goal = self.__goalsChoice.getBestGoal(self.__available_goals, self. __tibot_ready_for_filet) #best_goal type (path, goal, id_elem_goal)
+				best_goal = self.__goalsChoice.getBestGoal(self. __tibot_ready_for_filet) #best_goal type (path, goal, id_elem_goal)
 
 				if best_goal[1] != None:
 
@@ -161,11 +160,6 @@ class GoalsManager:
 				if objectif.getType() == "STORE_TRIANGLE":
 					self.__front_triangle_stack.clear()
 					self.__back_triangle_stack.clear()
-				# Gestion du nombre de balles de Tibot
-				elif objectif.getType() == "BALLES":
-					self.__balles_lancees[0] += objectif.getElemGoalLocked().getPoints()
-					if self.__balles_lancees[0] > 6:
-						self.__logger.error("On a lancé " + str(self.__balles_lancees[0]) + "(> 6) balles, c'pas normal !")
 
 				self.__logger.info(str(self.__robot_name)+" L'objectif "+str(objectif.getName())+" d'id "+str(objectif.getId())+" a terminé ses actions dynamiques")
 				self.__queueBestGoals()

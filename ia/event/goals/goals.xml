@@ -339,7 +339,7 @@
 	</goal>
 	<goal>
 		<id>11</id>
-		<name>BALLES GAUCHE</name>
+		<name>BALLES_GAUCHE</name>
 		<type>BALLES</type>
 		<concerned_robot>TIBOT</concerned_robot>
 		<x_objectif>800</x_objectif>
@@ -358,23 +358,11 @@
 				<script_only>False</script_only>
 				<id_script>5</id_script>
 			</elem_goal>
-			<elem_goal>
-				<id>1</id>
-				<x_elem>0</x_elem>
-				<y_elem>-160</y_elem>
-				<angle>-1.57</angle>
-				<points>2</points>
-				<priority>1</priority>
-				<duration>1</duration>
-				<color>NONE</color>
-				<script_only>False</script_only>
-				<id_script>6</id_script>
-			</elem_goal>
 		</elem_goals>
 	</goal>
 	<goal>
 		<id>12</id>
-		<name>BALLES DROITE</name>
+		<name>BALLES_DROITE</name>
 		<type>BALLES</type>
 		<concerned_robot>TIBOT</concerned_robot>
 		<x_objectif>2200</x_objectif>
@@ -392,18 +380,6 @@
 				<color>NONE</color>
 				<script_only>False</script_only>
 				<id_script>5</id_script>
-			</elem_goal>
-			<elem_goal>
-				<id>1</id>
-				<x_elem>0</x_elem>
-				<y_elem>-160</y_elem>
-				<angle>-1.57</angle>
-				<points>2</points>
-				<priority>1</priority>
-				<duration>1</duration>
-				<color>NONE</color>
-				<script_only>False</script_only>
-				<id_script>6</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>

@@ -12,7 +12,7 @@ from .navigation import *
 from .goalsLibrary import *
 
 class GoalsChoice:
-	def __init__(self, robot_name, data, goalsLib, Collision, our_color, back_triangle_stack, front_triangle_stack, balles_lancees):
+	def __init__(self, robot_name, data, goalsLib, Collision, our_color, back_triangle_stack, front_triangle_stack, available_goals, finished_goals):
 		self.__logger = logging.getLogger(__name__)
 
 		self.__robot_name = robot_name
@@ -20,6 +20,8 @@ class GoalsChoice:
 		self.__goalsLib = goalsLib
 		self.__Collision = Collision
 		self.__our_color = our_color
+		self.__available_goals = available_goals
+		self.__finished_goals = finished_goals
 
 		# Variables FLUSSMITTEL
 		self.__back_triangle_stack = back_triangle_stack
@@ -39,13 +41,13 @@ class GoalsChoice:
 			self.__prio_tibot_balles = {"BALLES GAUCHE": 2, "BALLES DROITE": 4}
 
 		# Variables TIBOT
-		self.__balles_lancees = balles_lancees
+		self.__balle_goal_already_swapped = False
 
-	def getBestGoal(self, goals, filet_locked=False):
+	def getBestGoal(self, filet_locked=False):
 		if self.__robot_name == "FLUSSMITTEL":
-			best_goal = self.__getBestGoalFlussmittel(goals)
+			best_goal = self.__getBestGoalFlussmittel()
 		elif self.__robot_name == "TIBOT":
-			best_goal = self.__getBestGoalTibot(goals, filet_locked)
+			best_goal = self.__getBestGoalTibot(filet_locked)
 		else:
 			self.__logger.info("Robot "+str(self.__robot_name)+" inconnu.")
 			best_goal = ([], None, None) #type (path, goal, id_elem_goal)
@@ -54,12 +56,12 @@ class GoalsChoice:
 
 	#FLUSSMITTEL
 
-	def __getBestGoalFlussmittel(self, goals):
+	def __getBestGoalFlussmittel(self):
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 		best_length = float("Inf")
 		position_last_goal = self.__goalsLib.getPositionLastGoal()
 		
-		for goal in goals:
+		for goal in self.__available_goals:
 			if len(self.__front_triangle_stack) >= MAX_FRONT_TRIANGLE_STACK:
 				if len(self.__front_triangle_stack) > MAX_FRONT_TRIANGLE_STACK:
 					self.__logger.error("On a stocké plus de triangle qu'on a de place")
@@ -84,14 +86,35 @@ class GoalsChoice:
 		return best_goal
 
 	#TIBOT
-	def __getBestGoalTibot(self, goals, filet_locked):
+	def __getBestGoalTibot(self, filet_locked):
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 		best_length = float("Inf")
 		best_goal_filet = ([], None, None)
 		best_length_filet = float("Inf")
 		position_last_goal = self.__goalsLib.getPositionLastGoal()
 
-		for goal in goals:
+		#Pour tirer toutes nos balles sur le même mamouth, même l'autre n'est pas dispo
+		if self.__balle_goal_already_swapped == False and self.__data["METADATA"]["getGameClock"] > 50000:
+			undo_goal = None
+			for goal in self.__available_goals:
+				if goal.getType() == "BALLES":
+					undo_goal = goal
+
+			already_done_goal = None
+			for goal in self.__finished_goals:
+				if goal.getType() == "BALLES":
+					already_done_goal = goal
+
+			if undo_goal is not None and already_done_goal is not None:
+				self.__available_goals.remove(undo_goal)
+				self.__finished_goals.append(undo_goal)
+				self.__finished_goals.remove(already_done_goal)
+				self.__available_goals.append(already_done_goal)
+				already_done_goal.resetElemAction()
+				self.__balle_goal_already_swapped = True
+
+
+		for goal in self.__available_goals:
 			nb_elem_goal = goal.getLenElemGoal()
 			for idd in range(nb_elem_goal):
 				path = self.__goalsLib.getOrderTrajectoire(goal, idd, position_last_goal)
@@ -109,13 +132,13 @@ class GoalsChoice:
 								best_goal_filet = (path, goal, idd)
 					else:
 						self.__logger.error("Le pathfinding nous a indiqué un chemin invalide goal "+str(goal.getName())+" elem_id "+str(idd)+"  path "+str(path))
-
-		#Si on est à plus de 80s de jeu, on force le choix du filet
-		if (best_goal[1] == None or self.__data["METADATA"]["getGameClock"] > 80000) and best_goal_filet[1] != None:
+		#Si on a pas d'action possible mis à part le filet
+		if best_goal[1] == None:
 			best_goal = best_goal_filet
 
-		#Si on a le temps de refaire un objectif avant le filet, on le fait
-		if filet_locked == True and self.__data["METADATA"]["getGameClock"] > 60000:
-			return ([], None, None)
+		#Si on est a plus de x secondes, on ne peut pas lock autre chose que le filet
+		if self.__data["METADATA"]["getGameClock"] > 75000:
+			best_goal = best_goal_filet
+
 
 		return best_goal
