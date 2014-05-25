@@ -34,3 +34,4 @@ config/visio_robot/*.avi
 supervisio/visio
 .idea/*
 /libs/cgal/CMakeLists.txt.bak
+config/visio/visio_robot/*.avi
