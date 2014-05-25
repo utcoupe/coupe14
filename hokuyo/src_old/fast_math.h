@@ -3,10 +3,10 @@
 
 #include "global.h"
 
-typedef struct Pt {
-	int x, y;
-} Pt_t;
-
+struct coord{
+	int x;
+	int y;
+};
 
 struct fastmathTrigo {
 	int n;
@@ -14,14 +14,13 @@ struct fastmathTrigo {
 };
 
 
-int dist_squared(Pt_t p1, Pt_t p2);
-int dist_to_edge(Pt_t p, int largeurX, int largeurY);
+int dist_squared(struct coord p1, struct coord p2);
+int dist_to_edge(struct coord p, int largeurX, int largeurY);
 
 
 struct fastmathTrigo initFastmath(int n, double *angles);
 void freeFastmath(struct fastmathTrigo s);
 
-double angle(Pt_t p1, Pt_t p2);
 double fastCos(struct fastmathTrigo f, int index);
 double fastSin(struct fastmathTrigo f, int index);
 double modTwoPi(double a);
