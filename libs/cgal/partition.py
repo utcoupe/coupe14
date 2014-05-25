@@ -105,13 +105,16 @@ class Partition:
 		self.p.stdin.flush()
 		self.p.stdout.flush()
 		str_n_polys = self.p.stdout.readline().decode("utf-8")
-		n_polys = int(str_n_polys)
-		#print("N_POLYS", n_polys)
-		result  = ""
-		for i in range(n_polys):
-			result += self.p.stdout.readline().decode("utf-8")
-			#print(result)
-		self.analyse_result(result)
+		if str_n_polys == "":
+			print("Erreur bizzare pathfinding")
+		else:
+			n_polys = int(str_n_polys)
+			#print("N_POLYS", n_polys)
+			result  = ""
+			for i in range(n_polys):
+				result += self.p.stdout.readline().decode("utf-8")
+				#print(result)
+			self.analyse_result(result)
 		
 	def analyse_result(self, result):
 		self.polygons = {}

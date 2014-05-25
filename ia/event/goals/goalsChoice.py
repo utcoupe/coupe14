@@ -41,6 +41,7 @@ class GoalsChoice:
 			self.__prio_tibot_balles = {"BALLES GAUCHE": 2, "BALLES DROITE": 4}
 
 		# Variables TIBOT
+		self.__balle_goal_already_swapped = False
 
 	def getBestGoal(self, filet_locked=False):
 		if self.__robot_name == "FLUSSMITTEL":
@@ -93,7 +94,7 @@ class GoalsChoice:
 		position_last_goal = self.__goalsLib.getPositionLastGoal()
 
 		#Pour tirer toutes nos balles sur le même mamouth, même l'autre n'est pas dispo
-		if self.__data["METADATA"]["getGameClock"] > 25000:
+		if self.__balle_goal_already_swapped == False and self.__data["METADATA"]["getGameClock"] > 50000:
 			undo_goal = None
 			for goal in self.__available_goals:
 				if goal.getType() == "BALLES":
@@ -109,6 +110,9 @@ class GoalsChoice:
 				self.__finished_goals.append(undo_goal)
 				self.__finished_goals.remove(already_done_goal)
 				self.__available_goals.append(already_done_goal)
+				already_done_goal.resetElemAction()
+				self.__balle_goal_already_swapped = True
+
 
 		for goal in self.__available_goals:
 			nb_elem_goal = goal.getLenElemGoal()
@@ -128,13 +132,13 @@ class GoalsChoice:
 								best_goal_filet = (path, goal, idd)
 					else:
 						self.__logger.error("Le pathfinding nous a indiqué un chemin invalide goal "+str(goal.getName())+" elem_id "+str(idd)+"  path "+str(path))
-
-		#Si on est à plus de 80s de jeu, on force le choix du filet
-		if (best_goal[1] == None or self.__data["METADATA"]["getGameClock"] > 80000) and best_goal_filet[1] != None:
+		#Si on a pas d'action possible mis à part le filet
+		if best_goal[1] == None:
 			best_goal = best_goal_filet
 
-		#Si on a le temps de refaire un objectif avant le filet, on le fait
-		if filet_locked == True and self.__data["METADATA"]["getGameClock"] > 65000:
-			return ([], None, None)
+		#Si on est a plus de x secondes, on ne peut pas lock autre chose que le filet
+		if self.__data["METADATA"]["getGameClock"] > 75000:
+			best_goal = best_goal_filet
+
 
 		return best_goal
