@@ -60,7 +60,7 @@
 		<id_script>4</id_script>
 		<orders>
 			<order>DYNAMIQUE_OVER</order>
-			<order>A_PWM 50 50 750</order>
+			<order>A_PWM 50 50 1500</order>
 			<order>A_PWM -50 -50 750</order>
 			<order>END</order>
 		</orders>
