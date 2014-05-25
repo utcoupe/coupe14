@@ -7,11 +7,13 @@
 
 //DIMENSIONS
 
-#define BRAS_OFFSET_DIST 124 //Distance in mm
-#define BRAS_OFFSET_ANGLE 5 //Angle offset in degrees
+#define BRAS_OFFSET_DIST 130 //Distance in mm
+#define BRAS_OFFSET_ANGLE -4 //Angle offset in degrees
 
-#define HAUTEUR_MAX 157 //En mm
-#define HAUTEUR_MIN 15 //en mm
+#define DECALAGE_VENT_AXE 35
+
+#define HAUTEUR_MAX 150 //En mm
+#define HAUTEUR_MIN 17 //en mm
 
 #define X_BRAS 128
 #define Y_BRAS 130
@@ -19,7 +21,7 @@
 //STEPPER
 
 #define PERIOD_STEPPER 200
-#define VMAX_STEPPER 300 
+#define VMAX_STEPPER 350 
 #define AMAX_STEPPER 30000 
 
 //SECU BRAS : en degree commande
@@ -30,7 +32,7 @@
 #define ANGLE_ANGLE_MAX 180 
 #define ANGLE_ANGLE_MIN 40
 #define ANGLE_INSIDE_ROBOT 110
-#define SECU_DELAY_REPLI_BRAS 200 //ms
+#define SECU_DELAY_REPLI_BRAS 100 //ms
 #define SECU_DELAY_ROT_BRAS 500 //ms
 
 //BRAS
@@ -41,24 +43,24 @@
 #define LONGUEUR_MIN BRAS_OFFSET_DIST
 #define MARGE_SECU_TOP 40 //En steps
 
-#define MARGE_DEPOT 80
-#define MARGE_PREHENSION 40
+#define MARGE_DEPOT 50
+#define MARGE_PREHENSION 20
 #define HAUTEUR_GARDE_DEPOT HAUTEUR_MIN + 10
 #define HAUTEUR_DEPOT_ARRIERE 130
 
 #define ANGLE_DEPOT (-(95.0/180.0)*M_PI)
 #define LONGUEUR_DEPOT LONGUEUR_MIN
 
-#define ANGLE_DEPOT_RET (-(145.0/180.0)*M_PI) 
+#define ANGLE_DEPOT_RET (-(105.0/180.0)*M_PI) 
 #define LONGUEUR_DEPOT_RET 205
 
 
 //PREHENSION
 
-#define DELAY_REPLI_BRAS_AVANT_POMPE 800
-#define DELAY_REPLI_BRAS_ARRIERE_POMPE 1200
+#define DELAY_REPLI_BRAS_AVANT_POMPE 700
+#define DELAY_REPLI_BRAS_ARRIERE_POMPE 1100
 #define DELAY_REPLI_BRAS2 100
-#define DELAY_STOP_PUMP 300
+#define DELAY_STOP_PUMP 100
 
 //DEPOT TRIANGLES
 
