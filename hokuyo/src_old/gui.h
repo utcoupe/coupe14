@@ -3,7 +3,7 @@
 
 #include "global.h"
 #include "fast_math.h"
-#include "utils.h"
+#include "robot.h"
 
 struct color {
 	int r, g, b;
@@ -13,9 +13,9 @@ struct color newColor(int r, int g, int b);
 
 void initSDL();
 void blitMap();
-void blitLidar(Pt_t positionLidar, struct color c);
-void blitRobots(Cluster_t *robots, int nRobots, struct color c);
-void blitPoints(Pt_t *points, int nPoints, struct color c);
+void blitLidar(struct coord positionLidar, struct color c);
+void blitRobots(struct robot *robots, int nRobots, struct color c);
+void blitPoints(struct coord *points, int nPoints, struct color c);
 void waitScreen();
 
 
