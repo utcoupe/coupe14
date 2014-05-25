@@ -14,10 +14,12 @@ class GraphView(View):
 		self.dynamic_obstacle = bots[1]
 		self.__liste_robots = bots #self_bot, other_bot, ennemy1, ennemy2
 		self.__liste_robots_simu = bots_simu #color, big_us, mini_us, big_ennemy, mini_ennemy
+		print("bots simu 1 : ",self.__liste_robots_simu[1].getPositionXY())
+		print("bots simu 2 : ",self.__liste_robots_simu[2].getPositionXY())
 		self.graph = graph
 
-		self.p_depart = (200,200)
-		self.p_arrive = (1500,1500)
+		self.p_depart = (200,1500)
+		self.p_arrive = (1500,1300)
 
 		self.draw_polygons(graph.getPolygons())
 
@@ -106,7 +108,7 @@ class GraphView(View):
 		Calcule un nouveau chemin à partir du point de départ et d'arrivée.
 		"""
 		start = time.time()
-		path = self.graph.getPath(self.p_depart,self.p_arrive, self.path_type)
+		path = self.graph.getPath(self.p_depart,self.p_arrive,enable_smooth=True)#self.path_type
 		difference = (time.time() - start)
 		self.sum_calc_times += difference
 		self.nb_calc_times += 1
@@ -136,7 +138,7 @@ class GraphView(View):
 		"""
 		self.remove()
 		self.draw_polygons(self.graph.getPolygons())
-		#self.calc_path()
+		self.calc_path()
 
 	def __updateNavGraph(self):
 		"""
@@ -152,6 +154,6 @@ class GraphView(View):
 		#mini_ennemy
 		self.__liste_robots[3]["getPosition"] = self.__liste_robots_simu[4].getPositionXY()
 		#actualisation du graph
-		self.graph.update(self.self_bot)
+		self.graph.update()
 		#on dessine
 		self.__updateView()

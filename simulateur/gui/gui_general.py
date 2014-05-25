@@ -89,7 +89,10 @@ class general(Frame):
 
 	def __startViz(self):
 		threading.Thread(target=nav.startVizNavGraph,args=(self.__bots,BIG)).start()
-		threading.Thread(target=nav.startVizNavGraph,args=(self.__bots,MINI)).start()
+		threading.Thread(target=nav.startVizNavGraph,args=(self.__switchBots(self.__bots),MINI)).start()
+
+	def __switchBots(self, bots):
+		return bots[0], bots[2], bots[1], bots[3], bots[4]
 
 	def boutons(self):
 		"""
