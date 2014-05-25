@@ -36,8 +36,8 @@
 #define DUREE_CYCLE 5 //période de calcul, en ms
 #define FREQ (1/(DUREE_CYCLE/1000.0))
 
-#define ACC_MAX 1000 //consigne*s-2
-#define RATIO_SPD_ROT_MAX 1 
+#define ACC_MAX 500 //consigne*s-2
+#define RATIO_SPD_ROT_MAX 0.8
 
 /* CONSIGNE OFFSET
  * DEVRAIT ETRE A 0
@@ -61,9 +61,9 @@
 
 #define ENC_RESOLUTION 1024 //resolution du codeur
 
-#define ENC_LEFT_RADIUS 36.1 //REGLE PAR TEST - rayon de la roue codeuse
-#define ENC_RIGHT_RADIUS 36.0 //REGLE PAR TEST - rayon de la roue codeuse
-#define ENTRAXE_ENC 323.3 //REGLE PAR TES - Distance entre chaque roue codeuse en mm
+#define ENC_LEFT_RADIUS 36.15 //REGLE PAR TEST - rayon de la roue codeuse
+#define ENC_RIGHT_RADIUS 36.15 //REGLE PAR TEST - rayon de la roue codeuse
+#define ENTRAXE_ENC 323.1 //REGLE PAR TES - Distance entre chaque roue codeuse en mm
 
 #define ERROR_ANGLE 0.02 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
 #define ERROR_ANGLE_TO_GO 0.1 //erreur en angle(radians) maximale avant de partir en cas de GOTO
