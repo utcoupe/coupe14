@@ -163,10 +163,11 @@ class BigRobot(robot.Robot):
 		"""
 		Calcule la position où éjecter le triangle devant le robot
 		"""
-		xBot = self.body.position[0]
-		yBot = self.body.position[1]
+		xBot = mm_to_px(self.getXreal())
+		yBot = mm_to_px(2000 - self.getYreal())
 		aBot = self.body.angle
 		dist_feu_robot = mm_to_px(math.sqrt(xFeu*xFeu + yFeu*yFeu))
 		xPosFeu = (int)(xBot + math.ceil(dist_feu_robot*math.cos(aBot)))
 		yPosFeu = (int)(yBot + math.ceil(dist_feu_robot*math.sin(aBot)))
+		#print("__computePositionTriangleAvant : ",px_to_mm(xPosFeu),2000-px_to_mm(yPosFeu),self.body.angle)
 		return xPosFeu,yPosFeu

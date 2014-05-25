@@ -512,8 +512,8 @@
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x_elem>430</x_elem>
-				<y_elem>310</y_elem>
+				<x_elem>430</x_elem> <!-- 430 -->
+				<y_elem>290</y_elem> <!-- 310 -->
 				<angle>-3.14</angle>
 				<points>0</points>
 				<priority>1</priority>

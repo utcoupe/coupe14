@@ -81,19 +81,31 @@ class Robot(EngineObjectPoly):
 		"""
 		Renvoie la position x réelle du robot (pas celle simulée)
 		"""
-		return px_to_mm(self.body.position[0])
+		if self.__typerobot == BIG:
+			return math.ceil(px_to_mm(self.body.position[0]) - abs(HEIGHT_GROS/2-170)*math.cos(self.body.angle))
+		else:
+			return px_to_mm(self.body.position[0])
 	
 	def getYreal(self):
 		"""
 		Renvoie la position y réelle du robot (pas celle simulée)
 		"""
-		return 2000 - px_to_mm(self.body.position[1])
+		if self.__typerobot == BIG:
+			return 2000 - math.ceil(px_to_mm(self.body.position[1]) - abs(HEIGHT_GROS/2-170)*math.sin(self.body.angle))
+		else:
+			return 2000 - px_to_mm(self.body.position[1])
 	
 	def getAreal(self):
 		"""
 		Renvoie l'angle a réel du robot (pas celle simulée)
 		"""
 		return - self.body.angle
+
+	def getAsimu(self):
+		"""
+		Renvoie l'angle a simulé du robot
+		"""
+		return self.body.angle
 
 	def setXsimu(self, x):
 		"""
