@@ -28,9 +28,9 @@ class Collision:
 
 		#on etablit la liste des robots autres que celui pour lequel on calcule la trajectoire
 		robot_list = [self.__big_enemy_bot, self.__small_enemy_bot]
-		if robot_name == "FLUSSMITTEL" and self.__tibot != {}:
+		if robot_name == "FLUSSMITTEL" and self.__tibot is not None:
 			robot_list.insert(0, self.__tibot)
-		elif robot_name == "TIBOT" and self.__flussmittel != {}:
+		elif robot_name == "TIBOT" and self.__flussmittel is not None:
 			robot_list.insert(0, self.__flussmittel)
 
 		traj = path

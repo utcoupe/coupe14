@@ -26,6 +26,7 @@ class TimeManager():
 
 	def startMatch(self):
 		self.__date_match_begin = int(time.time()*1000.0)
+		self.__logger.info("On commence le match !")
 
 		#Pendant le match
 		date_actuel = int(time.time()*1000.0)
