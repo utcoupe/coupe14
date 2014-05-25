@@ -429,7 +429,7 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 			case 1:
 				//ouvrir bras, descendre asc
 				cmdBrasServ(a, l);
-				time_end = timeMicros() + (long)(SECU_DELAY_ROT_BRAS+SECU_DELAY_REPLI_BRAS)*1000;
+				time_end = timeMicros() + (long)(SECU_DELAY_ROT_BRAS)*1000;
 				step++;
 				break;
 			case 2:
@@ -467,7 +467,7 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 				}
 				else {
 					cmdBrasServ(ANGLE_DEPOT_RET, LONGUEUR_DEPOT_RET);
-					time_end = timeMicros() + (long)(DELAY_REPLI_BRAS_ARRIERE_POMPE+SECU_DELAY_ROT_BRAS)*1000;
+					time_end = timeMicros() + (long)(DELAY_REPLI_BRAS_ARRIERE_POMPE)*1000;
 				}
 				step++;
 				break;
@@ -516,8 +516,9 @@ void cmdAsc(int h) { //h en mm
 void cmdBrasServ(double a, int l) {
 	call_critical = false;
 	//COMMANDE
-	int d = (l - BRAS_OFFSET_DIST)/ 10.0;
-	double alpha = -1.97e-2*pow(d,4) + 2.87e-1*pow(d,3) - 1.15*pow(d,2) - 5.25*d + 150; //regression polynomiale
+	int d = (l - BRAS_OFFSET_DIST);
+	double alpha = 7.36e-8*pow(d,4) - 1.51e-4*pow(d,3) + 1.75e-2*pow(d,2) - 1.03*d + 144; //regression polynomiale
+	a += atan2(DECALAGE_VENT_AXE, l);
 	int theta = ANGLE_ANGLE_MAX + (a*180.0/M_PI + BRAS_OFFSET_ANGLE);
 
 	//TESTS SECU
