@@ -52,6 +52,7 @@ void updateJackState() {
 }
 
 void initPins(){
+	pinMode(PIN_JACK, INPUT_PULLUP);
 	pinMode(PIN_DEBUG_LED, OUTPUT);//led debug
 	digitalWrite(PIN_DEBUG_LED, HIGH);
 	//RETOURNEMENT
