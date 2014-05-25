@@ -26,19 +26,36 @@ class GoalsChoice:
 		# Variables FLUSSMITTEL
 		self.__back_triangle_stack = back_triangle_stack
 		self.__front_triangle_stack = front_triangle_stack
-		"""
-		self.__ZONE_DEPOT_CENTRALE_VIDE = 0
-		self.__ZONE_DEPOT_GAUCHE_VIDE = 0
-		self.__ZONE_DEPOT_DROITE_VIDE = 0
-		"""
+
+		# state zone
+		self.__ZONE_LIBRE = 0 # Aucun triangle à priori => à remplir
+		self.__ZONE_SECURISEE = 1 # Sécurisé par FM => good
+		self.__ZONE_ENNEMI = 2 # Présence de triangles ennemis => les virer
+		self.__state_zone = {"ZONE_CENTRALE": self.__ZONE_LIBRE, "ZONE_GAUCHE": self.__ZONE_LIBRE, "ZONE_DROITE": self.__ZONE_LIBRE}
 
 		# Priorité
+		if ENNEMI_CAN_CLEAN_ZONE: # Cas 'normal'
+			if self.__our_color == "RED":
+				self.__prio_FM_zones = ["ZONE_GAUCHE", "ZONE_DROITE", "ZONE_CENTRALE"]
+			else: # YELLOW
+				self.__prio_FM_zones = ["ZONE_DROITE", "ZONE_GAUCHE", "ZONE_CENTRALE"]
+		else:
+			self.__prio_FM_zones = ["ZONE_CENTRALE", "ZONE_DROITE", "ZONE_GAUCHE"]
+		if self.__our_color == "RED":
+			self.__prio_FM_zone_triangles = {"ZONE_CENTRALE": [17,7,6,5,4,18,1], "ZONE_GAUCHE": [8,17,9,7], "ZONE_DROITE": [5,4,18,3]}
+		else:
+			self.__prio_FM_zone_triangles = {"ZONE_CENTRALE": [18,4,5,6,7,17,0], "ZONE_GAUCHE": [3,18,2,4], "ZONE_DROITE": [6,7,17,8]}
+
+
+		"""
+		### A priori inutile pour Tibot
 		if self.__our_color == "RED":
 			self.__prio_tibot_goals = ["Fresque", "BALLES GAUCHE", "BALLES DROITE", "TIR_FILET"] # goal.name
 			self.__prio_tibot_balles = {"BALLES GAUCHE": 4, "BALLES DROITE": 2} # elem_goal.points
 		else: # Yellow, idem qu'au dessus pour les variables
 			self.__prio_tibot_goals = ["Fresque", "BALLES DROITE", "BALLES GAUCHE", "TIR_FILET"]
 			self.__prio_tibot_balles = {"BALLES GAUCHE": 2, "BALLES DROITE": 4}
+		"""
 
 		# Variables TIBOT
 		self.__balle_goal_already_swapped = False
@@ -55,7 +72,6 @@ class GoalsChoice:
 		return best_goal
 
 	#FLUSSMITTEL
-
 	def __getBestGoalFlussmittel(self):
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 		best_length = float("Inf")
@@ -86,6 +102,16 @@ class GoalsChoice:
 		return best_goal
 
 	#TIBOT
+	"""
+		goals_by_name = {}
+		
+		for goal in goals:
+			goals_by_name[goal.getName()] = goal
+
+		for prio_name in self.__prio_tibot_goals:
+			if goals_by_name[prio_name]:
+				goal = goals_by_name[prio_name]
+	"""
 	def __getBestGoalTibot(self, filet_locked):
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 		best_length = float("Inf")
