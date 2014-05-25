@@ -371,48 +371,39 @@ class GoalsManager:
 
 				else:
 					if TEST_MODE == False:
-						limite_essai_viso = 10
-						triangle_find = False
-						triangle_list = []
-						while limite_essai_viso != 0 and triangle_find == False:
+						limite_essai_viso = NB_VISIO_TRY
+						list_of_triangle_list = []
+						triangle_list_temp = []
+						while limite_essai_viso > 0 and len(list_of_triangle_list) < NB_VISIO_DATA_NEEDED:
 							limite_essai_viso -= 1
 							self.__vision.update()
-							triangle_list = self.__vision.getTriangles()
-							if triangle_list != []:
-								triangle_find = True
-								break
-					else:
-						triangle_find = True
+							triangle_list_temp = self.__vision.getTriangles()
+							if triangle_list_temp != []:
+								triangle_list_multiple.append(triangle_list_temp)
 
-					if triangle_find == False:
-						self.__logger.warning("On a pas vu de triangle à la position attendu, dont on va supprimer l'objectif "+str(id_objectif))
-						self.__last_camera_color = None
-						self.__deleteGoal(objectif)
-					else:
-						if TEST_MODE == False:
-							min_distance = float("inf")
-							min_id = None
-							for i, triangle in enumerate(triangle_list):
-								distance = sqrt((triangle.coord[0]-220)**2 + (triangle.coord[1])**2)
-								if distance < min_distance:
-									min_distance = distance
-									min_id = i
-							triangle = triangle_list[i] 
-							data_camera = (triangle.color, triangle.coord[0], triangle.coord[1]) #type (color, x, y)
+						if len(list_of_triangle_list) >= NB_VISIO_DATA_NEEDED:
+							data_camera = self.__getBestDataTriangleOfList(list_of_triangle_list)
 						else:
-							# Coordonées du triangle par rapport au centre du robot
-							# sera corrigé par l'algo lors de la prise du premier triangle normalement
-							temp = (220, -100)
-							# Correction x y
-							temp_x = temp[0] + self.__hack_camera_simu_x
-							temp_y = temp[1] + self.__hack_camera_simu_y
-							# Rotation du robot
-							temp_x_rot = temp_x * cos(self.__hack_camera_simu_angle) - temp_y * sin(self.__hack_camera_simu_angle)
-							temp_y_rot = temp_x * sin(self.__hack_camera_simu_angle) + temp_y * cos(self.__hack_camera_simu_angle)
-							
-							data_camera = ("RED", temp_x_rot, temp_y_rot)
+							self.__logger.warning("On a pas vu de triangle à la position attendu, list_of_triangle_list "+str(list_of_triangle_list)+" dont on va supprimer l'objectif "+str(id_objectif))
+							self.__last_camera_color = None
+							self.__deleteGoal(objectif)
+							data_camera = None
+
+					else:
+						# Coordonées du triangle par rapport au centre du robot
+						# sera corrigé par l'algo lors de la prise du premier triangle normalement
+						temp = (220, -100)
+						# Correction x y
+						temp_x = temp[0] + self.__hack_camera_simu_x
+						temp_y = temp[1] + self.__hack_camera_simu_y
+						# Rotation du robot
+						temp_x_rot = temp_x * cos(self.__hack_camera_simu_angle) - temp_y * sin(self.__hack_camera_simu_angle)
+						temp_y_rot = temp_x * sin(self.__hack_camera_simu_angle) + temp_y * cos(self.__hack_camera_simu_angle)
+						
+						data_camera = ("RED", temp_x_rot, temp_y_rot)
 
 
+					if data_camera is not None:
 						self.__last_camera_color = data_camera[0]
 						#si on a la possibilité de le stocker
 						if len(self.__front_triangle_stack)  >= MAX_FRONT_TRIANGLE_STACK:
@@ -475,6 +466,41 @@ class GoalsManager:
 				objectif.removeFirstElemAction()
 		else:
 			self.__logger.warning("Pb, Il y a un STEP_OVER directement suivit d'un END ?")
+
+
+	def __getBestDataTriangleOfList(self, list_of_triangle_list):
+		#On prend le meilleur de chaque listes
+		list_of_best_triangle = []
+		for triangle_list in list_of_triangle_list:
+			min_distance = float("inf")
+			min_id = None
+			for i, triangle in enumerate(triangle_list):
+				distance = sqrt((triangle.coord[0]-220)**2 + (triangle.coord[1])**2)
+				if distance < min_distance:
+					min_distance = distance
+					min_id = i
+			list_of_best_triangle.append(triangle_list[min_id])
+
+		#On les comparent les un aux autres et on prend le plus proche des autres
+		min_distance = float("inf")
+		min_id = None
+		for triangle in list_of_best_triangle:
+			min_distance_temp = float("inf")
+			min_id_temp = None
+			for i, triangle_temp in enumerate(list_of_best_triangle):
+				distance = sqrt((triangle_temp.coord[0] - triangle.coord[0])**2 + (triangle_temp.coord[1] - triangle.coord[1])**2)
+				if min_id is not None and list_of_best_triangle[min_id].color != triangle_temp.color:
+					distance += 300 #valeur arbitraire pour les séparer
+				if distance < min_distance_temp:
+					min_distance_temp = distance
+					min_id_temp = i
+
+			if min_distance_temp < min_distance:
+				min_distance = min_distance_temp
+				min_id = min_id_temp
+
+		triangle_choisi = list_of_best_triangle[min_id]
+		return (triangle_choisi.color, triangle_choisi.coord[0], triangle_choisi.coord[1]) #type (color, x, y)
 
 	def __positionReady(self, x, y):
 		x2 = x - CENTRE_BRAS_X
