@@ -26,6 +26,7 @@ void setup(){
 
 	initServos();
 	initSize();
+	PDEBUGLN("WAITING FOR INIT");
 	protocol_blocking_reset();
 	PDEBUGLN("INIT DONE");
 }

@@ -250,7 +250,7 @@ void protocol_blocking_reset() {
 		long t = timeMillis();
 		if (!init_done && (t - last_send > 1000)) {
 			last_send = t;
-			serial_send(RESET | LOCAL_ADDR);
+			serial_send(RESET | (0x0F & LOCAL_ADDR));
 		}
 	}
 }
@@ -260,8 +260,7 @@ void protocol_send_reset(){
 	long t = timeMillis();
 	if (t - last_send > 1000) {
 		last_send = t;
-		serial_send(RESET | LOCAL_ADDR);
-		init_done = false; //On a dmeande un reste, on est plus initialisé
+		serial_send(RESET | (0x0F & LOCAL_ADDR));
 	}
 }
 
