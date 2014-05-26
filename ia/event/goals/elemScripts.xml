@@ -1,24 +1,11 @@
 <?xml version="1.0" ?><!--Ce fichier ne doit pas contenir de A_GOTO, remplacez les par des A_GOTO_SCRIPT pour bypasser les tests de collisions-->
 <elemScripts>
-	<elemScript><!--script récupèration triangle rouge avec mur-->
+	<elemScript><!--script récupèration triangle avec mur-->
 		<id_script>0</id_script>
 		<orders>
 			<order>O_BRAS_OUVRIR_HAUT</order>
 			<order>THEN</order>
-			<order>O_BRAS_FERMER</order>
-			<order>THEN</order>
-			<order>SLEEP 1000</order>
-			<order>STEP_OVER</order>
-			<order>GET_TRIANGLE_IA</order>
-			<order>DYNAMIQUE_OVER</order>
-			<order>STORE_TRIANGLE_IA</order>
-			<order>END</order>
-		</orders>
-	</elemScript>
-	<elemScript><!--script récupèration triangle jaune avec mur -->
-		<id_script>1</id_script>
-		<orders>
-			<order>O_BRAS_OUVRIR_HAUT</order>
+			<order>A_PWM -100 -100 300</order>
 			<order>THEN</order>
 			<order>O_BRAS_FERMER</order>
 			<order>THEN</order>
