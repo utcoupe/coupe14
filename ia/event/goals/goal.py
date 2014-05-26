@@ -15,10 +15,11 @@ class Goal:
 		self.__concerned_robot 	= concerned_robot
 		self.__x 				= x
 		self.__y 				= y
-		self.__finished			= 0 # From 0 (not finished) to 100 (finished)
+		self.__already_done		= 0 # From 0 (not finished) to 100 (finished)
 
 		self.__elem_goal = []
 		self.__elem_goal_locked = None
+		self.__area_status = "EMPTY" #type "EMPTY", "FULL", "ENEMY"
 
 	def getId(self):
 		return self.__id
@@ -41,14 +42,21 @@ class Goal:
 	def getElemGoalLocked(self):
 		return self.__elem_goal_locked
 
+	def getAreaStatus(self):
+		return self.__area_status
+
+	def setAreaStatus(self, status):
+		if status in ("EMPTY", "FULL", "ENEMY"):
+			self.__area_status = status
+		else:
+			self.__logger.error("Status impossible status, "+str(status))
+
 	def setElemGoalLocked(self, elem_goal):
 		self.__elem_goal_locked = elem_goal
 
-	def incrementFinished(self, by_value):
-		self.__finished += int(by_value)
 
 	def isFinished(self):
-		return (self.__finished > FINISHED_THRESHOLD)
+		return (self.__already_done > FINISHED_THRESHOLD)
 
 	def appendElemGoal(self, ElemGoal):
 		self.__elem_goal.append(ElemGoal)
@@ -81,13 +89,3 @@ class Goal:
 	def resetElemAction(self):
 		for elem in self.__elem_goal:
 			elem.reset_elem_action()
-
-
-	"""def toXml(self):
-		string =  "<goal name='" + self.__name + "'>\n\t<type>" + self.__type + "</type>\n"
-		string += "\t<location-x>" + str(self.__location[0]) +"</location-x>\n\t<location-y>" + str(self.__location[1]) +"</location-y>\n"
-		string += "\t<finished>" + str(self.__finished) + "</finished>\n\t<executions>\n\t"
-		for execution in self.executions:
-			string += execution.toXml()
-		string += "\t</executions>\n</goal>\n"
-		return string"""

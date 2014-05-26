@@ -67,39 +67,6 @@ class GoalsManager:
 			self.__hack_camera_simu_x = 0
 			self.__hack_camera_simu_y = 0
 
-		#Permet de faire une symétrie pour les ordres dans le cas où on commence en jaune
-		self.__reverse_table = {}
-		self.__reverse_table[(0,0)] = (1,1)
-		self.__reverse_table[(1,1)] = (0,0)
-		self.__reverse_table[(0,1)] = (1,0)
-		self.__reverse_table[(1,0)] = (0,1)
-
-		self.__reverse_table[(9,0)] = (2,0)
-		self.__reverse_table[(2,0)] = (9,0)
-
-		self.__reverse_table[(8,0)] = (3,0)
-		self.__reverse_table[(3,0)] = (8,0)
-		self.__reverse_table[(8,1)] = (3,1)
-		self.__reverse_table[(3,1)] = (8,1)
-
-		self.__reverse_table[(7,0)] = (4,1)
-		self.__reverse_table[(4,1)] = (7,0)
-		self.__reverse_table[(7,1)] = (4,0)
-		self.__reverse_table[(4,0)] = (7,1)
-
-		self.__reverse_table[(6,0)]=(5,0)
-		self.__reverse_table[(5,0)]=(6,0)
-
-		self.__reverse_table[(10,0)]=(10,1)
-
-		self.__reverse_table[(11,0)]=(12,0)
-		self.__reverse_table[(11,1)]=(12,1)
-		self.__reverse_table[(12,0)]=(11,0)
-		self.__reverse_table[(12,1)]=(11,1)
-
-		self.__reverse_table[(13,0)]=(13,1)
-		self.__reverse_table[(13,1)]=(13,0)
-
 		if self.__robot_name == "FLUSSMITTEL" and TEST_MODE == False:
 			self.__vision = Visio('../supervisio/visio', 0, '../config/visio/visio_robot/', self.__data["FLUSSMITTEL"], True)
 			self.__last_camera_color = None
@@ -679,7 +646,7 @@ class GoalsManager:
 			position_depart_speciale = None
 			#Inversion du script
 			if self.__our_color == "YELLOW":
-				id_objectif, elem_goal_id = self.__reverse_table[(id_objectif, elem_goal_id)]
+				id_objectif, elem_goal_id = self.__goalsLib.reverseGoalId(id_objectif, elem_goal_id)
 			prev_action = deque()
 			for raw_prev_action in xml_goal.getElementsByTagName('prev_action'):
 				raw_order = raw_prev_action.childNodes[0].nodeValue.split()

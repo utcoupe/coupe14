@@ -534,8 +534,8 @@
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x_elem>235</x_elem>
-				<y_elem>235</y_elem>
+				<x_elem>240</x_elem>
+				<y_elem>240</y_elem>
 				<angle>3.5</angle> <!-- old : 3.927 -->
 				<points>3</points>
 				<priority>1</priority>
@@ -546,8 +546,8 @@
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
-				<x_elem>235</x_elem>
-				<y_elem>-235</y_elem>
+				<x_elem>240</x_elem>
+				<y_elem>-240</y_elem>
 				<angle>2.2</angle>
 				<points>3</points>
 				<priority>1</priority>
@@ -558,8 +558,8 @@
 			</elem_goal>
 			<elem_goal>
 				<id>2</id>
-				<x_elem>-235</x_elem>
-				<y_elem>-235</y_elem>
+				<x_elem>-240</x_elem>
+				<y_elem>-240</y_elem>
 				<angle>0.685</angle>
 				<points>3</points>
 				<priority>1</priority>
@@ -569,9 +569,9 @@
 				<id_script>9</id_script>
 			</elem_goal>
 			<elem_goal>
-				<id>4</id>
-				<x_elem>-235</x_elem>
-				<y_elem>235</y_elem>
+				<id>3</id>
+				<x_elem>-240</x_elem>
+				<y_elem>240</y_elem>
 				<angle>-1.05</angle>
 				<points>3</points>
 				<priority>1</priority>
@@ -593,8 +593,8 @@
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x_elem>235</x_elem>
-				<y_elem>235</y_elem>
+				<x_elem>240</x_elem>
+				<y_elem>240</y_elem>
 				<angle>3.5</angle>
 				<points>3</points>
 				<priority>1</priority>
@@ -605,8 +605,8 @@
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
-				<x_elem>235</x_elem>
-				<y_elem>-235</y_elem>
+				<x_elem>240</x_elem>
+				<y_elem>-240</y_elem>
 				<angle>2.2</angle> <!-- old : 2.356 -->
 				<points>3</points>
 				<priority>1</priority>
@@ -617,8 +617,8 @@
 			</elem_goal>
 			<elem_goal>
 				<id>2</id>
-				<x_elem>-235</x_elem>
-				<y_elem>-235</y_elem>
+				<x_elem>-240</x_elem>
+				<y_elem>-240</y_elem>
 				<angle>0.685</angle>
 				<points>3</points>
 				<priority>1</priority>
@@ -628,9 +628,9 @@
 				<id_script>9</id_script>
 			</elem_goal>
 			<elem_goal>
-				<id>4</id>
-				<x_elem>-235</x_elem>
-				<y_elem>235</y_elem>
+				<id>3</id>
+				<x_elem>-240</x_elem>
+				<y_elem>240</y_elem>
 				<angle>-1.05</angle>
 				<points>3</points>
 				<priority>1</priority>

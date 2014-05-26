@@ -11,9 +11,10 @@ TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux
 
 
 #====================Enable====================
-ENABLE_TOURELLE =		False
+ENABLE_TOURELLE =		True
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
-ENABLE_TIBOT =			False
+ENABLE_TIBOT =			True
+
 
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
@@ -101,7 +102,8 @@ HAUTEUR_TRIANGLE = 30
 MARGE_DROP_TRIANGLE = 0
 HAUTEUR_TORCHE = 36
 # TODO mesures avec précision
-# Marges 20mm, 5°
+# Attention, prendre en compte le fait que la ventous est décalée par rapport à la glissière (il faut décaler angle_min et angle_max, ça devrait suffire)
+# Marges 20mm, 5° (à tester expérimentalement)
 ANGLE_MIN = math.radians(-70)
 ANGLE_MAX = math.radians(0)
 OUVERTURE_BRAS_MIN = 125
@@ -112,6 +114,8 @@ CENTRE_BRAS_X = 128
 CENTRE_BRAS_Y = 130
 NB_VISIO_TRY = 10
 NB_VISIO_DATA_NEEDED = 3
+# Choix d'objectif
+ENNEMI_CAN_CLEAN_ZONE = True
 
 #====================TIBOT====================
 START_POSITION_RED_TIBOT = (193, 1542, -0.42203)
