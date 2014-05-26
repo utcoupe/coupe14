@@ -32,6 +32,7 @@ class GoalsChoice:
 		self.__ZONE_SECURISEE = 1 # Sécurisé par FM => good
 		self.__ZONE_ENNEMI = 2 # Présence de triangles ennemis => les virer
 		self.__state_zone = {"ZONE_CENTRALE": self.__ZONE_LIBRE, "ZONE_GAUCHE": self.__ZONE_LIBRE, "ZONE_DROITE": self.__ZONE_LIBRE}
+		self.__TIME_PHASE = {"1": 50, "2": 75, "3": 90}
 
 		# Priorité
 		if ENNEMI_CAN_CLEAN_ZONE: # Cas 'normal'
@@ -41,14 +42,15 @@ class GoalsChoice:
 				self.__prio_FM_zones = ["ZONE_DROITE", "ZONE_GAUCHE", "ZONE_CENTRALE"]
 		else:
 			self.__prio_FM_zones = ["ZONE_CENTRALE", "ZONE_DROITE", "ZONE_GAUCHE"]
+
 		if self.__our_color == "RED":
-			self.__prio_FM_zone_triangles = {"ZONE_CENTRALE": [17,7,6,5,4,18,1], "ZONE_GAUCHE": [8,17,9,7], "ZONE_DROITE": [5,4,18,3]}
-		else:
-			self.__prio_FM_zone_triangles = {"ZONE_CENTRALE": [18,4,5,6,7,17,0], "ZONE_GAUCHE": [3,18,2,4], "ZONE_DROITE": [6,7,17,8]}
+			self.__prio_FM_zone_triangles = {"ZONE_CENTRALE": [17,7,6,5,4,18,1], "ZONE_GAUCHE": [8,17,9,7,5], "ZONE_DROITE": [7,5,4,18,3]}
+		else: # YELLOW
+			self.__prio_FM_zone_triangles = {"ZONE_CENTRALE": [18,4,5,6,7,17,0], "ZONE_GAUCHE": [4,6,7,17,8], "ZONE_DROITE": [3,18,2,4,6]}
 
 
 		"""
-		### A priori inutile pour Tibot
+		### A priori inutile pour Tibot, ou alors trier les goals par priorité et non choisir au plus proche, à discuter
 		if self.__our_color == "RED":
 			self.__prio_tibot_goals = ["Fresque", "BALLES GAUCHE", "BALLES DROITE", "TIR_FILET"] # goal.name
 			self.__prio_tibot_balles = {"BALLES GAUCHE": 4, "BALLES DROITE": 2} # elem_goal.points
@@ -71,13 +73,29 @@ class GoalsChoice:
 
 		return best_goal
 
+	def __getTimeSec(self):
+		return self.__data["METADATA"]["getGameClock"] / 1000
+
 	#FLUSSMITTEL
 	def __getBestGoalFlussmittel(self):
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
-		best_length = float("Inf")
-		position_last_goal = self.__goalsLib.getPositionLastGoal()
-		
-		for goal in self.__available_goals:
+
+		"""
+		### Phase 1 : Sécurisation des zones (avec priorité)
+		best_zone = None
+		if self.__getTimeSec() <= self.__TIME_PHASE["1"]:
+			for zone in self.__prio_FM_zones:
+				if self.__state_zone[zone] == self.__ZONE_LIBRE:
+					best_zone = zone
+					break
+		### Phase 2 : Max de triangles (du bon côté sans se soucier des zones)
+		if (self.__getTimeSec() > self.__TIME_PHASE["1"] and self.__getTimeSec() <= self.__TIME_PHASE["2"]) or (self.__getTimeSec() <= self.__TIME_PHASE["1"] and best_zone is None):
+		### Phase 3 : Zero triangle inside !
+		"""
+
+		goals = self.__getGoalsByNorm(self.__available_goals)
+		for goal in goals:
+			
 			if len(self.__front_triangle_stack) >= MAX_FRONT_TRIANGLE_STACK:
 				if len(self.__front_triangle_stack) > MAX_FRONT_TRIANGLE_STACK:
 					self.__logger.error("On a stocké plus de triangle qu'on a de place")
@@ -87,31 +105,40 @@ class GoalsChoice:
 			else:
 				if goal.getType() == "STORE_TRIANGLE":
 					continue
-			nb_elem_goal = goal.getLenElemGoal()
-			for idd in range(nb_elem_goal):
-				path = self.__goalsLib.getOrderTrajectoire(goal, idd, position_last_goal)
-				if path != []:
-					if self.__Collision.isCollisionFromGoalsManager("FLUSSMITTEL", path):
-						length = self.__goalsLib.pathLen(path)
-						if length < best_length:
-							best_length = length
-							best_goal = (path, goal, idd)
-					else:
-						self.__logger.error("Le pathfinding nous a indiqué un chemin invalide goal "+str(goal.getName())+" elem_id "+str(idd)+"  path "+str(path))
+
+			best_elem_goal = self.__getBestElemGoal(goal)
+			# Bug ? TORCHE jamais appelé car pathfinding impossible car point d'entrée dans la torche (obstacle)
+			if best_elem_goal is not None:
+				best_goal = best_elem_goal
+				break
 
 		return best_goal
 
-	#TIBOT
-	"""
-		goals_by_name = {}
-		
-		for goal in goals:
-			goals_by_name[goal.getName()] = goal
+	def __getGoalsByNorm(self, goals):
+		position_last_goal = self.__goalsLib.getPositionLastGoal()
+		def dist(goal):
+			return hypot(goal.getPosition()[0] - position_last_goal[0], goal.getPosition()[1] - position_last_goal[1])
+		return sorted(goals, key=dist)
 
-		for prio_name in self.__prio_tibot_goals:
-			if goals_by_name[prio_name]:
-				goal = goals_by_name[prio_name]
-	"""
+	def __getBestElemGoal(self, goal):
+		best_elem_goal = None
+		best_length = float("Inf")
+		position_last_goal = self.__goalsLib.getPositionLastGoal()
+
+		nb_elem_goal = goal.getLenElemGoal()
+		for idd in range(nb_elem_goal):
+			path = self.__goalsLib.getOrderTrajectoire(goal, idd, position_last_goal)
+			if path != []:
+				if self.__Collision.isCollisionFromGoalsManager(self.__robot_name, path):
+					length = self.__goalsLib.pathLen(path)
+					if length < best_length:
+						best_length = length
+						best_elem_goal = (path, goal, idd)
+				else:
+					self.__logger.error("Le pathfinding nous a indiqué un chemin invalide goal "+str(goal.getName())+" elem_id "+str(idd)+"  path "+str(path))
+		return best_elem_goal
+
+	#TIBOT
 	def __getBestGoalTibot(self, filet_locked):
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 		best_length = float("Inf")
