@@ -287,7 +287,7 @@ class EventManager():
 				else:
 					self.__logger.critical("L'ordre " + str(action[1]) + " ne suit pas la convention, il ne commence ni par A, ni par O")
 
-				#self.__logger.debug(str(address) + " envoi de l'ordre: " + str(action))
+				self.__logger.debug(str(address) + " envoi de l'ordre: " + str(action))
 
 
 	def __testCollision(self):
