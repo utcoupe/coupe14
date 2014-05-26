@@ -10,7 +10,7 @@ void setup(){
 
 void loop() {
 	int i;
-	for (i=150; i>=75; i-=5) {
+	for (i=0; i<=70; i+=5) {
 		s.write(i);
 		delay(3000);
 	}
