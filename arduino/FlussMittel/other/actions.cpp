@@ -547,7 +547,7 @@ void cmdBrasServ(double a, int l) {
 		criticalCmdBras(theta, alpha, 1);
 	} else {
 		//ORDRE
-		servoBrasAngle.write(theta);
+		servoBrasAngle.write(180-theta);
 		servoBrasDist.write(alpha);
 		current_theta = theta;
 		current_alpha = alpha;
@@ -582,7 +582,7 @@ void criticalCmdBras(int n_theta, int n_alpha, int direction) {
 			}
 			break;
 		case 1: {
-			servoBrasAngle.write(theta);
+			servoBrasAngle.write(180-theta);
 			current_theta = theta;
 			long new_time = timeMicros();
 			if ((new_time - time) > (long)SECU_DELAY_ROT_BRAS*1000) {
