@@ -290,7 +290,7 @@
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x_elem>270</x_elem>
+				<x_elem>250</x_elem>
 				<y_elem>-200</y_elem>
 				<angle>-0.96</angle>
 				<points>1</points>
@@ -314,7 +314,7 @@
 			<elem_goal>
 				<id>0</id>
 				<x_elem>-150</x_elem>
-				<y_elem>-200</y_elem>
+				<y_elem>-210</y_elem>
 				<angle>0</angle>
 				<points>6</points>
 				<priority>1</priority>
@@ -326,7 +326,7 @@
 			<elem_goal>
 				<id>1</id>
 				<x_elem>150</x_elem>
-				<y_elem>-200</y_elem>
+				<y_elem>-210</y_elem>
 				<angle>0</angle>
 				<points>6</points>
 				<priority>1</priority>
@@ -342,14 +342,14 @@
 		<name>BALLES_GAUCHE</name>
 		<type>BALLES</type>
 		<concerned_robot>TIBOT</concerned_robot>
-		<x_objectif>800</x_objectif>
+		<x_objectif>750</x_objectif>
 		<y_objectif>1700</y_objectif>
 		<angle_objectif>-1.57</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x_elem>0</x_elem>
-				<y_elem>-160</y_elem>
+				<x_elem>40</x_elem>
+				<y_elem>-140</y_elem>
 				<angle>-1.57</angle>
 				<points>4</points>
 				<priority>1</priority>
@@ -365,14 +365,14 @@
 		<name>BALLES_DROITE</name>
 		<type>BALLES</type>
 		<concerned_robot>TIBOT</concerned_robot>
-		<x_objectif>2200</x_objectif>
+		<x_objectif>2250</x_objectif>
 		<y_objectif>1700</y_objectif>
 		<angle_objectif>-1.57</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x_elem>0</x_elem>
-				<y_elem>-160</y_elem>
+				<x_elem>40</x_elem>
+				<y_elem>-140</y_elem>
 				<angle>-1.57</angle>
 				<points>4</points>
 				<priority>1</priority>
@@ -395,8 +395,8 @@
 			<elem_goal>
 				<id>0</id>
 				<x_elem>-1120</x_elem>
-				<y_elem>560</y_elem>
-				<angle>-0.78</angle>
+				<y_elem>550</y_elem>
+				<angle>-0.82</angle>
 				<points>6</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -407,8 +407,8 @@
 			<elem_goal>
 				<id>1</id>
 				<x_elem>1120</x_elem>
-				<y_elem>560</y_elem>
-				<angle>0.78</angle>
+				<y_elem>550</y_elem>
+				<angle>0.82</angle>
 				<points>6</points>
 				<priority>1</priority>
 				<duration>1</duration>

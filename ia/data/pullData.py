@@ -150,6 +150,7 @@ class PullData():
 			elif address == self.address_tibot_asserv:
 				system = self.Tibot
 				if order == 'A_GET_POS_ID':
+					print("A_GET_POS_ID "+str(arguments))
 					self.__data_tibot_asserv_asked = False
 				elif order == 'A_IS_BLOCKED':
 					self.__data_tibot_asserv_bloqued_asked = False

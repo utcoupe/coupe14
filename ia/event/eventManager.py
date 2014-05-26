@@ -137,7 +137,7 @@ class EventManager():
 
 	def __checkEvent(self):
 		self.__checkBrasStatus()
-		self.__checkAsservBlocked()
+		#self.__checkAsservBlocked() #TODO use it !
 		
 		new_data = ()
 		if self.__Flussmittel is not None:
@@ -343,6 +343,7 @@ class EventManager():
 				system.setIdToReach("ANY")
 				id_list = system.removeAllGoals()
 				if id_list:
+					self.__logger.info(system.getName()+" est en bloquage, on supprime donc les ordres id_list "+str(id_list))
 					empty_arg = []
 					self.__Communication.sendOrderAPI(system.getAddressAsserv(), 'A_CLEANG', *empty_arg)
 					self.__SubProcessCommunicate.sendObjectifsDeleted( (id_list[0],) )
