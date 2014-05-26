@@ -518,7 +518,7 @@ void cmdBrasServ(double a, int l) {
 	call_critical = false;
 	//COMMANDE
 	int d = (l - BRAS_OFFSET_DIST);
-	double alpha = 3.70e-4*pow(d,4) - 6.76e-4*pow(d,3) + 2.83e-2*pow(d,2) + 1.33*d ; //regression polynomiale
+	double alpha = 1.61e-6*pow(d,4) - 1.79e-4*pow(d,3) + 5.54e-3*pow(d,2) + 5.59e-1*d ; //regression polynomiale
 	a += atan2(DECALAGE_VENT_AXE, l);
 	int theta = ANGLE_ANGLE_MAX + (a*180.0/M_PI + BRAS_OFFSET_ANGLE);
 
