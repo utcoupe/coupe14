@@ -45,6 +45,12 @@ class Goal:
 	def getAreaStatus(self):
 		return self.__area_status
 
+	def getAlreadyDone(self):
+		return self.__already_done
+
+	def setAlreadyDone(self, pourcentage):
+		self.__already_done = pourcentage
+
 	def setAreaStatus(self, status):
 		if status in ("EMPTY", "FULL", "ENEMY"):
 			self.__area_status = status

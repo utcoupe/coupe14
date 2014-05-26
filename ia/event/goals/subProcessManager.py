@@ -71,7 +71,7 @@ class SubProcessManager():
 				if data[robot_name] is not None:
 					for info_name in data[robot_name]:
 						self.__data[robot_name][info_name] = data[robot_name][info_name]
-			self.__GoalsManager.update
+			self.__GoalsManager.updateAlreadyDone()
 
 	def __processStatus(self, status):
 		"""read new status and update objectif_list"""
