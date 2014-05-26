@@ -15,7 +15,7 @@ class GUI:
 		self.asserv_addr = '2'
 
 		#self.serverHost = '10.42.0.52'
-		self.serverHost = '127.0.0.1'
+		self.serverHost = '192.168.1.1'
 		self.serverPort = 2001
 
 		#init comm
@@ -172,8 +172,8 @@ class GUI:
 		self.sock.send(bytes(tosend, 'utf-8'))               # send the data
 	
 	def reset_pos(self):
-		self.chaine.configure(text = "reset_pos : "+str(200)+" ; "+str(1800)+" ; "+str(-1.57))
-		arguments = [str(200), str(1800), str(-1.57)]
+		self.chaine.configure(text = "reset_pos : "+str(2830)+" ; "+str(2830)+" ; "+str(-1.57))
+		arguments = [str(2830), str(2830), str(-1.57)]
 		tosend = ':'.join([self.asserv_addr, 'A_SET_POS'] + arguments) + '!'
 		self.sock.send(bytes(tosend, 'utf-8'))               # send the data
 	

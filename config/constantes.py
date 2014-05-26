@@ -5,15 +5,16 @@ Ce fichier regroupe toutes les constantes de l'IA
 
 import math
 
-TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
 
 #====================Enable====================
-ENABLE_TOURELLE =		False
-ENABLE_FLUSSMITTEL = 	False #permet de desactiver Flussmitel
+ENABLE_TOURELLE =		True
+ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
 ENABLE_TIBOT =			True
+
 
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
@@ -91,7 +92,7 @@ TOURELLE_PULL_PERIODE = 100 		#ms
 DISTANCE_MAX_ROBOT_FUSION = 250 #Différance max entre codeurs et hokuyo
 
 #====================Flussmittel====================
-START_POSITION_RED_FLUSSMITTEL = (187, 1870, -1.57)
+START_POSITION_RED_FLUSSMITTEL = (200, 1871, -1.57079)
 LARGEUR_FLUSSMITTEL = 	330 # ok car centré en largeur
 LONGUEUR_FLUSSMITTEL = 	340 # = 2 fois la distance entre le centre de rotation et le côté le plus loin
 MAX_FRONT_TRIANGLE_STACK = 3
@@ -101,7 +102,8 @@ HAUTEUR_TRIANGLE = 30
 MARGE_DROP_TRIANGLE = 0
 HAUTEUR_TORCHE = 36
 # TODO mesures avec précision
-# Marges 20mm, 5°
+# Attention, prendre en compte le fait que la ventous est décalée par rapport à la glissière (il faut décaler angle_min et angle_max, ça devrait suffire)
+# Marges 20mm, 5° (à tester expérimentalement)
 ANGLE_MIN = math.radians(-70)
 ANGLE_MAX = math.radians(0)
 OUVERTURE_BRAS_MIN = 125
@@ -112,9 +114,11 @@ CENTRE_BRAS_X = 128
 CENTRE_BRAS_Y = 130
 NB_VISIO_TRY = 10
 NB_VISIO_DATA_NEEDED = 3
+# Choix d'objectif
+ENNEMI_CAN_CLEAN_ZONE = True
 
 #====================TIBOT====================
-START_POSITION_RED_TIBOT = (193, 1542, -0.42203)
+START_POSITION_RED_TIBOT = (177, 1578, -1.14875)
 LARGEUR_TIBOT = 		180
 LONGUEUR_TIBOT = 		130
 
