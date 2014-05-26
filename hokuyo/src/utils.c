@@ -145,15 +145,6 @@ int mergeRobots(Cluster_t *r1, int n1, Cluster_t *r2, int n2, Cluster_t *result)
 		}
 	} while (changed);
 
-	printf("Distances \n");
-	for (i=0; i<n1*n2; i++) {
-		int ind1 = dist_indexes[i].r1;
-		int ind2 = dist_indexes[i].r2;
-		printf("%d ", distR1R2[ind1][ind2]);
-	}
-	printf("\n");
-
-
 	//Choix des correspondances en prenant la premiere qui vientdu plus petit au plus grand
 	int used_R1_index[MAX_ROBOTS], used_R2_index[MAX_ROBOTS], nbr_found = 0;
 	for (i=0; i<MAX_ROBOTS; i++) {
@@ -220,13 +211,12 @@ int mergeRobots(Cluster_t *r1, int n1, Cluster_t *r2, int n2, Cluster_t *result)
 			nbr_found++;
 		}
 	}
-	printf("used: \n");
-	for (i=0; i<nbr_found; i++) {
-		printf("r1:%d r2:%d\n", used_R1_index[i], used_R2_index[i]);
-	}
-	printf("Found %d in the end\n", nbr_found);
 
 	nbr_found = sortAndSelectRobots(nbr_found, result);
+	printf("Found %d in the end\n", nbr_found);
+	for (i=0; i<nbr_found;i++) {
+		printf("%d:%d ", result[i].center.x, result[i].center.y);
+	}
 	return nbr_found;
 }
 

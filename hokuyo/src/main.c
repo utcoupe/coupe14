@@ -27,7 +27,7 @@ void exit_handler() {
 	if (hok2.urg != 0)
 		urg_disconnect(hok2.urg);
 	printf("%sExitting\n", PREFIX);
-	//kill(getppid(), SIGUSR1); //Erreur envoyee au pere
+	kill(getppid(), SIGUSR1); //Erreur envoyee au pere
 }
 
 static void catch_SIGINT(int signal){
@@ -94,6 +94,7 @@ int main(int argc, char **argv){
 	timeStart = timeMillis();
 	while(1){
 		frame();
+		sleep(10);
 	}
 	exit(EXIT_SUCCESS);
 }
@@ -143,7 +144,7 @@ void frame(){
 	if (use_protocol){
 		//pushResults(robots, nRobots, timestamp);
 	}
-	else{
+	//else{
 		printf("%sHOK2 - %li;%i\n", PREFIX, timestamp, nRobots2);
 		for(int i=0; i<nRobots2; i++){
 			printf(";;%i:%i", robots2[i].center.x, robots2[i].center.y);
@@ -159,7 +160,7 @@ void frame(){
 			printf(";;%i:%i", robots[i].center.x, robots[i].center.y);
 		}
 		printf("\n");
-	}
+	//	}
 	lastTime = timestamp;
 }
 
