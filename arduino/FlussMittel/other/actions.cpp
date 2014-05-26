@@ -518,7 +518,7 @@ void cmdBrasServ(double a, int l) {
 	call_critical = false;
 	//COMMANDE
 	int d = (l - BRAS_OFFSET_DIST);
-	double alpha = 7.36e-8*pow(d,4) - 1.51e-4*pow(d,3) + 1.75e-2*pow(d,2) - 1.03*d + 144; //regression polynomiale
+	double alpha = 3.70e-4*pow(d,4) - 6.76e-4*pow(d,3) + 2.83e-2*pow(d,2) + 1.33*d ; //regression polynomiale
 	a += atan2(DECALAGE_VENT_AXE, l);
 	int theta = ANGLE_ANGLE_MAX + (a*180.0/M_PI + BRAS_OFFSET_ANGLE);
 
@@ -530,10 +530,10 @@ void cmdBrasServ(double a, int l) {
 		theta = ANGLE_ANGLE_MIN;
 		digitalWrite(PIN_DEBUG_LED, LOW);
 	}
-	if (alpha > ANGLE_DIST_MAX) {
+	if (alpha < ANGLE_DIST_MAX) {
 		alpha = ANGLE_DIST_MAX;
 		digitalWrite(PIN_DEBUG_LED, LOW);
-	} else if (alpha < ANGLE_DIST_MIN) {
+	} else if (alpha > ANGLE_DIST_MIN) {
 		alpha = ANGLE_DIST_MIN;
 		digitalWrite(PIN_DEBUG_LED, LOW);
 	}
@@ -547,7 +547,7 @@ void cmdBrasServ(double a, int l) {
 		criticalCmdBras(theta, alpha, 1);
 	} else {
 		//ORDRE
-		servoBrasAngle.write(theta);
+		servoBrasAngle.write(180-theta);
 		servoBrasDist.write(alpha);
 		current_theta = theta;
 		current_alpha = alpha;
@@ -582,7 +582,7 @@ void criticalCmdBras(int n_theta, int n_alpha, int direction) {
 			}
 			break;
 		case 1: {
-			servoBrasAngle.write(theta);
+			servoBrasAngle.write(180-theta);
 			current_theta = theta;
 			long new_time = timeMicros();
 			if ((new_time - time) > (long)SECU_DELAY_ROT_BRAS*1000) {

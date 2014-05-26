@@ -76,6 +76,9 @@ int switchOrdre(unsigned char ordre, unsigned char *argv, unsigned char *ret, bo
 	case A_CLEANG:
 		if (!doublon) {
 			control.clearGoals();
+			pos pos = control.getPos();
+			control.pushGoal(0, TYPE_POS, pos.x, pos.y, 0);
+			control.setIsReached();
 		}
 		break;
 	case RESET_ID:

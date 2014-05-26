@@ -41,6 +41,7 @@ class Control{
 	void nextGoal(); //va au goal suivant
 	void clearGoals();
 	int getRemainingGoals();
+	void setIsReached() { fifo.pushIsReached(); };
 
 	//Toutes les positions sont renvoyée en mm, toutes les vitess en mm/ms = m/s
 	void pushPos(pos n_pos); 
