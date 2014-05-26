@@ -80,10 +80,10 @@
 		<angle_objectif>0.0</angle_objectif>
 		<elem_goals>
 			<elem_goal>
-				<id>1</id>
+				<id>0</id>
 				<x_elem>-270</x_elem>
-				<y_elem>200</y_elem>
-				<angle>-0.96</angle>
+				<y_elem>0</y_elem>
+				<angle>0.0</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -174,15 +174,15 @@
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x_elem>200</x_elem>
-				<y_elem>250</y_elem>
-				<angle>-0.96</angle>
+				<x_elem>0</x_elem>
+				<y_elem>270</y_elem>
+				<angle>0.0</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>Y</color>
 				<script_only>False</script_only>
-				<id_script>1</id_script>
+				<id_script>0</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>
@@ -197,9 +197,9 @@
 		<elem_goals>
 			<elem_goal>
 				<id>1</id>
-				<x_elem>200</x_elem>
-				<y_elem>250</y_elem>
-				<angle>-0.96</angle>
+				<x_elem>0</x_elem>
+				<y_elem>270</y_elem>
+				<angle>0.0</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -290,15 +290,15 @@
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x_elem>250</x_elem>
-				<y_elem>-200</y_elem>
-				<angle>-0.96</angle>
+				<x_elem>270</x_elem>
+				<y_elem>0</y_elem>
+				<angle>0.0</angle>
 				<points>1</points>
 				<priority>1</priority>
 				<duration>1</duration>
 				<color>Y</color>
 				<script_only>False</script_only>
-				<id_script>1</id_script>
+				<id_script>0</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>

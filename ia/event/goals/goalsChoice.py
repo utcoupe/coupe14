@@ -74,6 +74,7 @@ class GoalsChoice:
 			nb_elem_goal = goal.getLenElemGoal()
 			for idd in range(nb_elem_goal):
 				path = self.__goalsLib.getOrderTrajectoire(goal, idd, position_last_goal)
+				self.__logger.debug("Path pour goal_id "+str(goal.getId())+" elem_id "+str(idd)+" path "+str(path))
 				if path != []:
 					if self.__Collision.isCollisionFromGoalsManager("FLUSSMITTEL", path):
 						length = self.__goalsLib.pathLen(path)
