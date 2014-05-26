@@ -93,7 +93,7 @@ class GoalsChoice:
 		### Phase 3 : Zero triangle inside !
 		"""
 
-		goals = self.__getGoalsByNorm(self.__available_goals)
+		goals = self.__getGoalsByPath(self.__available_goals)
 		for goal in goals:
 			
 			if len(self.__front_triangle_stack) >= MAX_FRONT_TRIANGLE_STACK:
@@ -119,6 +119,15 @@ class GoalsChoice:
 		def dist(goal):
 			return hypot(goal.getPosition()[0] - position_last_goal[0], goal.getPosition()[1] - position_last_goal[1])
 		return sorted(goals, key=dist)
+	
+	def __getGoalsByPath(self, goals):
+		def dist(goal):
+			best_path = self.__getBestElemGoal(goal)
+			if best_path is not None:
+				return best_path[3]
+			else:
+				return float("Inf")
+		return sorted(goals, key=dist)
 
 	def __getBestElemGoal(self, goal):
 		best_elem_goal = None
@@ -133,7 +142,7 @@ class GoalsChoice:
 					length = self.__goalsLib.pathLen(path)
 					if length < best_length:
 						best_length = length
-						best_elem_goal = (path, goal, idd)
+						best_elem_goal = (path, goal, idd, length)
 				else:
 					self.__logger.error("Le pathfinding nous a indiqué un chemin invalide goal "+str(goal.getName())+" elem_id "+str(idd)+"  path "+str(path))
 		return best_elem_goal
