@@ -170,8 +170,10 @@ class PullData():
 					self.__jack_tibot_asked = True
 					self.__jack_flussmittel_asked = True
 				else:
-					self.__jack_tibot_asked = False
-					self.__jack_flussmittel_asked = False
+					if system is self.Flussmittel:
+						self.__jack_flussmittel_asked = False
+					else:
+						self.__jack_tibot_asked = False
 
 
 			else:

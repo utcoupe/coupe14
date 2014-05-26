@@ -113,8 +113,8 @@ class Partition:
 		self.p.stdout.flush()
 		str_n_polys = self.p.stdout.readline().decode("utf-8")
 		if str_n_polys == "":
-			print("Erreur pathfinding, on va ignorer un robot random pour fixer ça")
-
+			print("Erreur pathfinding, TODO !")
+			#TODO, remove random bot
 		else:
 			n_polys = int(str_n_polys)
 			#print("N_POLYS", n_polys)
