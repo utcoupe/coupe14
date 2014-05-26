@@ -80,6 +80,8 @@ class GoalsChoice:
 	def __getBestGoalFlussmittel(self):
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 
+		# On tri d'abord par path car le tri est stable
+		goals = self.__getGoalsByPath(self.__available_goals)
 		"""
 		### Phase 1 : Sécurisation des zones (avec priorité)
 		best_zone = None
@@ -88,30 +90,68 @@ class GoalsChoice:
 				if self.__state_zone[zone] == self.__ZONE_LIBRE:
 					best_zone = zone
 					break
+			if best_zone is not None:
+				goals = self.__getGoalsByPriority(goals, zone)
+			for goal in goals:
+				if len(self.__front_triangle_stack) >= MAX_FRONT_TRIANGLE_STACK:
+					if len(self.__front_triangle_stack) > MAX_FRONT_TRIANGLE_STACK:
+						self.__logger.error("On a stocké plus de triangle qu'on a de place")
+					if goal.getType() != "STORE_TRIANGLE":
+						continue
+				else:
+					if goal.getType() == "STORE_TRIANGLE":
+						continue
+				best_elem_goal = self.__getBestElemGoal(goal)
+				if best_elem_goal is not None:
+					best_goal = best_elem_goal
+					break
 		### Phase 2 : Max de triangles (du bon côté sans se soucier des zones)
 		if (self.__getTimeSec() > self.__TIME_PHASE["1"] and self.__getTimeSec() <= self.__TIME_PHASE["2"]) or (self.__getTimeSec() <= self.__TIME_PHASE["1"] and best_zone is None):
+			# TEMP
+			for goal in goals:
+				if len(self.__front_triangle_stack) >= MAX_FRONT_TRIANGLE_STACK:
+					if len(self.__front_triangle_stack) > MAX_FRONT_TRIANGLE_STACK:
+						self.__logger.error("On a stocké plus de triangle qu'on a de place")
+					if goal.getType() != "STORE_TRIANGLE":
+						continue
+				else:
+					if goal.getType() == "STORE_TRIANGLE":
+						continue
+				best_elem_goal = self.__getBestElemGoal(goal)
+				if best_elem_goal is not None:
+					best_goal = best_elem_goal
+					break
 		### Phase 3 : Zero triangle inside !
+		elif True or self.__getTimeSec() <= self.__TIME_PHASE["3"]:
+			# TEMP
+			for goal in goals:
+				if len(self.__front_triangle_stack) >= MAX_FRONT_TRIANGLE_STACK:
+					if len(self.__front_triangle_stack) > MAX_FRONT_TRIANGLE_STACK:
+						self.__logger.error("On a stocké plus de triangle qu'on a de place")
+					if goal.getType() != "STORE_TRIANGLE":
+						continue
+				else:
+					if goal.getType() == "STORE_TRIANGLE":
+						continue
+				best_elem_goal = self.__getBestElemGoal(goal)
+				if best_elem_goal is not None:
+					best_goal = best_elem_goal
+					break
 		"""
-
-		goals = self.__getGoalsByPath(self.__available_goals)
 		for goal in goals:
-			
 			if len(self.__front_triangle_stack) >= MAX_FRONT_TRIANGLE_STACK:
 				if len(self.__front_triangle_stack) > MAX_FRONT_TRIANGLE_STACK:
 					self.__logger.error("On a stocké plus de triangle qu'on a de place")
-
 				if goal.getType() != "STORE_TRIANGLE":
 					continue
 			else:
 				if goal.getType() == "STORE_TRIANGLE":
 					continue
-
 			best_elem_goal = self.__getBestElemGoal(goal)
-			# Bug ? TORCHE jamais appelé car pathfinding impossible car point d'entrée dans la torche (obstacle)
 			if best_elem_goal is not None:
 				best_goal = best_elem_goal
 				break
-
+		
 		return best_goal
 
 	def __getGoalsByNorm(self, goals):
@@ -128,6 +168,16 @@ class GoalsChoice:
 			else:
 				return float("Inf")
 		return sorted(goals, key=dist)
+
+	def __getGoalsByPriority(self, goals, zone):
+		def prio(goal):
+			best_path = self.__getBestElemGoal(goal)
+			try:
+				index = self.__prio_FM_zone_triangles[zone].index(goal.getId())
+			except ValueError:
+				index = len(self.__prio_FM_zone_triangles[zone])
+			return index
+		return sorted(goals, key=prio)
 
 	def __getBestElemGoal(self, goal):
 		best_elem_goal = None
