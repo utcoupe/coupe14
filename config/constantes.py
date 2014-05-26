@@ -92,7 +92,7 @@ TOURELLE_PULL_PERIODE = 100 		#ms
 DISTANCE_MAX_ROBOT_FUSION = 250 #Différance max entre codeurs et hokuyo
 
 #====================Flussmittel====================
-START_POSITION_RED_FLUSSMITTEL = (187, 1870, -1.57)
+START_POSITION_RED_FLUSSMITTEL = (200, 1871, -1.57079)
 LARGEUR_FLUSSMITTEL = 	330 # ok car centré en largeur
 LONGUEUR_FLUSSMITTEL = 	340 # = 2 fois la distance entre le centre de rotation et le côté le plus loin
 MAX_FRONT_TRIANGLE_STACK = 3
@@ -118,7 +118,7 @@ NB_VISIO_DATA_NEEDED = 3
 ENNEMI_CAN_CLEAN_ZONE = True
 
 #====================TIBOT====================
-START_POSITION_RED_TIBOT = (193, 1542, -0.42203)
+START_POSITION_RED_TIBOT = (177, 1578, -1.14875)
 LARGEUR_TIBOT = 		180
 LONGUEUR_TIBOT = 		130
 
