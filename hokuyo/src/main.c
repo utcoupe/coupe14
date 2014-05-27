@@ -65,6 +65,7 @@ int main(int argc, char **argv){
 		}
 	}
 
+	/*
 	hok1 = initHokuyo("/dev/ttyACM0", HOK1_A, HOK1_CONE, (Pt_t){HOK1_X, HOK1_Y} );
 	hok2 = initHokuyo("/dev/ttyACM1", HOK2_A, HOK2_CONE, (Pt_t){HOK2_X, HOK2_Y} );
 	if (symetry) {
@@ -80,7 +81,7 @@ int main(int argc, char **argv){
 		do {
 			error = calibrate(&hok2);
 		} while (error < 0);
-	}
+	}*/
 
 	#ifdef SDL
 	initSDL();
@@ -93,7 +94,7 @@ int main(int argc, char **argv){
 	printf("%sRunning ! ...\n", PREFIX);
 	timeStart = timeMillis();
 	while(1){
-		frame();
+		//frame();
 		sleep(10);
 	}
 	exit(EXIT_SUCCESS);
@@ -142,9 +143,9 @@ void frame(){
 	#endif
 
 	if (use_protocol){
-		//pushResults(robots, nRobots, timestamp);
+		pushResults(robots, nRobots, timestamp);
 	}
-	//else{
+	else{
 		printf("%sHOK2 - %li;%i\n", PREFIX, timestamp, nRobots2);
 		for(int i=0; i<nRobots2; i++){
 			printf(";;%i:%i", robots2[i].center.x, robots2[i].center.y);
@@ -160,7 +161,7 @@ void frame(){
 			printf(";;%i:%i", robots[i].center.x, robots[i].center.y);
 		}
 		printf("\n");
-	//	}
+	}
 	lastTime = timestamp;
 }
 

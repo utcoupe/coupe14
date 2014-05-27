@@ -8,6 +8,9 @@
 #include "serial_defines.h"
 #include "serial_switch.h"
 #include "serial_types.h"
+#ifdef ARDUINO
+#include "parameters.h"
+#endif
 
 extern unsigned char ordreSize[MAX_ORDRES];
 static bool init_done = false;
@@ -245,8 +248,19 @@ void protocol_blocking_reset() {
 	unsigned char data;
 	long last_send = 0;
 	while (!init_done) {
-		data = generic_serial_read();
-		executeCmd(data);
+#ifdef ARDUINO
+		if (SERIAL_MAIN.available() > 0) {
+			data = generic_serial_read();
+			executeCmd(data);
+		}
+#else
+#ifdef LINUX
+		int nbr = nonblocking_read(&data);
+		if (nbr > 0) {
+			executeCmd(data);
+		}
+#endif
+#endif
 		long t = timeMillis();
 		if (!init_done && (t - last_send > 1000)) {
 			last_send = t;

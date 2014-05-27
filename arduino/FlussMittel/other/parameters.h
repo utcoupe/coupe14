@@ -1,5 +1,6 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
+#define ARDUINO
 
 //////////////////////
 //		PARAMETERS  //

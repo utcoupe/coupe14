@@ -97,6 +97,8 @@
 #define LED_MAINLOOP 22
 #define LED_BLOCKED 23
 
+#define SERIAL_MAIN Serial2
+
 /*****************************************
  *            PRIVATE                    *
  *****************************************/

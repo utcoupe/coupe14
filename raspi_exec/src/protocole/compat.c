@@ -17,14 +17,25 @@ long timeMillis() {
 }
 
 void serial_send(char c){
-	write (serial, &c, 1);           // send 7 character greeting
+	int n = write (serial, &c, 1);           // send 7 character greeting
 }
 
 unsigned char generic_serial_read() {
 	char data;
-	read (serial, &data, 1);
+	int nbr = 0;
+	do {
+		nbr = read (serial, &data, 1);
+		usleep(100000);
+	} while (nbr <= 0);
 	data &= 0xFF;
 	return data;
+}
+
+int nonblocking_read(char *data) {
+	set_blocking(serial, 0);
+	int n = read (serial, data, 1);
+	set_blocking(serial, 1);
+	return n;
 }
 
 int
@@ -72,7 +83,7 @@ set_blocking (int fd, int should_block)
         }
 
         tty.c_cc[VMIN]  = should_block ? 1 : 0;
-        tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
+        tty.c_cc[VTIME] = 5;            // 5 seconds read timeout
 
         if (tcsetattr (fd, TCSANOW, &tty) != 0);
 }
