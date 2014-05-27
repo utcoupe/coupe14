@@ -614,32 +614,34 @@ int getCurrentStockHeight() {
 
 void ascInt() {
 	static long start_time = -1;
-	if (stepperAsc.distanceToGo() == 0) {
-		if (step == 3 && action_en_cours == BrasVentouse) {
-			if (start_time == -1) {
-				start_time = timeMicros();
-			} else if (timeMicros() - start_time > (long)500*1000) {
-				got_tri = false;
+	if (!next_step) {
+		if (stepperAsc.distanceToGo() == 0) {
+			if (step == 3 && action_en_cours == BrasVentouse) {
+				if (start_time == -1) {
+					start_time = timeMicros();
+				} else if (timeMicros() - start_time > (long)500*1000) {
+					got_tri = false;
+					Timer1.detachInterrupt();
+					next_step = true;
+					start_time = -1;
+				}
+			} else {
 				Timer1.detachInterrupt();
 				next_step = true;
-				start_time = -1;
 			}
-		} else {
-			Timer1.detachInterrupt();
-			next_step = true;
 		}
-	}
-	if (digitalRead(PIN_INTERRUPT_BRAS) == 0) {
-		//On touche un triangle
-		if ((action_en_cours == BrasVentouse && step == 3)) {
-			Timer1.detachInterrupt();
-			next_step = true;
-			got_tri = true;
-			stepperAsc.move(20);
-		} else if ((action_en_cours == BrasDepot && step == 1) || (action_en_cours == None && step == -1)) {
-			Timer1.detachInterrupt();
-			next_step = true;
-			stepperAsc.move(0);
+		if (digitalRead(PIN_INTERRUPT_BRAS) == 0) {
+			//On touche un triangle
+			if ((action_en_cours == BrasVentouse && step == 3)) {
+				Timer1.detachInterrupt();
+				next_step = true;
+				got_tri = true;
+				stepperAsc.move(20);
+			} else if ((action_en_cours == BrasDepot && step == 1) || (action_en_cours == None && step == -1)) {
+				Timer1.detachInterrupt();
+				next_step = true;
+				stepperAsc.move(0);
+			}
 		}
 	}
 }
