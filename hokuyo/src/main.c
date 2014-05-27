@@ -94,7 +94,6 @@ int main(int argc, char **argv){
 	timeStart = timeMillis();
 	while(1){
 		frame();
-		sleep(10);
 	}
 	exit(EXIT_SUCCESS);
 }
@@ -106,27 +105,26 @@ void frame(){
 	Cluster_t robots1[MAX_CLUSTERS], robots2[MAX_CLUSTERS], robots[MAX_ROBOTS];
 	int nPts1, nPts2, nRobots1 = 0, nRobots2 = 0, nRobots;
 
-	printf("%sGetting points\n", PREFIX);
+	//printf("%sGetting points\n", PREFIX);
 
 	nPts1 = getPoints(hok1, pts1);
 	nPts2 = getPoints(hok2, pts2);
 
-	printf("%sGot %d and %d points\n", PREFIX, nPts1, nPts2);
 
 	
 	timestamp = timeMillis() - timeStart;
-	printf("%sDuration : %lims\n", PREFIX, timestamp-lastTime);
+	//printf("%sDuration : %lims\n", PREFIX, timestamp-lastTime);
 
 	nRobots1 = getClustersFromPts(pts1, nPts1, robots1);
 	nRobots2 = getClustersFromPts(pts2, nPts2, robots2);
 
-	printf("%sCalculated %d and %d clusters\n", PREFIX, nRobots1, nRobots2);
+	//printf("%sCalculated %d and %d clusters\n", PREFIX, nRobots1, nRobots2);
 
 	nRobots1 = sortAndSelectRobots(nRobots1, robots1);
 	nRobots2 = sortAndSelectRobots(nRobots2, robots2);
 
 	nRobots = mergeRobots(robots1, nRobots1, robots2, nRobots2, robots);
-	printf("%sGot %d robots\n", PREFIX, nRobots);
+	//printf("%sGot %d robots\n", PREFIX, nRobots);
 	
 	#ifdef SDL
 	struct color l1Color = {255, 0, 0}, l2Color = {0, 0, 255}, lColor = {255, 0, 255};
@@ -142,9 +140,9 @@ void frame(){
 	#endif
 
 	if (use_protocol){
-		//pushResults(robots, nRobots, timestamp);
+		pushResults(robots, nRobots, timestamp);
 	}
-	//else{
+	else{
 		printf("%sHOK2 - %li;%i\n", PREFIX, timestamp, nRobots2);
 		for(int i=0; i<nRobots2; i++){
 			printf(";;%i:%i", robots2[i].center.x, robots2[i].center.y);
@@ -160,7 +158,7 @@ void frame(){
 			printf(";;%i:%i", robots[i].center.x, robots[i].center.y);
 		}
 		printf("\n");
-	//	}
+	}
 	lastTime = timestamp;
 }
 
