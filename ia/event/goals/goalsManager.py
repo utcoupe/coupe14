@@ -73,6 +73,10 @@ class GoalsManager:
 
 		self.__loadBeginScript()
 
+		#pour le truc que thomas a fait
+		self.__last_pos_big = (0,0)
+		self.__last_pos_mini = (0,0)
+
 	def restartObjectifSearch(self):
 		self.__queueBestGoals()
 
@@ -687,7 +691,61 @@ class GoalsManager:
 			if not find:
 				self.__logger.error(str(self.__robot_name) + " impossible de lui ajouter le goal d'id: " + str(id_objectif))
 	
+	def __check_goal_proximity(self,goal,bot):
+		"""
+		Vérifie si un robot adverse est passé sur un objectif.
+		@param goal objectif qu'on regarde
+		@param bot robot ennemi considéré
+		"""
+		pos_goal = goal.getPosition()
+		pos_bot = bot["getPosition"]
+		dist_bot = sqrt((pos_goal[0] - pos_bot[0])**2+(pos_goal[1] - pos_bot[1])**2)
+		if dist_bot < bot["getRayon"]:
+			return True
+		else:
+			return False
+
+	def __check_goal_TS(self,goal,bot):
+		"""
+		Vérifie si le robot est resté proche d'un goal pendant longtemps.
+		@param goal objectif qu'on regarde
+		@param bot robot ennemi considéré
+		"""
+		ts = self.__data["METADATA"]["getGameClock"] #timeStamp
+		pos_goal = goal.getPosition()
+		pos_bot = bot["getPosition"]
+		dist_bot = sqrt((pos_goal[0] - pos_bot[0])**2+(pos_goal[1] - pos_bot[1])**2)
+		if dist_bot < bot["getRayon"]*1.5:
+			ts_goal = goal.getTSProximiy()
+			if ts_goal == -1:
+				goal.setTSProximiy(ts)
+			elif ts - ts_goal > 4000:
+				goal.setAlreadyDone(100)
+				print("check goal TS done : ", goal.getName())
+
 	def updateAlreadyDone(self):
-		pass
+		"""
+		Met à jour le pourcentage de possibilité que le robot adverse ait accomplit un objectif
+		"""
 		#quand on t'appel check self.__data, dont data["BIGENEMYBOT"]["getPosition"], data["SMALLENEMYBOT"]["getPosition"], data["METADATA"]["getGameClock"]
 		#pour tous les objectifs dans self.__available_goals, appel la fonction getAlreadyDone et setAlreadyDone
+		if self.__data["METADATA"]["getGameClock"] is not None:
+			if self.__last_pos_big != self.__data["BIGENEMYBOT"]["getPosition"]:
+				for goal in self.__available_goals:
+					if goal.getAlreadyDone() < 100:
+						if self.__check_goal_proximity(goal,self.__data["BIGENEMYBOT"]) is True:
+							goal.setAlreadyDone(100)
+							goal.setGoalDone(True)
+						else:
+							self.__check_goal_TS(goal,self.__data["BIGENEMYBOT"])
+				self.__last_pos_big = self.__data["BIGENEMYBOT"]["getPosition"]
+			#check pour le petit robot
+			if self.__last_pos_mini != self.__data["SMALLENEMYBOT"]["getPosition"]:
+				for goal in self.__available_goals:
+					if goal.getAlreadyDone() < 100:
+						if self.__check_goal_proximity(goal,self.__data["SMALLENEMYBOT"]) is True:
+							goal.setAlreadyDone(100)
+							goal.setGoalDone(True)
+						else:
+							self.__check_goal_TS(goal,self.__data["SMALLENEMYBOT"])
+				self.__last_mini_big = self.__data["SMALLENEMYBOT"]["getPosition"]
