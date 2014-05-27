@@ -13,7 +13,7 @@ PATH_CONFIG = "/config/visio/visio_tourelle_"
 PATH_TO_EXEC = "/supervisio/visio"
 PATH_PIPE = "/config/raspi/pipe_cameras"
 DIST_SAME_TRI = 100
-ENABLE_COIN = True
+ENABLE_COIN = False
 ENABLE_CENTRE = True
 
 
@@ -131,15 +131,15 @@ if __name__ == '__main__':
 				merge(v_centre.update(), triangles)
 			if v_coin is not None :
 				merge(v_coin.update(), triangles)
-			print("Detected", len(triangles), "in", (time.time() - start), "seconds")
+			print("[CAM ]  Detected", len(triangles), "in", (time.time() - start), "seconds")
 			send(triangles, pipe)
 		except BaseException as e:
 			conti = False
-			print("Failed to compute and send triangles :", str(e))
+			print("[CAM ]  Failed to compute and send triangles :", str(e))
 
 			triangles = []
 
-	print('Closing')
+	print('[CAM ]  Closing')
 	if v_centre is not None:
 		v_centre.close()
 	if v_coin is not None :

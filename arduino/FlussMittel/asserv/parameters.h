@@ -6,6 +6,7 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
+#define ARDUINO
 #define DEBUG //Commenter cette ligne pour enlever les pints de debug
 
 /* Simple ou Double ou Quadruple evaluation ? 
