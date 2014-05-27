@@ -343,7 +343,7 @@ class GoalsManager:
 								list_of_triangle_list.append(triangle_list_temp)
 
 						if len(list_of_triangle_list) >= NB_VISIO_DATA_NEEDED:
-							data_camera = self.__getBestDataTriangleOfList(list_of_triangle_list)
+							data_camera = self.__getBestDataTriangleOfList(list_of_triangle_list, objectif.getType() == "TORCHE")
 						else:
 							self.__logger.warning("On a pas vu de triangle à la position attendu, list_of_triangle_list "+str(list_of_triangle_list)+" dont on va supprimer l'objectif "+str(id_objectif))
 							self.__last_camera_color = None
@@ -429,13 +429,15 @@ class GoalsManager:
 			self.__logger.warning("Pb, Il y a un STEP_OVER directement suivit d'un END ?")
 
 
-	def __getBestDataTriangleOfList(self, list_of_triangle_list):
+	def __getBestDataTriangleOfList(self, list_of_triangle_list, torche):
 		#On prend le meilleur de chaque listes
 		list_of_best_triangle = []
 		for triangle_list in list_of_triangle_list:
 			min_distance = float("inf")
 			min_id = None
 			for i, triangle in enumerate(triangle_list):
+				if torche:
+					tiangle.coord[0] -= 140
 				distance = sqrt((triangle.coord[0]-220)**2 + (triangle.coord[1])**2)
 				if distance < min_distance:
 					min_distance = distance
