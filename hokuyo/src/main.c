@@ -65,7 +65,6 @@ int main(int argc, char **argv){
 		}
 	}
 
-	/*
 	hok1 = initHokuyo("/dev/ttyACM0", HOK1_A, HOK1_CONE, (Pt_t){HOK1_X, HOK1_Y} );
 	hok2 = initHokuyo("/dev/ttyACM1", HOK2_A, HOK2_CONE, (Pt_t){HOK2_X, HOK2_Y} );
 	if (symetry) {
@@ -81,7 +80,7 @@ int main(int argc, char **argv){
 		do {
 			error = calibrate(&hok2);
 		} while (error < 0);
-	}*/
+	}
 
 	#ifdef SDL
 	initSDL();
@@ -94,8 +93,7 @@ int main(int argc, char **argv){
 	printf("%sRunning ! ...\n", PREFIX);
 	timeStart = timeMillis();
 	while(1){
-		//frame();
-		sleep(10);
+		frame();
 	}
 	exit(EXIT_SUCCESS);
 }
