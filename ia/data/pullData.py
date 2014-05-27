@@ -165,12 +165,15 @@ class PullData():
 			if order == "O_JACK_STATE":
 				if arguments[0] == 0:
 					self.__logger.info("On a le jack, de la part de "+str(system.getName()))
-					self.MetaData.startMatch()
+					if self.MetaData.getInGame() == False:
+						self.MetaData.startMatch()
 					self.__jack_tibot_asked = True
 					self.__jack_flussmittel_asked = True
 				else:
-					self.__jack_tibot_asked = False
-					self.__jack_flussmittel_asked = False
+					if system is self.Flussmittel:
+						self.__jack_flussmittel_asked = False
+					else:
+						self.__jack_tibot_asked = False
 
 
 			else:

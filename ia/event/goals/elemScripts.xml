@@ -9,7 +9,6 @@
 			<order>THEN</order>
 			<order>O_BRAS_FERMER</order>
 			<order>THEN</order>
-			<order>SLEEP 1000</order>
 			<order>STEP_OVER</order>
 			<order>GET_TRIANGLE_IA</order>
 			<order>DYNAMIQUE_OVER</order>
@@ -22,7 +21,6 @@
 		<orders>
 			<order>O_BRAS_OUVRIR_BAS</order>
 			<order>THEN</order>
-			<order>SLEEP 1000</order>
 			<order>STEP_OVER</order>
 			<order>GET_TRIANGLE_IA</order>
 			<order>DYNAMIQUE_OVER</order>
@@ -35,7 +33,6 @@
 		<orders>
 			<order>O_BRAS_OUVRIR_BAS</order>
 			<order>THEN</order>
-			<order>SLEEP 1000</order>
 			<order>STEP_OVER</order>
 			<order>GET_TRIANGLE_IA</order>
 			<order>DYNAMIQUE_OVER</order>

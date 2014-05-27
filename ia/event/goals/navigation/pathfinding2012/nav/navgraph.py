@@ -37,6 +37,7 @@ class NavGraph:
 
 	def setOffset(self, offset):
 		self.offset = offset
+		self.partition.stop()
 		self.partition = Partition(
 			offset,
 			self.container.points,
