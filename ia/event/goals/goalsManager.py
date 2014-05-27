@@ -722,7 +722,6 @@ class GoalsManager:
 				goal.setTSProximiy(ts)
 			elif ts - ts_goal > 4000:
 				goal.setAlreadyDone(100)
-				print("check goal TS done : ", goal.getName())
 
 	def updateAlreadyDone(self):
 		"""
