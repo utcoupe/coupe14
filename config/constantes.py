@@ -5,19 +5,19 @@ Ce fichier regroupe toutes les constantes de l'IA
 
 import math
 
-TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
 
 #====================Enable====================
-ENABLE_TOURELLE =		False
+ENABLE_TOURELLE =		True
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
 ENABLE_TIBOT =			False
 
 
 #========================================Communication========================================
-PORT_XBEE = 			"/dev/ttyUSB1"
+PORT_XBEE = 			"/dev/ttyUSB0"
 VITESSE_XBEE = 			57600
 PARITY_XBEE = 			"ODD"
 PORT_OTHER = 			"/dev/ttyACM0"
@@ -112,8 +112,8 @@ MARGE_OUVERTURE_BRAS_MAX_DEPLACEMENT = 20
 MARGE_OUVERTURE_BRAS_MIN_DEPLACEMENT = 20
 CENTRE_BRAS_X = 128
 CENTRE_BRAS_Y = 130
-NB_VISIO_TRY = 10
-NB_VISIO_DATA_NEEDED = 3
+NB_VISIO_TRY = 25
+NB_VISIO_DATA_NEEDED = 5
 # Choix d'objectif
 ENNEMI_CAN_CLEAN_ZONE = True
 

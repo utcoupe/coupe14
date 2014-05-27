@@ -337,13 +337,13 @@ class GoalsManager:
 						triangle_list_temp = []
 						while limite_essai_viso > 0 and len(list_of_triangle_list) < NB_VISIO_DATA_NEEDED:
 							limite_essai_viso -= 1
-							self.__vision.update()
+							self.__vision.update(objectif.getType() == "TORCHE")
 							triangle_list_temp = self.__vision.getTriangles()
 							if triangle_list_temp != []:
 								list_of_triangle_list.append(triangle_list_temp)
 
 						if len(list_of_triangle_list) >= NB_VISIO_DATA_NEEDED:
-							data_camera = self.__getBestDataTriangleOfList(list_of_triangle_list, objectif.getType() == "TORCHE")
+							data_camera = self.__getBestDataTriangleOfList(list_of_triangle_list)
 						else:
 							self.__logger.warning("On a pas vu de triangle à la position attendu, list_of_triangle_list "+str(list_of_triangle_list)+" dont on va supprimer l'objectif "+str(id_objectif))
 							self.__last_camera_color = None
@@ -429,16 +429,13 @@ class GoalsManager:
 			self.__logger.warning("Pb, Il y a un STEP_OVER directement suivit d'un END ?")
 
 
-	def __getBestDataTriangleOfList(self, list_of_triangle_list, torche):
+	def __getBestDataTriangleOfList(self, list_of_triangle_list):
 		#On prend le meilleur de chaque listes
 		list_of_best_triangle = []
 		for triangle_list in list_of_triangle_list:
 			min_distance = float("inf")
 			min_id = None
 			for i, triangle in enumerate(triangle_list):
-				if torche:
-					triangle.coord[0] -= 100
-					triangle.coord[1] -= 20
 				distance = sqrt((triangle.coord[0]-220)**2 + (triangle.coord[1])**2)
 				if distance < min_distance:
 					min_distance = distance
@@ -464,6 +461,7 @@ class GoalsManager:
 				min_id = min_id_temp
 
 		triangle_choisi = list_of_best_triangle[min_id]
+		self.__logger.debug("On a choisi le triangle coord[0] "+str(triangle_choisi.coord[0])+" coord[1] "+str(triangle_choisi.coord[1])+" color "+str(triangle_choisi.color))
 		return (triangle_choisi.color, triangle_choisi.coord[0], triangle_choisi.coord[1]) #type (color, x, y)
 
 	def __positionReady(self, x, y):
