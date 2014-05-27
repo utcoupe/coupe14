@@ -22,7 +22,7 @@ void setup(){
 	TCCR3B = (TCCR3B & 0xF8) | 0x01 ; //PWM FREQUENCY
 	initPins();
 	initSize();
-	Serial2.begin(57600, SERIAL_8O1);
+	SERIAL_MAIN.begin(57600, SERIAL_8O1);
 #ifdef DEBUG
 	Serial.begin(115200, SERIAL_8N1);
 #endif
@@ -39,7 +39,7 @@ void loop(){
 	}
 
 	/* zone programmation libre */
-	int available = Serial2.available();
+	int available = SERIAL_MAIN.available();
 	if (available > MAX_READ) {
 		available = MAX_READ;
 	}

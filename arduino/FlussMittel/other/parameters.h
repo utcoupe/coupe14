@@ -1,5 +1,6 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
+#define ARDUINO
 
 //////////////////////
 //		PARAMETERS  //
@@ -8,7 +9,7 @@
 //DIMENSIONS
 
 #define BRAS_OFFSET_DIST 132 //Distance in mm
-#define BRAS_OFFSET_ANGLE -4 //Angle offset in degrees
+#define BRAS_OFFSET_ANGLE 4 //Angle offset in degrees
 
 #define DECALAGE_VENT_AXE 35
 

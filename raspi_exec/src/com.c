@@ -216,6 +216,7 @@ void parseHokuyo(char *ori_line) {
 		ignore = 1;
 	}
 	if (!ignore) {
+		printf("[MAIN]  Pushing hokuyo data\n");
 		pushHokData(robots, timestamp);
 	} else {
 		printf("[MAIN]  Failed to parse hokuyo data, got %d args\n", arg_nbr);

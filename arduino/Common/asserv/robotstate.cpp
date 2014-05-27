@@ -78,10 +78,8 @@ void RobotState::update(){
 	dr *= FIXED_POINT_PRECISION;
 
 	float dd = (dr + dl) / 2.0;
-	//current_pos.x += round(dd*cos((current_pos.angle + last_angle)/2.0));
-	//current_pos.y += round(dd*sin((current_pos.angle + last_angle)/2.0));
-	current_pos.x += round(dd*cos(current_pos.angle));
-	current_pos.y += round(dd*sin(current_pos.angle));
+	current_pos.x += round(dd*cos((current_pos.angle + last_angle)/2.0));
+	current_pos.y += round(dd*sin((current_pos.angle + last_angle)/2.0));
 
 
 	//prepare la prochaine update

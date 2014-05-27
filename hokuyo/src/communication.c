@@ -26,9 +26,6 @@ void init_protocol(char *path) {
 
 //t x1 y1 x2 y2 x3 y3 x4 y4\n
 void pushResults(Cluster_t *coords, int nbr, long timestamp) {
-	if (nbr != MAX_ROBOTS) {
-		printf("%sExpected %d robots, got %d\n", PREFIX, MAX_ROBOTS, nbr);
-	}
 	int i=0;
 	fprintf(pipe, "%ld", timestamp);
 	for(i=0; i<nbr; i++) {

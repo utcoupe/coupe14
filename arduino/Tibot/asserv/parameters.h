@@ -26,7 +26,7 @@
  * 
  * OPTIONS : '1' - '2 - '4' */
 
-#define ENCODER_EVAL 4
+#define ENCODER_EVAL 1
 
 #define FIXED_POINT_PRECISION 100000 //The robot's position is stocked with a precision of 1/FIXED_POINT_PRECISION ticks
 
@@ -37,7 +37,7 @@
 #define FREQ (1/(DUREE_CYCLE/1000.0))
 
 #define ACC_MAX 100 //consigne*s-2
-#define RATIO_SPD_ROT_MAX 0.5
+#define RATIO_SPD_ROT_MAX 0.7
 
 /* CONSIGNE OFFSET
  * DEVRAIT ETRE A 0
@@ -62,8 +62,8 @@
 #define ENC_RESOLUTION 1024 //resolution du codeur
 
 #define ENC_LEFT_RADIUS 36.23 //rayon de la roue codeuse
-#define ENC_RIGHT_RADIUS 36.23 //rayon de la roue codeuse
-#define ENTRAXE_ENC 189.17 // Distance entre chaque roue codeuse en mm
+#define ENC_RIGHT_RADIUS 36.23//rayon de la roue codeuse
+#define ENTRAXE_ENC 182.39 // Distance entre chaque roue codeuse en mm
 
 #define ERROR_ANGLE 0.03 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
 #define ERROR_ANGLE_TO_GO 0.1 //erreur en angle(radians) maximale avant d'avancer
@@ -96,6 +96,8 @@
 //PIN LED
 #define LED_MAINLOOP 22
 #define LED_BLOCKED 23
+
+#define SERIAL_MAIN Serial2
 
 /*****************************************
  *            PRIVATE                    *
