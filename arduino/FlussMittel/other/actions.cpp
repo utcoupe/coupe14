@@ -265,7 +265,7 @@ void cmdBrasDepot(double a, int l) {
 				step++;
 				break;
 			case 7: {
-				int hauteur = MIN(HAUTEUR_MAX, hauteur_revele - 30);
+				int hauteur = MIN(HAUTEUR_MAX, MAX(hauteur_revele - 30, getCurrentHauteur()));
 				cmdAsc(hauteur);
 				step++;
 				setLastId();
@@ -374,7 +374,7 @@ void cmdTriBordure() {
 				}
 				break;
 			case 4:
-				cmdAsc(HAUTEUR_MAX);
+				cmdAsc(getCurrentStockHeight() + MARGE_PREHENSION);
 				step++;
 				break;
 			case 5: //On abaisse le bras sur les triangles du depot
