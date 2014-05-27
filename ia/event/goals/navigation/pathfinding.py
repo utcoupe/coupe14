@@ -65,15 +65,6 @@ class PathFinding:
 		self.__ng.update()
 		self.__log.info("Mise à jour des polygones convexes en " + str((time.time() - start_time) * 1000) + "ms")
 
-	def updateOld(self, robot):
-		start_time = time.time()
-		self.__ng.setOffset(robot["getRayon"] + MARGE_PASSAGE_PATH)
-		self.__update_enemy_bot()
-		if self.__our_bot_count == 2:  #Si on a deux robots, il faut compte le deuxieme dans le pathfinding
-			self.__update_our_bot()
-		self.__ng.update()
-		self.__log.info("Mise à jour des polygones convexes en " + str((time.time() - start_time) * 1000) + "ms")
-
 	def getPath(self, start, end, enable_smooth=True):
 		if enable_smooth == 'smooth':
 			enable_smooth = True

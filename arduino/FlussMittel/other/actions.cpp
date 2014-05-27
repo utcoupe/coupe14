@@ -518,7 +518,7 @@ void cmdBrasServ(double a, int l) {
 	call_critical = false;
 	//COMMANDE
 	int d = (l - BRAS_OFFSET_DIST);
-	double alpha = 7.36e-8*pow(d,4) - 1.51e-4*pow(d,3) + 1.75e-2*pow(d,2) - 1.03*d + 144; //regression polynomiale
+	double alpha = 1.61e-6*pow(d,4) - 1.79e-4*pow(d,3) + 5.54e-3*pow(d,2) + 5.59e-1*d ; //regression polynomiale
 	a += atan2(DECALAGE_VENT_AXE, l);
 	int theta = ANGLE_ANGLE_MAX + (a*180.0/M_PI + BRAS_OFFSET_ANGLE);
 
@@ -530,10 +530,10 @@ void cmdBrasServ(double a, int l) {
 		theta = ANGLE_ANGLE_MIN;
 		digitalWrite(PIN_DEBUG_LED, LOW);
 	}
-	if (alpha > ANGLE_DIST_MAX) {
+	if (alpha < ANGLE_DIST_MAX) {
 		alpha = ANGLE_DIST_MAX;
 		digitalWrite(PIN_DEBUG_LED, LOW);
-	} else if (alpha < ANGLE_DIST_MIN) {
+	} else if (alpha > ANGLE_DIST_MIN) {
 		alpha = ANGLE_DIST_MIN;
 		digitalWrite(PIN_DEBUG_LED, LOW);
 	}
@@ -547,7 +547,7 @@ void cmdBrasServ(double a, int l) {
 		criticalCmdBras(theta, alpha, 1);
 	} else {
 		//ORDRE
-		servoBrasAngle.write(theta);
+		servoBrasAngle.write(180-theta);
 		servoBrasDist.write(alpha);
 		current_theta = theta;
 		current_alpha = alpha;
@@ -582,7 +582,7 @@ void criticalCmdBras(int n_theta, int n_alpha, int direction) {
 			}
 			break;
 		case 1: {
-			servoBrasAngle.write(theta);
+			servoBrasAngle.write(180-theta);
 			current_theta = theta;
 			long new_time = timeMicros();
 			if ((new_time - time) > (long)SECU_DELAY_ROT_BRAS*1000) {
@@ -614,32 +614,34 @@ int getCurrentStockHeight() {
 
 void ascInt() {
 	static long start_time = -1;
-	if (stepperAsc.distanceToGo() == 0) {
-		if (step == 3 && action_en_cours == BrasVentouse) {
-			if (start_time == -1) {
-				start_time = timeMicros();
-			} else if (timeMicros() - start_time > (long)500*1000) {
-				got_tri = false;
+	if (!next_step) {
+		if (stepperAsc.distanceToGo() == 0) {
+			if (step == 3 && action_en_cours == BrasVentouse) {
+				if (start_time == -1) {
+					start_time = timeMicros();
+				} else if (timeMicros() - start_time > (long)500*1000) {
+					got_tri = false;
+					Timer1.detachInterrupt();
+					next_step = true;
+					start_time = -1;
+				}
+			} else {
 				Timer1.detachInterrupt();
 				next_step = true;
-				start_time = -1;
 			}
-		} else {
-			Timer1.detachInterrupt();
-			next_step = true;
 		}
-	}
-	if (digitalRead(PIN_INTERRUPT_BRAS) == 0) {
-		//On touche un triangle
-		if ((action_en_cours == BrasVentouse && step == 3)) {
-			Timer1.detachInterrupt();
-			next_step = true;
-			got_tri = true;
-			stepperAsc.move(20);
-		} else if ((action_en_cours == BrasDepot && step == 1) || (action_en_cours == None && step == -1)) {
-			Timer1.detachInterrupt();
-			next_step = true;
-			stepperAsc.move(0);
+		if (digitalRead(PIN_INTERRUPT_BRAS) == 0) {
+			//On touche un triangle
+			if ((action_en_cours == BrasVentouse && step == 3)) {
+				Timer1.detachInterrupt();
+				next_step = true;
+				got_tri = true;
+				stepperAsc.move(20);
+			} else if ((action_en_cours == BrasDepot && step == 1) || (action_en_cours == None && step == -1)) {
+				Timer1.detachInterrupt();
+				next_step = true;
+				stepperAsc.move(0);
+			}
 		}
 	}
 }

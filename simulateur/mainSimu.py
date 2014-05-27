@@ -49,8 +49,8 @@ if __name__ == "__main__":
 		Ne pas toucher au reste du code.
 		"""
 
-		redIA = False
-		yellowIA = True
+		redIA = True
+		yellowIA = False
 
 #=========================================================
 #======= Pas besoin de toucher à la suite du code ========
@@ -61,17 +61,22 @@ if __name__ == "__main__":
 
 		# robots
 		bigbotRed = bigrobot.BigRobot(engine = engine,
-							posinit = mm_to_px(180, 200),
+							posinit = mm_to_px(187, 2000-1870),
 							team = RED)
 		minibotRed = minirobot.MiniRobot(engine = engine,
-							  posinit = mm_to_px(70, 570),
+							  posinit = mm_to_px(193, 2000-1542),
 							  team = RED)
 		bigbotYellow = bigrobot.BigRobot(engine = engine,
-							 posinit = mm_to_px(3000-180,200),
+							 posinit = mm_to_px(3000-187,2000-1870),
 							 team = YELLOW)
 		minibotYellow = minirobot.MiniRobot(engine = engine,
-							   posinit = mm_to_px(3000-100,690),
+							   posinit = mm_to_px(3000-193, 2000-1542),
 							   team = YELLOW)
+		"""
+		bigbotRed.body.angle = 1.57
+		minibotRed.body.angle = 1.57
+		bigbotYellow.body.angle = 1.57
+		minibotYellow.body.angle = 1.57"""
 
 		#ne pas toucher des drapaux !
 		bigbotRed_flag = False
