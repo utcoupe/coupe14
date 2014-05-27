@@ -22,7 +22,6 @@ class PathFinding:
 		self.__log = logging.getLogger(__name__)
 		self.__flussmittel, self.__tibot, self.__big_enemy_bot, self.__small_enemy_bot = robot_list
 		#on cree le navgraph
-		print("Nav")
 		self.__ng = nav.NavGraph(MARGE_PASSAGE_PATH, xml_filename)
 		#on compte nos robots
 		self.__our_bot_count = 0

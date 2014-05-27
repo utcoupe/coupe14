@@ -69,11 +69,13 @@ class Partition:
 """
 class Partition:
 	def __init__(self, offset, container, obstacles, init_request=None):
+		"""
 		print("init_request "+str(init_request))
 		print("offset "+str(offset))
 		print("container "+str(container))
 		print("obstacles "+str(obstacles))
 		print()
+		"""
 		self.polygons = {}
 		cmd = os.path.join(os.path.dirname(os.path.abspath(__file__)), "partition_continue")
 		self.p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
@@ -106,8 +108,10 @@ class Partition:
 		
 	def calc(self, request):
 		self.polygons = {}
+		"""
 		print("request "+str(request))
 		print()
+		"""
 		self.p.stdin.write(request.encode("utf-8"))
 		self.p.stdin.flush()
 		self.p.stdout.flush()
