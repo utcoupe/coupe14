@@ -15,7 +15,6 @@ ENABLE_TOURELLE =		True
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
 ENABLE_TIBOT =			False
 
-
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
 VITESSE_XBEE = 			57600
@@ -47,7 +46,7 @@ renvoiImmediat = 		False # fonction non terminé, ne pas activer !
 #=======================================IA========================================
 
 #====================Variables globales====================
-NUMBER_OF_ENEMY = 		2 #TODO
+NUMBER_OF_ENEMY = 		1 #TODO
 #si 1, on considère que l'ennemi est petit
 
 #====================eventManager====================

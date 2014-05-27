@@ -119,11 +119,11 @@ class Visio:
 				self._triangles = []
 		else:
 			# Maj des triangles
-			self.__updateTriFromStr(data)
+			self.__updateTriFromStr(data, isTorch)
 			self.__retry_count = 0
 		return self._triangles
 
-	def __updateTriFromStr(self, data):
+	def __updateTriFromStr(self, data, isTorch=False):
 		self._triangles = []
 		try:
 			triangles = data.split('\n')
@@ -142,7 +142,7 @@ class Visio:
 			try:
 				for i in range(len(self._triangles)):
 					tri = self._triangles[i]
-					self.__highGroundProcess(tri, self__htorch)
+					self.__highGroundProcess(tri, self.__htorch)
 			except BaseException as e:
 				self.__log.error("Failed to post-process datas : "+str(e))
 				self._triangles = triangles  # si echec, on ne corrige pas

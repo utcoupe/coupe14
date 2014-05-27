@@ -473,6 +473,10 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 				step++;
 				break;
 			case 5:
+				cmdAsc(getCurrentStockHeight() + MARGE_PREHENSION);
+				step++;
+				break;
+			case 6:
 				//Lacher pompe
 				pump(false);
 				if (depot > 0) { //Depot a l'avant
@@ -483,13 +487,13 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 				}
 				time_end = timeMicros() + (long)DELAY_STOP_PUMP*1000;
 				break;
-			case 6:
+			case 7:
 				//Remise du bras au niveau du depot avant
 				cmdBrasServ(ANGLE_DEPOT, LONGUEUR_DEPOT);
 				time_end = timeMicros() + (long)DELAY_REPLI_BRAS2*1000; 
 				step++;
 				break;
-			case 7:
+			case 8:
 				got_tri = false;
 				setLastId(); //Fin de depot
 				cmdAsc(HAUTEUR_GARDE_DEPOT); //On descend le bras pour bloquer les triangles
