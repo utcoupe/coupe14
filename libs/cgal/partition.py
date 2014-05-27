@@ -69,9 +69,16 @@ class Partition:
 """
 class Partition:
 	def __init__(self, offset, container, obstacles, init_request=None):
+		"""
+		print("init_request "+str(init_request))
+		print("offset "+str(offset))
+		print("container "+str(container))
+		print("obstacles "+str(obstacles))
+		print()
+		"""
 		self.polygons = {}
-		self.cmd = os.path.join(os.path.dirname(os.path.abspath(__file__)), "partition_continue")
-		self.p = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+		cmd = os.path.join(os.path.dirname(os.path.abspath(__file__)), "partition_continue")
+		self.p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
 		if init_request:
 			self.p.stdin.write(init_request.encode("utf-8"))
 		else:
@@ -101,12 +108,17 @@ class Partition:
 		
 	def calc(self, request):
 		self.polygons = {}
+		"""
+		print("request "+str(request))
+		print()
+		"""
 		self.p.stdin.write(request.encode("utf-8"))
 		self.p.stdin.flush()
 		self.p.stdout.flush()
 		str_n_polys = self.p.stdout.readline().decode("utf-8")
 		if str_n_polys == "":
-			print("Erreur bizzare pathfinding")
+			print("Erreur pathfinding, TODO !")
+			#TODO, remove random bot
 		else:
 			n_polys = int(str_n_polys)
 			#print("N_POLYS", n_polys)
@@ -138,7 +150,7 @@ class Partition:
 
 	def stop(self):
 		self.p.terminate()
-		time.sleep(1)
+		time.sleep(0.1)
 		if not self.p.poll():
 			self.p.kill()
 		

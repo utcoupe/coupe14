@@ -91,6 +91,7 @@ class MetaData():
 			self.__logger.error("Demande la fin de funny action alors que funny action est arreté.")
 
 	def startCheckCollision(self):
+		self.__logger.info("On commencer à verifier les collisions")
 		self.__checkCollision = True
 
 			# GETTER

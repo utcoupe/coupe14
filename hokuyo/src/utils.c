@@ -167,10 +167,6 @@ int mergeRobots(Cluster_t *r1, int n1, Cluster_t *r2, int n2, Cluster_t *result)
 			nbr_found++;
 		}
 	}
-	printf("used: \n");
-	for (i=0; i<nbr_found; i++) {
-		printf("r1:%d r2:%d\n", used_R1_index[i], used_R2_index[i]);
-	}
 
 	for (i=0; i<nbr_found; i++) {
 		struct corres c = merged[i];
@@ -180,7 +176,6 @@ int mergeRobots(Cluster_t *r1, int n1, Cluster_t *r2, int n2, Cluster_t *result)
 		clu.size = (r1[c.r1].size + r2[c.r2].size) / 2;
 		result[i] = clu;
 	}
-	printf("Found %d pairs\n", nbr_found);
 
 	int nbr_left = n1 + n2 - 2*nbr_found, clust_counter = 0;
 	Cluster_t clust_left[MAX_ROBOTS*MAX_ROBOTS];
@@ -213,10 +208,6 @@ int mergeRobots(Cluster_t *r1, int n1, Cluster_t *r2, int n2, Cluster_t *result)
 	}
 
 	nbr_found = sortAndSelectRobots(nbr_found, result);
-	printf("Found %d in the end\n", nbr_found);
-	for (i=0; i<nbr_found;i++) {
-		printf("%d:%d ", result[i].center.x, result[i].center.y);
-	}
 	return nbr_found;
 }
 

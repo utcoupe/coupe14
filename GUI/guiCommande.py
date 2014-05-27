@@ -24,9 +24,9 @@ def gui(com):
 					arguments = last_arg
 					order = last_ordre
 				if order[0] == 'A':
-					address = 1
+					address = 4
 				elif order[0] == 'O':
-					address = 2
+					address = 3
 				elif order[0] == 'T':
 					address = 5
 
@@ -48,6 +48,17 @@ def gui(com):
 					arguments = []
 					com.sendOrderAPI(5, 'T_GET_CAM', *arguments)
 					com.sendOrderAPI(5, 'T_GET_HOKUYO', *arguments)
+				elif order == 'm':
+					i = 10
+					while i >0:
+						arguments = [9, 50, 50, 1000]
+						com.sendOrderAPI(4, 'A_PWM', *arguments)
+						time.sleep(4)
+						arguments = [10, -50, -50, 1000]
+						com.sendOrderAPI(4, 'A_PWM', *arguments)
+						time.sleep(4)
+						i -= 1
+
 
 				elif order == 's':
 					arguments = [0,2000,0]

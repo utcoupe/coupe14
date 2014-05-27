@@ -32,7 +32,7 @@ class TimeManager():
 		date_actuel = int(time.time()*1000.0)
 		while( date_actuel - self.__date_match_begin ) < END_OF_MATCH:
 			self.__MetaData.setGameClock(date_actuel - self.__date_match_begin)
-			if ( date_actuel - self.__date_match_begin ) > BEGIN_CHECK_COLLISION:
+			if ( date_actuel - self.__date_match_begin ) > BEGIN_CHECK_COLLISION and self.__MetaData.getCheckCollision() == False:
 				self.__MetaData.startCheckCollision()
 			time.sleep(PERIODE_TIME_MANAGER/1000.0)
 			date_actuel = int(time.time()*1000.0)
