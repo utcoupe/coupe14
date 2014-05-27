@@ -119,11 +119,11 @@ class Visio:
 				self._triangles = []
 		else:
 			# Maj des triangles
-			self.__updateTriFromStr(data)
+			self.__updateTriFromStr(data, isTorch)
 			self.__retry_count = 0
 		return self._triangles
 
-	def __updateTriFromStr(self, data):
+	def __updateTriFromStr(self, data, isTorch=False):
 		self._triangles = []
 		try:
 			triangles = data.split('\n')
