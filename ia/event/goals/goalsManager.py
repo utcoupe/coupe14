@@ -437,7 +437,8 @@ class GoalsManager:
 			min_id = None
 			for i, triangle in enumerate(triangle_list):
 				if torche:
-					tiangle.coord[0] -= 140
+					triangle.coord[0] -= 100
+					triangle.coord[1] -= 20
 				distance = sqrt((triangle.coord[0]-220)**2 + (triangle.coord[1])**2)
 				if distance < min_distance:
 					min_distance = distance
