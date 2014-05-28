@@ -28,6 +28,7 @@ class GoalsChoice:
 		self.__front_triangle_stack = front_triangle_stack
 
 		# Priorité
+		""" Ancien choix d'objectif
 		self.__prio_FM_areas = ["STORE_TRIANGLE_GAUCHE", "STORE_TRIANGLE_CENTRE", "STORE_TRIANGLE_DROITE"]
 		#self.__prio_FM_area_triangles = {"STORE_TRIANGLE_CENTRE": [7,17], "STORE_TRIANGLE_GAUCHE": [8,17,9,7,5], "STORE_TRIANGLE_DROITE": [7,17]}
 		self.__prio_FM_area_triangles = {"STORE_TRIANGLE_CENTRE": [], "STORE_TRIANGLE_GAUCHE": [], "STORE_TRIANGLE_DROITE": []}
@@ -37,7 +38,7 @@ class GoalsChoice:
 			temp = self.__goalsLib.reverseTabOfGoalId(self.__prio_FM_area_triangles["STORE_TRIANGLE_GAUCHE"])
 			self.__prio_FM_area_triangles["STORE_TRIANGLE_GAUCHE"] = self.__goalsLib.reverseTabOfGoalId(self.__prio_FM_area_triangles["STORE_TRIANGLE_DROITE"])
 			self.__prio_FM_area_triangles["STORE_TRIANGLE_DROITE"] = temp
-
+		"""
 		# Variables TIBOT
 		self.__balle_goal_already_swapped = False
 
@@ -57,95 +58,31 @@ class GoalsChoice:
 
 	#FLUSSMITTEL
 	def __getBestGoalFlussmittel(self):
-		self.__logger.info("GET BEST GOAL FLUSSMITTEL")
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
+
+		# Log error
+		if len(self.__front_triangle_stack) > MAX_FRONT_TRIANGLE_STACK:
+			self.__logger.error("On a stocké plus de triangles qu'on a de place")
 
 		# On tri d'abord par path car le tri est stable
 		goals = sorted(self.__available_goals, key=self.__distByPath)
-		
-		### Phase 1 : Sécurisation des areas (avec priorité)
-		if self.__getTime() <= TIME_BETWEEN_PHASE_FM:
-			# On récupère et trie les areas
-			self.__state_area = []
-			for goal in goals:
-				if goal.getType() == "STORE_TRIANGLE":
-					can_go = False
-					best_elem_goal = self.__getBestElemGoal(goal)
-					if best_elem_goal is not None:
-						can_go = True
-					self.__state_area.append([goal.getName(), goal.getAreaStatus(), can_go])
-			self.__state_area.sort(key=self.__sort_area)
-			# On cherche la meilleure area
-			best_area = None
-			for area in self.__state_area:
-				if area[1] == "EMPTY" and area[2]:
-					best_area = area[0]
-					break
-			# Si on en a trouvé une, on entre dans la phase 1
-			if best_area is not None:
-				self.__logger.info("Phase 1")
-				self.__logger.info("best area = " + best_area)
-				goals = self.__getGoalsByPriority(goals, best_area)
-				for goal in goals:
-					# Si on est obligé de déposer les triangles
-					if len(self.__front_triangle_stack) >= MAX_FRONT_TRIANGLE_STACK:
-						if len(self.__front_triangle_stack) > MAX_FRONT_TRIANGLE_STACK:
-							self.__logger.error("On a stocké plus de triangles qu'on a de place")
-						if goal.getName() != best_area:
-							continue
-						best_elem_goal = self.__getBestElemGoal(goal)
-						best_goal = best_elem_goal
-						break
-					# Sinon on en stocke un maximum
-					else:
-						if goal.getType() == "STORE_TRIANGLE":
-							continue
-						best_elem_goal = self.__getBestElemGoal(goal)
-						if best_elem_goal is not None:
-							best_goal = best_elem_goal
-							break
+		if len(self.__front_triangle_stack) > 1:
+			goals.sort(key=self.__prioStoreTriangle) # car tri stable
+		else:
+			goals.sort(key=self.__prioTriangle) # car tri stable
 
-		### Phase 2 : Max de triangles (du bon côté sans se soucier des areas)
-		if self.__getTime() > TIME_BETWEEN_PHASE_FM or best_area is None:
-			self.__logger.info("Phase 2")
-			# TEMP
-			for goal in goals:
-				if len(self.__front_triangle_stack) >= MAX_FRONT_TRIANGLE_STACK:
-					if len(self.__front_triangle_stack) > MAX_FRONT_TRIANGLE_STACK:
-						self.__logger.error("On a stocké plus de triangle qu'on a de place")
-					if goal.getType() != "STORE_TRIANGLE":
-						continue
-				else:
-					if goal.getType() == "STORE_TRIANGLE":
-						continue
-				best_elem_goal = self.__getBestElemGoal(goal)
-				if best_elem_goal is not None:
-					best_goal = best_elem_goal
-					break
-
-		"""
 		for goal in goals:
-			if len(self.__front_triangle_stack) >= MAX_FRONT_TRIANGLE_STACK:
-				if len(self.__front_triangle_stack) > MAX_FRONT_TRIANGLE_STACK:
-					self.__logger.error("On a stocké plus de triangle qu'on a de place")
-				if goal.getType() != "STORE_TRIANGLE":
-					continue
-			else:
-				if goal.getType() == "STORE_TRIANGLE":
-					continue
-
 			best_elem_goal = self.__getBestElemGoal(goal)
 			if best_elem_goal is not None:
 				best_goal = best_elem_goal
 				break
-		"""
+		
 		if best_goal[1] is not None:
-			self.__logger.info("Best goal = " + best_goal[1].getName())
+			self.__logger.info("Best goal FLUSSMITTEL : " + best_goal[1].getName())
 		else:
-			self.__logger.info("On a pas trouvé de goal à faire.")
+			self.__logger.info("Best goal FLUSSMITTEL : On a pas trouvé de goal à faire.")
 
 		return best_goal
-
 	
 	def __distByPath(self, goal):
 		best_path = self.__getBestElemGoal(goal)
@@ -153,6 +90,20 @@ class GoalsChoice:
 			return best_path[3]
 		else:
 			return float("Inf")
+
+	def __prioTriangle(self, goal):
+		if goal.getType() == "triangle":
+			return 0
+		elif goal.getType() == "TORCHE":
+			return 1
+		else:
+			return 2
+
+	def __prioStoreTriangle(self, goal):
+		if goal.getType() == "STORE_TRIANGLE":
+			return 0
+		else:
+			return 1
 
 	def __sort_area(self, area):
 		return self.__prio_FM_areas.index(area[0])
@@ -248,3 +199,66 @@ class GoalsChoice:
 		def dist(goal):
 			return hypot(goal.getPosition()[0] - position_last_goal[0], goal.getPosition()[1] - position_last_goal[1])
 		return sorted(goals, key=dist)"""
+
+""" Ancien choix d'objectif
+		### Phase 1 : Sécurisation des areas (avec priorité)
+		if self.__getTime() <= TIME_BETWEEN_PHASE_FM:
+			# On récupère et trie les areas
+			self.__state_area = []
+			for goal in goals:
+				if goal.getType() == "STORE_TRIANGLE":
+					can_go = False
+					best_elem_goal = self.__getBestElemGoal(goal)
+					if best_elem_goal is not None:
+						can_go = True
+					self.__state_area.append([goal.getName(), goal.getAreaStatus(), can_go])
+			self.__state_area.sort(key=self.__sort_area)
+			# On cherche la meilleure area
+			best_area = None
+			for area in self.__state_area:
+				if area[1] == "EMPTY" and area[2]:
+					best_area = area[0]
+					break
+			# Si on en a trouvé une, on entre dans la phase 1
+			if best_area is not None:
+				self.__logger.info("Phase 1")
+				self.__logger.info("best area = " + best_area)
+				goals = self.__getGoalsByPriority(goals, best_area)
+				for goal in goals:
+					# Si on est obligé de déposer les triangles
+					if len(self.__front_triangle_stack) >= MAX_FRONT_TRIANGLE_STACK:
+						if len(self.__front_triangle_stack) > MAX_FRONT_TRIANGLE_STACK:
+							self.__logger.error("On a stocké plus de triangles qu'on a de place")
+						if goal.getName() != best_area:
+							continue
+						best_elem_goal = self.__getBestElemGoal(goal)
+						best_goal = best_elem_goal
+						break
+					# Sinon on en stocke un maximum
+					else:
+						if goal.getType() == "STORE_TRIANGLE":
+							continue
+						best_elem_goal = self.__getBestElemGoal(goal)
+						if best_elem_goal is not None:
+							best_goal = best_elem_goal
+							break
+
+		### Phase 2 : Max de triangles (du bon côté sans se soucier des areas)
+		if self.__getTime() > TIME_BETWEEN_PHASE_FM or best_area is None:
+			self.__logger.info("Phase 2")
+			# TEMP
+			for goal in goals:
+				if len(self.__front_triangle_stack) >= MAX_FRONT_TRIANGLE_STACK:
+					if len(self.__front_triangle_stack) > MAX_FRONT_TRIANGLE_STACK:
+						self.__logger.error("On a stocké plus de triangle qu'on a de place")
+					if goal.getType() != "STORE_TRIANGLE":
+						continue
+				else:
+					if goal.getType() == "STORE_TRIANGLE":
+						continue
+				best_elem_goal = self.__getBestElemGoal(goal)
+				if best_elem_goal is not None:
+					best_goal = best_elem_goal
+					break
+
+		"""
