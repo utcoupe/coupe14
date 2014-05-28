@@ -447,10 +447,11 @@ class GoalsManager:
 			min_distance = float("inf")
 			min_id = None
 			for i, triangle in enumerate(triangle_list):
-				distance = sqrt((triangle.coord[0]-220)**2 + (triangle.coord[1])**2)
-				if distance < min_distance and distance < VISIO_MAX_DIST_TRIANGLE:
-					min_distance = distance
-					min_id = i
+				if self.__isThisTriangleOnTable(triangle):
+					distance = sqrt((triangle.coord[0]-220)**2 + (triangle.coord[1])**2)
+					if distance < min_distance and distance < VISIO_MAX_DIST_TRIANGLE:
+						min_distance = distance
+						min_id = i
 			if min_id is not None:
 				list_of_best_triangle.append(triangle_list[min_id])
 
@@ -475,6 +476,16 @@ class GoalsManager:
 		self.__logger.debug("On a choisi le triangle coord[0] "+str(triangle_choisi.coord[0])+" coord[1] "+str(triangle_choisi.coord[1])+" color "+str(triangle_choisi.color))
 		return (triangle_choisi.color, triangle_choisi.coord[0], triangle_choisi.coord[1]) #type (color, x, y)
 
+	def __isThisTriangleOnTable(self, triangle):
+		x, y, a = self.__data[self.__robot_name]["getPositionAndAngle"]
+		x += (cos(a)*triangle.coord[0]) + (cos(a+1.57)*triangle.coord[1])
+		y += (sin(a)+triangle.coord[0]) + (sin(a+1.57)+triangle.coord[1])
+
+		if x<0 or x>3000 or y<0 or y>2000:
+			self.__logger.warning("On a vu un triangle en dehors de la map, triangle "+str(triangle)+" our_bot "+str(self.__data[self.__robot_name]["getPositionAndAngle"])+" x "+str(x)+" y "+str(y))
+			return False
+		return True
+		
 	def __positionReady(self, x, y):
 		x2 = x - CENTRE_BRAS_X
 		y2 = y - CENTRE_BRAS_Y

@@ -113,9 +113,8 @@ CENTRE_BRAS_X = 128
 CENTRE_BRAS_Y = 130
 NB_VISIO_TRY = 25
 NB_VISIO_DATA_NEEDED = 5
-# Choix d'objectif
-ENNEMI_CAN_CLEAN_ZONE = True
 VISIO_MAX_DIST_TRIANGLE = 400
+
 
 #====================TIBOT====================
 START_POSITION_RED_TIBOT = (177, 1578, -1.14875)
@@ -138,3 +137,8 @@ RAYON_BIG_ENEMY = 		200
 #====================SMALL ENEMY====================
 RAYON_SMALL_ENEMY = 	120
 
+
+
+
+#==================== Choix d'objectif ====================
+ENNEMI_CAN_CLEAN_ZONE = True
