@@ -473,7 +473,11 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 				step++;
 				break;
 			case 5:
-				cmdAsc(getCurrentStockHeight() + MARGE_PREHENSION);
+				if (depot >= 0) {
+					cmdAsc(getCurrentStockHeight() + MARGE_PREHENSION);
+				} else {
+					cmdAsc(HAUTEUR_MAX);
+				}
 				step++;
 				break;
 			case 6:

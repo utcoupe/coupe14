@@ -10,6 +10,7 @@
 #include "serial_types.h"
 #ifdef ARDUINO
 #include "parameters.h"
+#include <Arduino.h>
 #endif
 
 extern unsigned char ordreSize[MAX_ORDRES];
