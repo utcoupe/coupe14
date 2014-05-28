@@ -80,11 +80,10 @@
 			<order>THEN</order>
 			<order>O_DROP_TRIANGLE 300 110</order>
 			<order>THEN</order>
-			<order>O_DROP_TRIANGLE 250 -50</order>
-			<order>THEN</order>
 			<order>A_ROT 1.57</order>
 			<order>A_PWM 50 50 150</order>
 			<order>A_ROT 1.57</order>
+			<order>THEN</order>
 			<order>O_RET</order>
 			<order>END</order>
 		</orders>

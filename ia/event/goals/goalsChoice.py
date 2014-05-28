@@ -119,8 +119,8 @@ class GoalsChoice:
 					break
 		"""
 		for goal in goals:
-			if len(self.__front_triangle_stack) >= MAX_FRONT_TRIANGLE_STACK:
-				if len(self.__front_triangle_stack) > MAX_FRONT_TRIANGLE_STACK:
+			if len(self.__front_triangle_stack) >= MAX_FRONT_TRIANGLE_STACK_STORE:
+				if len(self.__front_triangle_stack) > MAX_FRONT_TRIANGLE_STACK_STORE:
 					self.__logger.error("On a stocké plus de triangle qu'on a de place")
 				if goal.getType() != "STORE_TRIANGLE":
 					continue
