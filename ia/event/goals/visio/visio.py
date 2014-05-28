@@ -138,6 +138,10 @@ class Visio:
 
 		# En situation de test, big bot est None
 		triangles = self._triangles
+		self.__log.info("Got "+str(len(triangles))+" triangles, coords :")
+		for tri in triangles:
+			self.__log.info(tri)
+
 		if isTorch:
 			try:
 				for i in range(len(self._triangles)):
@@ -155,6 +159,10 @@ class Visio:
 			self.__log.error("Failed to post-process datas (generic) : "+str(e))
 			self._triangles = triangles  # si echec, on ne corrige pas
 
+		self.__log.info("After post-process :")
+		for tri in self._triangles:
+			self.__log.info(tri)
+
 	def __post_processing(self):
 		if self.__big_bot is None:
 			return
@@ -164,14 +172,19 @@ class Visio:
 
 			#calcul des coordonnées relatives dans le repère des coords absolues
 			robot_angle = self.__big_bot["getPositionAndAngle"][2]
+			self.__log.info("Got robot in position : " + str(self.__big_bot["getPosition"]) + " with angle = " + str(self.__big_bot["getPositionAndAngle"][2]))
 
 			#calcul des coordonnées réelles du triangles, on le recalcule par la
 			# suite si elles sont a modifier, mais on en a besoin pour savoir
 			# s'i faut les modifier
 			tri.real_coords = [i + j for i, j in zip(tri.rel_in_abs(robot_angle), self.__big_bot["getPosition"])]
+			self.__log.info("realtive coords : " + str(tri.coords))
+			self.__log.info("rel in ab : " + str(tri.rel_in_abs(robot_angle)))
+			self.__log.info("real : " + str(tri.real_coords))
 
 			#Traitement de la position pour modif si triangle en hauteur
 			if self.__outOfMap(tri) or self.__inFruitZone(tri) or self.__inStartZone(tri):
+				self.__log("Removed detected triangle at coords " + str(tri.real_coords))
 				self._triangles.remove(tri)
 
 			#elif self.__inHighGround(tri):
