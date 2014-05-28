@@ -152,12 +152,12 @@ class Visio:
 				self._triangles = triangles  # si echec, on ne corrige pas
 
 		triangles = self._triangles
-		try:
-			if self.__big_bot is not None:
-				self.__post_processing()
-		except BaseException as e:
-			self.__log.error("Failed to post-process datas (generic) : "+str(e))
-			self._triangles = triangles  # si echec, on ne corrige pas
+		#try:
+		if self.__big_bot is not None:
+			self.__post_processing()
+		#except BaseException as e:
+		#	self.__log.error("Failed to post-process datas (generic) : "+str(e))
+		#	self._triangles = triangles  # si echec, on ne corrige pas
 
 		self.__log.info("After post-process :")
 		for tri in self._triangles:
