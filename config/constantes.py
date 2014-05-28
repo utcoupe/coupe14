@@ -5,7 +5,7 @@ Ce fichier regroupe toutes les constantes de l'IA
 
 import math
 
-TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
@@ -13,7 +13,7 @@ TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté au
 #====================Enable====================
 ENABLE_TOURELLE =		True
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
-ENABLE_TIBOT =			False
+ENABLE_TIBOT =			True
 
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
@@ -115,6 +115,7 @@ NB_VISIO_TRY = 25
 NB_VISIO_DATA_NEEDED = 5
 # Choix d'objectif
 ENNEMI_CAN_CLEAN_ZONE = True
+VISIO_MAX_DIST_TRIANGLE = 400
 
 #====================TIBOT====================
 START_POSITION_RED_TIBOT = (177, 1578, -1.14875)

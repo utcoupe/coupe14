@@ -443,10 +443,11 @@ class GoalsManager:
 			min_id = None
 			for i, triangle in enumerate(triangle_list):
 				distance = sqrt((triangle.coord[0]-220)**2 + (triangle.coord[1])**2)
-				if distance < min_distance:
+				if distance < min_distance and distance < VISIO_MAX_DIST_TRIANGLE:
 					min_distance = distance
 					min_id = i
-			list_of_best_triangle.append(triangle_list[min_id])
+			if min_id is not None:
+				list_of_best_triangle.append(triangle_list[min_id])
 
 		#On les comparent les un aux autres et on prend le plus proche des autres
 		min_distance = float("inf")
@@ -455,12 +456,11 @@ class GoalsManager:
 			min_distance_temp = float("inf")
 			min_id_temp = None
 			for i, triangle_temp in enumerate(list_of_best_triangle):
-				distance = sqrt((triangle_temp.coord[0] - triangle.coord[0])**2 + (triangle_temp.coord[1] - triangle.coord[1])**2)
-				if min_id is not None and list_of_best_triangle[min_id].color != triangle_temp.color:
-					distance += 300 #valeur arbitraire pour les séparer
-				if distance < min_distance_temp:
-					min_distance_temp = distance
-					min_id_temp = i
+				if triangle.color == triangle_temp.color:
+					distance = sqrt((triangle_temp.coord[0] - triangle.coord[0])**2 + (triangle_temp.coord[1] - triangle.coord[1])**2)
+					if distance < min_distance_temp:
+						min_distance_temp = distance
+						min_id_temp = i
 
 			if min_distance_temp < min_distance:
 				min_distance = min_distance_temp
