@@ -144,7 +144,7 @@ class Visio:
 					tri = self._triangles[i]
 					self.__highGroundProcess(tri, self.__htorch)
 			except BaseException as e:
-				self.__log.error("Failed to post-process datas : "+str(e))
+				self.__log.error("Failed to post-process datas (torches) : "+str(e))
 				self._triangles = triangles  # si echec, on ne corrige pas
 
 		triangles = self._triangles
@@ -152,7 +152,7 @@ class Visio:
 			if self.__big_bot is not None:
 				self.__post_processing()
 		except BaseException as e:
-			self.__log.error("Failed to post-process datas : "+str(e))
+			self.__log.error("Failed to post-process datas (generic) : "+str(e))
 			self._triangles = triangles  # si echec, on ne corrige pas
 
 	def __post_processing(self):

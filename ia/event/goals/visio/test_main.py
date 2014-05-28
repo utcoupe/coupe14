@@ -15,7 +15,7 @@ print('Visio started')
 
 while 1:
 	start = time.time()
-	tris = v.update()
+	tris = v.update(True)
 	#tris = v2.update()
 	print("Duration : ", time.time() - start)
 	for tri in tris:
