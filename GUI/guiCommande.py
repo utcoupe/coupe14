@@ -24,9 +24,9 @@ def gui(com):
 					arguments = last_arg
 					order = last_ordre
 				if order[0] == 'A':
-					address = 4
+					address = 2
 				elif order[0] == 'O':
-					address = 3
+					address = 1
 				elif order[0] == 'T':
 					address = 5
 

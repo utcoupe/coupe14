@@ -167,6 +167,8 @@ class Visio:
 		if self.__big_bot is None:
 			return
 
+		tri_to_remove = []
+
 		for i in range(len(self._triangles)):
 			#calcul des coordonnées relatives dans le repère des coords absolues
 			robot_angle = self.__big_bot["getPositionAndAngle"][2]
@@ -181,9 +183,14 @@ class Visio:
 			self.__log.info("real : " + str(self._triangles[i].real_coords))
 
 			#Traitement de la position pour modif si self._triangles[i]angle en hauteur
-			if self.__outOfMap(self._triangles[i]) or self.__inFruitZone(self._triangles[i]) or self.__inStartZone(self._triangles[i]):
+			if self._triangles[i].coords[0] < MIN_X_TRIANGLE:
+				tri_to_remove.append(self._triangles[i])
+			elif self.__outOfMap(self._triangles[i]) or self.__inFruitZone(self._triangles[i]) or self.__inStartZone(self._triangles[i]):
 				self.__log("Removed detected triangle at coords " + str(self._triangles[i].real_coords))
-				self._triangles.remove(self._triangles[i])
+				tri_to_remove.append(self._triangles[i])
+
+			for j in range(len(tri_to_remove)):
+				self._triangles.remove(tri_to_remove[j])
 
 			#elif self.__inHighGround(self._triangles[i]):
 			#	self.__highGroundProcess(self._triangles[i], self.__hplat)
@@ -205,23 +212,35 @@ class Visio:
 		tri.real_coords = [i + j for i, j in zip(tri.rel_in_abs(robot_angle), self.__big_bot["getPosition"])]
 
 	def __outOfMap(self, tri):
-		return tri.real_coords[0] > 3000 or tri.real_coords[0] < 0\
-		or tri.real_coord[1] > 2000 or tri.real_coord[1] < 0
+		if tri.real_coords[0] > 3000 or tri.real_coords[0] < 0\
+				or tri.real_coord[1] > 2000 or tri.real_coord[1] < 0:
+			return True
+		else:
+			return False
 
 	def __inFruitZone(self, tri):
-		return (tri.real_coords[0] > 400 and tri.real_coords[0] < 1100 and tri.real_coord[1] > 1700)\
-		or (tri.real_coords[0] > 1900 and tri.real_coords[0] < 2600 and tri.real_coord[1] > 1700)
+		if (tri.real_coords[0] > 400 and tri.real_coords[0] < 1100 and tri.real_coord[1] > 1700)\
+				or (tri.real_coords[0] > 1900 and tri.real_coords[0] < 2600 and tri.real_coord[1] > 1700):
+			return True
+		else:
+			return False
 
 
 	def __inHighGround(self, tri):
 		#plateformes
-		return self.__p_in_circle((0, 0), 250, tri.real_coords) \
+		if self.__p_in_circle((0, 0), 250, tri.real_coords) \
 		or self.__p_in_circle((3000, 0), 250, tri.real_coords) \
-		or self.__p_in_circle((1500, 950), 150, tri.real_coords)
+		or self.__p_in_circle((1500, 950), 150, tri.real_coords):
+			return True
+		else:
+			return False
 
 	def __inStartZone(self, tri):
-		return (tri.real_coords[0] < 400 and tri.real_coord[1] > 1700) or (tri.real_coords[0] > 2600 and tri.real_coord[1] > 1700) \
-		or self.__p_in_circle((0,1700), 400, tri.real_coords) or self.__p_in_circle((3000, 1700), 400, tri.real_coords)
+		if (tri.real_coords[0] < 400 and tri.real_coord[1] > 1700) or (tri.real_coords[0] > 2600 and tri.real_coord[1] > 1700) \
+				or self.__p_in_circle((0,1700), 400, tri.real_coords) or self.__p_in_circle((3000, 1700), 400, tri.real_coords):
+			return True
+		else:
+			return False
 
 	def __p_in_circle(self, center, radius, p):
 			# (x−p)2+(y−q)2<r2
