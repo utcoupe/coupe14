@@ -5,15 +5,15 @@ Ce fichier regroupe toutes les constantes de l'IA
 
 import math
 
-TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
 
 #====================Enable====================
-ENABLE_TOURELLE =		True
+ENABLE_TOURELLE =		False
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
-ENABLE_TIBOT =			True
+ENABLE_TIBOT =			False
 
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
@@ -86,7 +86,7 @@ COLLISION_WARNING_THRESHOLD = 800
 
 #=======================================Systemes physiques========================================
 #====================tourelle====================
-OUR_ROBOTS_VISIBLE_TOURELLE = True 	#True si une balise visible par l'hokuyo est presente sur nos robots 
+OUR_ROBOTS_VISIBLE_TOURELLE = False 	#True si une balise visible par l'hokuyo est presente sur nos robots 
 TOURELLE_PULL_PERIODE = 100 		#ms
 DISTANCE_MAX_ROBOT_FUSION = 250 #Différance max entre codeurs et hokuyo
 
@@ -101,12 +101,11 @@ HAUTEUR_TRIANGLE = 30
 MARGE_DROP_TRIANGLE = 0
 HAUTEUR_TORCHE = 36
 # TODO mesures avec précision
-# Attention, prendre en compte le fait que la ventous est décalée par rapport à la glissière (il faut décaler angle_min et angle_max, ça devrait suffire)
-# Marges 20mm, 5° (à tester expérimentalement)
-ANGLE_MIN = math.radians(-70)
-ANGLE_MAX = math.radians(0)
-OUVERTURE_BRAS_MIN = 125
-OUVERTURE_BRAS_MAX = 235
+# Attention, prendre en compte le fait que la ventouse est décalée par rapport à la glissière (il faut décaler angle_min et angle_max, ça devrait suffire)
+ANGLE_MIN = math.radians(-90)
+ANGLE_MAX = math.radians(-3)
+OUVERTURE_BRAS_MIN = 132
+OUVERTURE_BRAS_MAX = 132+225
 MARGE_OUVERTURE_BRAS_MAX_DEPLACEMENT = 20
 MARGE_OUVERTURE_BRAS_MIN_DEPLACEMENT = 20
 CENTRE_BRAS_X = 128
