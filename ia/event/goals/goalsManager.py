@@ -60,6 +60,14 @@ class GoalsManager:
 		self.__goalsChoice = GoalsChoice(self.__robot_name, self.__data, self.__goalsLib, self.__Collision, self.__our_color, self.__back_triangle_stack, self.__front_triangle_stack, self.__available_goals, self.__finished_goals)
 
 		self.__tibot_ready_for_filet = False
+		temp = ("BIGENEMYBOT", "SMALLENEMYBOT", "FLUSSMITTEL", "TIBOT")
+		self.__robot_to_check_goal_collision = []
+		self.__last_enemy_pos = {}
+		for robot in temp:
+			if self.__data[robot] is not None:
+				self.__robot_to_check_goal_collision.append(robot)
+				self.__last_enemy_pos[robot] = None
+		
 
 		# Pour tester le déplacement du robot dans le simu lorsqu'il ne peut pas attraper un triangle
 		if TEST_MODE == True:
@@ -73,9 +81,6 @@ class GoalsManager:
 
 		self.__loadBeginScript()
 
-		#pour le truc que thomas a fait
-		self.__last_pos_big = (0,0)
-		self.__last_pos_mini = (0,0)
 
 	def restartObjectifSearch(self):
 		self.__queueBestGoals()
@@ -732,22 +737,15 @@ class GoalsManager:
 		#quand on t'appel check self.__data, dont data["BIGENEMYBOT"]["getPosition"], data["SMALLENEMYBOT"]["getPosition"], data["METADATA"]["getGameClock"]
 		#pour tous les objectifs dans self.__available_goals, appel la fonction getAlreadyDone et setAlreadyDone
 		if self.__data["METADATA"]["getGameClock"] is not None:
-			if self.__data["BIGENEMYBOT"] is not None and self.__last_pos_big != self.__data["BIGENEMYBOT"]["getPosition"]:
-				for goal in self.__available_goals:
-					if goal.getAlreadyDone() < 100:
-						if self.__check_goal_proximity(goal,self.__data["BIGENEMYBOT"]) is True:
-							goal.setAlreadyDone(100)
-							goal.setGoalDone(True)
-						else:
-							self.__check_goal_TS(goal,self.__data["BIGENEMYBOT"])
-				self.__last_pos_big = self.__data["BIGENEMYBOT"]["getPosition"]
-			#check pour le petit robot
-			if self.__data["SMALLENEMYBOT"] is not None and self.__last_pos_mini != self.__data["SMALLENEMYBOT"]["getPosition"]:
-				for goal in self.__available_goals:
-					if goal.getAlreadyDone() < 100:
-						if self.__check_goal_proximity(goal,self.__data["SMALLENEMYBOT"]) is True:
-							goal.setAlreadyDone(100)
-							goal.setGoalDone(True)
-						else:
-							self.__check_goal_TS(goal,self.__data["SMALLENEMYBOT"])
-				self.__last_mini_big = self.__data["SMALLENEMYBOT"]["getPosition"]
+			for robot in self.__robot_to_check_goal_collision:
+				if self.__last_enemy_pos[robot] != self.__data[robot]["getPosition"]:
+					self.__last_enemy_pos[robot] = self.__data[robot]["getPosition"]
+					for goal in self.__available_goals:
+						if goal.getAlreadyDone() < 100:
+							if self.__check_goal_proximity(goal, self.__data[robot]) is True:
+								goal.setAlreadyDone(100)
+								goal.setGoalDone(True)
+								self.__available_goals.remove(goal)
+								self.__finished_goals.append(goal)
+							else:
+								self.__check_goal_TS(goal,self.__data[robot])
