@@ -362,7 +362,7 @@ class GoalsManager:
 					else:
 						# Coordonées du triangle par rapport au centre du robot
 						# sera corrigé par l'algo lors de la prise du premier triangle normalement
-						temp = (220, -100)
+						temp = (220, 0)
 						# Correction x y
 						temp_x = temp[0] + self.__hack_camera_simu_x
 						temp_y = temp[1] + self.__hack_camera_simu_y
