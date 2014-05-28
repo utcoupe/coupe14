@@ -48,6 +48,17 @@ def gui(com):
 					arguments = []
 					com.sendOrderAPI(5, 'T_GET_CAM', *arguments)
 					com.sendOrderAPI(5, 'T_GET_HOKUYO', *arguments)
+				elif order == 'm':
+					i = 10
+					while i >0:
+						arguments = [9, 100, 100, 1000]
+						com.sendOrderAPI(4, 'A_PWM', *arguments)
+						time.sleep(4)
+						arguments = [10, -100, -100, 1000]
+						com.sendOrderAPI(4, 'A_PWM', *arguments)
+						time.sleep(4)
+						i -= 1
+
 
 				elif order == 's':
 					arguments = [0,2000,0]

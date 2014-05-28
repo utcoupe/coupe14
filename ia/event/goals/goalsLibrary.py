@@ -76,14 +76,14 @@ class GoalsLibrary:
 	def getPositionLastGoal(self, position_depart_speciale=None):
 		if position_depart_speciale is not None:
 			position_last_goal = position_depart_speciale
-			self.__logger.debug("Position from position_depart_speciale" + str(position_last_goal))
+			#self.__logger.debug("Position from position_depart_speciale" + str(position_last_goal))
 		elif self.__blocked_goals:
 			last_goal = self.__blocked_goals[-1]
 			position_last_goal = last_goal.getElemGoalLocked().getPositionAndAngle()
-			self.__logger.debug("Position from queue" + str(position_last_goal))
+			#self.__logger.debug("Position from queue" + str(position_last_goal))
 		else:
 			position_last_goal = self.__data[self.__robot_name]["getPositionAndAngle"]
-			self.__logger.debug("Position from data" + str(position_last_goal))
+			#self.__logger.debug("Position from data" + str(position_last_goal))
 
 		return position_last_goal
 

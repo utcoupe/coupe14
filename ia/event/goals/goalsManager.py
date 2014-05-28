@@ -73,6 +73,10 @@ class GoalsManager:
 
 		self.__loadBeginScript()
 
+		#pour le truc que thomas a fait
+		self.__last_pos_big = (0,0)
+		self.__last_pos_mini = (0,0)
+
 	def restartObjectifSearch(self):
 		self.__queueBestGoals()
 
@@ -337,13 +341,13 @@ class GoalsManager:
 						triangle_list_temp = []
 						while limite_essai_viso > 0 and len(list_of_triangle_list) < NB_VISIO_DATA_NEEDED:
 							limite_essai_viso -= 1
-							self.__vision.update()
+							self.__vision.update(objectif.getType() == "TORCHE")
 							triangle_list_temp = self.__vision.getTriangles()
 							if triangle_list_temp != []:
 								list_of_triangle_list.append(triangle_list_temp)
 
 						if len(list_of_triangle_list) >= NB_VISIO_DATA_NEEDED:
-							data_camera = self.__getBestDataTriangleOfList(list_of_triangle_list, objectif.getType() == "TORCHE")
+							data_camera = self.__getBestDataTriangleOfList(list_of_triangle_list)
 						else:
 							self.__logger.warning("On a pas vu de triangle à la position attendu, list_of_triangle_list "+str(list_of_triangle_list)+" dont on va supprimer l'objectif "+str(id_objectif))
 							self.__last_camera_color = None
@@ -403,6 +407,7 @@ class GoalsManager:
 										path = self.__PathFinding.getPath((x_abs, y_abs), (x+x_abs, y+y_abs), enable_smooth=True)
 										if len(path) == 2:
 											script_get_triangle.append( ("A_GOTOA", (path[1][0], path[1][1], a+a_abs)) ) 
+											script_get_triangle.append( ("THEN", (),) )
 											script_get_triangle.append( ("STEP_OVER", (),) )
 											self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
 										elif len(path) > 2:
@@ -414,6 +419,7 @@ class GoalsManager:
 									# Sinon on a besoin de juste tourner
 									else:
 										script_get_triangle.append( ("A_ROT", (a+a_abs,)) ) 
+										script_get_triangle.append( ("THEN", (),) )
 										script_get_triangle.append( ("STEP_OVER", (),) )
 										self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
 								else:
@@ -429,16 +435,13 @@ class GoalsManager:
 			self.__logger.warning("Pb, Il y a un STEP_OVER directement suivit d'un END ?")
 
 
-	def __getBestDataTriangleOfList(self, list_of_triangle_list, torche):
+	def __getBestDataTriangleOfList(self, list_of_triangle_list):
 		#On prend le meilleur de chaque listes
 		list_of_best_triangle = []
 		for triangle_list in list_of_triangle_list:
 			min_distance = float("inf")
 			min_id = None
 			for i, triangle in enumerate(triangle_list):
-				if torche:
-					triangle.coord[0] -= 100
-					triangle.coord[1] -= 20
 				distance = sqrt((triangle.coord[0]-220)**2 + (triangle.coord[1])**2)
 				if distance < min_distance:
 					min_distance = distance
@@ -464,6 +467,7 @@ class GoalsManager:
 				min_id = min_id_temp
 
 		triangle_choisi = list_of_best_triangle[min_id]
+		self.__logger.debug("On a choisi le triangle coord[0] "+str(triangle_choisi.coord[0])+" coord[1] "+str(triangle_choisi.coord[1])+" color "+str(triangle_choisi.color))
 		return (triangle_choisi.color, triangle_choisi.coord[0], triangle_choisi.coord[1]) #type (color, x, y)
 
 	def __positionReady(self, x, y):
@@ -690,7 +694,60 @@ class GoalsManager:
 			if not find:
 				self.__logger.error(str(self.__robot_name) + " impossible de lui ajouter le goal d'id: " + str(id_objectif))
 	
+	def __check_goal_proximity(self,goal,bot):
+		"""
+		Vérifie si un robot adverse est passé sur un objectif.
+		@param goal objectif qu'on regarde
+		@param bot robot ennemi considéré
+		"""
+		pos_goal = goal.getPosition()
+		pos_bot = bot["getPosition"]
+		dist_bot = sqrt((pos_goal[0] - pos_bot[0])**2+(pos_goal[1] - pos_bot[1])**2)
+		if dist_bot < bot["getRayon"]:
+			return True
+		else:
+			return False
+
+	def __check_goal_TS(self,goal,bot):
+		"""
+		Vérifie si le robot est resté proche d'un goal pendant longtemps.
+		@param goal objectif qu'on regarde
+		@param bot robot ennemi considéré
+		"""
+		ts = self.__data["METADATA"]["getGameClock"] #timeStamp
+		pos_goal = goal.getPosition()
+		pos_bot = bot["getPosition"]
+		dist_bot = sqrt((pos_goal[0] - pos_bot[0])**2+(pos_goal[1] - pos_bot[1])**2)
+		if dist_bot < bot["getRayon"]*1.5:
+			ts_goal = goal.getTSProximiy()
+			if ts_goal == -1:
+				goal.setTSProximiy(ts)
+			elif ts - ts_goal > 4000:
+				goal.setAlreadyDone(100)
+
 	def updateAlreadyDone(self):
-		pass
+		"""
+		Met à jour le pourcentage de possibilité que le robot adverse ait accomplit un objectif
+		"""
 		#quand on t'appel check self.__data, dont data["BIGENEMYBOT"]["getPosition"], data["SMALLENEMYBOT"]["getPosition"], data["METADATA"]["getGameClock"]
 		#pour tous les objectifs dans self.__available_goals, appel la fonction getAlreadyDone et setAlreadyDone
+		if self.__data["METADATA"]["getGameClock"] is not None:
+			if self.__data["BIGENEMYBOT"] is not None and self.__last_pos_big != self.__data["BIGENEMYBOT"]["getPosition"]:
+				for goal in self.__available_goals:
+					if goal.getAlreadyDone() < 100:
+						if self.__check_goal_proximity(goal,self.__data["BIGENEMYBOT"]) is True:
+							goal.setAlreadyDone(100)
+							goal.setGoalDone(True)
+						else:
+							self.__check_goal_TS(goal,self.__data["BIGENEMYBOT"])
+				self.__last_pos_big = self.__data["BIGENEMYBOT"]["getPosition"]
+			#check pour le petit robot
+			if self.__data["SMALLENEMYBOT"] is not None and self.__last_pos_mini != self.__data["SMALLENEMYBOT"]["getPosition"]:
+				for goal in self.__available_goals:
+					if goal.getAlreadyDone() < 100:
+						if self.__check_goal_proximity(goal,self.__data["SMALLENEMYBOT"]) is True:
+							goal.setAlreadyDone(100)
+							goal.setGoalDone(True)
+						else:
+							self.__check_goal_TS(goal,self.__data["SMALLENEMYBOT"])
+				self.__last_mini_big = self.__data["SMALLENEMYBOT"]["getPosition"]
