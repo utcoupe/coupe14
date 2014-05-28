@@ -28,6 +28,8 @@ class GoalsChoice:
 		self.__front_triangle_stack = front_triangle_stack
 
 		# Priorité
+		self.__triangles_gauche = [0,6,7,8,9]
+		self.__torche_gauche = 17
 		""" Ancien choix d'objectif
 		self.__prio_FM_areas = ["STORE_TRIANGLE_GAUCHE", "STORE_TRIANGLE_CENTRE", "STORE_TRIANGLE_DROITE"]
 		#self.__prio_FM_area_triangles = {"STORE_TRIANGLE_CENTRE": [7,17], "STORE_TRIANGLE_GAUCHE": [8,17,9,7,5], "STORE_TRIANGLE_DROITE": [7,17]}
@@ -93,20 +95,37 @@ class GoalsChoice:
 			return float("Inf")
 
 	def __prioTriangle(self, goal):
-		if goal.getType() == "triangle":
-			return 1
+		side_gauche = self.__data["FLUSSMITTEL"]["getPosition"][0] < 1500
+		if goal.getType() == "triangle" or goal.getType() == "TORCHE":
+			if side_gauche:
+				if goal.getId() in self.__triangles_gauche:
+					return 1
+				else:
+					return 2
+			else:
+				if goal.getId() in self.__triangles_gauche:
+					return 2
+				else:
+					return 1
 		elif goal.getType() == "TORCHE":
-			return 2
+			if side_gauche:
+				if goal.getId() == self.__torche_gauche:
+					return 1.5
+				else:
+					return 2.5
+			else:
+				if goal.getId() == self.__torche_gauche:
+					return 2.5
+				else:
+					return 1.5
 		else:
 			return 3
 
 	def __prioStoreTriangle(self, goal):
 		if goal.getType() == "STORE_TRIANGLE":
-			return 1
-		elif goal.getType() == "triangle":
-			return 2
+			return 0
 		else:
-			return 3
+			return self.__prioTriangle(goal)
 
 	def __sort_area(self, area):
 		return self.__prio_FM_areas.index(area[0])
