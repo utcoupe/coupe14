@@ -95,7 +95,7 @@ void Control::compute(){
 				float d = dd * cos(da); //Distance adjacente
 				static char aligne = 0;
 
-				da = moduloTwoPI(da);
+				//da = moduloTwoPI(da);
 
 				//Init ordre
 				if (!order_started) {
@@ -114,7 +114,6 @@ void Control::compute(){
 				}
 
 				if (abs(d) < ERROR_POS && dd < 2*ERROR_POS) {
-					setConsigne(0, 0);
 					fifo.pushIsReached();
 					da = 0;
 				}
