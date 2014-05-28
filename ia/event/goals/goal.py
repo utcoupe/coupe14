@@ -15,11 +15,13 @@ class Goal:
 		self.__concerned_robot 	= concerned_robot
 		self.__x 				= x
 		self.__y 				= y
-		self.__already_done		= 0 # From 0 (not finished) to 100 (finished)
-
 		self.__elem_goal = []
 		self.__elem_goal_locked = None
 		self.__area_status = "EMPTY" #type "EMPTY", "FULL", "ENEMY"
+		#données pour la gestion UpdateAlreadyDone
+		self.__est_ce_qu_on_m_ait_passé_dessus		= False
+		self.__time_stamp_proximity = -1
+		self.__already_done		= 0 # From 0 (not finished) to 100 (finished)
 
 	def getId(self):
 		return self.__id
@@ -44,12 +46,6 @@ class Goal:
 
 	def getAreaStatus(self):
 		return self.__area_status
-
-	def getAlreadyDone(self):
-		return self.__already_done
-
-	def setAlreadyDone(self, pourcentage):
-		self.__already_done = pourcentage
 
 	def setAreaStatus(self, status):
 		if status in ("EMPTY", "FULL", "ENEMY"):
@@ -95,3 +91,21 @@ class Goal:
 	def resetElemAction(self):
 		for elem in self.__elem_goal:
 			elem.reset_elem_action()
+
+	def getAlreadyDone(self):
+		return self.__already_done
+
+	def setAlreadyDone(self, pourcentage):
+		self.__already_done = pourcentage
+
+	def setGoalDone(self,value):
+		self.__est_ce_qu_on_m_ait_passé_dessus = value
+
+	def getGoalDone(self):
+		return self.__est_ce_qu_on_m_ait_passé_dessus
+
+	def setTSProximiy(self,value):
+		self.__time_stamp_proximity = value
+
+	def getTSProximiy(self):
+		return self.__time_stamp_proximity
