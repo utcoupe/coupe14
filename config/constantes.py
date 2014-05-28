@@ -5,14 +5,14 @@ Ce fichier regroupe toutes les constantes de l'IA
 
 import math
 
-TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
 
 #====================Enable====================
-ENABLE_TOURELLE =		False
-ENABLE_FLUSSMITTEL = 	False #permet de desactiver Flussmitel
+ENABLE_TOURELLE =		True
+ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
 ENABLE_TIBOT =			True
 
 #========================================Communication========================================
@@ -113,8 +113,8 @@ CENTRE_BRAS_X = 128
 CENTRE_BRAS_Y = 130
 NB_VISIO_TRY = 25
 NB_VISIO_DATA_NEEDED = 5
-# Choix d'objectif
-ENNEMI_CAN_CLEAN_ZONE = True
+VISIO_MAX_DIST_TRIANGLE = 400
+
 
 #====================TIBOT====================
 START_POSITION_RED_TIBOT = (177, 1578, -1.14875)
@@ -137,3 +137,8 @@ RAYON_BIG_ENEMY = 		200
 #====================SMALL ENEMY====================
 RAYON_SMALL_ENEMY = 	120
 
+
+
+
+#==================== Choix d'objectif ====================
+ENNEMI_CAN_CLEAN_ZONE = True

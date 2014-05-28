@@ -60,6 +60,14 @@ class GoalsManager:
 		self.__goalsChoice = GoalsChoice(self.__robot_name, self.__data, self.__goalsLib, self.__Collision, self.__our_color, self.__back_triangle_stack, self.__front_triangle_stack, self.__available_goals, self.__finished_goals)
 
 		self.__tibot_ready_for_filet = False
+		temp = ("BIGENEMYBOT", "SMALLENEMYBOT", "FLUSSMITTEL", "TIBOT")
+		self.__robot_to_check_goal_collision = []
+		self.__last_enemy_pos = {}
+		for robot in temp:
+			if self.__data[robot] is not None:
+				self.__robot_to_check_goal_collision.append(robot)
+				self.__last_enemy_pos[robot] = None
+		
 
 		# Pour tester le déplacement du robot dans le simu lorsqu'il ne peut pas attraper un triangle
 		if TEST_MODE == True:
@@ -73,9 +81,6 @@ class GoalsManager:
 
 		self.__loadBeginScript()
 
-		#pour le truc que thomas a fait
-		self.__last_pos_big = (0,0)
-		self.__last_pos_mini = (0,0)
 
 	def restartObjectifSearch(self):
 		self.__queueBestGoals()
@@ -442,11 +447,13 @@ class GoalsManager:
 			min_distance = float("inf")
 			min_id = None
 			for i, triangle in enumerate(triangle_list):
-				distance = sqrt((triangle.coord[0]-220)**2 + (triangle.coord[1])**2)
-				if distance < min_distance:
-					min_distance = distance
-					min_id = i
-			list_of_best_triangle.append(triangle_list[min_id])
+				if self.__isThisTriangleOnTable(triangle):
+					distance = sqrt((triangle.coord[0]-220)**2 + (triangle.coord[1])**2)
+					if distance < min_distance and distance < VISIO_MAX_DIST_TRIANGLE:
+						min_distance = distance
+						min_id = i
+			if min_id is not None:
+				list_of_best_triangle.append(triangle_list[min_id])
 
 		#On les comparent les un aux autres et on prend le plus proche des autres
 		min_distance = float("inf")
@@ -455,12 +462,11 @@ class GoalsManager:
 			min_distance_temp = float("inf")
 			min_id_temp = None
 			for i, triangle_temp in enumerate(list_of_best_triangle):
-				distance = sqrt((triangle_temp.coord[0] - triangle.coord[0])**2 + (triangle_temp.coord[1] - triangle.coord[1])**2)
-				if min_id is not None and list_of_best_triangle[min_id].color != triangle_temp.color:
-					distance += 300 #valeur arbitraire pour les séparer
-				if distance < min_distance_temp:
-					min_distance_temp = distance
-					min_id_temp = i
+				if triangle.color == triangle_temp.color:
+					distance = sqrt((triangle_temp.coord[0] - triangle.coord[0])**2 + (triangle_temp.coord[1] - triangle.coord[1])**2)
+					if distance < min_distance_temp:
+						min_distance_temp = distance
+						min_id_temp = i
 
 			if min_distance_temp < min_distance:
 				min_distance = min_distance_temp
@@ -470,6 +476,16 @@ class GoalsManager:
 		self.__logger.debug("On a choisi le triangle coord[0] "+str(triangle_choisi.coord[0])+" coord[1] "+str(triangle_choisi.coord[1])+" color "+str(triangle_choisi.color))
 		return (triangle_choisi.color, triangle_choisi.coord[0], triangle_choisi.coord[1]) #type (color, x, y)
 
+	def __isThisTriangleOnTable(self, triangle):
+		x, y, a = self.__data[self.__robot_name]["getPositionAndAngle"]
+		x += (cos(a)*triangle.coord[0]) + (cos(a+1.57)*triangle.coord[1])
+		y += (sin(a)+triangle.coord[0]) + (sin(a+1.57)+triangle.coord[1])
+
+		if x<0 or x>3000 or y<0 or y>2000:
+			self.__logger.warning("On a vu un triangle en dehors de la map, triangle "+str(triangle)+" our_bot "+str(self.__data[self.__robot_name]["getPositionAndAngle"])+" x "+str(x)+" y "+str(y))
+			return False
+		return True
+		
 	def __positionReady(self, x, y):
 		x2 = x - CENTRE_BRAS_X
 		y2 = y - CENTRE_BRAS_Y
@@ -732,22 +748,15 @@ class GoalsManager:
 		#quand on t'appel check self.__data, dont data["BIGENEMYBOT"]["getPosition"], data["SMALLENEMYBOT"]["getPosition"], data["METADATA"]["getGameClock"]
 		#pour tous les objectifs dans self.__available_goals, appel la fonction getAlreadyDone et setAlreadyDone
 		if self.__data["METADATA"]["getGameClock"] is not None:
-			if self.__data["BIGENEMYBOT"] is not None and self.__last_pos_big != self.__data["BIGENEMYBOT"]["getPosition"]:
-				for goal in self.__available_goals:
-					if goal.getAlreadyDone() < 100:
-						if self.__check_goal_proximity(goal,self.__data["BIGENEMYBOT"]) is True:
-							goal.setAlreadyDone(100)
-							goal.setGoalDone(True)
-						else:
-							self.__check_goal_TS(goal,self.__data["BIGENEMYBOT"])
-				self.__last_pos_big = self.__data["BIGENEMYBOT"]["getPosition"]
-			#check pour le petit robot
-			if self.__data["SMALLENEMYBOT"] is not None and self.__last_pos_mini != self.__data["SMALLENEMYBOT"]["getPosition"]:
-				for goal in self.__available_goals:
-					if goal.getAlreadyDone() < 100:
-						if self.__check_goal_proximity(goal,self.__data["SMALLENEMYBOT"]) is True:
-							goal.setAlreadyDone(100)
-							goal.setGoalDone(True)
-						else:
-							self.__check_goal_TS(goal,self.__data["SMALLENEMYBOT"])
-				self.__last_mini_big = self.__data["SMALLENEMYBOT"]["getPosition"]
+			for robot in self.__robot_to_check_goal_collision:
+				if self.__last_enemy_pos[robot] != self.__data[robot]["getPosition"]:
+					self.__last_enemy_pos[robot] = self.__data[robot]["getPosition"]
+					for goal in self.__available_goals:
+						if goal.getAlreadyDone() < 100:
+							if self.__check_goal_proximity(goal, self.__data[robot]) is True:
+								goal.setAlreadyDone(100)
+								goal.setGoalDone(True)
+								self.__available_goals.remove(goal)
+								self.__finished_goals.append(goal)
+							else:
+								self.__check_goal_TS(goal,self.__data[robot])
