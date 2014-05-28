@@ -61,7 +61,7 @@ class GoalsChoice:
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 
 		# Log error
-		if len(self.__front_triangle_stack) > MAX_FRONT_TRIANGLE_STACK:
+		if len(self.__front_triangle_stack) > MAX_FRONT_TRIANGLE_STACK_STORE:
 			self.__logger.error("On a stocké plus de triangles qu'on a de place")
 
 		# On tri d'abord par path car le tri est stable
@@ -94,17 +94,19 @@ class GoalsChoice:
 
 	def __prioTriangle(self, goal):
 		if goal.getType() == "triangle":
-			return 0
-		elif goal.getType() == "TORCHE":
 			return 1
-		else:
+		elif goal.getType() == "TORCHE":
 			return 2
+		else:
+			return 3
 
 	def __prioStoreTriangle(self, goal):
 		if goal.getType() == "STORE_TRIANGLE":
-			return 0
-		else:
 			return 1
+		elif goal.getType() == "TORCHE":
+			return 3
+		else:
+			return 2
 
 	def __sort_area(self, area):
 		return self.__prio_FM_areas.index(area[0])
