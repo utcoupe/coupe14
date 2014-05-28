@@ -184,8 +184,8 @@ class Visio:
 		hcam = self.__hcam - self.__htri
 		x = tri.coord[0] - self.__xcam
 		y = tri.coord[1] - self.__ycam
-		dx = x * ( ho / (ho + hcam))
-		dy = y * ( ho / (ho + hcam))
+		dx = x * (ho / hcam)
+		dy = y * (ho / hcam)
 		#modif coords
 		tri.coord[0] -= dx
 		tri.coord[1] -= dy

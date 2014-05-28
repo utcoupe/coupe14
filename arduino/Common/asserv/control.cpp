@@ -74,9 +74,9 @@ void Control::compute(){
 			{
 				float da = (current_goal.data_1 - current_pos.angle);
 				
-				//da = moduloTwoPI(da);//Commenter pour multi-tour
+				da = moduloTwoPI(da);//Commenter pour multi-tour
 
-				if(abs(da) <= ERROR_ANGLE){
+				if(abs(da) <= ERROR_ANGLE && abs(value_consigne_right) < CONSIGNE_REACHED && abs(value_consigne_left) < CONSIGNE_REACHED){
 					setConsigne(0, 0);
 					fifo.pushIsReached();
 				}
@@ -113,7 +113,7 @@ void Control::compute(){
 					da = moduloPI(da);
 				}
 
-				if (dd < ERROR_POS) { //"Zone" d'arrivée
+				if (dd < ERROR_POS && abs(value_consigne_right) < CONSIGNE_REACHED && abs(value_consigne_left) < CONSIGNE_REACHED ) { //"Zone" d'arrivée
 					fifo.pushIsReached();
 					da = 0;
 				}

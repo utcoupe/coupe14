@@ -1,6 +1,5 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
-#define ARDUINO
 
 //////////////////////
 //		PARAMETERS  //
@@ -22,7 +21,7 @@
 //STEPPER
 
 #define PERIOD_STEPPER 200
-#define VMAX_STEPPER 350 
+#define VMAX_STEPPER 300 
 #define AMAX_STEPPER 30000 
 
 //SECU BRAS : en degree commande
