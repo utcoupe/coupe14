@@ -103,10 +103,10 @@ class GoalsChoice:
 	def __prioStoreTriangle(self, goal):
 		if goal.getType() == "STORE_TRIANGLE":
 			return 1
-		elif goal.getType() == "TORCHE":
-			return 3
-		else:
+		elif goal.getType() == "triangle":
 			return 2
+		else:
+			return 3
 
 	def __sort_area(self, area):
 		return self.__prio_FM_areas.index(area[0])

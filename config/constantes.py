@@ -5,7 +5,7 @@ Ce fichier regroupe toutes les constantes de l'IA
 
 import math
 
-TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
@@ -86,7 +86,7 @@ COLLISION_WARNING_THRESHOLD = 800
 
 #=======================================Systemes physiques========================================
 #====================tourelle====================
-OUR_ROBOTS_VISIBLE_TOURELLE = False 	#True si une balise visible par l'hokuyo est presente sur nos robots 
+OUR_ROBOTS_VISIBLE_TOURELLE = True 	#True si une balise visible par l'hokuyo est presente sur nos robots 
 TOURELLE_PULL_PERIODE = 100 		#ms
 DISTANCE_MAX_ROBOT_FUSION = 250 #Différance max entre codeurs et hokuyo
 
