@@ -66,6 +66,7 @@ class GoalsChoice:
 
 		# On tri d'abord par path car le tri est stable
 		goals = sorted(self.__available_goals, key=self.__distByPath)
+
 		if len(self.__front_triangle_stack) > 1:
 			goals.sort(key=self.__prioStoreTriangle) # car tri stable
 		else:

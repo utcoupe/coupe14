@@ -302,7 +302,7 @@ class GoalsManager:
 					script_to_send = deque()
 
 					if self.__our_color == self.__last_camera_color:
-						if nb_front_stack < MAX_FRONT_TRIANGLE_STACK:
+						if nb_front_stack < MAX_FRONT_TRIANGLE_STACK_STORE:
 							self.__front_triangle_stack.append(self.__last_camera_color)
 							position = 1
 							hauteur_drop = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE
@@ -380,7 +380,7 @@ class GoalsManager:
 						self.__last_camera_color = data_camera[0]
 						#si on a la possibilité de le stocker
 						if len(self.__front_triangle_stack)  >= MAX_FRONT_TRIANGLE_STACK:
-							self.__logger.warning("Impossible de stocker ce triangle dans le robot, la pile de devant est pleine.")
+							self.__logger.warning("La pile de devant est pleine, du coup, inutile d'aller plus loin on ne eput rien get")
 							#Si besoin, on change la couleur du triangle pour la prochaine fois
 							if self.__last_camera_color != objectif.getColorElemLock():
 								objectif.switchColor()

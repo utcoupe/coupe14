@@ -5,13 +5,13 @@ Ce fichier regroupe toutes les constantes de l'IA
 
 import math
 
-TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
 
 #====================Enable====================
-ENABLE_TOURELLE =		False
+ENABLE_TOURELLE =		True
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
 ENABLE_TIBOT =			False
 
@@ -95,6 +95,7 @@ START_POSITION_RED_FLUSSMITTEL = (200, 1871, -1.57079)
 LARGEUR_FLUSSMITTEL = 	330 # ok car centré en largeur
 LONGUEUR_FLUSSMITTEL = 	340 # = 2 fois la distance entre le centre de rotation et le côté le plus loin
 MAX_FRONT_TRIANGLE_STACK = 3
+MAX_FRONT_TRIANGLE_STACK_STORE = 2
 MAX_BACK_TRIANGLE_STACK = 1
 GARDE_AU_SOL = 16
 HAUTEUR_TRIANGLE = 30
