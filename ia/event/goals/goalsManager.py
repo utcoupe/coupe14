@@ -732,7 +732,7 @@ class GoalsManager:
 		#quand on t'appel check self.__data, dont data["BIGENEMYBOT"]["getPosition"], data["SMALLENEMYBOT"]["getPosition"], data["METADATA"]["getGameClock"]
 		#pour tous les objectifs dans self.__available_goals, appel la fonction getAlreadyDone et setAlreadyDone
 		if self.__data["METADATA"]["getGameClock"] is not None:
-			if self.__last_pos_big != self.__data["BIGENEMYBOT"]["getPosition"]:
+			if self.__data["BIGENEMYBOT"] is not None and self.__last_pos_big != self.__data["BIGENEMYBOT"]["getPosition"]:
 				for goal in self.__available_goals:
 					if goal.getAlreadyDone() < 100:
 						if self.__check_goal_proximity(goal,self.__data["BIGENEMYBOT"]) is True:
@@ -742,7 +742,7 @@ class GoalsManager:
 							self.__check_goal_TS(goal,self.__data["BIGENEMYBOT"])
 				self.__last_pos_big = self.__data["BIGENEMYBOT"]["getPosition"]
 			#check pour le petit robot
-			if self.__last_pos_mini != self.__data["SMALLENEMYBOT"]["getPosition"]:
+			if self.__data["SMALLENEMYBOT"] is not None and self.__last_pos_mini != self.__data["SMALLENEMYBOT"]["getPosition"]:
 				for goal in self.__available_goals:
 					if goal.getAlreadyDone() < 100:
 						if self.__check_goal_proximity(goal,self.__data["SMALLENEMYBOT"]) is True:
