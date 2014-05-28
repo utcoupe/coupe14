@@ -456,7 +456,7 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 				} else { //Pas de triangles
 					pump(false);
 					step=7;
-					cmdAsc(HAUTEUR_MAX);
+					cmdAsc(getCurrentStockHeight() + MARGE_PREHENSION);
 				}
 				break;
 			case 4:
