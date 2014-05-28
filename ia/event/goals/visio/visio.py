@@ -175,15 +175,15 @@ class Visio:
 			#calcul des coordonnées réelles du self._triangles[i]angles, on le recalcule par la
 			# suite si elles sont a modifier, mais on en a besoin pour savoir
 			# s'i faut les modifier
-			self._triangles[i].real_coords = [i + j for i, j in zip(tri.rel_in_abs(robot_angle), self.__big_bot["getPosition"])]
+			self._triangles[i].real_coords = [i + j for i, j in zip(self._triangles[i].rel_in_abs(robot_angle), self.__big_bot["getPosition"])]
 			self.__log.info("realtive coords : " + str(self._triangles[i].coords))
 			self.__log.info("rel in ab : " + str(self._triangles[i].rel_in_abs(robot_angle)))
 			self.__log.info("real : " + str(self._triangles[i].real_coords))
 
 			#Traitement de la position pour modif si self._triangles[i]angle en hauteur
-			if self.__outOfMap(self._triangles[i]) or self.__inFruitZone(tri) or self.__inStartZone(tri):
-				self.__log("Removed detected self._triangles[i]angle at coords " + str(tri.real_coords))
-				self._self._triangles[i]angles.remove(tri)
+			if self.__outOfMap(self._triangles[i]) or self.__inFruitZone(self._triangles[i]) or self.__inStartZone(self._triangles[i]):
+				self.__log("Removed detected triangle at coords " + str(self._triangles[i].real_coords))
+				self._triangles.remove(self._triangles[i])
 
 			#elif self.__inHighGround(self._triangles[i]):
 			#	self.__highGroundProcess(self._triangles[i], self.__hplat)

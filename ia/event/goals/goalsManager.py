@@ -243,7 +243,7 @@ class GoalsManager:
 				self.__deleteGoal(goal, fromEvent = True)
 
 
-	def __deleteGoal(self, goal, fromEvent = False):
+	def __deleteGoal(self, goal, fromEvent = False, fromGoalCollision=False):
 		success = False
 
 		if goal in self.__available_goals:
@@ -258,9 +258,9 @@ class GoalsManager:
 		if goal in self.__finished_goals:
 			self.__finished_goals.remove(goal)
 			success = True
-
-		self.__removeLastValueOfDeque(self.__id_objectif_send, goal.getId())
-		if fromEvent == False:
+		if fromGoalCollision == False:
+			self.__removeLastValueOfDeque(self.__id_objectif_send, goal.getId())
+		if fromEvent == False and fromGoalCollision == False:
 			self.__SubProcessManager.sendDeleteGoal(goal.getId())
 		if success:
 			self.__logger.info('Goal ' + goal.getName() + ' is delete')
@@ -353,6 +353,9 @@ class GoalsManager:
 
 						if len(list_of_triangle_list) >= NB_VISIO_DATA_NEEDED:
 							data_camera = self.__getBestDataTriangleOfList(list_of_triangle_list)
+							if data_camera is None:
+								self.__last_camera_color = None
+								self.__deleteGoal(objectif)
 						else:
 							self.__logger.warning("On a pas vu de triangle à la position attendu, list_of_triangle_list "+str(list_of_triangle_list)+" dont on va supprimer l'objectif "+str(id_objectif))
 							self.__last_camera_color = None
@@ -362,7 +365,7 @@ class GoalsManager:
 					else:
 						# Coordonées du triangle par rapport au centre du robot
 						# sera corrigé par l'algo lors de la prise du premier triangle normalement
-						temp = (220, -100)
+						temp = (220, 0)
 						# Correction x y
 						temp_x = temp[0] + self.__hack_camera_simu_x
 						temp_y = temp[1] + self.__hack_camera_simu_y
@@ -471,10 +474,13 @@ class GoalsManager:
 			if min_distance_temp < min_distance:
 				min_distance = min_distance_temp
 				min_id = min_id_temp
-
-		triangle_choisi = list_of_best_triangle[min_id]
-		self.__logger.debug("On a choisi le triangle coord[0] "+str(triangle_choisi.coord[0])+" coord[1] "+str(triangle_choisi.coord[1])+" color "+str(triangle_choisi.color))
-		return (triangle_choisi.color, triangle_choisi.coord[0], triangle_choisi.coord[1]) #type (color, x, y)
+		if min_id is not None:
+			triangle_choisi = list_of_best_triangle[min_id]
+			self.__logger.debug("On a choisi le triangle coord[0] "+str(triangle_choisi.coord[0])+" coord[1] "+str(triangle_choisi.coord[1])+" color "+str(triangle_choisi.color))
+			return (triangle_choisi.color, triangle_choisi.coord[0], triangle_choisi.coord[1]) #type (color, x, y)
+		else:
+			self.__logger.warning("On a bien reçu assez de données viso, mais elles n'avaient aucun sens... list_of_best_triangle "+str(list_of_best_triangle))
+			return None
 
 	def __isThisTriangleOnTable(self, triangle):
 		x, y, a = self.__data[self.__robot_name]["getPositionAndAngle"]
@@ -756,7 +762,6 @@ class GoalsManager:
 							if self.__check_goal_proximity(goal, self.__data[robot]) is True:
 								goal.setAlreadyDone(100)
 								goal.setGoalDone(True)
-								self.__available_goals.remove(goal)
-								self.__finished_goals.append(goal)
+								self.__deleteGoal(goal, fromGoalCollision=True)
 							else:
 								self.__check_goal_TS(goal,self.__data[robot])
