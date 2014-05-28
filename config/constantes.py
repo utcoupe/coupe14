@@ -114,6 +114,7 @@ CENTRE_BRAS_Y = 130
 NB_VISIO_TRY = 25
 NB_VISIO_DATA_NEEDED = 5
 VISIO_MAX_DIST_TRIANGLE = 400
+MIN_X_TRIANGLE = 190
 
 
 #====================TIBOT====================
