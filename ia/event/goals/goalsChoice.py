@@ -28,10 +28,11 @@ class GoalsChoice:
 		self.__front_triangle_stack = front_triangle_stack
 
 		# Priorité
-		self.__prio_FM_areas = ["STORE_TRIANGLE_GAUCHE", "STORE_TRIANGLE_DROITE", "STORE_TRIANGLE_CENTRE"]
-		self.__prio_FM_area_triangles = {"STORE_TRIANGLE_CENTRE": [], "STORE_TRIANGLE_GAUCHE": [8,17,9,7,5], "STORE_TRIANGLE_DROITE": [7,5,4,18,3]}
+		self.__prio_FM_areas = ["STORE_TRIANGLE_GAUCHE", "STORE_TRIANGLE_CENTRE", "STORE_TRIANGLE_DROITE"]
+		#self.__prio_FM_area_triangles = {"STORE_TRIANGLE_CENTRE": [7,17], "STORE_TRIANGLE_GAUCHE": [8,17,9,7,5], "STORE_TRIANGLE_DROITE": [7,17]}
+		self.__prio_FM_area_triangles = {"STORE_TRIANGLE_CENTRE": [], "STORE_TRIANGLE_GAUCHE": [], "STORE_TRIANGLE_DROITE": []}
 		if self.__our_color == "YELLOW":
-			self.__prio_FM_areas = ["STORE_TRIANGLE_DROITE", "STORE_TRIANGLE_GAUCHE", "STORE_TRIANGLE_CENTRE"]
+			self.__prio_FM_areas = ["STORE_TRIANGLE_DROITE", "STORE_TRIANGLE_CENTRE", "STORE_TRIANGLE_GAUCHE"]
 			self.__prio_FM_area_triangles["STORE_TRIANGLE_CENTRE"] = self.__goalsLib.reverseTabOfGoalId(self.__prio_FM_area_triangles["STORE_TRIANGLE_CENTRE"])
 			temp = self.__goalsLib.reverseTabOfGoalId(self.__prio_FM_area_triangles["STORE_TRIANGLE_GAUCHE"])
 			self.__prio_FM_area_triangles["STORE_TRIANGLE_GAUCHE"] = self.__goalsLib.reverseTabOfGoalId(self.__prio_FM_area_triangles["STORE_TRIANGLE_DROITE"])
@@ -56,28 +57,34 @@ class GoalsChoice:
 
 	#FLUSSMITTEL
 	def __getBestGoalFlussmittel(self):
+		self.__logger.info("GET BEST GOAL FLUSSMITTEL")
 		best_goal = ([], None, None) #type (path, goal, id_elem_goal)
 
 		# On tri d'abord par path car le tri est stable
 		goals = sorted(self.__available_goals, key=self.__distByPath)
 		
 		### Phase 1 : Sécurisation des areas (avec priorité)
-		best_area = None
-		self.__state_area = []
-		for goal in goals:
-			if goal.getType() == "STORE_TRIANGLE":
-				can_go = False
-				best_elem_goal = self.__getBestElemGoal(goal)
-				if best_elem_goal is not None:
-					can_go = True
-				self.__state_area.append([goal.getName(), goal.getAreaStatus(), can_go])
-		self.__state_area.sort(key=self.__sort_area)
 		if self.__getTime() <= TIME_BETWEEN_PHASE_FM:
+			# On récupère et trie les areas
+			self.__state_area = []
+			for goal in goals:
+				if goal.getType() == "STORE_TRIANGLE":
+					can_go = False
+					best_elem_goal = self.__getBestElemGoal(goal)
+					if best_elem_goal is not None:
+						can_go = True
+					self.__state_area.append([goal.getName(), goal.getAreaStatus(), can_go])
+			self.__state_area.sort(key=self.__sort_area)
+			# On cherche la meilleure area
+			best_area = None
 			for area in self.__state_area:
 				if area[1] == "EMPTY" and area[2]:
 					best_area = area[0]
 					break
+			# Si on en a trouvé une, on entre dans la phase 1
 			if best_area is not None:
+				self.__logger.info("Phase 1")
+				self.__logger.info("best area = " + best_area)
 				goals = self.__getGoalsByPriority(goals, best_area)
 				for goal in goals:
 					# Si on est obligé de déposer les triangles
@@ -99,7 +106,8 @@ class GoalsChoice:
 							break
 
 		### Phase 2 : Max de triangles (du bon côté sans se soucier des areas)
-		if (self.__getTime() > TIME_BETWEEN_PHASE_FM) or (self.__getTime() <= TIME_BETWEEN_PHASE_FM and best_area is None):
+		if self.__getTime() > TIME_BETWEEN_PHASE_FM or best_area is None:
+			self.__logger.info("Phase 2")
 			# TEMP
 			for goal in goals:
 				if len(self.__front_triangle_stack) >= MAX_FRONT_TRIANGLE_STACK:
@@ -131,6 +139,11 @@ class GoalsChoice:
 				best_goal = best_elem_goal
 				break
 		"""
+		if best_goal[1] is not None:
+			self.__logger.info("Best goal = " + best_goal[1].getName())
+		else:
+			self.__logger.info("On a pas trouvé de goal à faire.")
+
 		return best_goal
 
 	

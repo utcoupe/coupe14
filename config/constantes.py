@@ -46,7 +46,7 @@ renvoiImmediat = 		False # fonction non terminé, ne pas activer !
 #=======================================IA========================================
 
 #====================Variables globales====================
-NUMBER_OF_ENEMY = 		1 #TODO
+NUMBER_OF_ENEMY = 		2 #TODO
 #si 1, on considère que l'ennemi est petit
 
 #====================eventManager====================
