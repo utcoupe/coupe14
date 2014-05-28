@@ -35,8 +35,8 @@ class Triangle:
 		return str(self.coord) + '\ta=' + str(self.angle) + '\t' + str(self.size) + '\t' + self.color + '\t' + state
 
 	def rel_in_abs(self, robot_angle):
-		return (tri.coord[0] * cos(robot_angle) - tri.coord[1] * sin(robot_angle), 
-				tri.coord[0] * sin(robot_angle) + tri.coord[1] * cos(robot_angle))
+		return (self.coord[0] * cos(robot_angle) - self.coord[1] * sin(robot_angle), 
+				self.coord[0] * sin(robot_angle) + self.coord[1] * cos(robot_angle))
 
 	def dist2(self, tri):
 		dx = self.coord[0] - tri.coord[0]
