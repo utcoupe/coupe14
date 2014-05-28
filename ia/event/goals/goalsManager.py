@@ -77,7 +77,8 @@ class GoalsManager:
 
 		if self.__robot_name == "FLUSSMITTEL" and TEST_MODE == False:
 			self.__vision = Visio('../supervisio/visio', 0, '../config/visio/visio_robot/', self.__data["FLUSSMITTEL"], True)
-			self.__last_camera_color = None
+		self.__last_camera_color = None
+		self.__last_data_camera = None
 
 		self.__loadBeginScript()
 
@@ -124,7 +125,7 @@ class GoalsManager:
 	def goalStepOverId(self, id_objectif):
 		for objectif in self.__blocked_goals:
 			if objectif.getId() == id_objectif:
-				self.__manageStepOver(objectif, id_objectif, skip_get_triangle=False)
+				self.__manageStepOver(objectif, id_objectif)
 				break
 
 	def goalDynamiqueFinishedId(self, id_objectif):
@@ -287,161 +288,190 @@ class GoalsManager:
 		else:
 			self.__logger.warning("Impossible de supprimer la valeur "+str(value_to_remove)+" de la liste "+str(deque))
 
-
-	def __manageStepOver(self, objectif, id_objectif, skip_get_triangle=False):
+	def __manageStepBras(self, objectif, id_objectif):
 		action_list = objectif.getFirstElemAction()
-		if action_list:
-			if (action_list[0][0] == "GET_TRIANGLE_IA" or action_list[0][0] == "GET_TRIANGLE_IA_TORCHE")  and self.__robot_name == "FLUSSMITTEL":#Redondant normalement
-				get_triangle_mode = action_list[0][0]
-				if skip_get_triangle == True:
-					position = None # 1=front and -1=back
-					hauteur_drop = None #hauteur en mm
-					nb_front_stack = len(self.__front_triangle_stack) 
-					nb_back_stack = len(self.__back_triangle_stack)
-					stack_full = False
-					script_to_send = deque()
-
-					if self.__our_color == self.__last_camera_color:
-						if nb_front_stack < MAX_FRONT_TRIANGLE_STACK_STORE:
-							self.__front_triangle_stack.append(self.__last_camera_color)
-							position = 1
-							hauteur_drop = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE
-						else:
-							self.__logger.error("On a pas la place pour stocker ce triangle à l'avant, ca cas ne devrait pas arriver !")
-							stack_full = True
-							self.__cancelGoal(objectif, False)
-
-					else:
-						if (nb_front_stack < MAX_FRONT_TRIANGLE_STACK) and (nb_back_stack < MAX_BACK_TRIANGLE_STACK):
-							self.__back_triangle_stack.append(self.__last_camera_color)
-							position = -1
-							hauteur_drop = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
-						elif (nb_front_stack < MAX_FRONT_TRIANGLE_STACK) and (nb_back_stack >= MAX_BACK_TRIANGLE_STACK):
-							self.__back_triangle_stack.popleft()
-							script_to_send.append( ("O_RET", ()) )
-							self.__back_triangle_stack.append(self.__last_camera_color)
-							position = -1
-							hauteur_drop = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
-						else:
-							self.__logger.error("On a pas la place pour stocker ce triangle ni à l'avant ni à l'arrière, ce cas ne devrait pas arriver !")
-							stack_full = True
-							self.__cancelGoal(objectif, False)
-
-					if not stack_full:
-						script_base = action_list
-						for action in script_base:
-							if action[0] == "STORE_TRIANGLE_IA":
-								script_to_send.append( ("O_STORE_TRIANGLE", (int(position*hauteur_drop),)) )
-							elif action[0] == "GET_TRIANGLE_IA" or action[0] == "GET_TRIANGLE_IA_TORCHE":
-								pass
-							else:
-								script_to_send.append(action)
-						self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_to_send)
-						objectif.removeFirstElemAction()
-
-				else:
-					if TEST_MODE == False:
-						limite_essai_viso = NB_VISIO_TRY
-						list_of_triangle_list = []
-						triangle_list_temp = []
-						while limite_essai_viso > 0 and len(list_of_triangle_list) < NB_VISIO_DATA_NEEDED:
-							limite_essai_viso -= 1
-							self.__vision.update(objectif.getType() == "TORCHE")
-							triangle_list_temp = self.__vision.getTriangles()
-							if triangle_list_temp != []:
-								list_of_triangle_list.append(triangle_list_temp)
-
-						if len(list_of_triangle_list) >= NB_VISIO_DATA_NEEDED:
-							data_camera = self.__getBestDataTriangleOfList(list_of_triangle_list)
-							if data_camera is None:
-								self.__last_camera_color = None
-								self.__deleteGoal(objectif)
-						else:
-							self.__logger.warning("On a pas vu de triangle à la position attendu, list_of_triangle_list "+str(list_of_triangle_list)+" dont on va supprimer l'objectif "+str(id_objectif))
-							self.__last_camera_color = None
-							self.__deleteGoal(objectif)
-							data_camera = None
-
-					else:
-						# Coordonées du triangle par rapport au centre du robot
-						# sera corrigé par l'algo lors de la prise du premier triangle normalement
-						temp = (220, 0)
-						# Correction x y
-						temp_x = temp[0] + self.__hack_camera_simu_x
-						temp_y = temp[1] + self.__hack_camera_simu_y
-						# Rotation du robot
-						temp_x_rot = temp_x * cos(self.__hack_camera_simu_angle) - temp_y * sin(self.__hack_camera_simu_angle)
-						temp_y_rot = temp_x * sin(self.__hack_camera_simu_angle) + temp_y * cos(self.__hack_camera_simu_angle)
-						
-						data_camera = ("RED", temp_x_rot, temp_y_rot)
-
-
-					if data_camera is not None:
-						self.__last_camera_color = data_camera[0]
-						#si on a la possibilité de le stocker
-						if len(self.__front_triangle_stack)  >= MAX_FRONT_TRIANGLE_STACK:
-							self.__logger.warning("La pile de devant est pleine, du coup, inutile d'aller plus loin on ne eput rien get")
-							#Si besoin, on change la couleur du triangle pour la prochaine fois
-							if self.__last_camera_color != objectif.getColorElemLock():
-								objectif.switchColor()
-							self.__cancelGoal(objectif, False)
-						else:
-							if self.__positionReady(data_camera[1], data_camera[2]):
-								script_get_triangle = deque()
-								if get_triangle_mode == "GET_TRIANGLE_IA":
-									script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], HAUTEUR_TRIANGLE)) )
-								elif get_triangle_mode == "GET_TRIANGLE_IA_TORCHE":
-									script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], HAUTEUR_TORCHE+3*HAUTEUR_TRIANGLE)) )
-								script_get_triangle.append( ("THEN", ()) )
-								script_get_triangle.append( ("O_GET_BRAS_STATUS", ()) )
-								script_get_triangle.append( ("THEN", (),) )
-								self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
-							else:
-								coord_to_move_to = self.__getPosToHaveTriangle(data_camera[1], data_camera[2])
-								if coord_to_move_to != None:
-									find  = True
-									x, y, a = coord_to_move_to
-									x_abs, y_abs, a_abs = self.__data[self.__robot_name]["getPositionAndAngle"]
-									script_get_triangle = deque()
-
-									if TEST_MODE == True:
-										self.__hack_camera_simu_x -= x
-										self.__hack_camera_simu_y -= y
-										self.__hack_camera_simu_angle -= a
-
-									# Si on a besoin d'avancer, on vérifie avec le pathfinding
-									if x != 0 or y != 0:
-										self.__PathFinding.update()
-										path = self.__PathFinding.getPath((x_abs, y_abs), (x+x_abs, y+y_abs), enable_smooth=True)
-										if len(path) == 2:
-											script_get_triangle.append( ("A_GOTOA", (path[1][0], path[1][1], a+a_abs)) ) 
-											script_get_triangle.append( ("THEN", (),) )
-											script_get_triangle.append( ("STEP_OVER", (),) )
-											self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
-										elif len(path) > 2:
-											self.__logger.warning("Impossible d'attendre le triangle en ligne droite d'après PathFinding, data_camera: "+str(data_camera)+" path: "+str(path)+" x+x_abs: "+str(x+x_abs)+" y+y_abs "+str(y+y_abs)+" a+a_abs "+str(a+a_abs))
-											self.__deleteGoal(objectif)
-										else:
-											self.__logger.warning("Impossible d'attendre le triangle d'après PathFinding, data_camera: "+str(data_camera)+" path: "+str(path)+" x+x_abs: "+str(x+x_abs)+" y+y_abs "+str(y+y_abs)+" a+a_abs "+str(a+a_abs))
-											self.__deleteGoal(objectif)
-									# Sinon on a besoin de juste tourner
-									else:
-										script_get_triangle.append( ("A_ROT", (a+a_abs,)) ) 
-										script_get_triangle.append( ("THEN", (),) )
-										script_get_triangle.append( ("STEP_OVER", (),) )
-										self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
-								else:
-									self.__logger.warning("Impossible d'attendre le triangle d'après Alexis, data_camera: "+str(data_camera))
-									self.__deleteGoal(objectif)
-			
-			#Si ce sont des actions simples, on ne devrait pas utliser STEP_OVER pour ça, mais plutôt THEN		
-			else:
-				self.__logger.warning("Attention, les actons sont simples, action_list "+str(action_list)+" on ne devrait pas utliser STEP_OVER pour ça, mais plutôt THEN")
-				self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), action_list)
-				objectif.removeFirstElemAction()
-		else:
+		if not action_list:
 			self.__logger.warning("Pb, Il y a un STEP_OVER directement suivit d'un END ?")
+			return None
 
+		if (action_list[0][0] == "GET_TRIANGLE_IA" or action_list[0][0] == "GET_TRIANGLE_IA_TORCHE"):
+			can_be_store, position, hauteur_drop, script_to_send = self.__last_data_camera
+
+			if not can_be_store:
+				self.__logger.info("Impossible de stocker le triangle, ca cas ne devrait pas arriver, si ?")
+				self.__cancelGoal(objectif, False)
+				return None
+
+			if script_to_send:
+				self.__back_triangle_stack.popleft()
+			if position == 1:
+				self.__front_triangle_stack.append(self.__last_camera_color)
+			else:
+				self.__back_triangle_stack.append(self.__last_camera_color)
+			script_base = action_list
+			for action in script_base:
+				if action[0] == "STORE_TRIANGLE_IA":
+					script_to_send.append( ("O_STORE_TRIANGLE", (int(position*hauteur_drop),)) )
+				elif action[0] == "GET_TRIANGLE_IA" or action[0] == "GET_TRIANGLE_IA_TORCHE":
+					pass
+				else:
+					script_to_send.append(action)
+			self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_to_send)
+			objectif.removeFirstElemAction()
+		#Si ce sont des actions simples, on ne devrait pas utliser STEP_OVER pour ça, mais plutôt THEN		
+		else:
+			self.__logger.warning("Attention, les actions sont simples, action_list "+str(action_list)+" on ne devrait pas utliser STEP_OVER pour ça, mais plutôt THEN")
+			self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), action_list)
+			objectif.removeFirstElemAction()
+	
+
+	def __manageStepOver(self, objectif, id_objectif):
+		action_list = objectif.getFirstElemAction()
+		if not action_list:
+			self.__logger.warning("Pb, Il y a un STEP_OVER directement suivit d'un END ?")
+			return None
+
+		#Si ce sont des actions simples, on ne devrait pas utliser STEP_OVER pour ça, mais plutôt THEN
+		if (action_list[0][0] != "GET_TRIANGLE_IA" and action_list[0][0] != "GET_TRIANGLE_IA_TORCHE"):
+			self.__logger.warning("Attention, les actions sont simples, action_list "+str(action_list)+" on ne devrait pas utliser STEP_OVER pour ça, mais plutôt THEN")
+			self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), action_list)
+			objectif.removeFirstElemAction()
+			return None
+
+		get_triangle_mode = action_list[0][0]
+		data_camera = self.__getVisioData(objectif)
+		if data_camera is None:
+			self.__logger.info("On a pas trouvé de données camera")
+			self.__deleteGoal(objectif)
+			return None
+
+		#Si besoin, on change la couleur du triangle pour la prochaine fois
+		if data_camera[0] != objectif.getColorElemLock():
+			objectif.switchColor()	
+
+		can_be_store, position, hauteur_drop, script_data_to_get = self.__howToStoreTriangle(objectif, data_camera[0])
+		self.__last_data_camera =  (can_be_store, position, hauteur_drop, script_data_to_get)
+		#si on a la possibilité de le stocker
+		if not can_be_store:
+			self.__logger.info("Impossible de stocker le triangle de couleur "+str(data_camera[0])+" self.__front_triangle_stack "+str(self.__front_triangle_stack)+" self.__back_triangle_stack "+str(self.__back_triangle_stack))
+			self.__cancelGoal(objectif, False)
+			return None
+			
+		if self.__positionReady(data_camera[1], data_camera[2]):
+			script_get_triangle = deque()
+			if get_triangle_mode == "GET_TRIANGLE_IA":
+				script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], HAUTEUR_TRIANGLE)) )
+			elif get_triangle_mode == "GET_TRIANGLE_IA_TORCHE":
+				script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], HAUTEUR_TORCHE+3*HAUTEUR_TRIANGLE)) )
+			script_get_triangle.append( ("THEN", ()) )
+			script_get_triangle.append( ("O_GET_BRAS_STATUS", ()) )
+			script_get_triangle.append( ("THEN", (),) )
+			self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
+		else:
+			coord_to_move_to = self.__getPosToHaveTriangle(data_camera[1], data_camera[2])
+			if coord_to_move_to == None:
+				self.__logger.warning("Impossible d'attendre le triangle d'après Alexis, data_camera: "+str(data_camera))
+				self.__deleteGoal(objectif)
+				return None
+			find  = True
+			x, y, a = coord_to_move_to
+			x_abs, y_abs, a_abs = self.__data[self.__robot_name]["getPositionAndAngle"]
+			script_get_triangle = deque()
+
+			if TEST_MODE == True:
+				self.__hack_camera_simu_x -= x
+				self.__hack_camera_simu_y -= y
+				self.__hack_camera_simu_angle -= a
+
+			# Si on a besoin d'avancer, on vérifie avec le pathfinding
+			if x != 0 or y != 0:
+				self.__PathFinding.update()
+				path = self.__PathFinding.getPath((x_abs, y_abs), (x+x_abs, y+y_abs), enable_smooth=True)
+				if len(path) == 2:
+					script_get_triangle.append( ("A_GOTOA", (path[1][0], path[1][1], a+a_abs)) ) 
+					script_get_triangle.append( ("THEN", (),) )
+					script_get_triangle.append( ("STEP_OVER", (),) )
+					self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
+				elif len(path) > 2:
+					self.__logger.warning("Impossible d'attendre le triangle en ligne droite d'après PathFinding, data_camera: "+str(data_camera)+" path: "+str(path)+" x+x_abs: "+str(x+x_abs)+" y+y_abs "+str(y+y_abs)+" a+a_abs "+str(a+a_abs))
+					self.__deleteGoal(objectif)
+				else:
+					self.__logger.warning("Impossible d'attendre le triangle d'après PathFinding, data_camera: "+str(data_camera)+" path: "+str(path)+" x+x_abs: "+str(x+x_abs)+" y+y_abs "+str(y+y_abs)+" a+a_abs "+str(a+a_abs))
+					self.__deleteGoal(objectif)
+			# Sinon on a besoin de juste tourner
+			else:
+				script_get_triangle.append( ("A_ROT", (a+a_abs,)) ) 
+				script_get_triangle.append( ("THEN", (),) )
+				script_get_triangle.append( ("STEP_OVER", (),) )
+				self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
+
+	def __howToStoreTriangle(self, objectif, color): #return type: (can_be_store, position, hauteur_drop)
+		position = None
+		hauteur_drop = None
+		nb_front_stack = len(self.__front_triangle_stack) 
+		nb_back_stack = len(self.__back_triangle_stack)
+		can_be_store = True
+		script_to_send = deque()
+
+		if self.__our_color == color:
+			if nb_front_stack < MAX_FRONT_TRIANGLE_STACK_STORE:
+				position = 1
+				hauteur_drop = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE
+			else:
+				self.__logger.error("On a pas la place pour stocker ce triangle à l'avant, ca cas ne devrait pas arriver !")
+				can_be_store = False
+
+		else:
+			if (nb_front_stack < MAX_FRONT_TRIANGLE_STACK) and (nb_back_stack < MAX_BACK_TRIANGLE_STACK):
+				position = -1
+				hauteur_drop = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
+			elif (nb_front_stack < MAX_FRONT_TRIANGLE_STACK) and (nb_back_stack >= MAX_BACK_TRIANGLE_STACK):
+				script_to_send.append( ("O_RET", ()) )
+				position = -1
+				hauteur_drop = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
+			else:
+				self.__logger.error("On a pas la place pour stocker ce triangle ni à l'avant ni à l'arrière, ce cas ne devrait pas arriver !")
+				can_be_store = False
+
+		return (can_be_store, position, hauteur_drop, script_to_send)
+	
+	def __getVisioData(self, objectif):
+		if TEST_MODE == False:
+			limite_essai_viso = NB_VISIO_TRY
+			list_of_triangle_list = []
+			triangle_list_temp = []
+			while limite_essai_viso > 0 and len(list_of_triangle_list) < NB_VISIO_DATA_NEEDED:
+				limite_essai_viso -= 1
+				self.__vision.update(objectif.getType() == "TORCHE")
+				triangle_list_temp = self.__vision.getTriangles()
+				if triangle_list_temp != []:
+					list_of_triangle_list.append(triangle_list_temp)
+
+			if len(list_of_triangle_list) >= NB_VISIO_DATA_NEEDED:
+				data_camera = self.__getBestDataTriangleOfList(list_of_triangle_list)
+				if data_camera is None:
+					self.__last_camera_color = None
+					self.__deleteGoal(objectif)
+			else:
+				self.__logger.warning("On a pas vu de triangle à la position attendu, list_of_triangle_list "+str(list_of_triangle_list)+" dont on va supprimer l'objectif "+str(id_objectif))
+				self.__last_camera_color = None
+				self.__deleteGoal(objectif)
+				data_camera = None
+
+		else:
+			# Coordonées du triangle par rapport au centre du robot
+			# sera corrigé par l'algo lors de la prise du premier triangle normalement
+			temp = (220, 0)
+			# Correction x y
+			temp_x = temp[0] + self.__hack_camera_simu_x
+			temp_y = temp[1] + self.__hack_camera_simu_y
+			# Rotation du robot
+			temp_x_rot = temp_x * cos(self.__hack_camera_simu_angle) - temp_y * sin(self.__hack_camera_simu_angle)
+			temp_y_rot = temp_x * sin(self.__hack_camera_simu_angle) + temp_y * cos(self.__hack_camera_simu_angle)
+			
+			data_camera = ("RED", temp_x_rot, temp_y_rot)
+
+		return data_camera #type (color, x, y)
 
 	def __getBestDataTriangleOfList(self, list_of_triangle_list):
 		#On prend le meilleur de chaque listes
@@ -583,7 +613,7 @@ class GoalsManager:
 			self.__logger.critical("L'objectif a supprimer n'est plus dans la liste des bloqués "+str(id_objectif))
 		else:
 			if status_fin == 1:
-				self.__manageStepOver(objectif, id_objectif, skip_get_triangle=True)
+				self.__manageStepBras(objectif, id_objectif)
 			else:
 				self.__logger.warning("La prehention du trianglé à échoué, donc on supprime l'ordre "+str(id_objectif))
 				self.__deleteGoal(objectif)
