@@ -37,7 +37,7 @@
 #define FREQ (1/(DUREE_CYCLE/1000.0))
 
 #define ACC_MAX 100 //consigne*s-2
-#define RATIO_SPD_ROT_MAX 0.7
+#define RATIO_SPD_ROT_MAX 0.8
 
 /* CONSIGNE OFFSET
  * DEVRAIT ETRE A 0
@@ -52,12 +52,12 @@
  * dès que le robot avance, la pwm min est trouvée */
 #define PWM_MIN 20 
 
-#define CONSIGNE_MAX 60 
+#define CONSIGNE_MAX 80 
 
 #define CONSIGNE_RANGE_MAX (CONSIGNE_MAX - PWM_MIN)
 
 //CONSIGNE_REACHED est la pwm en dessous de laquelle un robot peut etre considéré comme arrêté à son goal
-#define CONSIGNE_REACHED 0
+#define CONSIGNE_REACHED 5
 
 #define ENC_RESOLUTION 1024 //resolution du codeur
 
@@ -82,9 +82,9 @@
 #define ANG_D 40 //a regler par incrementation
 #define ANG_AWU 0 //Anti-windup, en radian
 
-#define DIS_P 0.15 //spd = P * E_dis(mm)
+#define DIS_P 0.25 //spd = P * E_dis(mm)
 #define DIS_I 0 //spd = I * I_dis(mm * s)
-#define DIS_D 0.008 //a regler par incrementation
+#define DIS_D 0.007 //a regler par incrementation
 #define DIS_AWU 0 //Anti-windup, en mm
 
 //BLOCAGE
