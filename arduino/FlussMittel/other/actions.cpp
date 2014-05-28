@@ -455,7 +455,7 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 					}
 				} else { //Pas de triangles
 					pump(false);
-					step=6;
+					step=7;
 					cmdAsc(HAUTEUR_MAX);
 				}
 				break;
@@ -485,9 +485,9 @@ void cmdBrasVentouse(double angle, int length, int height, int n_depot) {
 				pump(false);
 				if (depot > 0) { //Depot a l'avant
 					tri_in_depot++;
-					step = 7;
+					step = 8;
 				} else { //Depot a l'arriere
-					step = 6;
+					step = 7;
 				}
 				time_end = timeMicros() + (long)DELAY_STOP_PUMP*1000;
 				break;
