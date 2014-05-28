@@ -160,7 +160,7 @@ class GoalsChoice:
 		nb_elem_goal = goal.getLenElemGoal()
 		for idd in range(nb_elem_goal):
 			path = self.__goalsLib.getOrderTrajectoire(goal, idd, position_last_goal)
-			self.__logger.debug("Calcul de trajectoire pour goalName "+str(goal.getName())+" id_elem "+str(idd)+" path "+str(path))
+			#self.__logger.debug("Calcul de trajectoire pour goalName "+str(goal.getName())+" id_elem "+str(idd)+" path "+str(path))
 			if path != []:
 				if self.__Collision.isCollisionFromGoalsManager(self.__robot_name, path):
 					length = self.__goalsLib.pathLen(path)

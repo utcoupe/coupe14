@@ -95,9 +95,11 @@
 			<order>STEP_OVER</order>
 			<order>GET_TRIANGLE_IA_TORCHE</order>
 			<order>STORE_TRIANGLE_IA</order>
+			<order>THEN</order>
 			<order>STEP_OVER</order>
 			<order>GET_TRIANGLE_IA_TORCHE</order>
 			<order>STORE_TRIANGLE_IA</order>
+			<order>THEN</order>
 			<order>STEP_OVER</order>
 			<order>GET_TRIANGLE_IA_TORCHE</order>
 			<order>DYNAMIQUE_OVER</order>

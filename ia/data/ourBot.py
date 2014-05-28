@@ -211,7 +211,7 @@ class OurBot():
 			order = elm_action[0]
 			action += (order,)
 
-			if order not in ("SLEEP", "THEN", "STEP_OVER", "END", "DYNAMIQUE_OVER", "IA_GET_BRAS_STATUS"):
+			if order not in ("SLEEP", "THEN", "STEP_OVER", "END", "DYNAMIQUE_OVER"):
 				argument_type_list = self.__arduino_constantes['ordersArguments'][order]
 				arguments_temp = ()
 				for i, argument_type in enumerate(argument_type_list):
@@ -248,7 +248,7 @@ class OurBot():
 	def addOrderStepOver(self, id_objectif, action_data):
 		first_objectif = self.__objectifs[0]
 		first_objectif[1].extend(self.__castOrders(action_data))
-		self.__logger.debug( str(self.getName()) + " order next STEP_OVER queued: " + str(first_objectif))
+		self.__logger.debug( str(self.getName()) + " order next STEP_OVER queued: "+str(action_data)+" on a donc "+str(first_objectif))
 		
 	def removeAllGoals(self):
 		if self.__objectifs:

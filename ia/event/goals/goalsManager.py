@@ -403,6 +403,7 @@ class GoalsManager:
 										path = self.__PathFinding.getPath((x_abs, y_abs), (x+x_abs, y+y_abs), enable_smooth=True)
 										if len(path) == 2:
 											script_get_triangle.append( ("A_GOTOA", (path[1][0], path[1][1], a+a_abs)) ) 
+											script_get_triangle.append( ("THEN", (),) )
 											script_get_triangle.append( ("STEP_OVER", (),) )
 											self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
 										elif len(path) > 2:
@@ -414,6 +415,7 @@ class GoalsManager:
 									# Sinon on a besoin de juste tourner
 									else:
 										script_get_triangle.append( ("A_ROT", (a+a_abs,)) ) 
+										script_get_triangle.append( ("THEN", (),) )
 										script_get_triangle.append( ("STEP_OVER", (),) )
 										self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
 								else:

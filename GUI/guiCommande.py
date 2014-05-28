@@ -51,10 +51,10 @@ def gui(com):
 				elif order == 'm':
 					i = 10
 					while i >0:
-						arguments = [9, 50, 50, 1000]
+						arguments = [9, 100, 100, 1000]
 						com.sendOrderAPI(4, 'A_PWM', *arguments)
 						time.sleep(4)
-						arguments = [10, -50, -50, 1000]
+						arguments = [10, -100, -100, 1000]
 						com.sendOrderAPI(4, 'A_PWM', *arguments)
 						time.sleep(4)
 						i -= 1
