@@ -286,7 +286,8 @@ class GoalsManager:
 		if find == True:
 			self.__logger.debug("On supprime la dernière occurance de "+str(value_to_remove)+" il reste "+str(deque_list))
 		else:
-			self.__logger.warning("Impossible de supprimer la valeur "+str(value_to_remove)+" de la liste "+str(deque))
+			deque_list.extend(removed_deque)
+			self.__logger.warning("Impossible de supprimer la valeur "+str(value_to_remove)+" de la liste "+str(deque_list))
 
 	def __manageStepBras(self, objectif, id_objectif):
 		action_list = objectif.getFirstElemAction()
@@ -343,7 +344,6 @@ class GoalsManager:
 		data_camera = self.__getVisioData(objectif)
 		if data_camera is None:
 			self.__logger.info("On a pas trouvé de données camera")
-			self.__deleteGoal(objectif)
 			return None
 
 		#Si besoin, on change la couleur du triangle pour la prochaine fois
