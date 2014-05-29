@@ -62,6 +62,10 @@
 			<order>SLEEP 1000</order>
 			<order>O_TIR_BALLE 1</order>
 			<order>SLEEP 1000</order>
+			<order>O_TIR_BALLE 1</order>
+			<order>SLEEP 1000</order>
+			<order>O_TIR_BALLE 1</order>
+			<order>SLEEP 1000</order>
 			<order>END</order>
 		</orders>
 	</elemScript>
