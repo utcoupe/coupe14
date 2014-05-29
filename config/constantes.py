@@ -5,7 +5,7 @@ Ce fichier regroupe toutes les constantes de l'IA
 
 import math
 
-TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
@@ -118,7 +118,7 @@ MIN_X_TRIANGLE = 190
 
 
 #====================TIBOT====================
-START_POSITION_RED_TIBOT = (177, 1578, -0.422)
+START_POSITION_RED_TIBOT = (177, 1498, -0.422)
 LARGEUR_TIBOT = 		180
 LONGUEUR_TIBOT = 		130
 

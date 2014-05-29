@@ -388,7 +388,7 @@ class CommunicationGlobale():
 				else:
 					i = 0
 					lastIdToAccept = self.lastIdConfirm[address]
-					while lastIdToAccept != idd and returnMissed == False:
+					"""while lastIdToAccept != idd and returnMissed == False:
 						if (self.returnSize[ self.ordreLog[address][unconfirmedIds[i]][0] ] == 0 and returnMissed == False):
 							lastIdToAccept = unconfirmedIds[i]
 						else:
@@ -405,7 +405,7 @@ class CommunicationGlobale():
 							self.lastIdConfirm[address] = lastIdToAccept
 						
 					
-					self.lastConfirmationDate[address] = date
+					self.lastConfirmationDate[address] = date"""
 					
 				if idd == self.getNextConfirmeId(address) or lastIdToAccept != self.lastIdConfirm[address]:
 					#python enleve les zero lors de la conversion en binaire donc on les rajoute, sauf le premier du protocole
