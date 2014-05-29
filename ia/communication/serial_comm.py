@@ -82,4 +82,5 @@ class ComSerial():
 			for char in rawOutputString:
 				self.liaison.write(bytes(char, 'latin-1'))
 			
-
+	def __del__(self):
+		self.liaison.close()

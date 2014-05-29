@@ -36,8 +36,8 @@
 #define DUREE_CYCLE 5 //période de calcul, en ms
 #define FREQ (1/(DUREE_CYCLE/1000.0))
 
-#define ACC_MAX 100 //consigne*s-2
-#define RATIO_SPD_ROT_MAX 0.8
+#define ACC_MAX 150 //consigne*s-2
+#define RATIO_SPD_ROT_MAX 0.7
 
 /* CONSIGNE OFFSET
  * DEVRAIT ETRE A 0
@@ -50,7 +50,7 @@
  * envoyer des consignes en pwm au robot
  * partant de 0 et en augmentant progressivement
  * dès que le robot avance, la pwm min est trouvée */
-#define PWM_MIN 20 
+#define PWM_MIN 10 
 
 #define CONSIGNE_MAX 80 
 
@@ -63,7 +63,7 @@
 
 #define ENC_LEFT_RADIUS 36.23 //rayon de la roue codeuse
 #define ENC_RIGHT_RADIUS 36.23//rayon de la roue codeuse
-#define ENTRAXE_ENC 182.39 // Distance entre chaque roue codeuse en mm
+#define ENTRAXE_ENC 189.11 // Distance entre chaque roue codeuse en mm
 
 #define ERROR_ANGLE 0.03 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
 #define ERROR_ANGLE_TO_GO 0.1 //erreur en angle(radians) maximale avant d'avancer
@@ -79,12 +79,12 @@
 //Le "I" devrait etre faible (ou nul), le "D" est à régler progressivement pour éviter le dépassement
 #define ANG_P 300 //spd = P * E_ang(rad)
 #define ANG_I 0 //spd = I * I_ang(rad * s)
-#define ANG_D 40 //a regler par incrementation
+#define ANG_D 50 //a regler par incrementation
 #define ANG_AWU 0 //Anti-windup, en radian
 
-#define DIS_P 0.25 //spd = P * E_dis(mm)
+#define DIS_P 0.4 //spd = P * E_dis(mm)
 #define DIS_I 0 //spd = I * I_dis(mm * s)
-#define DIS_D 0.007 //a regler par incrementation
+#define DIS_D 0.045 //a regler par incrementation
 #define DIS_AWU 0 //Anti-windup, en mm
 
 //BLOCAGE

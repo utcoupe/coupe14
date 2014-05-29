@@ -8,6 +8,7 @@
 
 #include "AFMotor.h"
 #include "Arduino.h"
+#define NO_PWM 0
 
 void set_pwm_right(int pwm);
 void set_pwm_left(int pwm);
