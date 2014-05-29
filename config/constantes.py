@@ -11,7 +11,7 @@ TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux
 
 
 #====================Enable====================
-ENABLE_TOURELLE =		False
+ENABLE_TOURELLE =		True
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
 ENABLE_TIBOT =			True
 
@@ -111,13 +111,13 @@ MARGE_OUVERTURE_BRAS_MAX_DEPLACEMENT = 20
 MARGE_OUVERTURE_BRAS_MIN_DEPLACEMENT = 20
 CENTRE_BRAS_X = 128
 CENTRE_BRAS_Y = 130
-NB_VISIO_TRY = 25
-NB_VISIO_DATA_NEEDED = 5
+NB_VISIO_TRY = 10
+NB_VISIO_DATA_NEEDED = 3
 VISIO_MAX_DIST_TRIANGLE = 400
 MIN_X_TRIANGLE = 190
 
 #====================TIBOT====================
-START_POSITION_RED_TIBOT = (177, 1578, -0.422)
+START_POSITION_RED_TIBOT = (177, 1498, -0.422)
 LARGEUR_TIBOT = 		180
 LONGUEUR_TIBOT = 		130
 

@@ -87,6 +87,8 @@
 #define DIS_D 0.4 //a regler par incrementation
 #define DIS_AWU 0
 
+#define TIME_BETWEEN_ORDERS 500
+
 //BLOCAGE
 //TIME_BLOCKED : période de vérification (ms)
 //MIN_DIST_BLOCKED : disatcne min a parcourir pour ne pas etre considere bloqué (mm)

@@ -1,6 +1,8 @@
 #ifndef ACTIONS_H
 #define ACTIONS_H
 
+#define PAUSE_PUMP -1
+#define RESUME_PUMP -2
 enum action {
 	None,
 	BrasVentouse,

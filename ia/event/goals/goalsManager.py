@@ -339,6 +339,7 @@ class GoalsManager:
 			return None
 
 		get_triangle_mode = action_list[0][0]
+		time.sleep(0.03)
 		data_camera = self.__getVisioData(objectif)
 		if data_camera is None:
 			self.__logger.info("On a pas trouvé de données camera")
@@ -350,7 +351,7 @@ class GoalsManager:
 			objectif.switchColor()
 
 		#Si ce n'est pas une torche et que la couleur est déjà bonne
-		if data_camera[0] == self.__our_color:
+		if data_camera[0] == self.__our_color and objectif.getType() != "TORCHE":
 			self.__logger.info("Ce triangle est de notre couleur donc on le laisse ici")
 			self.__deleteGoal(objectif)
 			return None
@@ -688,7 +689,7 @@ class GoalsManager:
 					script_only	= bool(elem_goal.getElementsByTagName('script_only')[0].firstChild.nodeValue)
 					id_script	= int(elem_goal.getElementsByTagName('id_script')[0].firstChild.nodeValue)
 					
-					goal.appendElemGoal( ElemGoal(id, x_objectif+x_elem, y_objectif+y_elem, angle_objectif+angle, points, priority, duration, color, self.__elem_script[id_script]) )
+					goal.appendElemGoal( ElemGoal(id, x_objectif+x_elem, y_objectif+y_elem, angle_objectif+angle, points, priority, duration, color, script_only, self.__elem_script[id_script]) )
 
 	def __loadBeginScript(self):
 		base_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
