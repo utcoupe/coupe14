@@ -12,7 +12,7 @@
 #define MAX_DATA 1024
 #define MAX_CLUSTERS 50
 #define MAX_ROBOTS 4
-#define BORDER_MARGIN 500
+#define BORDER_MARGIN 50
 
 
 #define CONE_CALIB  (10.0/180)*M_PI

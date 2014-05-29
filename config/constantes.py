@@ -13,7 +13,7 @@ TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux
 #====================Enable====================
 ENABLE_TOURELLE =		False
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
-ENABLE_TIBOT =			False
+ENABLE_TIBOT =			True
 
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
@@ -117,7 +117,7 @@ VISIO_MAX_DIST_TRIANGLE = 400
 MIN_X_TRIANGLE = 190
 
 #====================TIBOT====================
-START_POSITION_RED_TIBOT = (177, 1578, -1.14875)
+START_POSITION_RED_TIBOT = (177, 1578, -0.422)
 LARGEUR_TIBOT = 		180
 LONGUEUR_TIBOT = 		130
 

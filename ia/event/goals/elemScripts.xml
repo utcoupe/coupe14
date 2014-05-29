@@ -5,7 +5,7 @@
 		<orders>
 			<order>O_BRAS_OUVRIR_HAUT</order>
 			<order>THEN</order>
-			<order>A_PWM -100 -100 300</order>
+			<order>A_PWM -100 -100 500</order>
 			<order>THEN</order>
 			<order>O_BRAS_FERMER</order>
 			<order>THEN</order>
@@ -103,6 +103,40 @@
 			<order>GET_TRIANGLE_IA_TORCHE</order>
 			<order>DYNAMIQUE_OVER</order>
 			<order>STORE_TRIANGLE_IA</order>
+			<order>END</order>
+		</orders>
+	</elemScript>
+	<elemScript>
+		<id_script>20</id_script>
+		<orders>
+			<order>O_GET_TRIANGLE 328 88 130</order>
+			<order>THEN</order>
+			<order>O_STORE_TRIANGLE 1 82</order>
+			<order>THEN</order>
+			<order>O_GET_TRIANGLE 328 88 130</order>
+			<order>THEN</order>
+			<order>O_STORE_TRIANGLE -1 82</order>
+			<order>THEN</order>
+			<order>O_GET_TRIANGLE 328 88 130</order>
+			<order>THEN</order>
+			<order>O_STORE_TRIANGLE 1 112</order>
+			<order>END</order>
+		</orders>
+	</elemScript>
+	<elemScript>
+		<id_script>21</id_script>
+		<orders>
+			<order>O_GET_TRIANGLE 328 -88 130</order>
+			<order>THEN</order>
+			<order>O_STORE_TRIANGLE 1 82</order>
+			<order>THEN</order>
+			<order>O_GET_TRIANGLE 328 -88 130</order>
+			<order>THEN</order>
+			<order>O_STORE_TRIANGLE -1 82</order>
+			<order>THEN</order>
+			<order>O_GET_TRIANGLE 328 -88 130</order>
+			<order>THEN</order>
+			<order>O_STORE_TRIANGLE 1 112</order>
 			<order>END</order>
 		</orders>
 	</elemScript>
