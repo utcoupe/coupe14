@@ -73,13 +73,20 @@ int main(int argc, char **argv){
 	}
 	
 	if (calib) {
-		int error = 0;
+		int error = 0, i=0;
 		do {
-			error = calibrate(&hok1);
+			error = calibrate(&hok1, CONE_CALIB + (i++ * (2/180.0*M_PI))); //On éclargit le cone de 2 degree a chaque iteration
 		} while (error < 0);
+		if (i > 1) {
+			printf("%sWARNING : calibrated hokuyo %s with %d cone extensions\n", PREFIX, hok1.path, i);
+		}
+		i = 0;
 		do {
-			error = calibrate(&hok2);
+			error = calibrate(&hok1, CONE_CALIB + (i++ * (2/180.0*M_PI))); //On éclargit le cone de 2 degree a chaque iteration
 		} while (error < 0);
+		if (i > 1) {
+			printf("%sWARNING : calibrated hokuyo %s with %d cone extensions\n", PREFIX, hok1.path, i);
+		}
 	}
 
 	#ifdef SDL

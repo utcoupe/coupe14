@@ -49,10 +49,10 @@ Hok_t initHokuyo(const char *path, double ori, double cone, Pt_t pt) {
 	return hok;	
 }
 
-int calibrate(Hok_t *hok) {
+int calibrate(Hok_t *hok, float cone) {
 	double a_calib = angle(hok->pt,  CALIB_PT) - hok->orientation;
-	hok->imin = urg_rad2index(hok->urg, a_calib - CONE_CALIB);
-	hok->imax = urg_rad2index(hok->urg, a_calib + CONE_CALIB);
+	hok->imin = urg_rad2index(hok->urg, a_calib - cone);
+	hok->imax = urg_rad2index(hok->urg, a_calib + cone);
 
 	Pt_t points[MAX_DATA], detected;
 	Cluster_t clusters[MAX_CLUSTERS];
@@ -85,9 +85,7 @@ int calibrate(Hok_t *hok) {
 			sumx += clusters[0].center.x;
 			sumy += clusters[0].center.y;
 			count++;
-		} else {
-			printf("%sCan't calibrate : got %d clusters on %s\n", PREFIX, nb_cluster, hok->path);
-		}
+		} 
 	}
 	
 	if (count > CALIB_MEASURES/2) {
@@ -114,6 +112,7 @@ int calibrate(Hok_t *hok) {
 
 		return 0;
 	} else {
+		printf("%sOnly got %d valid measures, needed %d\n", PREFIX, count, CALIB_MEASURES/2);
 		return -1;
 	}
 }
