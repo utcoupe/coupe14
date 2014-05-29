@@ -5,14 +5,14 @@ Ce fichier regroupe toutes les constantes de l'IA
 
 import math
 
-TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
 
 #====================Enable====================
 ENABLE_TOURELLE =		False
-ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
+ENABLE_FLUSSMITTEL = 	False #permet de desactiver Flussmitel
 ENABLE_TIBOT =			True
 
 #========================================Communication========================================
@@ -118,8 +118,8 @@ VISIO_MAX_DIST_TRIANGLE = 400
 
 #====================TIBOT====================
 START_POSITION_RED_TIBOT = (177, 1498, -0.422)
-LARGEUR_TIBOT = 		180
-LONGUEUR_TIBOT = 		130
+LARGEUR_TIBOT = 		210
+LONGUEUR_TIBOT = 		160
 
 
 #====================VISIO====================

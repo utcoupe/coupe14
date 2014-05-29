@@ -675,8 +675,8 @@ class GoalsManager:
 				if (self.__our_color == "RED" and id == 0) or (self.__our_color == "YELLOW" and id == 1):
 					self.__finished_goals.append(goal)
 				#Hack pour ignorer le second mamouth
-				elif (self.__our_color == "RED" and id == 12) or (self.__our_color == "YELLOW" and id == 11):
-					self.__finished_goals.append(goal)
+				#elif (self.__our_color == "RED" and id == 12) or (self.__our_color == "YELLOW" and id == 11):
+					#self.__finished_goals.append(goal)
 				else:
 					self.__available_goals.append(goal)
 

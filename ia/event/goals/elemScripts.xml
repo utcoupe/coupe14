@@ -44,8 +44,8 @@
 		<id_script>4</id_script>
 		<orders>
 			<order>DYNAMIQUE_OVER</order>
-			<order>A_PWM 50 50 1250</order>
-			<order>A_PWM -50 -50 500</order>
+			<order>A_PWM 20 20 2000</order>
+			<order>A_PWM -15 -15 1500</order>
 			<order>END</order>
 		</orders>
 	</elemScript>
@@ -53,10 +53,6 @@
 		<id_script>5</id_script>
 		<orders>
 			<order>DYNAMIQUE_OVER</order>
-			<order>SLEEP 1000</order>
-			<order>O_TIR_BALLE 1</order>
-			<order>SLEEP 1000</order>
-			<order>O_TIR_BALLE 1</order>
 			<order>SLEEP 1000</order>
 			<order>O_TIR_BALLE 1</order>
 			<order>SLEEP 1000</order>
