@@ -371,7 +371,7 @@
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x_elem>80</x_elem>
+				<x_elem>-40</x_elem>
 				<y_elem>-140</y_elem>
 				<angle>-1.57</angle>
 				<points>4</points>
@@ -406,7 +406,7 @@
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
-				<x_elem>2330</x_elem>
+				<x_elem>2210</x_elem>
 				<y_elem>-140</y_elem>
 				<angle>0.0</angle>
 				<points>6</points>
