@@ -5,7 +5,7 @@
 		<orders>
 			<order>O_BRAS_OUVRIR_HAUT</order>
 			<order>THEN</order>
-			<order>A_PWM -100 -100 300</order>
+			<order>A_PWM -100 -100 500</order>
 			<order>THEN</order>
 			<order>O_BRAS_FERMER</order>
 			<order>THEN</order>
@@ -44,8 +44,8 @@
 		<id_script>4</id_script>
 		<orders>
 			<order>DYNAMIQUE_OVER</order>
-			<order>A_PWM 100 100 1750</order>
-			<order>A_PWM -40 -40 750</order>
+			<order>A_PWM 50 50 1250</order>
+			<order>A_PWM -50 -50 500</order>
 			<order>END</order>
 		</orders>
 	</elemScript>

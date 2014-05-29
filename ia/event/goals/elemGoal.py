@@ -6,7 +6,7 @@ Class used to reprsent an elemetary goal, which is on entry of an objectif
 import copy
 
 class ElemGoal:
-	def __init__(self, id, x, y, angle, points, priority, duration, color, elem_action):
+	def __init__(self, id, x, y, angle, points, priority, duration, color, script_only, elem_action):
 		self.__id 		= id
 		self.__x 		= x
 		self.__y 		= y
@@ -15,9 +15,13 @@ class ElemGoal:
 		self.__priority	= priority
 		self.__duration	= duration
 		self.__color	= color
+		self.__script_only = script_only
 		self.__elem_action_base = copy.deepcopy(elem_action)
 		self.__elem_action_temp = copy.deepcopy(elem_action)
 		self.__already_step_over = False
+
+	def getScriptOnly(self):
+		return self.__script_only
 
 	def getNextElemAction(self):
 		return self.__elem_action_temp

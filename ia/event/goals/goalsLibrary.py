@@ -52,15 +52,22 @@ class GoalsLibrary:
 		self.__reverse_table[(13,0)] = (13,1)
 		self.__reverse_table[(13,1)] = (13,0)
 
+		self.__reverse_table[(14,0)] = (14,0)
+
+		self.__reverse_table[(15,0)] = (16,0)
+		self.__reverse_table[(16,0)] = (15,0)
+
 		self.__reverse_table[(17,0)] = (17,0)
 		self.__reverse_table[(17,1)] = (17,1)
 		self.__reverse_table[(17,2)] = (17,2)
 		self.__reverse_table[(17,3)] = (17,3)
+		self.__reverse_table[(17,4)] = (18,0)
 
 		self.__reverse_table[(18,0)] = (18,0)
 		self.__reverse_table[(18,1)] = (18,1)
 		self.__reverse_table[(18,2)] = (18,2)
 		self.__reverse_table[(18,3)] = (18,3)
+		self.__reverse_table[(18,0)] = (17,4)
 
 
 	def reverseGoalId(self, goal_id, elem_id = 0):

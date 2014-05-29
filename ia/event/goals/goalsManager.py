@@ -347,7 +347,13 @@ class GoalsManager:
 
 		#Si besoin, on change la couleur du triangle pour la prochaine fois
 		if data_camera[0] != objectif.getColorElemLock():
-			objectif.switchColor()	
+			objectif.switchColor()
+
+		#Si ce n'est pas une torche et que la couleur est déjà bonne
+		if data_camera[0] == self.__our_color and objectif.getType() != "TORCHE":
+			self.__logger.info("Ce triangle est de notre couleur donc on le laisse ici")
+			self.__deleteGoal(objectif)
+			return None
 
 		can_be_store, position, hauteur_drop, script_data_to_get = self.__howToStoreTriangle(objectif, data_camera[0])
 		self.__last_data_camera =  (can_be_store, position, hauteur_drop, script_data_to_get)
@@ -682,7 +688,7 @@ class GoalsManager:
 					script_only	= bool(elem_goal.getElementsByTagName('script_only')[0].firstChild.nodeValue)
 					id_script	= int(elem_goal.getElementsByTagName('id_script')[0].firstChild.nodeValue)
 					
-					goal.appendElemGoal( ElemGoal(id, x_objectif+x_elem, y_objectif+y_elem, angle_objectif+angle, points, priority, duration, color, self.__elem_script[id_script]) )
+					goal.appendElemGoal( ElemGoal(id, x_objectif+x_elem, y_objectif+y_elem, angle_objectif+angle, points, priority, duration, color, script_only, self.__elem_script[id_script]) )
 
 	def __loadBeginScript(self):
 		base_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -767,15 +773,22 @@ class GoalsManager:
 		@param bot robot ennemi considéré
 		"""
 		ts = self.__data["METADATA"]["getGameClock"] #timeStamp
+		ts_goal = goal.getTSProximiy()
+
 		pos_goal = goal.getPosition()
 		pos_bot = bot["getPosition"]
 		dist_bot = sqrt((pos_goal[0] - pos_bot[0])**2+(pos_goal[1] - pos_bot[1])**2)
 		if dist_bot < bot["getRayon"]*1.5:
-			ts_goal = goal.getTSProximiy()
 			if ts_goal == -1:
 				goal.setTSProximiy(ts)
-			elif ts - ts_goal > 4000:
+		elif ts_goal != -1:
+			if ts - ts_goal > 6000:
 				goal.setAlreadyDone(100)
+				self.__deleteGoal(goal, fromGoalCollision=True)
+				goal.setTSProximiy(self.__data["METADATA"]["getGameClock"])
+				goal.setTSProximiy(-1)
+			else:
+				goal.setTSProximiy(-1)
 
 	def updateAlreadyDone(self):
 		"""
@@ -783,7 +796,7 @@ class GoalsManager:
 		"""
 		#quand on t'appel check self.__data, dont data["BIGENEMYBOT"]["getPosition"], data["SMALLENEMYBOT"]["getPosition"], data["METADATA"]["getGameClock"]
 		#pour tous les objectifs dans self.__available_goals, appel la fonction getAlreadyDone et setAlreadyDone
-		if self.__data["METADATA"]["getGameClock"] is not None:
+		if self.__data["METADATA"]["getGameClock"] is not None and self.__robot_name == "FLUSSMITTEL":
 			for robot in self.__robot_to_check_goal_collision:
 				if self.__last_enemy_pos[robot] != self.__data[robot]["getPosition"]:
 					self.__last_enemy_pos[robot] = self.__data[robot]["getPosition"]
