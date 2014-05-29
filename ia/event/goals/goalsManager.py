@@ -459,7 +459,7 @@ class GoalsManager:
 					self.__last_camera_color = None
 					self.__deleteGoal(objectif)
 			else:
-				self.__logger.warning("On a pas vu de triangle à la position attendu, list_of_triangle_list "+str(list_of_triangle_list)+" dont on va supprimer l'objectif "+str(id_objectif))
+				self.__logger.warning("On a pas vu de triangle à la position attendu, list_of_triangle_list "+str(list_of_triangle_list)+" dont on va supprimer l'objectif d'id "+str(objectif.getId()))
 				self.__last_camera_color = None
 				self.__deleteGoal(objectif)
 				data_camera = None

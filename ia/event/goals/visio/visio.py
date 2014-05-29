@@ -5,6 +5,7 @@ import time
 import atexit
 from math import cos, sin
 
+from constantes import *
 
 """TODO : Post-traitement des positions des triangles pour corriger
 la position des triangles en hauteur"""
@@ -152,12 +153,12 @@ class Visio:
 				self._triangles = triangles  # si echec, on ne corrige pas
 
 		triangles = self._triangles
-		#try:
-		if self.__big_bot is not None:
-			self.__post_processing()
-		#except BaseException as e:
-		#	self.__log.error("Failed to post-process datas (generic) : "+str(e))
-		#	self._triangles = triangles  # si echec, on ne corrige pas
+		try:
+			if self.__big_bot is not None:
+				self.__post_processing()
+		except BaseException as e:
+			self.__log.error("Failed to post-process datas (generic) : "+str(e))
+			self._triangles = triangles  # si echec, on ne corrige pas
 
 		self.__log.info("After post-process :")
 		for tri in self._triangles:
@@ -178,22 +179,22 @@ class Visio:
 			# suite si elles sont a modifier, mais on en a besoin pour savoir
 			# s'i faut les modifier
 			self._triangles[i].real_coords = [i + j for i, j in zip(self._triangles[i].rel_in_abs(robot_angle), self.__big_bot["getPosition"])]
-			self.__log.info("realtive coords : " + str(self._triangles[i].coords))
+			self.__log.info("realtive coords : " + str(self._triangles[i].coord))
 			self.__log.info("rel in ab : " + str(self._triangles[i].rel_in_abs(robot_angle)))
 			self.__log.info("real : " + str(self._triangles[i].real_coords))
 
 			#Traitement de la position pour modif si self._triangles[i]angle en hauteur
-			if self._triangles[i].coords[0] < MIN_X_TRIANGLE:
+			if self._triangles[i].coord[0] < MIN_X_TRIANGLE:
 				tri_to_remove.append(self._triangles[i])
 			elif self.__outOfMap(self._triangles[i]) or self.__inFruitZone(self._triangles[i]) or self.__inStartZone(self._triangles[i]):
-				self.__log("Removed detected triangle at coords " + str(self._triangles[i].real_coords))
+				self.__log.debug("Removed detected triangle at coords " + str(self._triangles[i].real_coords))
 				tri_to_remove.append(self._triangles[i])
-
-			for j in range(len(tri_to_remove)):
-				self._triangles.remove(tri_to_remove[j])
-
 			#elif self.__inHighGround(self._triangles[i]):
 			#	self.__highGroundProcess(self._triangles[i], self.__hplat)
+
+		for j in range(len(tri_to_remove)):
+			self._triangles.remove(tri_to_remove[j])
+
 
 	def __highGroundProcess(self, tri, hobj):
 		"""Corrige les coordonnées des triangles en hauteurs à des positions connues
