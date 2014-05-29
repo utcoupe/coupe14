@@ -82,10 +82,12 @@
 #define ANG_D 50 //a regler par incrementation
 #define ANG_AWU 0 //Anti-windup, en radian
 
-#define DIS_P 0.4 //spd = P * E_dis(mm)
+#define DIS_P 0.5 //spd = P * E_dis(mm)
 #define DIS_I 0 //spd = I * I_dis(mm * s)
-#define DIS_D 0.045 //a regler par incrementation
+#define DIS_D 0.09 //a regler par incrementation
 #define DIS_AWU 0 //Anti-windup, en mm
+
+#define TIME_BETWEEN_ORDERS 500
 
 //BLOCAGE
 //TIME_BLOCKED : période de vérification (ms)

@@ -655,12 +655,23 @@ void ascInt() {
 }
 
 void pump(bool etat) {
-	if (etat) {
-		digitalWrite(PIN_VALVE, LOW);
-		pump_motor.setSpeed(PWM_PUMP);
-	} else {
+	static bool saved_etat = etat;
+	if (etat == PAUSE_PUMP) {
 		digitalWrite(PIN_VALVE, HIGH);
 		pump_motor.setSpeed(0);
+	} else  {
+		if (etat == RESUME_PUMP) {
+			etat = saved_etat;
+		} else {
+			saved_etat = etat;
+		}
+		if (etat) {
+			digitalWrite(PIN_VALVE, LOW);
+			pump_motor.setSpeed(PWM_PUMP);
+		} else {
+			digitalWrite(PIN_VALVE, HIGH);
+			pump_motor.setSpeed(0);
+		}
 	}
 }
 

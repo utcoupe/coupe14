@@ -32,7 +32,7 @@ Control::Control(){
 
 void Control::compute(){
 	static bool reset = true, order_started = false;
-	static long start_time;
+	static long start_time, start_end_timer = -1;
 	struct goal current_goal = fifo.getCurrentGoal();
 	static struct goal last_goal = current_goal;
 	pos current_pos = robot.getMmPos();
@@ -66,6 +66,7 @@ void Control::compute(){
 			PID_Distance.reset();
 			reset = false;
 			order_started = false;
+			start_end_timer = -1;
 		}
 	
 	/* Choix de l'action en fonction du type d'objectif */
@@ -77,7 +78,7 @@ void Control::compute(){
 				da = moduloTwoPI(da);//Commenter pour multi-tour
 
 				if(abs(da) <= ERROR_ANGLE) {
-					setConsigne(0, 0);
+					setConsigne(NO_PWM, NO_PWM);
 					fifo.pushIsReached();
 				}
 				else
@@ -114,7 +115,11 @@ void Control::compute(){
 				}
 
 				if (abs(d) < ERROR_POS && dd < 2*ERROR_POS) {
-					fifo.pushIsReached();
+					if (start_end_timer < 0) {
+						start_end_timer = timeMillis();
+					}  else if (!fifo.getCurrentGoal().isReached && timeMillis() - start_end_timer > TIME_BETWEEN_ORDERS) {
+						fifo.pushIsReached();
+					}
 					da = 0;
 				}
 
@@ -151,7 +156,7 @@ void Control::compute(){
 					setConsigne(pwmL, pwmR);
 				}
 				else {
-					setConsigne(0,0);
+					setConsigne(NO_PWM, NO_PWM);
 					fifo.pushIsReached();
 				}
 				break;
