@@ -83,4 +83,8 @@ class ComSerial():
 				self.liaison.write(bytes(char, 'latin-1'))
 			
 	def __del__(self):
-		self.liaison.close()
+		try:
+			self.liaison.close()
+		except:
+			self.__logger.critical("Impossible d'ouvrir le port serie demandé, depuis le fichier de constantes déactivez les robots indisponibles")
+			exit()
