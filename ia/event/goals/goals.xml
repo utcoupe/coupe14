@@ -348,7 +348,7 @@
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x_elem>40</x_elem>
+				<x_elem>80</x_elem>
 				<y_elem>-140</y_elem>
 				<angle>-1.57</angle>
 				<points>4</points>
@@ -371,7 +371,7 @@
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x_elem>40</x_elem>
+				<x_elem>80</x_elem>
 				<y_elem>-140</y_elem>
 				<angle>-1.57</angle>
 				<points>4</points>
@@ -388,15 +388,15 @@
 		<name>TIR_FILET</name>
 		<type>FILET</type>
 		<concerned_robot>TIBOT</concerned_robot>
-		<x_objectif>1500</x_objectif>
-		<y_objectif>1000</y_objectif>
+		<x_objectif>0</x_objectif>
+		<y_objectif>1700</y_objectif>
 		<angle_objectif>-1.57</angle_objectif>
 		<elem_goals>
 			<elem_goal>
 				<id>0</id>
-				<x_elem>-1120</x_elem>
-				<y_elem>550</y_elem>
-				<angle>-0.82</angle>
+				<x_elem>830</x_elem>
+				<y_elem>-140</y_elem>
+				<angle>0.0</angle>
 				<points>6</points>
 				<priority>1</priority>
 				<duration>1</duration>
@@ -406,9 +406,9 @@
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
-				<x_elem>1120</x_elem>
-				<y_elem>550</y_elem>
-				<angle>0.82</angle>
+				<x_elem>2330</x_elem>
+				<y_elem>-140</y_elem>
+				<angle>0.0</angle>
 				<points>6</points>
 				<priority>1</priority>
 				<duration>1</duration>
