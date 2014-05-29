@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 
-from visio import Visio
 import sys
 import time
+import os
+
+FILE_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(FILE_DIR,"../../../"))
+from visio import Visio
 
 try:
 	index = sys.argv[1]
@@ -15,7 +19,7 @@ print('Visio started')
 
 while 1:
 	start = time.time()
-	tris = v.update(True)
+	tris = v.update()
 	#tris = v2.update()
 	print("Duration : ", time.time() - start)
 	for tri in tris:
