@@ -580,18 +580,6 @@
 				<script_only>False</script_only>
 				<id_script>9</id_script>
 			</elem_goal>
-			<elem_goal>
-				<id>4</id>
-				<x_elem>-240</x_elem>
-				<y_elem>240</y_elem>
-				<angle>-1.05</angle>
-				<points>3</points>
-				<priority>1</priority>
-				<duration>1</duration>
-				<color>RYR</color>
-				<script_only>True</script_only>
-				<id_script>20</id_script>
-			</elem_goal>
 		</elem_goals>
 	</goal>
 	<goal>
@@ -650,18 +638,6 @@
 				<color>RYR</color>
 				<script_only>False</script_only>
 				<id_script>9</id_script>
-			</elem_goal>
-			<elem_goal>
-				<id>4</id>
-				<x_elem>240</x_elem>
-				<y_elem>240</y_elem>
-				<angle>3.67</angle>
-				<points>3</points>
-				<priority>1</priority>
-				<duration>1</duration>
-				<color>RYR</color>
-				<script_only>True</script_only>
-				<id_script>21</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>

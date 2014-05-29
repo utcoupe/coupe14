@@ -5,13 +5,13 @@ Ce fichier regroupe toutes les constantes de l'IA
 
 import math
 
-TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
 
 #====================Enable====================
-ENABLE_TOURELLE =		False
+ENABLE_TOURELLE =		True
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
 ENABLE_TIBOT =			True
 
@@ -46,7 +46,7 @@ renvoiImmediat = 		False # fonction non terminé, ne pas activer !
 #=======================================IA========================================
 
 #====================Variables globales====================
-NUMBER_OF_ENEMY = 		1 #TODO
+NUMBER_OF_ENEMY = 		2 #TODO
 #si 1, on considère que l'ennemi est petit
 
 #====================eventManager====================
@@ -86,7 +86,7 @@ COLLISION_WARNING_THRESHOLD = 800
 
 #=======================================Systemes physiques========================================
 #====================tourelle====================
-OUR_ROBOTS_VISIBLE_TOURELLE = False 	#True si une balise visible par l'hokuyo est presente sur nos robots 
+OUR_ROBOTS_VISIBLE_TOURELLE = True 	#True si une balise visible par l'hokuyo est presente sur nos robots 
 TOURELLE_PULL_PERIODE = 100 		#ms
 DISTANCE_MAX_ROBOT_FUSION = 250 #Différance max entre codeurs et hokuyo
 
