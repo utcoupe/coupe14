@@ -50,7 +50,7 @@ if __name__ == "__main__":
 		"""
 
 		redIA = True
-		yellowIA = False
+		yellowIA = True
 
 #=========================================================
 #======= Pas besoin de toucher à la suite du code ========

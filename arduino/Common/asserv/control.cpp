@@ -47,7 +47,7 @@ void Control::compute(){
 	robot.update();
 
 	if(fifo.isPaused() || current_goal.type == NO_GOAL){
-		setConsigne(0, 0);
+		setConsigne(NO_PWM, NO_PWM);
 	}
 	else{
 		if (current_goal.isReached) {
@@ -74,9 +74,9 @@ void Control::compute(){
 			{
 				float da = (current_goal.data_1 - current_pos.angle);
 				
-				//da = moduloTwoPI(da);//Commenter pour multi-tour
+				da = moduloTwoPI(da);//Commenter pour multi-tour
 
-				if(abs(da) <= ERROR_ANGLE && abs(value_consigne_right) < CONSIGNE_REACHED && abs(value_consigne_left) < CONSIGNE_REACHED){
+				if(abs(da) <= ERROR_ANGLE) {
 					setConsigne(0, 0);
 					fifo.pushIsReached();
 				}
@@ -113,7 +113,7 @@ void Control::compute(){
 					da = moduloPI(da);
 				}
 
-				if (dd < ERROR_POS && abs(value_consigne_right) < CONSIGNE_REACHED && abs(value_consigne_left) < CONSIGNE_REACHED ) { //"Zone" d'arrivée
+				if (abs(d) < ERROR_POS && dd < 2*ERROR_POS) {
 					fifo.pushIsReached();
 					da = 0;
 				}
@@ -250,18 +250,23 @@ void Control::resume(){
 /********** PRIVATE **********/
 
 void Control::setConsigne(float consigne_left, float consigne_right){
-	if (consigne_right == 0 && consigne_left == 0) {
-		//Pour pas casser l'asserv quand on s'arrete
-		last_consigne_angle = 0;
-		last_consigne_dist = 0;
-	}
+	if (consigne_right == NO_PWM && consigne_left == NO_PWM) {
+		value_consigne_right = NO_PWM;
+		value_consigne_left = NO_PWM;
+	} else {
+		if (consigne_right == 0 && consigne_left == 0) {
+			//Pour pas casser l'asserv quand on s'arrete
+			last_consigne_angle = 0;
+			last_consigne_dist = 0;
+		}
 
-	//Tests d'overflow
-	check_max(&consigne_left);
-	check_max(&consigne_right);
-	
-	value_consigne_right = consigne_right;
-	value_consigne_left = consigne_left;
+		//Tests d'overflow
+		check_max(&consigne_left);
+		check_max(&consigne_right);
+		
+		value_consigne_right = consigne_right;
+		value_consigne_left = consigne_left;
+	}
 }
 
 void Control::check_max(float *consigne, float max) {
