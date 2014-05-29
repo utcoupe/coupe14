@@ -11,8 +11,8 @@ TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux
 
 
 #====================Enable====================
-ENABLE_TOURELLE =		True
-ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
+ENABLE_TOURELLE =		False
+ENABLE_FLUSSMITTEL = 	False #permet de desactiver Flussmitel
 ENABLE_TIBOT =			True
 
 #========================================Communication========================================
@@ -46,7 +46,7 @@ renvoiImmediat = 		False # fonction non terminé, ne pas activer !
 #=======================================IA========================================
 
 #====================Variables globales====================
-NUMBER_OF_ENEMY = 		2 #TODO
+NUMBER_OF_ENEMY = 		1 #TODO
 #si 1, on considère que l'ennemi est petit
 
 #====================eventManager====================
@@ -58,7 +58,7 @@ DELAY_IGNORE_ASSER_BLOCKED = 2000
 PERIODE_TIME_MANAGER =	100
 END_OF_MATCH = 			89000
 BEGIN_FUNNY_ACTION =	92000
-END_OF_FUNNY_ACTION = 	95000
+END_OF_FUNNY_ACTION = 	94500
 BEGIN_CHECK_COLLISION =	3000 #TODO
 
 #====================Goal====================
@@ -135,7 +135,7 @@ FIRST_POSITION_SMALL_RED_ENNEMY = (193, 1542)
 RAYON_BIG_ENEMY = 		200
 
 #====================SMALL ENEMY====================
-RAYON_SMALL_ENEMY = 	120
+RAYON_SMALL_ENEMY = 	200
 
 
 

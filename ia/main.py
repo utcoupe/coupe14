@@ -65,6 +65,7 @@ def startIa(pipe=None, ia_color="RED"):
 	TimeManager = event.TimeManager(Communication, Data)
 	EventManager = event.EventManager(Communication, Data)
 
+	print("IA Ready !")
 	while Data.MetaData.getInGame() == False:
 		time.sleep(0.01)
 	TimeManager.startMatch()
