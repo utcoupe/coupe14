@@ -69,14 +69,14 @@ class GoalsChoice:
 		# On tri d'abord par path car le tri est stable
 		goals = sorted(self.__available_goals, key=self.__distByPath)
 
-		if len(self.__front_triangle_stack) > 1:
+		if len(self.__front_triangle_stack) >= MAX_FRONT_TRIANGLE_STACK_STORE:
 			goals.sort(key=self.__prioStoreTriangle) # car tri stable
 		else:
-			# Le rush est scripté maintenant, inutile de le mettre dans l'IA, on va au plus proche
-			#goals.sort(key=self.__prioTriangle) # car tri stable
-			pass
+			goals.sort(key=self.__prioTriangle) # car tri stable
 
 		for goal in goals:
+			if len(self.__front_triangle_stack) == 0 and goal.getType() == "STORE_TRIANGLE":
+				continue
 			best_elem_goal = self.__getBestElemGoal(goal)
 			if best_elem_goal is not None:
 				best_goal = best_elem_goal
@@ -97,29 +97,10 @@ class GoalsChoice:
 			return float("Inf")
 
 	def __prioTriangle(self, goal):
-		side_gauche = self.__data["FLUSSMITTEL"]["getPosition"][0] < 1500
 		if goal.getType() == "triangle":
-			if side_gauche:
-				if goal.getId() in self.__triangles_gauche:
-					return 1
-				else:
-					return 2
-			else:
-				if goal.getId() in self.__triangles_gauche:
-					return 2
-				else:
-					return 1
+			return 1
 		elif goal.getType() == "TORCHE":
-			if side_gauche:
-				if goal.getId() == self.__torche_gauche:
-					return 1.5 # 1.5 pour ne pas rusher les torches, 0.5 pour les rusher
-				else:
-					return 2.5
-			else:
-				if goal.getId() == self.__torche_gauche:
-					return 2.5
-				else:
-					return 1.5 # 1.5 pour ne pas rusher les torches, 0.5 pour les rusher
+			return 1 # 2 pour prioriser les triangles
 		else:
 			return 3
 
@@ -289,4 +270,31 @@ class GoalsChoice:
 					best_goal = best_elem_goal
 					break
 
+		"""
+"""
+		side_gauche = self.__data["FLUSSMITTEL"]["getPosition"][0] < 1500
+		if goal.getType() == "triangle":
+			if side_gauche:
+				if goal.getId() in self.__triangles_gauche:
+					return 1
+				else:
+					return 2
+			else:
+				if goal.getId() in self.__triangles_gauche:
+					return 2
+				else:
+					return 1
+		elif goal.getType() == "TORCHE":
+			if side_gauche:
+				if goal.getId() == self.__torche_gauche:
+					return 1.5 # 1.5 pour ne pas rusher les torches, 0.5 pour les rusher
+				else:
+					return 2.5
+			else:
+				if goal.getId() == self.__torche_gauche:
+					return 2.5
+				else:
+					return 1.5 # 1.5 pour ne pas rusher les torches, 0.5 pour les rusher
+		else:
+			return 3
 		"""
