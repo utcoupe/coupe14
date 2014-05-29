@@ -35,8 +35,8 @@ class Triangle:
 		return str(self.coord) + '\ta=' + str(self.angle) + '\t' + str(self.size) + '\t' + self.color + '\t' + state
 
 	def rel_in_abs(self, robot_angle):
-		return (tri.coord[0] * cos(robot_angle) - tri.coord[1] * sin(robot_angle), 
-				tri.coord[0] * sin(robot_angle) + tri.coord[1] * cos(robot_angle))
+		return (self.coord[0] * cos(robot_angle) - self.coord[1] * sin(robot_angle), 
+				self.coord[0] * sin(robot_angle) + self.coord[1] * cos(robot_angle))
 
 	def dist2(self, tri):
 		dx = self.coord[0] - tri.coord[0]
@@ -152,12 +152,12 @@ class Visio:
 				self._triangles = triangles  # si echec, on ne corrige pas
 
 		triangles = self._triangles
-		try:
-			if self.__big_bot is not None:
-				self.__post_processing()
-		except BaseException as e:
-			self.__log.error("Failed to post-process datas (generic) : "+str(e))
-			self._triangles = triangles  # si echec, on ne corrige pas
+		#try:
+		if self.__big_bot is not None:
+			self.__post_processing()
+		#except BaseException as e:
+		#	self.__log.error("Failed to post-process datas (generic) : "+str(e))
+		#	self._triangles = triangles  # si echec, on ne corrige pas
 
 		self.__log.info("After post-process :")
 		for tri in self._triangles:

@@ -34,6 +34,7 @@
 #define INTERRUPT_ENC_RIGHT_B 2
 #define INTERRUPT_ENC_RIGHT_0 1
 
+#define NO_PWM 666
 
 class Motor
 {
