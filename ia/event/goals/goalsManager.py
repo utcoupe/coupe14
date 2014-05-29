@@ -339,6 +339,7 @@ class GoalsManager:
 			return None
 
 		get_triangle_mode = action_list[0][0]
+		time.sleep(0.03)
 		data_camera = self.__getVisioData(objectif)
 		if data_camera is None:
 			self.__logger.info("On a pas trouvé de données camera")
