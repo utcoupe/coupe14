@@ -12,7 +12,7 @@ TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté au
 
 #====================Enable====================
 ENABLE_TOURELLE =		False
-ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
+ENABLE_FLUSSMITTEL = 	False #permet de desactiver Flussmitel
 ENABLE_TIBOT =			True
 
 #========================================Communication========================================
@@ -118,7 +118,7 @@ MIN_X_TRIANGLE = 190
 
 
 #====================TIBOT====================
-START_POSITION_RED_TIBOT = (177, 1578, -0.422)
+START_POSITION_RED_TIBOT = (177, 1498, -0.422)
 LARGEUR_TIBOT = 		180
 LONGUEUR_TIBOT = 		130
 
