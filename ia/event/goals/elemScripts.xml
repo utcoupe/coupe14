@@ -106,4 +106,38 @@
 			<order>END</order>
 		</orders>
 	</elemScript>
+	<elemScript>
+		<id_script>20</id_script>
+		<orders>
+			<order>O_GET_TRIANGLE 328 88 130</order>
+			<order>THEN</order>
+			<order>O_STORE_TRIANGLE 1 82</order>
+			<order>THEN</order>
+			<order>O_GET_TRIANGLE 328 88 130</order>
+			<order>THEN</order>
+			<order>O_STORE_TRIANGLE -1 82</order>
+			<order>THEN</order>
+			<order>O_GET_TRIANGLE 328 88 130</order>
+			<order>THEN</order>
+			<order>O_STORE_TRIANGLE 1 112</order>
+			<order>END</order>
+		</orders>
+	</elemScript>
+	<elemScript>
+		<id_script>21</id_script>
+		<orders>
+			<order>O_GET_TRIANGLE 328 -88 130</order>
+			<order>THEN</order>
+			<order>O_STORE_TRIANGLE 1 82</order>
+			<order>THEN</order>
+			<order>O_GET_TRIANGLE 328 -88 130</order>
+			<order>THEN</order>
+			<order>O_STORE_TRIANGLE -1 82</order>
+			<order>THEN</order>
+			<order>O_GET_TRIANGLE 328 -88 130</order>
+			<order>THEN</order>
+			<order>O_STORE_TRIANGLE 1 112</order>
+			<order>END</order>
+		</orders>
+	</elemScript>
 </elemScripts>
