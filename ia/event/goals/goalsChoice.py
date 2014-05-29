@@ -72,7 +72,9 @@ class GoalsChoice:
 		if len(self.__front_triangle_stack) > 1:
 			goals.sort(key=self.__prioStoreTriangle) # car tri stable
 		else:
-			goals.sort(key=self.__prioTriangle) # car tri stable
+			# Le rush est scripté maintenant, inutile de le mettre dans l'IA, on va au plus proche
+			#goals.sort(key=self.__prioTriangle) # car tri stable
+			pass
 
 		for goal in goals:
 			best_elem_goal = self.__getBestElemGoal(goal)
@@ -110,14 +112,14 @@ class GoalsChoice:
 		elif goal.getType() == "TORCHE":
 			if side_gauche:
 				if goal.getId() == self.__torche_gauche:
-					return 0.5 # 1.5 pour ne pas rusher les torches, 0.5 pour les rusher
+					return 1.5 # 1.5 pour ne pas rusher les torches, 0.5 pour les rusher
 				else:
 					return 2.5
 			else:
 				if goal.getId() == self.__torche_gauche:
 					return 2.5
 				else:
-					return 0.5 # 1.5 pour ne pas rusher les torches, 0.5 pour les rusher
+					return 1.5 # 1.5 pour ne pas rusher les torches, 0.5 pour les rusher
 		else:
 			return 3
 
