@@ -41,7 +41,7 @@ class Tourelle():
 			position_hokuyo.append(Position(arguments[i], arguments[i+1]))
 
 		position_enemy = self.__fitreNosRobots(position_hokuyo) 
-		if position_enemy != None:
+		if position_enemy != None and len(position_enemy) > 0:
 			#Si on voit les deux robots, on vérfie qu'ils ne sont pas inversés et on set
 			if len(position_enemy) == 2:
 				position_enemy = self.__checkRobotsPosition(position_enemy)
@@ -65,7 +65,7 @@ class Tourelle():
 				if ia_position_big_ennemy.distanceSquarred(position_enemy[0]) < ia_position_small_ennemy.distanceSquarred(position_enemy[0]):
 					self.BigEnemyBot.setPosition(position_enemy[0])
 				else:
-					self.SmallEnemyBot.setPosition(position_enemy[i])
+					self.SmallEnemyBot.setPosition(position_enemy[0])
 		else:
 			self.__logger.warning("On a trouvé aucun enemy donc on drop les données hokuyo.")
 	
