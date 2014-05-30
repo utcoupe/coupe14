@@ -218,6 +218,11 @@ void parseHokuyo(char *ori_line) {
 	if (!ignore) {
 		printf("[MAIN]  Pushing hokuyo data\n");
 		pushHokData(robots, timestamp);
+		printf("[M-HK]  ");
+		for (i=0; i<NBR_ROBOTS; i++) {
+			printf("%d:%d ", robots[i].x, robots[i].y);
+		}
+		printf("\n");
 	} else {
 		printf("[MAIN]  Failed to parse hokuyo data, got %d args\n", arg_nbr);
 		printf("[MAIN]  %s", ori_line);

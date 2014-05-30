@@ -129,7 +129,7 @@ int main(int argc, char **argv) {
 			//Suite du main
 			usleep(600000);
 			printf("[MAIN]  Waiting for initialization\n");
-			sleep(10);
+			sleep(5);
 			
 			printf("[MAIN]  Starting main program\n");
 			com_loop(pipe_cam, pipe_hok);
