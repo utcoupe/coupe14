@@ -3,14 +3,7 @@
 <size width="3000" height="2000" w_tiles="100" />
 
 <!-- DEPOT CENTRE -->
-<polygon>
-	<vertex x="1500" y="800" />
-	<vertex x="1600" y="850" />
-	<vertex x="1600" y="1050" />
-	<vertex x="1500" y="1100" />
-	<vertex x="1400" y="1050" />
-	<vertex x="1400" y="850" />
-</polygon>
+<circle x="1500" y="950" rayon="150" n="12"/>
 
 
 <!-- DEPOTS -->

@@ -5,7 +5,7 @@ Ce fichier regroupe toutes les constantes de l'IA
 
 import math
 
-TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
@@ -59,7 +59,7 @@ PERIODE_TIME_MANAGER =	100
 END_OF_MATCH = 			89000
 BEGIN_FUNNY_ACTION =	92000
 END_OF_FUNNY_ACTION = 	94500
-BEGIN_CHECK_COLLISION =	5000
+BEGIN_CHECK_COLLISION =	0
 
 #====================Goal====================
 FINISHED_THRESHOLD = 	50
