@@ -85,21 +85,11 @@ class Tourelle():
 		#On essaie de supprimer les robots qui corespondent aux notres et aux indications des constantes
 		self.__tryRemoveOurBot(position_hokuyo, OUR_ROBOTS_VISIBLE_TOURELLE, DISTANCE_MAX_ROBOT_FUSION)
 		if len(position_hokuyo) > NUMBER_OF_ENEMY:
-			#cas ou ont verrai quand même nos robots
-			self.__logger.warning("Attention on bypass les indications des constantes pour supprimer nos robots des données hokuyo")
-			position_hokuyo = copy.deepcopy(position_hokuyo_base)
-			self.__tryRemoveOurBot(position_hokuyo, True, DISTANCE_MAX_ROBOT_FUSION)
-			if len(position_hokuyo) > NUMBER_OF_ENEMY:
-				self.__logger.warning("Attention on va chercher nos robots plus loin que ce qui est prévu")
-				position_hokuyo = copy.deepcopy(position_hokuyo_base)
-				self.__tryRemoveOurBot(position_hokuyo, OUR_ROBOTS_VISIBLE_TOURELLE, float("inf"))
-				self.__logger.error("Il y a un probleme avec le nombre de robots détecté par les hokuyo position_hokuyo: "+str(position_hokuyo))
-			if len(position_hokuyo) > NUMBER_OF_ENEMY:
-				self.__logger.error("OH ! Faut pas pousser mémé dans les begonias !")
-				return None
+			self.__logger.warning("Attention on drop les données hokuyo, on voit trop d'objet "+str(position_hokuyo))
+			return None
 
 		if len(position_hokuyo) < NUMBER_OF_ENEMY:
-			self.__logger.warning("On a perdu au moins un des robots adverses position_hokuyo "+str(position_hokuyo))
+			self.__logger.warning("Attention on drop les données hokuyo, on voit trop peu d'objet "+str(position_hokuyo))
 		return position_hokuyo
 
 	def __tryRemoveOurBot(self, position_hokuyo, nos_robots_visible, threshold):

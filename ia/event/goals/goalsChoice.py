@@ -168,7 +168,7 @@ class GoalsChoice:
 						best_length = length
 						best_elem_goal = (path, goal, idd, length)
 				else:
-					self.__logger.error("Le pathfinding nous a indiqué un chemin invalide goal "+str(goal.getName())+" elem_id "+str(idd)+"  path "+str(path))
+					self.__logger.warning("Le pathfinding nous a indiqué un chemin invalide goal "+str(goal.getName())+" elem_id "+str(idd)+"  path "+str(path))
 		return best_elem_goal
 
 	#TIBOT

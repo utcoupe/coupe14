@@ -5,13 +5,13 @@ Ce fichier regroupe toutes les constantes de l'IA
 
 import math
 
-TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
 
 #====================Enable====================
-ENABLE_TOURELLE =		False
+ENABLE_TOURELLE =		True
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
 ENABLE_TIBOT =			True
 
@@ -88,12 +88,12 @@ COLLISION_WARNING_THRESHOLD = 800
 #====================tourelle====================
 OUR_ROBOTS_VISIBLE_TOURELLE = True 	#True si une balise visible par l'hokuyo est presente sur nos robots 
 TOURELLE_PULL_PERIODE = 100 		#ms
-DISTANCE_MAX_ROBOT_FUSION = 250 #Différance max entre codeurs et hokuyo
+DISTANCE_MAX_ROBOT_FUSION = 300 #Différance max entre codeurs et hokuyo
 
 #====================Flussmittel====================
-START_POSITION_RED_FLUSSMITTEL = (200, 1871, -1.57079)
-LARGEUR_FLUSSMITTEL = 	330 # ok car centré en largeur
-LONGUEUR_FLUSSMITTEL = 	340 # = 2 fois la distance entre le centre de rotation et le côté le plus loin
+START_POSITION_RED_FLUSSMITTEL = (205, 1878, -1.57079)
+LARGEUR_FLUSSMITTEL = 	270 # ok car centré en largeur
+LONGUEUR_FLUSSMITTEL = 	330 # = 2 fois la distance entre le centre de rotation et le côté le plus loin
 MAX_FRONT_TRIANGLE_STACK = 3
 MAX_FRONT_TRIANGLE_STACK_STORE = 2
 MAX_BACK_TRIANGLE_STACK = 1
@@ -117,9 +117,9 @@ VISIO_MAX_DIST_TRIANGLE = 400
 
 
 #====================TIBOT====================
-START_POSITION_RED_TIBOT = (177, 1498, -0.422)
-LARGEUR_TIBOT = 		210
-LONGUEUR_TIBOT = 		160
+START_POSITION_RED_TIBOT = (55, 1555, 0.0)
+LARGEUR_TIBOT = 		200
+LONGUEUR_TIBOT = 		150
 
 
 #====================VISIO====================
@@ -135,8 +135,8 @@ MIN_SIZE_TRIANGLE_TORCH = 10000
 
 
 #====================ENEMYs====================
-FIRST_POSITION_BIG_RED_ENNEMY = (187, 1870)
-FIRST_POSITION_SMALL_RED_ENNEMY = (193, 1542)
+FIRST_POSITION_BIG_RED_ENNEMY = (205, 1878)
+FIRST_POSITION_SMALL_RED_ENNEMY = (55, 1555)
 
 #====================BIG ENEMY====================
 #Si un seul adversaire, on utilise les constantes de BIG ENEMY

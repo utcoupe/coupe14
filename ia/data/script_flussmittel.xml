@@ -9,16 +9,4 @@
 			<prev_action>MYPOSITION_INFO 200 1500</prev_action>
 		</prev_actions>
 	</objectif>
-	<objectif>
-		<id_objectif>9</id_objectif>
-		<elem_goal_id>0</elem_goal_id>
-		<prev_actions>
-		</prev_actions>
-	</objectif>
-	<objectif>
-		<id_objectif>17</id_objectif>
-		<elem_goal_id>3</elem_goal_id>
-		<prev_actions>
-		</prev_actions>
-	</objectif>
 </objectifs>
