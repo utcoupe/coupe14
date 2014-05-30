@@ -117,7 +117,8 @@ void Control::compute(){
 				if (abs(d) < ERROR_POS && dd < 2*ERROR_POS) {
 					if (start_end_timer < 0) {
 						start_end_timer = timeMillis();
-					}  else if (!fifo.getCurrentGoal().isReached && timeMillis() - start_end_timer > TIME_BETWEEN_ORDERS) {
+					}  else if (fifo.getNextGoal().type == TYPE_POS || 
+							(!fifo.getCurrentGoal().isReached && timeMillis() - start_end_timer > TIME_BETWEEN_ORDERS) {
 						fifo.pushIsReached();
 					}
 					da = 0;

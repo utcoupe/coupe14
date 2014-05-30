@@ -108,6 +108,22 @@ struct goal Fifo::getCurrentGoal(){
 		return *current_goal;
 }
 
+struct goal Fifo::getNextGoal() {
+	if(current_goal == 0){
+		struct goal no_goal;
+		no_goal.type = NO_GOAL;
+		return no_goal;
+	}
+	else if (current_goal->next == 0) {
+		struct goal no_goal;
+		no_goal.type = NO_GOAL;
+		return no_goal;
+	}
+	else {
+		return *(current_goal->next);
+	}
+}
+
 bool Fifo::isPaused(){
 	return paused;
 }

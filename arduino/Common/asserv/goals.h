@@ -32,6 +32,7 @@ class Fifo{
 	void pushIsReached(); //Set le flag isReached du current goal
 
 	struct goal getCurrentGoal(); //Renvoie le current goal
+	struct goal getNextGoal(); //renvoit le prochain goal
 	int getRemainingGoals(); //Renvoie le nombre de goals restant
 	bool isPaused();//true si en paus,e false sinon
 
