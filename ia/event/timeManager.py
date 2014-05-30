@@ -72,7 +72,7 @@ class TimeManager():
 			self.__Communication.sendOrderAPI(self.__Tibot.getAddressAsserv(), 'PAUSE', *empty_arg)
 			self.__Communication.sendOrderAPI(self.__Tibot.getAddressOther(), 'PAUSE', *empty_arg)
 
-		self.__logger.info("On arrete les robtos avec broadcastStopOrder")
+		self.__logger.info("On arrete les robots avec broadcastStopOrder")
 
 	def __sendResetBot(self):
 		empty_arg = []

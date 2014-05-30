@@ -57,6 +57,9 @@ class EventManager():
 			self.__checkEvent()
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)
 
+		#TODO
+		#arg = [42,]# 42 est un nombre aleatoire
+		#self.__Communication.sendOrderAPI("ADDR_FLUSSMITTEL_OTHER", "O_RET", *arg)
 		#On attend le debut de la funny action
 		while self.__MetaData.getInFunnyAction() == False:
 			time.sleep(PERIODE_EVENT_MANAGER/1000.0)

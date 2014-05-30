@@ -143,34 +143,41 @@ class Visio:
 		for tri in triangles:
 			self.__log.info(tri)
 
-		if isTorch:
-			try:
-				for i in range(len(self._triangles)):
-					tri = self._triangles[i]
-					self.__highGroundProcess(tri, self.__htorch)
-			except BaseException as e:
-				self.__log.error("Failed to post-process datas (torches) : "+str(e))
-				self._triangles = triangles  # si echec, on ne corrige pas
-
 		triangles = self._triangles
 		try:
 			if self.__big_bot is not None:
-				self.__post_processing()
+				self.__post_processing(isTorch)
 		except BaseException as e:
-			self.__log.error("Failed to post-process datas (generic) : "+str(e))
-			self._triangles = triangles  # si echec, on ne corrige pas
+			self.__log.error("Failed to post-process datas : "+str(e))
+			if isTorch:
+				self._triangles = []
+			else:
+				self._triangles = triangles  # si echec, on ne corrige pas
 
 		self.__log.info("After post-process :")
 		for tri in self._triangles:
 			self.__log.info(tri)
 
-	def __post_processing(self):
+	def __post_processing(self, isTorch=False):
 		if self.__big_bot is None:
 			return
 
 		tri_to_remove = []
 
 		for i in range(len(self._triangles)):
+			"""
+			if isTorch:
+				self.__highGroundProcess(self._triangles[i], self.__htorch)
+				if self._triangles[i].size < MIN_SIZE_TRIANGLE_TORCH:
+					tri_to_remove.append(self._triangles[i])
+				elif self._triangles[i].size > MAX_SIZE_TRIANGLE_TORCH:
+					tri_to_remove.append(self._triangles[i])
+			else:
+				if self._triangles[i].size > MAX_SIZE_TRIANGLE:
+					tri_to_remove.append(self._triangles[i])
+					"""
+
+
 			#calcul des coordonnées relatives dans le repère des coords absolues
 			robot_angle = self.__big_bot["getPositionAndAngle"][2]
 
@@ -181,6 +188,12 @@ class Visio:
 
 			#Traitement de la position pour modif si self._triangles[i]angle en hauteur
 			if self._triangles[i].coord[0] < MIN_X_TRIANGLE:
+				tri_to_remove.append(self._triangles[i])
+			elif self._triangles[i].coord[0] > MAX_X_TRIANGLE:
+				tri_to_remove.append(self._triangles[i])
+			elif self._triangles[i].coord[1] < MIN_Y_TRIANGLE:
+				tri_to_remove.append(self._triangles[i])
+			elif self._triangles[i].coord[1] > MAX_Y_TRIANGLE:
 				tri_to_remove.append(self._triangles[i])
 			elif self.__outOfMap(self._triangles[i]) or self.__inFruitZone(self._triangles[i]) or self.__inStartZone(self._triangles[i]):
 				tri_to_remove.append(self._triangles[i])

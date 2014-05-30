@@ -49,7 +49,7 @@ if __name__ == "__main__":
 		Ne pas toucher au reste du code.
 		"""
 
-		redIA = True
+		redIA = False
 		yellowIA = True
 
 #=========================================================

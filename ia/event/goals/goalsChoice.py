@@ -100,7 +100,7 @@ class GoalsChoice:
 		if goal.getType() == "triangle":
 			return 1
 		elif goal.getType() == "TORCHE":
-			return 1 # 2 pour prioriser les triangles
+			return 1 # 2 pour prioriser les triangles par rapport aux torches
 		else:
 			return 3
 
@@ -117,14 +117,16 @@ class GoalsChoice:
 	def __sort_area(self, area):
 		return self.__prio_FM_areas.index(area[0])
 
-	def __getGoalsByPriority(self, goals, area):
+	"""
+	def __getGoalsByPriority(self, goals, zone):
 		def prio(goal):
 			best_path = self.__getBestElemGoal(goal)
 			if goal.getId() in self.__prio_FM_area_triangles[area]:
 				return self.__prio_FM_area_triangles[area].index(goal.getId())
 			else:
-				return len(self.__prio_FM_area_triangles[area])
+				return len(self.__prio_FM_zone_triangles[zone])
 		return sorted(goals, key=prio)
+	"""
 
 	def __getBestElemGoal(self, goal):
 		best_elem_goal = None
@@ -136,13 +138,13 @@ class GoalsChoice:
 			path = self.__goalsLib.getOrderTrajectoire(goal, idd, position_last_goal)
 			#self.__logger.debug("Calcul de trajectoire pour goalName "+str(goal.getName())+" id_elem "+str(idd)+" path "+str(path))
 			if path != []:
-				if self.__Collision.isCollisionFromGoalsManager(self.__robot_name, path):
+				if self.__data["METADATA"]["getGameClock"] < BEGIN_CHECK_COLLISION or self.__Collision.isCollisionFromGoalsManager(self.__robot_name, path):
 					length = self.__goalsLib.pathLen(path)
 					if length < best_length:
 						best_length = length
 						best_elem_goal = (path, goal, idd, length)
 				else:
-					self.__logger.error("Le pathfinding nous a indiqué un chemin invalide goal "+str(goal.getName())+" elem_id "+str(idd)+"  path "+str(path))
+					self.__logger.warning("Le pathfinding nous a indiqué un chemin invalide goal "+str(goal.getName())+" elem_id "+str(idd)+"  path "+str(path))
 		return best_elem_goal
 
 	#TIBOT
@@ -180,7 +182,7 @@ class GoalsChoice:
 				path = self.__goalsLib.getOrderTrajectoire(goal, idd, position_last_goal)
 				self.__logger.debug("Calcul de trajectoire pour goalName "+str(goal.getName())+" id_elem "+str(idd)+" path "+str(path))
 				if path != []:
-					if self.__Collision.isCollisionFromGoalsManager("TIBOT", path):
+					if self.__data["METADATA"]["getGameClock"] < BEGIN_CHECK_COLLISION or self.__Collision.isCollisionFromGoalsManager("TIBOT", path):
 						length = self.__goalsLib.pathLen(path)
 						if goal.getType() != "FILET":
 							if length < best_length:

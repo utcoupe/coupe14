@@ -50,7 +50,7 @@
  * envoyer des consignes en pwm au robot
  * partant de 0 et en augmentant progressivement
  * dès que le robot avance, la pwm min est trouvée */
-#define PWM_MIN 10 
+#define PWM_MIN 20 
 
 #define CONSIGNE_MAX 80 
 

@@ -8,20 +8,28 @@
 #define max(a, b) a>b?a:b
 #define min(a, b) a<b?a:b
 
+int inZone(Pt_t pt, ScanZone_t zone) {
+	return !(pt.x > zone.xmax || pt.x < zone.xmin || pt.y > zone.ymax || pt.y < zone.ymin);
+}
 
 int getPoints(Hok_t hok, Pt_t* pt_list) {
 	long data[MAX_DATA];
 	int n = urg_receiveData(hok.urg, data, MAX_DATA);
-	int i, j=0;
-	for (i=hok.imin; i<hok.imax; i++) {
-		Pt_t pt = (Pt_t) { hok.pt.x + data[i]*fastCos(hok.fm, i), hok.pt.y + data[i]*fastSin(hok.fm, i) };
-		if (pt.x > TABLE_X - BORDER_MARGIN || pt.x < BORDER_MARGIN || pt.y > TABLE_Y - BORDER_MARGIN || pt.y < BORDER_MARGIN) {
-			pt_list[j++] = (Pt_t) { -1, -1 };
-		} else {
-			pt_list[j++] = pt;
+	if (n > 0) {
+		int i, j=0;
+		for (i=hok.imin; i<hok.imax; i++) {
+			Pt_t pt = (Pt_t) { hok.pt.x + data[i]*fastCos(hok.fm, i), hok.pt.y + data[i]*fastSin(hok.fm, i) };
+			if (inZone(pt, hok.zone)) {
+				pt_list[j++] = pt;
+			} else {
+				pt_list[j++] = (Pt_t) { -1, -1 };
+			}
 		}
+		return hok.imax-hok.imin;
+	} else {
+		printf("%s%s : %s\n", PREFIX, hok.path, urg_error(hok.urg));
+		return -1;
 	}
-	return hok.imax-hok.imin;
 }
 
 int getClustersFromPts(Pt_t *pt_list, int nb_pts, Cluster_t* clusters) {
@@ -91,8 +99,8 @@ int getClustersFromPts(Pt_t *pt_list, int nb_pts, Cluster_t* clusters) {
 	return nbCluster;
 }
 
-int sortAndSelectRobots(int n, Cluster_t *robots){
-	int i, nbr_robots = min(n, MAX_ROBOTS);
+int sortAndSelectRobots(int n, Cluster_t *robots, int nb_robots_to_find){
+	int i, nbr_robots = min(n, nb_robots_to_find);
 	Cluster_t *r = malloc(n*sizeof(Cluster_t));
 	memcpy(r, robots, n*sizeof(Cluster_t));
 	for(i=0; i<nbr_robots; i++){
@@ -110,7 +118,70 @@ int sortAndSelectRobots(int n, Cluster_t *robots){
 	return i;
 }
 
-int mergeRobots(Cluster_t *r1, int n1, Cluster_t *r2, int n2, Cluster_t *result) {
+int mergeRobots(Cluster_t *r1, int n1, Cluster_t *r2, int n2, Cluster_t *result, int nb_robots_to_find) {
+	Cluster_t all_bots[2*MAX_ROBOTS];
+	int i, n_tot=0;
+	for (i=0; i<n1; i++) {
+		all_bots[n_tot++] = r1[i];
+	}
+	for (i=0; i<n2; i++) {
+		all_bots[n_tot++] = r2[i];
+	}
+	if (n_tot <= nb_robots_to_find) {
+		memcpy(result, all_bots, n_tot*sizeof(Cluster_t));
+		return n_tot;
+	}
+
+	struct corres { //permet d'établir des correspondances entre les index
+		int r1;
+		int r2;
+	};
+	while (n_tot > nb_robots_to_find) {
+		//Brute force ici, on aura max 4 robots de chaque hokuyo, 4x4 = 16 cas, ca reste peu
+		//Calcul de la distance entre chaque combinaison de coords
+		int distR1R2[MAX_ROBOTS][MAX_ROBOTS], i, j;
+		struct corres dist_indexes[MAX_ROBOTS*MAX_ROBOTS]; //Tableau d'index de distR1R2, sert a trier les distances
+		struct corres merged[MAX_ROBOTS]; //Correspondances finales et retenues
+		int changed = 0;
+
+		//Calcul des distaces
+		for (i=0; i<n1; i++) {
+			for (j=0; j<n2; j++) {
+				distR1R2[i][j] = dist_squared(r1[i].center, r2[j].center);
+			}
+		}
+
+		for (i=0; i<n1*n2; i++) {
+			dist_indexes[i] = (struct corres){ i/n2, i%n2 };
+		}
+
+		//Tri ordre decroissant
+		do {
+			changed = 0;
+			for (i=1; i<n1*n2; i++) {
+				if (distR1R2[dist_indexes[i-1].r1][dist_indexes[i-1].r2] < distR1R2[dist_indexes[i].r1][dist_indexes[i].r2]) {
+					struct corres temp = dist_indexes[i];
+					dist_indexes[i] = dist_indexes[i-1];
+					dist_indexes[i-1] = temp;
+					changed = 1;
+				}
+			}
+		} while (changed);
+
+		for (i=n1+dist_indexes[0].r2; i<n_tot-1; i++) {
+			all_bots[i] = all_bots[i+1];
+		}
+		n_tot--;
+	}
+	return n_tot;
+}
+
+
+
+	
+/*
+
+int mergeRobots(Cluster_t *r1, int n1, Cluster_t *r2, int n2, Cluster_t *result, int nb_robots_to_find) {
 	struct corres { //permet d'établir des correspondances entre les index
 		int r1;
 		int r2;
@@ -207,9 +278,10 @@ int mergeRobots(Cluster_t *r1, int n1, Cluster_t *r2, int n2, Cluster_t *result)
 		}
 	}
 
-	nbr_found = sortAndSelectRobots(nbr_found, result);
+	nbr_found = sortAndSelectRobots(nbr_found, result, nb_robots_to_find);
 	return nbr_found;
 }
+*/
 
 int isIn(int e, int *tab, int tab_size) {
 	int i, ret = 0;

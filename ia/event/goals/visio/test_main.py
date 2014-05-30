@@ -13,7 +13,11 @@ try:
 except:
 	index = 0
 
-v = Visio('../../../../supervisio/visio', index, '../../../../config/visio/visio_robot/', None, False)
+robot = {}
+robot["getPosition"] = (300,100)
+robot["getPositionAndAngle"] = (300,100,0.0)
+
+v = Visio('../../../../supervisio/visio', index, '../../../../config/visio/visio_robot/', robot, False)
 #v2 = Visio('../../../../supervisio/visio', index+1, '../../../../config/visio/visio_tourelle_red/', None, False)
 print('Visio started')
 

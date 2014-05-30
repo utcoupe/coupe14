@@ -13,6 +13,7 @@
 #define MAX_CLUSTERS 50
 #define MAX_ROBOTS 4
 #define BORDER_MARGIN 50
+#define TIMEOUT 1000
 
 
 #define CONE_CALIB  (10.0/180)*M_PI
@@ -24,13 +25,15 @@
 
 #define HOK1_X -25
 #define HOK1_Y -25 
-#define HOK1_A (M_PI/4)
-#define HOK1_CONE (M_PI/4)
+#define HOK1_A 0
+#define HOK1_CONE_MIN 0
+#define HOK1_CONE_MAX (M_PI/2)
 
 #define HOK2_X 3025 
 #define HOK2_Y 1000 
 #define HOK2_A M_PI
-#define HOK2_CONE (M_PI/2)
+#define HOK2_CONE_MIN (-M_PI/2)
+#define HOK2_CONE_MAX (M_PI/2)
 
 
 #define CLUSTER_POINTS_BACKWARDS 15

@@ -5,14 +5,14 @@ Ce fichier regroupe toutes les constantes de l'IA
 
 import math
 
-TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
 
 #====================Enable====================
-ENABLE_TOURELLE =		False
-ENABLE_FLUSSMITTEL = 	False #permet de desactiver Flussmitel
+ENABLE_TOURELLE =		True
+ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
 ENABLE_TIBOT =			True
 
 #========================================Communication========================================
@@ -46,7 +46,7 @@ renvoiImmediat = 		False # fonction non terminé, ne pas activer !
 #=======================================IA========================================
 
 #====================Variables globales====================
-NUMBER_OF_ENEMY = 		1 #TODO
+NUMBER_OF_ENEMY = 		2 #TODO
 #si 1, on considère que l'ennemi est petit
 
 #====================eventManager====================
@@ -59,7 +59,7 @@ PERIODE_TIME_MANAGER =	100
 END_OF_MATCH = 			89000
 BEGIN_FUNNY_ACTION =	92000
 END_OF_FUNNY_ACTION = 	94500
-BEGIN_CHECK_COLLISION =	3000 #TODO
+BEGIN_CHECK_COLLISION =	5000
 
 #====================Goal====================
 FINISHED_THRESHOLD = 	50
@@ -73,7 +73,7 @@ PULL_PERIODE = 			100
 #====================NAVIGATION================
 EMPTY_FIFO = 			True
 POINTS_PAR_CERCLE = 	8
-MARGE_PASSAGE_PATH = 	0
+MARGE_PASSAGE_PATH = 	10
 MARGE_COLLISION =		-20
 COLLISION_THRESHOLD =	400
 COLLISION_WARNING_THRESHOLD = 800
@@ -88,12 +88,12 @@ COLLISION_WARNING_THRESHOLD = 800
 #====================tourelle====================
 OUR_ROBOTS_VISIBLE_TOURELLE = True 	#True si une balise visible par l'hokuyo est presente sur nos robots 
 TOURELLE_PULL_PERIODE = 100 		#ms
-DISTANCE_MAX_ROBOT_FUSION = 250 #Différance max entre codeurs et hokuyo
+DISTANCE_MAX_ROBOT_FUSION = 300 #Différance max entre codeurs et hokuyo
 
 #====================Flussmittel====================
-START_POSITION_RED_FLUSSMITTEL = (200, 1871, -1.57079)
-LARGEUR_FLUSSMITTEL = 	330 # ok car centré en largeur
-LONGUEUR_FLUSSMITTEL = 	340 # = 2 fois la distance entre le centre de rotation et le côté le plus loin
+START_POSITION_RED_FLUSSMITTEL = (205, 1878, -1.57079) # true start pos
+LARGEUR_FLUSSMITTEL = 	270 # ok car centré en largeur
+LONGUEUR_FLUSSMITTEL = 	330 # = 2 fois la distance entre le centre de rotation et le côté le plus loin
 MAX_FRONT_TRIANGLE_STACK = 3
 MAX_FRONT_TRIANGLE_STACK_STORE = 2
 MAX_BACK_TRIANGLE_STACK = 1
@@ -114,14 +114,21 @@ CENTRE_BRAS_Y = 130
 NB_VISIO_TRY = 10
 NB_VISIO_DATA_NEEDED = 3
 VISIO_MAX_DIST_TRIANGLE = 400
-MIN_X_TRIANGLE = 190
 
 #====================TIBOT====================
-START_POSITION_RED_TIBOT = (177, 1498, -0.422)
-LARGEUR_TIBOT = 		180
-LONGUEUR_TIBOT = 		130
+START_POSITION_RED_TIBOT = (55, 1475, 0.0)
+LARGEUR_TIBOT = 		200
+LONGUEUR_TIBOT = 		150
 
 
+#====================VISIO====================
+MIN_X_TRIANGLE = 190
+MAX_X_TRIANGLE = 400
+MIN_Y_TRIANGLE = -150 
+MAX_Y_TRIANGLE = 150
+MAX_SIZE_TRIANGLE_TORCH = 22000
+MAX_SIZE_TRIANGLE = 8000
+MIN_SIZE_TRIANGLE_TORCH = 10000
 
 
 
@@ -135,7 +142,7 @@ FIRST_POSITION_SMALL_RED_ENNEMY = (193, 1542)
 RAYON_BIG_ENEMY = 		200
 
 #====================SMALL ENEMY====================
-RAYON_SMALL_ENEMY = 	200
+RAYON_SMALL_ENEMY = 	120
 
 
 

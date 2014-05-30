@@ -41,12 +41,10 @@ class Tourelle():
 			position_hokuyo.append(Position(arguments[i], arguments[i+1]))
 
 		position_enemy = self.__fitreNosRobots(position_hokuyo) 
-		if position_enemy != None:
-			if len(position_enemy) == NUMBER_OF_ENEMY:
-
-				#Si on voit les deux robots, on vérfie qu'ils ne sont pas inversés
-				if len(position_enemy) == 2:
-					position_enemy = self.__checkRobotsPosition(position_enemy)
+		if position_enemy != None and len(position_enemy) > 0:
+			#Si on voit les deux robots, on vérfie qu'ils ne sont pas inversés et on set
+			if len(position_enemy) == 2:
+				position_enemy = self.__checkRobotsPosition(position_enemy)
 				if position_enemy is not None:
 					i = 0
 					if self.BigEnemyBot is not None:
@@ -55,10 +53,21 @@ class Tourelle():
 					if self.SmallEnemyBot is not None:
 						self.SmallEnemyBot.setPosition(position_enemy[i])
 						i += 1
+			elif NUMBER_OF_ENEMY == 1:
+				self.SmallEnemyBot.setPosition(position_enemy[0])
 			else:
-				self.__logger.warning("On a trouvé qu'un seul robot adverse dans les données hokuyo, du coup on les drop.")
+				temp = self.BigEnemyBot.getPosition()
+				ia_position_big_ennemy = Position(temp[0], temp[1])
+
+				temp = self.SmallEnemyBot.getPosition()
+				ia_position_small_ennemy = Position(temp[0], temp[1])
+
+				if ia_position_big_ennemy.distanceSquarred(position_enemy[0]) < ia_position_small_ennemy.distanceSquarred(position_enemy[0]):
+					self.BigEnemyBot.setPosition(position_enemy[0])
+				else:
+					self.SmallEnemyBot.setPosition(position_enemy[0])
 		else:
-			self.__logger.warning("On a trouvé aucun enemy donc on drop les données hokuyo.")
+			self.__logger.warning("On drop les données hokuyo.")
 	
 	def __checkRobotsPosition(self, position_enemy):
 		temp = self.BigEnemyBot.getPosition()
@@ -80,26 +89,12 @@ class Tourelle():
 
 	def __fitreNosRobots(self, position_hokuyo):
 		"""return une liste de robots ennemies, il peut manquer un robots, si il n'y en a aucun on return None"""
-		position_hokuyo_base = copy.deepcopy(position_hokuyo)
 
 		#On essaie de supprimer les robots qui corespondent aux notres et aux indications des constantes
 		self.__tryRemoveOurBot(position_hokuyo, OUR_ROBOTS_VISIBLE_TOURELLE, DISTANCE_MAX_ROBOT_FUSION)
 		if len(position_hokuyo) > NUMBER_OF_ENEMY:
-			#cas ou ont verrai quand même nos robots
-			self.__logger.warning("Attention on bypass les indications des constantes pour supprimer nos robots des données hokuyo")
-			position_hokuyo = copy.deepcopy(position_hokuyo_base)
-			self.__tryRemoveOurBot(position_hokuyo, True, DISTANCE_MAX_ROBOT_FUSION)
-			if len(position_hokuyo) > NUMBER_OF_ENEMY:
-				self.__logger.warning("Attention on va chercher nos robots plus loin que ce qui est prévu")
-				position_hokuyo = copy.deepcopy(position_hokuyo_base)
-				self.__tryRemoveOurBot(position_hokuyo, OUR_ROBOTS_VISIBLE_TOURELLE, float("inf"))
-				self.__logger.error("Il y a un probleme avec le nombre de robots détecté par les hokuyo position_hokuyo: "+str(position_hokuyo))
-			if len(position_hokuyo) > NUMBER_OF_ENEMY:
-				self.__logger.error("OH ! Faut pas pousser mémé dans les begonias !")
-				return None
-
-		if len(position_hokuyo) < NUMBER_OF_ENEMY:
-			self.__logger.warning("On a perdu au moins un des robots adverses position_hokuyo "+str(position_hokuyo))
+			self.__logger.warning("Attention on drop les données hokuyo, on voit trop d'objet "+str(position_hokuyo))
+			return None
 		return position_hokuyo
 
 	def __tryRemoveOurBot(self, position_hokuyo, nos_robots_visible, threshold):
@@ -122,7 +117,8 @@ class Tourelle():
 						min_distance = distance
 						min_id = i
 				if min_distance > DISTANCE_MAX_ROBOT_FUSION:
-					self.__logger.warning("Nous n'avons pas trouvé un de nos robots à un emplacement proche de celui attendu min_distance: "+str(min_distance)+" position_nos_robots "+str(position_nos_robots)+" position_hokuyo: "+str(position_hokuyo))
+					#self.__logger.warning("Nous n'avons pas trouvé un de nos robots à un emplacement proche de celui attendu min_distance: "+str(min_distance)+" position_nos_robots "+str(position_nos_robots)+" position_hokuyo: "+str(position_hokuyo))
+					pass
 				else:
 					del position_hokuyo[min_id]
 
