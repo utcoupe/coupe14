@@ -8,20 +8,28 @@
 #define max(a, b) a>b?a:b
 #define min(a, b) a<b?a:b
 
+int inZone(Pt_t pt, ScanZone_t zone) {
+	return !(pt.x > zone.xmax || pt.x < zone.xmin || pt.y > zone.ymax || pt.y < zone.ymin);
+}
 
 int getPoints(Hok_t hok, Pt_t* pt_list) {
 	long data[MAX_DATA];
 	int n = urg_receiveData(hok.urg, data, MAX_DATA);
-	int i, j=0;
-	for (i=hok.imin; i<hok.imax; i++) {
-		Pt_t pt = (Pt_t) { hok.pt.x + data[i]*fastCos(hok.fm, i), hok.pt.y + data[i]*fastSin(hok.fm, i) };
-		if (pt.x > TABLE_X - BORDER_MARGIN || pt.x < BORDER_MARGIN || pt.y > TABLE_Y - BORDER_MARGIN || pt.y < BORDER_MARGIN) {
-			pt_list[j++] = (Pt_t) { -1, -1 };
-		} else {
-			pt_list[j++] = pt;
+	if (n > 0) {
+		int i, j=0;
+		for (i=hok.imin; i<hok.imax; i++) {
+			Pt_t pt = (Pt_t) { hok.pt.x + data[i]*fastCos(hok.fm, i), hok.pt.y + data[i]*fastSin(hok.fm, i) };
+			if (inZone(pt, hok.zone)) {
+				pt_list[j++] = pt;
+			} else {
+				pt_list[j++] = (Pt_t) { -1, -1 };
+			}
 		}
+		return hok.imax-hok.imin;
+	} else {
+		printf("%s%s : %s\n", PREFIX, hok.path, urg_error(hok.urg));
+		return -1;
 	}
-	return hok.imax-hok.imin;
 }
 
 int getClustersFromPts(Pt_t *pt_list, int nb_pts, Cluster_t* clusters) {
@@ -91,8 +99,8 @@ int getClustersFromPts(Pt_t *pt_list, int nb_pts, Cluster_t* clusters) {
 	return nbCluster;
 }
 
-int sortAndSelectRobots(int n, Cluster_t *robots){
-	int i, nbr_robots = min(n, MAX_ROBOTS);
+int sortAndSelectRobots(int n, Cluster_t *robots, int nb_robots_to_find){
+	int i, nbr_robots = min(n, nb_robots_to_find);
 	Cluster_t *r = malloc(n*sizeof(Cluster_t));
 	memcpy(r, robots, n*sizeof(Cluster_t));
 	for(i=0; i<nbr_robots; i++){
@@ -110,7 +118,7 @@ int sortAndSelectRobots(int n, Cluster_t *robots){
 	return i;
 }
 
-int mergeRobots(Cluster_t *r1, int n1, Cluster_t *r2, int n2, Cluster_t *result) {
+int mergeRobots(Cluster_t *r1, int n1, Cluster_t *r2, int n2, Cluster_t *result, int nb_robots_to_find) {
 	struct corres { //permet d'établir des correspondances entre les index
 		int r1;
 		int r2;
@@ -207,7 +215,7 @@ int mergeRobots(Cluster_t *r1, int n1, Cluster_t *r2, int n2, Cluster_t *result)
 		}
 	}
 
-	nbr_found = sortAndSelectRobots(nbr_found, result);
+	nbr_found = sortAndSelectRobots(nbr_found, result, nb_robots_to_find);
 	return nbr_found;
 }
 
