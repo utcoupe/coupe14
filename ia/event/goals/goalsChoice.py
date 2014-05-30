@@ -142,7 +142,7 @@ class GoalsChoice:
 			return best_path[3]
 		else:
 			return float("Inf")
-
+	"""
 	def __getGoalsByPriority(self, goals, zone):
 		def prio(goal):
 			best_path = self.__getBestElemGoal(goal)
@@ -150,7 +150,7 @@ class GoalsChoice:
 				return self.__prio_FM_zone_triangles[zone].index(goal.getId())
 			else:
 				return len(self.__prio_FM_zone_triangles[zone])
-		return sorted(goals, key=prio)
+		return sorted(goals, key=prio)"""
 
 	def __getBestElemGoal(self, goal):
 		best_elem_goal = None
