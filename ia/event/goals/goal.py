@@ -23,6 +23,15 @@ class Goal:
 		self.__time_stamp_proximity = -1
 		self.__already_done		= 0 # From 0 (not finished) to 100 (finished)
 
+		self.__color_for_script_torche = deque()# 1: ma_couleur, 0: pas ma couleur
+		self.__color_for_script_torche.append("HACK")# HACK, sup au STEP_OVER
+		self.__color_for_script_torche.append(1)
+		self.__color_for_script_torche.append(0)
+		self.__color_for_script_torche.append(1)
+
+	def getColorForScriptTorche(self):
+		return self.__color_for_script_torche[0]
+
 	def getId(self):
 		return self.__id
 
@@ -81,6 +90,7 @@ class Goal:
 		return action_list
 
 	def removeFirstElemAction(self):
+		self.__color_for_script_torche.popleft()
 		for elem in self.__elem_goal:
 			action_objectif = elem.getNextElemAction()
 			if action_objectif:

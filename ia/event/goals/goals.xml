@@ -483,7 +483,7 @@
 				<duration>1</duration>
 				<color>RYR</color>
 				<script_only>False</script_only>
-				<id_script>9</id_script>
+				<id_script>10</id_script>
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
@@ -495,7 +495,7 @@
 				<duration>1</duration>
 				<color>RYR</color>
 				<script_only>False</script_only>
-				<id_script>9</id_script>
+				<id_script>10</id_script>
 			</elem_goal>
 			<elem_goal>
 				<id>2</id>
@@ -507,7 +507,7 @@
 				<duration>1</duration>
 				<color>RYR</color>
 				<script_only>False</script_only>
-				<id_script>9</id_script>
+				<id_script>10</id_script>
 			</elem_goal>
 			<elem_goal>
 				<id>3</id>
@@ -519,7 +519,7 @@
 				<duration>1</duration>
 				<color>RYR</color>
 				<script_only>False</script_only>
-				<id_script>9</id_script>
+				<id_script>10</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>
@@ -542,7 +542,7 @@
 				<duration>1</duration>
 				<color>RYR</color>
 				<script_only>False</script_only>
-				<id_script>9</id_script>
+				<id_script>10</id_script>
 			</elem_goal>
 			<elem_goal>
 				<id>1</id>
@@ -554,7 +554,7 @@
 				<duration>1</duration>
 				<color>RYR</color>
 				<script_only>False</script_only>
-				<id_script>9</id_script>
+				<id_script>10</id_script>
 			</elem_goal>
 			<elem_goal>
 				<id>2</id>
@@ -566,7 +566,7 @@
 				<duration>1</duration>
 				<color>RYR</color>
 				<script_only>False</script_only>
-				<id_script>9</id_script>
+				<id_script>10</id_script>
 			</elem_goal>
 			<elem_goal>
 				<id>3</id>
@@ -578,7 +578,7 @@
 				<duration>1</duration>
 				<color>RYR</color>
 				<script_only>False</script_only>
-				<id_script>9</id_script>
+				<id_script>10</id_script>
 			</elem_goal>
 		</elem_goals>
 	</goal>

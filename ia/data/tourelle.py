@@ -76,7 +76,7 @@ class Tourelle():
 		temp = self.SmallEnemyBot.getPosition()
 		ia_position_small_ennemy = Position(temp[0], temp[1])
 
-		if ia_position_big_ennemy.distanceSquarred(position_enemy[0]) > ia_position_big_ennemy.distanceSquarred(position_enemy[1]) or ia_position_small_ennemy.distanceSquarred(position_enemy[1]) > ia_position_small_ennemy.distanceSquarred(position_enemy[0]):
+		if ia_position_big_ennemy.distanceSquarred(position_enemy[0]) > ia_position_big_ennemy.distanceSquarred(position_enemy[1]) and ia_position_small_ennemy.distanceSquarred(position_enemy[1]) > ia_position_small_ennemy.distanceSquarred(position_enemy[0]):
 			if self.__compteur_inversion < 3:
 				self.__logger.warning("L'hokuyo semble avoir confondu le petit et le gros robots adverse ia_position_big_ennemy "+str(ia_position_big_ennemy)+" position_enemy[0] "+str(position_enemy[0])+" ia_position_small_ennemy "+str(ia_position_small_ennemy)+" position_enemy[1] "+str(position_enemy[1]))
 				self.__compteur_inversion += 1

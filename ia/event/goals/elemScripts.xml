@@ -106,4 +106,22 @@
 			<order>END</order>
 		</orders>
 	</elemScript>
+	<elemScript>
+		<id_script>10</id_script>
+		<orders>
+			<order>STEP_OVER</order>
+			<order>GET_TRIANGLE_IA_TORCHE_SCRIPT</order>
+			<order>STORE_TRIANGLE_IA</order>
+			<order>THEN</order>
+			<order>STEP_OVER</order>
+			<order>GET_TRIANGLE_IA_TORCHE_SCRIPT</order>
+			<order>STORE_TRIANGLE_IA</order>
+			<order>THEN</order>
+			<order>STEP_OVER</order>
+			<order>GET_TRIANGLE_IA_TORCHE_SCRIPT</order>
+			<order>DYNAMIQUE_OVER</order>
+			<order>STORE_TRIANGLE_IA</order>
+			<order>END</order>
+		</orders>
+	</elemScript>
 </elemScripts>

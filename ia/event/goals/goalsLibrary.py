@@ -118,12 +118,12 @@ class GoalsLibrary:
 
 		return length
 
-	"""def calcArmPos(self, xRobot, yRobot, aRobot, xTorche, yTorche):
-		x = xRobot - xTorche
-		y = yRobot - yTorche
+	def calcArmPos(self, xTorche, yTorche):
+		x = xTorche - self.__data["FLUSSMITTEL"]["getPositionAndAngle"][0]
+		y = yTorche - self.__data["FLUSSMITTEL"]["getPositionAndAngle"][1]
+		d = sqrt(x**2 + y**2)
 
-		d = sqrt(x**2, y**2)
 		a = atan2(y, x)
-
-		theta = a - aDelta
-		return (d*cos(theta), d*sin(theta))"""
+		theta = a - self.__data["FLUSSMITTEL"]["getPositionAndAngle"][2]
+		
+		return (d*cos(theta), d*sin(theta))

@@ -11,9 +11,9 @@ TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté au
 
 
 #====================Enable====================
-ENABLE_TOURELLE =		True
+ENABLE_TOURELLE =		False
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
-ENABLE_TIBOT =			True
+ENABLE_TIBOT =			False
 
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
@@ -111,7 +111,7 @@ MARGE_OUVERTURE_BRAS_MAX_DEPLACEMENT = 20
 MARGE_OUVERTURE_BRAS_MIN_DEPLACEMENT = 20
 CENTRE_BRAS_X = 128
 CENTRE_BRAS_Y = 130
-NB_VISIO_TRY = 10
+NB_VISIO_TRY = 20
 NB_VISIO_DATA_NEEDED = 3
 VISIO_MAX_DIST_TRIANGLE = 400
 

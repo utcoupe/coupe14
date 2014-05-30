@@ -189,7 +189,7 @@ class GoalsManager:
 
 			#Hack pour le cas des torches qui sont des actions qu'on peut faire en plusieurs fois
 			if first_action_elem:
-				if first_action_elem[0][0] == "GET_TRIANGLE_IA_TORCHE" or first_action_elem[0][0] == "GET_TRIANGLE_IA":
+				if first_action_elem[0][0] == "GET_TRIANGLE_IA_TORCHE" or first_action_elem[0][0] == "GET_TRIANGLE_IA" or first_action_elem[0][0] == "GET_TRIANGLE_IA_TORCHE_SCRIPT":
 					orders.append( ("STEP_OVER", ()) )
 				else:
 					orders.extend(first_action_elem)
@@ -298,7 +298,7 @@ class GoalsManager:
 
 		objectif.getElemGoalLocked().setCoordBrasVerified(True)
 
-		if (action_list[0][0] == "GET_TRIANGLE_IA" or action_list[0][0] == "GET_TRIANGLE_IA_TORCHE"):
+		if (action_list[0][0] == "GET_TRIANGLE_IA" or action_list[0][0] == "GET_TRIANGLE_IA_TORCHE" or action_list[0][0] == "GET_TRIANGLE_IA_TORCHE_SCRIPT"):
 			can_be_store, position, hauteur_drop, script_to_send = self.__last_data_camera
 
 			if not can_be_store:
@@ -319,7 +319,7 @@ class GoalsManager:
 					if objectif.getType() != "TORCHE" and position == -1:
 						script_to_send.append( ("THEN", ()) )
 						script_to_send.append( ("O_RET", ()) )
-				elif action[0] == "GET_TRIANGLE_IA" or action[0] == "GET_TRIANGLE_IA_TORCHE":
+				elif action[0] == "GET_TRIANGLE_IA" or action[0] == "GET_TRIANGLE_IA_TORCHE" or action[0] == "GET_TRIANGLE_IA_TORCHE_SCRIPT":
 					pass
 				else:
 					script_to_send.append(action)
@@ -339,30 +339,46 @@ class GoalsManager:
 			return None
 
 		#Si ce sont des actions simples, on ne devrait pas utliser STEP_OVER pour ça, mais plutôt THEN
-		if (action_list[0][0] != "GET_TRIANGLE_IA" and action_list[0][0] != "GET_TRIANGLE_IA_TORCHE"):
+		if action_list[0][0] != "GET_TRIANGLE_IA" and action_list[0][0] != "GET_TRIANGLE_IA_TORCHE" and action_list[0][0] != "GET_TRIANGLE_IA_TORCHE_SCRIPT":
 			self.__logger.warning("Attention, les actions sont simples, action_list "+str(action_list)+" on ne devrait pas utliser STEP_OVER pour ça, mais plutôt THEN")
 			self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), action_list)
 			objectif.removeFirstElemAction()
 			return None
 
 		get_triangle_mode = action_list[0][0]
-		time.sleep(0.03)
-		data_camera = self.__getVisioData(objectif)
-		if data_camera is None:
-			self.__logger.info("On a pas trouvé de données camera")
-			return None
+		if get_triangle_mode != "GET_TRIANGLE_IA_TORCHE_SCRIPT":
+			data_camera = self.__getVisioData(objectif)
+			if data_camera == None:
+				self.__logger.info("On a pas trouvé de données camera pour l'objectif d'id "+str(objectif.getType()))
+				return None
 
-		#Si besoin, on change la couleur du triangle pour la prochaine fois
-		if data_camera[0] != objectif.getColorElemLock():
-			objectif.switchColor()
+			#Si besoin, on change la couleur du triangle pour la prochaine fois
+			if data_camera[0] != objectif.getColorElemLock():
+				objectif.switchColor()
 
-		#Si ce n'est pas une torche et que la couleur est déjà bonne
-		if data_camera[0] == self.__our_color and objectif.getType() != "TORCHE":
-			self.__logger.info("Ce triangle est de notre couleur donc on le laisse ici")
-			self.__deleteGoal(objectif)
-			return None
+			#Si ce n'est pas une torche et que la couleur est déjà bonne
+			if data_camera[0] == self.__our_color and objectif.getType() != "TORCHE":
+				self.__logger.info("Ce triangle est de notre couleur donc on le laisse ici")
+				self.__deleteGoal(objectif)
+				return None
 
-		can_be_store, position, hauteur_drop, script_data_to_get = self.__howToStoreTriangle(objectif, data_camera[0])
+			can_be_store, position, hauteur_drop, script_data_to_get = self.__howToStoreTriangle(data_camera[0])
+		else:
+			color_temp = objectif.getColorForScriptTorche()
+			if color_temp == 1:
+				triangle_color = self.__our_color
+			elif color_temp == 0:
+				if self.__our_color == "RED":
+					triangle_color = "YELLOW"
+				else:
+					triangle_color = "RED"
+			else:
+				triangle_color = self.__our_color# pour eviter le plantage
+				self.__logger("Erreur de couleur dans le script torche")
+			can_be_store, position, hauteur_drop, script_data_to_get = self.__howToStoreTriangle(triangle_color)
+			abs_coord = objectif.getPosition()
+			relative_coord = self.__goalsLib.calcArmPos(abs_coord[0], abs_coord[1])
+			data_camera = ("FUCK", relative_coord[0], relative_coord[1])
 		self.__last_data_camera =  (can_be_store, position, hauteur_drop, script_data_to_get)
 		#si on a la possibilité de le stocker
 		if not can_be_store:
@@ -383,6 +399,9 @@ class GoalsManager:
 					objectif.getElemGoalLocked().setCoordBras(data_camera[1], data_camera[2])
 					objectif.getElemGoalLocked().setCoordBrasVerified(False)
 					script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], HAUTEUR_TORCHE+3*HAUTEUR_TRIANGLE)) )
+			elif get_triangle_mode == "GET_TRIANGLE_IA_TORCHE_SCRIPT":
+				script_get_triangle.append( ("O_GET_TRIANGLE", (relative_coord[0], relative_coord[1], HAUTEUR_TORCHE+3*HAUTEUR_TRIANGLE)) )
+				
 			script_get_triangle.append( ("THEN", ()) )
 			script_get_triangle.append( ("O_GET_BRAS_STATUS", ()) )
 			script_get_triangle.append( ("THEN", (),) )
@@ -425,7 +444,7 @@ class GoalsManager:
 				script_get_triangle.append( ("STEP_OVER", (),) )
 				self.__SubProcessManager.sendGoalStepOver(objectif.getId(), objectif.getId(), script_get_triangle)
 
-	def __howToStoreTriangle(self, objectif, color): #return type: (can_be_store, position, hauteur_drop)
+	def __howToStoreTriangle(self, color): #return type: (can_be_store, position, hauteur_drop)
 		position = None
 		hauteur_drop = None
 		nb_front_stack = len(self.__front_triangle_stack) 
@@ -471,14 +490,15 @@ class GoalsManager:
 
 			if len(list_of_triangle_list) >= NB_VISIO_DATA_NEEDED:
 				data_camera = self.__getBestDataTriangleOfList(list_of_triangle_list)
-				if data_camera is None:
+				if data_camera == None:
 					self.__last_camera_color = None
 					self.__deleteGoal(objectif)
 			else:
 				self.__logger.warning("On a pas vu de triangle à la position attendu, list_of_triangle_list "+str(list_of_triangle_list)+" dont on va supprimer l'objectif d'id "+str(objectif.getId()))
 				self.__last_camera_color = None
-				self.__deleteGoal(objectif)
 				data_camera = None
+				self.__deleteGoal(objectif)
+				
 
 		else:
 			# Coordonées du triangle par rapport au centre du robot
