@@ -5,13 +5,13 @@ Ce fichier regroupe toutes les constantes de l'IA
 
 import math
 
-TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
 
 #====================Enable====================
-ENABLE_TOURELLE =		False
+ENABLE_TOURELLE =		True
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
 ENABLE_TIBOT =			True
 
@@ -140,7 +140,7 @@ FIRST_POSITION_SMALL_RED_ENNEMY = (193, 1542)
 
 #====================BIG ENEMY====================
 #Si un seul adversaire, on utilise les constantes de BIG ENEMY
-RAYON_BIG_ENEMY = 		220
+RAYON_BIG_ENEMY = 		300
 
 #====================SMALL ENEMY====================
 RAYON_SMALL_ENEMY = 	120
