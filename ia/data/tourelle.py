@@ -67,7 +67,7 @@ class Tourelle():
 				else:
 					self.SmallEnemyBot.setPosition(position_enemy[0])
 		else:
-			self.__logger.warning("On a trouvé aucun enemy donc on drop les données hokuyo.")
+			self.__logger.warning("On drop les données hokuyo.")
 	
 	def __checkRobotsPosition(self, position_enemy):
 		temp = self.BigEnemyBot.getPosition()
@@ -89,7 +89,6 @@ class Tourelle():
 
 	def __fitreNosRobots(self, position_hokuyo):
 		"""return une liste de robots ennemies, il peut manquer un robots, si il n'y en a aucun on return None"""
-		position_hokuyo_base = copy.deepcopy(position_hokuyo)
 
 		#On essaie de supprimer les robots qui corespondent aux notres et aux indications des constantes
 		self.__tryRemoveOurBot(position_hokuyo, OUR_ROBOTS_VISIBLE_TOURELLE, DISTANCE_MAX_ROBOT_FUSION)
@@ -118,7 +117,8 @@ class Tourelle():
 						min_distance = distance
 						min_id = i
 				if min_distance > DISTANCE_MAX_ROBOT_FUSION:
-					self.__logger.warning("Nous n'avons pas trouvé un de nos robots à un emplacement proche de celui attendu min_distance: "+str(min_distance)+" position_nos_robots "+str(position_nos_robots)+" position_hokuyo: "+str(position_hokuyo))
+					#self.__logger.warning("Nous n'avons pas trouvé un de nos robots à un emplacement proche de celui attendu min_distance: "+str(min_distance)+" position_nos_robots "+str(position_nos_robots)+" position_hokuyo: "+str(position_hokuyo))
+					pass
 				else:
 					del position_hokuyo[min_id]
 
