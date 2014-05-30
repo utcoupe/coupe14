@@ -19,6 +19,14 @@ class ElemGoal:
 		self.__elem_action_base = copy.deepcopy(elem_action)
 		self.__elem_action_temp = copy.deepcopy(elem_action)
 		self.__already_step_over = False
+		self.__coord_bras = None
+		self.__coord_bras_verified = False
+
+	def getCoordBras(self):
+		return self.__coord_bras
+
+	def getCoordBrasVerified(self):
+		return self.__coord_bras_verified
 
 	def getScriptOnly(self):
 		return self.__script_only
@@ -43,3 +51,9 @@ class ElemGoal:
 
 	def reset_elem_action(self):
 		self.__elem_action_temp = copy.deepcopy(self.__elem_action_base)
+
+	def setCoordBras(self, x, y):
+		self.__coord_bras = (x,y)
+
+	def setCoordBrasVerified(self, verified):
+		self.__coord_bras_verified = verified

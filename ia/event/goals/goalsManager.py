@@ -286,13 +286,16 @@ class GoalsManager:
 		if find == True:
 			self.__logger.debug("On supprime la dernière occurance de "+str(value_to_remove)+" il reste "+str(deque_list))
 		else:
-			self.__logger.warning("Impossible de supprimer la valeur "+str(value_to_remove)+" de la liste "+str(deque))
+			deque_list.extend(removed_deque)
+			self.__logger.warning("Impossible de supprimer la valeur "+str(value_to_remove)+" de la liste "+str(deque_list))
 
 	def __manageStepBras(self, objectif, id_objectif):
 		action_list = objectif.getFirstElemAction()
 		if not action_list:
 			self.__logger.warning("Pb, Il y a un STEP_OVER directement suivit d'un END ?")
 			return None
+
+		objectif.getElemGoalLocked().setCoordBrasVerified(True)
 
 		if (action_list[0][0] == "GET_TRIANGLE_IA" or action_list[0][0] == "GET_TRIANGLE_IA_TORCHE"):
 			can_be_store, position, hauteur_drop, script_to_send = self.__last_data_camera
@@ -343,7 +346,6 @@ class GoalsManager:
 		data_camera = self.__getVisioData(objectif)
 		if data_camera is None:
 			self.__logger.info("On a pas trouvé de données camera")
-			self.__deleteGoal(objectif)
 			return None
 
 		#Si besoin, on change la couleur du triangle pour la prochaine fois
@@ -369,7 +371,14 @@ class GoalsManager:
 			if get_triangle_mode == "GET_TRIANGLE_IA":
 				script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], HAUTEUR_TRIANGLE)) )
 			elif get_triangle_mode == "GET_TRIANGLE_IA_TORCHE":
-				script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], HAUTEUR_TORCHE+3*HAUTEUR_TRIANGLE)) )
+				#Si on en a déjà pris un avec succes
+				last_coord = objectif.getElemGoalLocked().getCoordBras()
+				if last_coord is not None and objectif.getElemGoalLocked().getCoordBrasVerified():
+					script_get_triangle.append( ("O_GET_TRIANGLE", (last_coord[0], last_coord[1], HAUTEUR_TORCHE+3*HAUTEUR_TRIANGLE)) )
+				else:
+					objectif.getElemGoalLocked().setCoordBras(data_camera[1], data_camera[2])
+					objectif.getElemGoalLocked().setCoordBrasVerified(False)
+					script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], HAUTEUR_TORCHE+3*HAUTEUR_TRIANGLE)) )
 			script_get_triangle.append( ("THEN", ()) )
 			script_get_triangle.append( ("O_GET_BRAS_STATUS", ()) )
 			script_get_triangle.append( ("THEN", (),) )
@@ -425,7 +434,7 @@ class GoalsManager:
 				position = 1
 				hauteur_drop = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE
 			else:
-				self.__logger.error("On a pas la place pour stocker ce triangle à l'avant, ca cas ne devrait pas arriver !")
+				self.__logger.warning("On a plus de place à l'avant pour stocker ce triangle.")
 				can_be_store = False
 
 		else:
@@ -437,7 +446,7 @@ class GoalsManager:
 				position = -1
 				hauteur_drop = GARDE_AU_SOL + nb_front_stack*HAUTEUR_TRIANGLE + MARGE_DROP_TRIANGLE #ici c'est bien nb_front_stack !
 			else:
-				self.__logger.error("On a pas la place pour stocker ce triangle ni à l'avant ni à l'arrière, ce cas ne devrait pas arriver !")
+				self.__logger.warning("On a plus la place pour stocker ce triangle, ni à l'avant ni à l'arrière.")
 				can_be_store = False
 
 		return (can_be_store, position, hauteur_drop, script_to_send)
@@ -675,8 +684,8 @@ class GoalsManager:
 				if (self.__our_color == "RED" and id == 0) or (self.__our_color == "YELLOW" and id == 1):
 					self.__finished_goals.append(goal)
 				#Hack pour ignorer le second mamouth
-				elif (self.__our_color == "RED" and id == 12) or (self.__our_color == "YELLOW" and id == 11):
-					self.__finished_goals.append(goal)
+				#elif (self.__our_color == "RED" and id == 12) or (self.__our_color == "YELLOW" and id == 11):
+					#self.__finished_goals.append(goal)
 				else:
 					self.__available_goals.append(goal)
 
@@ -770,7 +779,7 @@ class GoalsManager:
 		else:
 			return False
 
-	def __check_goal_TS(self,goal,bot):
+	def __check_goal_TS(self,goal,bot, robot):
 		"""
 		Vérifie si le robot est resté proche d'un goal pendant longtemps.
 		@param goal objectif qu'on regarde
@@ -788,6 +797,7 @@ class GoalsManager:
 		elif ts_goal != -1:
 			if ts - ts_goal > 6000:
 				goal.setAlreadyDone(100)
+				self.__logger.info("On supprime le goal d'id "+str(goal.getId())+" car "+str(robot)+" est resté longtemps à côté")
 				self.__deleteGoal(goal, fromGoalCollision=True)
 				goal.setTSProximiy(self.__data["METADATA"]["getGameClock"])
 				goal.setTSProximiy(-1)
@@ -809,6 +819,7 @@ class GoalsManager:
 							if self.__check_goal_proximity(goal, self.__data[robot]) is True:
 								goal.setAlreadyDone(100)
 								goal.setGoalDone(True)
+								self.__logger.info("On supprime le goal d'id "+str(goal.getId())+" car "+str(robot)+" est passé dessus")
 								self.__deleteGoal(goal, fromGoalCollision=True)
 							else:
-								self.__check_goal_TS(goal,self.__data[robot])
+								self.__check_goal_TS(goal,self.__data[robot], robot)
