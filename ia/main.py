@@ -23,7 +23,7 @@ import gpio
 import sys
 
 #lancement de l'IA via le subprocess simu
-def startIa(pipe=None, ia_color="YELLOW"):
+def startIa(pipe=None, ia_color="RED"):
 	Communication = communication.CommunicationGlobale()
 	arduino_constantes = Communication.getConst()
 

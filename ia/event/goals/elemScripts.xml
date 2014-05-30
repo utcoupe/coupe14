@@ -45,7 +45,7 @@
 		<orders>
 			<order>DYNAMIQUE_OVER</order>
 			<order>A_PWM 20 20 2000</order>
-			<order>A_PWM -15 -15 1500</order>
+			<order>A_PWM -15 -15 750</order>
 			<order>END</order>
 		</orders>
 	</elemScript>
@@ -109,6 +109,9 @@
 	<elemScript>
 		<id_script>10</id_script>
 		<orders>
+			<order>SLEEP 1000</order>
+			<order>A_PWM 10 10 0</order>
+			<order>THEN</order>
 			<order>STEP_OVER</order>
 			<order>GET_TRIANGLE_IA_TORCHE_SCRIPT</order>
 			<order>STORE_TRIANGLE_IA</order>

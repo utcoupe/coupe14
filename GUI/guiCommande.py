@@ -26,7 +26,7 @@ def gui(com):
 				if order[0] == 'A':
 					address = 4
 				elif order[0] == 'O':
-					address = 3
+					address = 1
 				elif order[0] == 'T':
 					address = 5
 
