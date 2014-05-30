@@ -12,6 +12,7 @@ from collections import deque
 import sys
 import inspect, os
 from math import *
+import time
 
 FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(FILE_DIR,".."))
@@ -459,8 +460,10 @@ class GoalsManager:
 			limite_essai_viso = NB_VISIO_TRY
 			list_of_triangle_list = []
 			triangle_list_temp = []
+			time.sleep(0.1)
 			while limite_essai_viso > 0 and len(list_of_triangle_list) < NB_VISIO_DATA_NEEDED:
 				limite_essai_viso -= 1
+				time.sleep(0.05)
 				self.__vision.update(objectif.getType() == "TORCHE")
 				triangle_list_temp = self.__vision.getTriangles()
 				if triangle_list_temp != []:
@@ -491,6 +494,8 @@ class GoalsManager:
 			data_camera = ("RED", temp_x_rot, temp_y_rot)
 
 		return data_camera #type (color, x, y)
+
+	
 
 	def __getBestDataTriangleOfList(self, list_of_triangle_list):
 		#On prend le meilleur de chaque listes

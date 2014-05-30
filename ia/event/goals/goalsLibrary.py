@@ -117,3 +117,13 @@ class GoalsLibrary:
 			begin_point = point
 
 		return length
+
+	"""def calcArmPos(self, xRobot, yRobot, aRobot, xTorche, yTorche):
+		x = xRobot - xTorche
+		y = yRobot - yTorche
+
+		d = sqrt(x**2, y**2)
+		a = atan2(y, x)
+
+		theta = a - aDelta
+		return (d*cos(theta), d*sin(theta))"""

@@ -162,7 +162,7 @@ class GoalsChoice:
 			path = self.__goalsLib.getOrderTrajectoire(goal, idd, position_last_goal)
 			#self.__logger.debug("Calcul de trajectoire pour goalName "+str(goal.getName())+" id_elem "+str(idd)+" path "+str(path))
 			if path != []:
-				if self.__data["METADATA"]["getGameClock"] < BEGIN_CHECK_COLLISION or self.__Collision.isCollisionFromGoalsManager(self.__robot_name, path):
+				if (self.__data["METADATA"]["getGameClock"] is not None and self.__data["METADATA"]["getGameClock"] < BEGIN_CHECK_COLLISION) or self.__Collision.isCollisionFromGoalsManager(self.__robot_name, path):
 					length = self.__goalsLib.pathLen(path)
 					if length < best_length:
 						best_length = length
