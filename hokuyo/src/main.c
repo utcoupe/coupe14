@@ -16,7 +16,7 @@
 
 void frame(int nb_robots_to_find);
 
-static int use_protocol = 0;
+static int use_protocol = 0, symetry = 0;
 static long timeStart = 0;
 static Hok_t hok1, hok2;
 
@@ -35,7 +35,7 @@ static void catch_SIGINT(int signal){
 }
 
 int main(int argc, char **argv){
-	int calib = 1, symetry = 0, nb_robots_to_find = 4;
+	int calib = 1, nb_robots_to_find = 4;
 	char *path = 0;
 	hok1.urg = 0;
 	hok2.urg = 0;
@@ -113,11 +113,16 @@ void frame(int nb_robots_to_find){
 	int nPts1 = 0, nPts2 = 0, nRobots1 = 0, nRobots2 = 0, nRobots;
 
 	if (hok1.isWorking && hok2.isWorking) {
-		hok1.zone = (ScanZone_t){ 0, TABLE_X/2, 0, TABLE_Y };
-		hok2.zone = (ScanZone_t){ TABLE_X/2, TABLE_X, 0, TABLE_Y };
+		printf("Both hokuyos working\n");
+		hok1.zone = (ScanZone_t){ BORDER_MARGIN, TABLE_X/2, BORDER_MARGIN, TABLE_Y-BORDER_MARGIN };
+		hok2.zone = (ScanZone_t){ TABLE_X/2, TABLE_X-BORDER_MARGIN, BORDER_MARGIN, TABLE_Y-BORDER_MARGIN };
+		if (symetry) {
+			ScanZone_t temp = hok1.zone;
+			hok1.zone = hok2.zone;
+			hok2.zone = temp;
+		}
 	} else {
-		hok1.zone = (ScanZone_t){ 0, TABLE_X, 0, TABLE_Y };
-		hok2.zone = (ScanZone_t){ 0, TABLE_X, 0, TABLE_Y };
+		hok1.zone = hok2.zone = (ScanZone_t){ BORDER_MARGIN, TABLE_X - BORDER_MARGIN, BORDER_MARGIN, TABLE_Y-BORDER_MARGIN };
 	}
 
 	long start_t = timeMillis();

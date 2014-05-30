@@ -62,8 +62,10 @@ void checkAndConnect(Hok_t *hok) {
 }
 
 Hok_t applySymetry(Hok_t hok) {
-	hok.pt = (Pt_t) {TABLE_X - hok.pt.x, TABLE_Y - hok.pt.y};
+	hok.pt = (Pt_t) {TABLE_X - hok.pt.x, hok.pt.y};
 	hok.orientation = M_PI - hok.orientation;
-	hok.imin = urg_rad2index(hok.urg, hok.orientation + hok.cone_min);
-	hok.imax = urg_rad2index(hok.urg, hok.orientation + hok.cone_max);
+	double temp = hok.cone_min;
+	hok.cone_min = -hok.cone_max;
+	hok.cone_max = -temp;
+	return hok;
 }
