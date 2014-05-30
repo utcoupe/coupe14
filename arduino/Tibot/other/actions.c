@@ -61,23 +61,8 @@ void tirBalles(int nbr) {
 
 	int angle_to_go_R, angle_to_go_L;
 	if (tirs < 4) {
-		angle_to_go_R = POS_BALLES_R0;
+		angle_to_go_L = POS_BALLES_L0;
 		switch (tirs) {
-			case 1:
-				angle_to_go_L = POS_BALLES_L1;
-				break;
-			case 2:
-				angle_to_go_L = POS_BALLES_L2;
-				break;
-			case 3:
-				angle_to_go_L = POS_BALLES_L3;
-				break;
-			default:
-				angle_to_go_L = POS_BALLES_L0;
-		}
-	} else {
-		angle_to_go_L = POS_BALLES_L3;
-		switch (tirs - 3) {
 			case 1:
 				angle_to_go_R = POS_BALLES_R1;
 				break;
@@ -89,6 +74,21 @@ void tirBalles(int nbr) {
 				break;
 			default:
 				angle_to_go_R = POS_BALLES_R0;
+		}
+	} else {
+		angle_to_go_R = POS_BALLES_R3;
+		switch (tirs - 3) {
+			case 1:
+				angle_to_go_L = POS_BALLES_L1;
+				break;
+			case 2:
+				angle_to_go_L = POS_BALLES_L2;
+				break;
+			case 3:
+				angle_to_go_L = POS_BALLES_L3;
+				break;
+			default:
+				angle_to_go_L = POS_BALLES_L0;
 		}
 	} 
 	tirs = tirs % 6; //N'arrivera pas en match, mais utile en test
