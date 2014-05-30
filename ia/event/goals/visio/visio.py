@@ -3,6 +3,7 @@ import logging
 from subprocess import Popen, PIPE
 import time
 import atexit
+import os
 from math import cos, sin
 
 from constantes import *
@@ -57,6 +58,7 @@ class Visio:
 		self.__xcam = 190  # distance entre cam et milieu robot
 		self.__ycam = 0  # devrait etre 0
 
+		logging.basicConfig(filename=os.path.join(os.path.dirname(os.path.abspath(__file__)), "log.log"), filemode='w', level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 		self.__log = logging.getLogger(__name__)
 		self.path_exec = './' + path_exec
 		self.__big_bot = big_bot
@@ -67,7 +69,7 @@ class Visio:
 			capture_vid = 'false'
 
 		#Lancement du client
-		self.__log.info("Executing C++ program")
+		self.__log.info("Executing C++ program at " + str(self.path_exec))
 		self.client = Popen([self.path_exec, str(index), 'com', path_config, capture_vid], stdin=PIPE, universal_newlines=True, stdout=PIPE)
 		self.__log.info("C++ Program executed, waiting till program is ready")
 		atexit.register(self.client.kill)
@@ -107,6 +109,8 @@ class Visio:
 			data += stdout
 			#Sleep 1ms
 			time.sleep(self.__updatePeriod)
+
+		print(data)
 
 		# On supprime le END
 		data = data[:-4]
@@ -196,6 +200,7 @@ class Visio:
 			elif self._triangles[i].coord[1] > MAX_Y_TRIANGLE:
 				tri_to_remove.append(self._triangles[i])
 			elif self.__outOfMap(self._triangles[i]) or self.__inFruitZone(self._triangles[i]) or self.__inStartZone(self._triangles[i]):
+				self.__log.info("Remove triangle in invalid zone")
 				tri_to_remove.append(self._triangles[i])
 			#elif self.__inHighGround(self._triangles[i]):
 			#	self.__highGroundProcess(self._triangles[i], self.__hplat)
