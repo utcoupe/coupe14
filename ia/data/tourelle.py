@@ -42,11 +42,9 @@ class Tourelle():
 
 		position_enemy = self.__fitreNosRobots(position_hokuyo) 
 		if position_enemy != None:
-			if len(position_enemy) == NUMBER_OF_ENEMY:
-
-				#Si on voit les deux robots, on vérfie qu'ils ne sont pas inversés
-				if len(position_enemy) == 2:
-					position_enemy = self.__checkRobotsPosition(position_enemy)
+			#Si on voit les deux robots, on vérfie qu'ils ne sont pas inversés et on set
+			if len(position_enemy) == 2:
+				position_enemy = self.__checkRobotsPosition(position_enemy)
 				if position_enemy is not None:
 					i = 0
 					if self.BigEnemyBot is not None:
@@ -55,8 +53,19 @@ class Tourelle():
 					if self.SmallEnemyBot is not None:
 						self.SmallEnemyBot.setPosition(position_enemy[i])
 						i += 1
+			elif NUMBER_OF_ENEMY == 1:
+				self.SmallEnemyBot.setPosition(position_enemy[0])
 			else:
-				self.__logger.warning("On a trouvé qu'un seul robot adverse dans les données hokuyo, du coup on les drop.")
+				temp = self.BigEnemyBot.getPosition()
+				ia_position_big_ennemy = Position(temp[0], temp[1])
+
+				temp = self.SmallEnemyBot.getPosition()
+				ia_position_small_ennemy = Position(temp[0], temp[1])
+
+				if ia_position_big_ennemy.distanceSquarred(position_enemy[0]) < ia_position_small_ennemy.distanceSquarred(position_enemy[0]):
+					self.BigEnemyBot.setPosition(position_enemy[0])
+				else:
+					self.SmallEnemyBot.setPosition(position_enemy[i])
 		else:
 			self.__logger.warning("On a trouvé aucun enemy donc on drop les données hokuyo.")
 	
@@ -87,9 +96,6 @@ class Tourelle():
 		if len(position_hokuyo) > NUMBER_OF_ENEMY:
 			self.__logger.warning("Attention on drop les données hokuyo, on voit trop d'objet "+str(position_hokuyo))
 			return None
-
-		if len(position_hokuyo) < NUMBER_OF_ENEMY:
-			self.__logger.warning("Attention on drop les données hokuyo, on voit trop peu d'objet "+str(position_hokuyo))
 		return position_hokuyo
 
 	def __tryRemoveOurBot(self, position_hokuyo, nos_robots_visible, threshold):
