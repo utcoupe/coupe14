@@ -73,7 +73,7 @@ PULL_PERIODE = 			100
 #====================NAVIGATION================
 EMPTY_FIFO = 			True
 POINTS_PAR_CERCLE = 	8
-MARGE_PASSAGE_PATH = 	0
+MARGE_PASSAGE_PATH = 	10
 MARGE_COLLISION =		-20
 COLLISION_THRESHOLD =	400
 COLLISION_WARNING_THRESHOLD = 800
@@ -91,7 +91,7 @@ TOURELLE_PULL_PERIODE = 100 		#ms
 DISTANCE_MAX_ROBOT_FUSION = 300 #Différance max entre codeurs et hokuyo
 
 #====================Flussmittel====================
-START_POSITION_RED_FLUSSMITTEL = (205, 1878, -1.57079)
+START_POSITION_RED_FLUSSMITTEL = (205, 1878, -1.57079) # true start pos
 LARGEUR_FLUSSMITTEL = 	270 # ok car centré en largeur
 LONGUEUR_FLUSSMITTEL = 	330 # = 2 fois la distance entre le centre de rotation et le côté le plus loin
 MAX_FRONT_TRIANGLE_STACK = 3
@@ -135,8 +135,8 @@ MIN_SIZE_TRIANGLE_TORCH = 10000
 
 
 #====================ENEMYs====================
-FIRST_POSITION_BIG_RED_ENNEMY = (205, 1878)
-FIRST_POSITION_SMALL_RED_ENNEMY = (55, 1555)
+FIRST_POSITION_BIG_RED_ENNEMY = (187, 1870)
+FIRST_POSITION_SMALL_RED_ENNEMY = (193, 1542)
 
 #====================BIG ENEMY====================
 #Si un seul adversaire, on utilise les constantes de BIG ENEMY

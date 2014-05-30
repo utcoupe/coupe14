@@ -315,6 +315,9 @@ class GoalsManager:
 			for action in script_base:
 				if action[0] == "STORE_TRIANGLE_IA":
 					script_to_send.append( ("O_STORE_TRIANGLE", (int(position*hauteur_drop),)) )
+					if objectif.getType() != "TORCHE" and position == -1:
+						script_to_send.append( ("THEN", ()) )
+						script_to_send.append( ("O_RET", ()) )
 				elif action[0] == "GET_TRIANGLE_IA" or action[0] == "GET_TRIANGLE_IA_TORCHE":
 					pass
 				else:
