@@ -49,8 +49,8 @@ if __name__ == "__main__":
 		Ne pas toucher au reste du code.
 		"""
 
-		redIA = True
-		yellowIA = False
+		redIA = False
+		yellowIA = True
 
 #=========================================================
 #======= Pas besoin de toucher à la suite du code ========
