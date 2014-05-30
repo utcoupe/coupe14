@@ -119,6 +119,69 @@ int sortAndSelectRobots(int n, Cluster_t *robots, int nb_robots_to_find){
 }
 
 int mergeRobots(Cluster_t *r1, int n1, Cluster_t *r2, int n2, Cluster_t *result, int nb_robots_to_find) {
+	Cluster_t all_bots[2*MAX_ROBOTS];
+	int i, n_tot=0;
+	for (i=0; i<n1; i++) {
+		all_bots[n_tot++] = r1[i];
+	}
+	for (i=0; i<n2; i++) {
+		all_bots[n_tot++] = r2[i];
+	}
+	if (n_tot <= nb_robots_to_find) {
+		memcpy(result, all_bots, n_tot*sizeof(Cluster_t));
+		return n_tot;
+	}
+
+	struct corres { //permet d'établir des correspondances entre les index
+		int r1;
+		int r2;
+	};
+	while (n_tot > nb_robots_to_find) {
+		//Brute force ici, on aura max 4 robots de chaque hokuyo, 4x4 = 16 cas, ca reste peu
+		//Calcul de la distance entre chaque combinaison de coords
+		int distR1R2[MAX_ROBOTS][MAX_ROBOTS], i, j;
+		struct corres dist_indexes[MAX_ROBOTS*MAX_ROBOTS]; //Tableau d'index de distR1R2, sert a trier les distances
+		struct corres merged[MAX_ROBOTS]; //Correspondances finales et retenues
+		int changed = 0;
+
+		//Calcul des distaces
+		for (i=0; i<n1; i++) {
+			for (j=0; j<n2; j++) {
+				distR1R2[i][j] = dist_squared(r1[i].center, r2[j].center);
+			}
+		}
+
+		for (i=0; i<n1*n2; i++) {
+			dist_indexes[i] = (struct corres){ i/n2, i%n2 };
+		}
+
+		//Tri ordre decroissant
+		do {
+			changed = 0;
+			for (i=1; i<n1*n2; i++) {
+				if (distR1R2[dist_indexes[i-1].r1][dist_indexes[i-1].r2] < distR1R2[dist_indexes[i].r1][dist_indexes[i].r2]) {
+					struct corres temp = dist_indexes[i];
+					dist_indexes[i] = dist_indexes[i-1];
+					dist_indexes[i-1] = temp;
+					changed = 1;
+				}
+			}
+		} while (changed);
+
+		for (i=n1+dist_indexes[0].r2; i<n_tot-1; i++) {
+			all_bots[i] = all_bots[i+1];
+		}
+		n_tot--;
+	}
+	return n_tot;
+}
+
+
+
+	
+/*
+
+int mergeRobots(Cluster_t *r1, int n1, Cluster_t *r2, int n2, Cluster_t *result, int nb_robots_to_find) {
 	struct corres { //permet d'établir des correspondances entre les index
 		int r1;
 		int r2;
@@ -218,6 +281,7 @@ int mergeRobots(Cluster_t *r1, int n1, Cluster_t *r2, int n2, Cluster_t *result,
 	nbr_found = sortAndSelectRobots(nbr_found, result, nb_robots_to_find);
 	return nbr_found;
 }
+*/
 
 int isIn(int e, int *tab, int tab_size) {
 	int i, ret = 0;
