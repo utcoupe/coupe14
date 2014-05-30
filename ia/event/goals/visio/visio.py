@@ -169,7 +169,6 @@ class Visio:
 		tri_to_remove = []
 
 		for i in range(len(self._triangles)):
-			"""
 			if isTorch:
 				self.__highGroundProcess(self._triangles[i], self.__htorch)
 				if self._triangles[i].size < MIN_SIZE_TRIANGLE_TORCH:
@@ -179,7 +178,6 @@ class Visio:
 			else:
 				if self._triangles[i].size > MAX_SIZE_TRIANGLE:
 					tri_to_remove.append(self._triangles[i])
-					"""
 
 
 			#calcul des coordonnées relatives dans le repère des coords absolues
