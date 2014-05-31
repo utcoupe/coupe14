@@ -13,7 +13,7 @@ TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté au
 #====================Enable====================
 ENABLE_TOURELLE =		False
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
-ENABLE_TIBOT =			True
+ENABLE_TIBOT =			False
 
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
@@ -56,7 +56,7 @@ DELAY_IGNORE_ASSER_BLOCKED = 2000
 
 #====================timeManager====================
 PERIODE_TIME_MANAGER =	100
-END_OF_MATCH = 			89000
+END_OF_MATCH = 			89500
 BEGIN_FUNNY_ACTION =	92000
 END_OF_FUNNY_ACTION = 	94500
 BEGIN_CHECK_COLLISION =	1500
@@ -140,10 +140,10 @@ FIRST_POSITION_SMALL_RED_ENNEMY = (193, 1542)
 
 #====================BIG ENEMY====================
 #Si un seul adversaire, on utilise les constantes de BIG ENEMY
-RAYON_BIG_ENEMY = 		220
+RAYON_BIG_ENEMY = 		300
 
 #====================SMALL ENEMY====================
-RAYON_SMALL_ENEMY = 	120
+RAYON_SMALL_ENEMY = 	110
 
 
 

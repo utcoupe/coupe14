@@ -386,7 +386,8 @@ class GoalsManager:
 			self.__cancelGoal(objectif, False)
 			return None
 			
-		if self.__positionReady(data_camera[1], data_camera[2]):
+		#if self.__positionReady(data_camera[1], data_camera[2]):
+		if True:
 			script_get_triangle = deque()
 			if get_triangle_mode == "GET_TRIANGLE_IA":
 				script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], HAUTEUR_TRIANGLE)) )

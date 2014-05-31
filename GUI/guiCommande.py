@@ -24,26 +24,25 @@ def gui(com):
 					arguments = last_arg
 					order = last_ordre
 				if order[0] == 'A':
-					address = 4
+					address = 2
 				elif order[0] == 'O':
 					address = 1
 				elif order[0] == 'T':
 					address = 5
-
 				if order == 'k':# arret d'urgence
-					com.sendOrderAPI(4, 'A_CLEANG', *arguments)
+					com.sendOrderAPI(2, 'A_CLEANG', *arguments)
 				elif order == 'a':# arret d'urgence
 					arguments = [0, 1000, 0]
-					com.sendOrderAPI(4, 'A_GOTO', *arguments)
+					com.sendOrderAPI(2, 'A_GOTO', *arguments)
 					arguments = [0, 0, 0, 0.0]
-					com.sendOrderAPI(4, 'A_GOTOA', *arguments)
+					com.sendOrderAPI(2, 'A_GOTOA', *arguments)
 				elif order == 'c':
-					com.sendOrderAPI(4, 'A_GET_CODER', *arguments)
+					com.sendOrderAPI(2, 'A_GET_CODER', *arguments)
 				elif order == 'p':
-					com.sendOrderAPI(4, 'A_GET_POS', *arguments)
+					com.sendOrderAPI(2, 'A_GET_POS', *arguments)
 				elif order == 'r':
 					arguments = [0, 0, 0.0]
-					com.sendOrderAPI(4, 'A_SET_POS', *arguments)
+					com.sendOrderAPI(2, 'A_SET_POS', *arguments)
 				elif order == 't':
 					arguments = []
 					com.sendOrderAPI(5, 'T_GET_CAM', *arguments)
@@ -52,43 +51,43 @@ def gui(com):
 					i = 10
 					while i >0:
 						arguments = [9, 100, 100, 1000]
-						com.sendOrderAPI(4, 'A_PWM', *arguments)
+						com.sendOrderAPI(2, 'A_PWM', *arguments)
 						time.sleep(4)
 						arguments = [10, -100, -100, 1000]
-						com.sendOrderAPI(4, 'A_PWM', *arguments)
+						com.sendOrderAPI(2, 'A_PWM', *arguments)
 						time.sleep(4)
 						i -= 1
 
 
 				elif order == 's':
 					arguments = [0,2000,0]
-					com.sendOrderAPI(4, 'A_GOTO', *arguments)
+					com.sendOrderAPI(2, 'A_GOTO', *arguments)
 					arguments = [0,2300,-800]
-					com.sendOrderAPI(4, 'A_GOTO', *arguments)
+					com.sendOrderAPI(2, 'A_GOTO', *arguments)
 					arguments = [0,2000,-1000]
-					com.sendOrderAPI(4, 'A_GOTO', *arguments)
+					com.sendOrderAPI(2, 'A_GOTO', *arguments)
 					arguments = [0,1000,-1200]
-					com.sendOrderAPI(4, 'A_GOTO', *arguments)
+					com.sendOrderAPI(2, 'A_GOTO', *arguments)
 					arguments = [0,500,-900]
-					com.sendOrderAPI(4, 'A_GOTO', *arguments)
+					com.sendOrderAPI(2, 'A_GOTO', *arguments)
 					arguments = [0,0,0,0.0]
-					com.sendOrderAPI(4, 'A_GOTOA', *arguments)
+					com.sendOrderAPI(2, 'A_GOTOA', *arguments)
 					"""arguments = [0, 2000, 0, 3.14]
-					com.sendOrderAPI(4, 'A_GOTOA', *arguments)
+					com.sendOrderAPI(2, 'A_GOTOA', *arguments)
 					arguments = [0, 0, 0, 0.0]
-					com.sendOrderAPI(4, 'A_GOTOA', *arguments)
+					com.sendOrderAPI(2, 'A_GOTOA', *arguments)
 					arguments = [0, 2000, 0, 3.14]
-					com.sendOrderAPI(4, 'A_GOTOA', *arguments)
+					com.sendOrderAPI(2, 'A_GOTOA', *arguments)
 					arguments = [0, 0, 0, 0.0]
-					com.sendOrderAPI(4, 'A_GOTOA', *arguments)
+					com.sendOrderAPI(2, 'A_GOTOA', *arguments)
 					arguments = [0, 2000, 0, 3.14]
-					com.sendOrderAPI(4, 'A_GOTOA', *arguments)
+					com.sendOrderAPI(2, 'A_GOTOA', *arguments)
 					arguments = [0, 0, 0, 0.0]
-					com.sendOrderAPI(4, 'A_GOTOA', *arguments)
+					com.sendOrderAPI(2, 'A_GOTOA', *arguments)
 					arguments = [0, 2000, 0, 3.14]
-					com.sendOrderAPI(4, 'A_GOTOA', *arguments)
+					com.sendOrderAPI(2, 'A_GOTOA', *arguments)
 					arguments = [0, 0, 0, 0.0]
-					com.sendOrderAPI(4, 'A_GOTOA', *arguments)"""
+					com.sendOrderAPI(2, 'A_GOTOA', *arguments)"""
 
 				elif order in com.orders:
 					if isinstance(order, (int)):
