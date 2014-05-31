@@ -139,6 +139,12 @@ class GoalsManager:
 					self.__front_triangle_stack.clear()
 					self.__back_triangle_stack.clear()
 
+				if objectif.getType() == "FILET":
+					#on reset pour pouvoir retirer un filet
+					objectif.resetElemAction()
+					self.__tibot_ready_for_filet = True
+					self.__logger.info("Tibot est en position pour tirer le filet.")
+
 				self.__logger.info(str(self.__robot_name)+" L'objectif "+str(objectif.getName())+" d'id "+str(objectif.getId())+" a terminé ses actions dynamiques")
 				self.__queueBestGoals()
 				break
@@ -226,11 +232,6 @@ class GoalsManager:
 			self.__dynamique_finished_goals.remove(goal)
 			self.__finished_goals.append(goal)
 			self.__logger.info('Goal ' + str(goal.getName()) + " d'id "+str(goal.getId())+" is finished")
-			if goal.getType() == "FILET":
-				#on reset pour pouvoir retirer un filet
-				goal.resetElemAction()
-				self.__tibot_ready_for_filet = True
-				self.__logger.info("Tibot est en position pour tirer le filet.")
 			#Dans le cas où on aurait oublier le DYNAMIQUE_OVER
 			self.__queueBestGoals()
 		

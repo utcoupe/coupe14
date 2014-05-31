@@ -5,13 +5,13 @@ Ce fichier regroupe toutes les constantes de l'IA
 
 import math
 
-TEST_MODE = False #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
+TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux robots
 
 
 
 
 #====================Enable====================
-ENABLE_TOURELLE =		False
+ENABLE_TOURELLE =		True
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
 ENABLE_TIBOT =			False
 
@@ -128,7 +128,7 @@ MAX_X_TRIANGLE = 500
 MIN_Y_TRIANGLE = -200
 MAX_Y_TRIANGLE = 200
 MAX_SIZE_TRIANGLE_TORCH = 22000
-MAX_SIZE_TRIANGLE = 8000
+MAX_SIZE_TRIANGLE = 7000
 MIN_SIZE_TRIANGLE_TORCH = 10000
 
 

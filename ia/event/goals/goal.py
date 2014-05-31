@@ -28,6 +28,9 @@ class Goal:
 		self.__color_for_script_torche.append(1)
 		self.__color_for_script_torche.append(0)
 		self.__color_for_script_torche.append(1)
+		self.__color_for_script_torche.append(1)
+		self.__color_for_script_torche.append(1)
+		self.__color_for_script_torche.append(1)
 
 	def getColorForScriptTorche(self):
 		return self.__color_for_script_torche[0]

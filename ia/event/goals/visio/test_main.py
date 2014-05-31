@@ -29,4 +29,4 @@ while 1:
 	for tri in tris:
 		print(tri)
 	print()
-	time.sleep(1/30)
+	time.sleep(1)
