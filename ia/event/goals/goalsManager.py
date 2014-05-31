@@ -88,30 +88,29 @@ class GoalsManager:
 		self.__queueBestGoals()
 
 	def __queueBestGoals(self):
+		self.__SubProcessManager.setLastDateGoalFind(int(time.time()*1000))
 		if not self.__blocked_goals:
 			self.__logger.debug(str(self.__robot_name)+" Recherche d'un nouvel objectif")	
-			self.__PathFinding.update()
 
 			#On cherche l'elem goal le plus proche par bruteforce
 			if self.__available_goals:
-				best_goal = self.__goalsChoice.getBestGoal(self. __tibot_ready_for_filet) #best_goal type (path, goal, id_elem_goal)
+				self.__PathFinding.update()
+				best_goal = self.__goalsChoice.getBestGoal(self.__tibot_ready_for_filet) #best_goal type (path, goal, id_elem_goal)
 
 				if best_goal[1] != None:
-
-					if self. __tibot_ready_for_filet == True:
+					if self.__tibot_ready_for_filet == True:
 						self.__logger.info("Finalement, on va refaire un objectif avant le filet")
 						for goal_temp in self.__finished_goals:
 							if goal_temp.getType() == "FILET":
-								self.__finished_goals.remove(goal_temp)
 								self.__available_goals.append(goal_temp)
+								self.__logger.info("On reque le filet")
 								break
-						self. __tibot_ready_for_filet = False
+						self.__tibot_ready_for_filet = False
+						self.__logger.info("Tibot n'est plus pret pour le filet")
 
 					self.__logger.info("On a choisi l'objectif "+str(best_goal[1].getName())+" goal_id "+str(best_goal[1].getId())+" elem_goal_id "+str(best_goal[2])+" avec le path "+str(best_goal[0]))
-					self.__SubProcessManager.setLastDateNoGoal(None)
 					self.__addGoal(best_goal[0], best_goal[1], best_goal[2])
 				else:
-					self.__SubProcessManager.setLastDateNoGoal(int(time.time()*1000))
 					self.__logger.info(str(self.__robot_name)+" aucun objectifs accessibles")
 			else:
 				self.__logger.info(str(self.__robot_name)+" N'a plus aucun objectif disponible, GG (ou pas, y'a toujours un truc à faire) !")
@@ -139,11 +138,6 @@ class GoalsManager:
 					self.__front_triangle_stack.clear()
 					self.__back_triangle_stack.clear()
 
-				if objectif.getType() == "FILET":
-					#on reset pour pouvoir retirer un filet
-					objectif.resetElemAction()
-					self.__tibot_ready_for_filet = True
-					self.__logger.info("Tibot est en position pour tirer le filet.")
 
 				self.__logger.info(str(self.__robot_name)+" L'objectif "+str(objectif.getName())+" d'id "+str(objectif.getId())+" a terminé ses actions dynamiques")
 				self.__queueBestGoals()
@@ -234,6 +228,12 @@ class GoalsManager:
 			self.__logger.info('Goal ' + str(goal.getName()) + " d'id "+str(goal.getId())+" is finished")
 			#Dans le cas où on aurait oublier le DYNAMIQUE_OVER
 			self.__queueBestGoals()
+
+			if goal.getType() == "FILET":
+				#on reset pour pouvoir retirer un filet
+				goal.resetElemAction()
+				self.__tibot_ready_for_filet = True
+				self.__logger.info("Tibot est en position pour tirer le filet.")
 		
 		#Dans le cas où c'est l'autre robot qui à fait l'objectif
 		elif goal in self.__available_goals:
@@ -387,8 +387,7 @@ class GoalsManager:
 			self.__cancelGoal(objectif, False)
 			return None
 			
-		#if self.__positionReady(data_camera[1], data_camera[2]):
-		if True:
+		if self.__positionReady(data_camera[1], data_camera[2]):
 			script_get_triangle = deque()
 			if get_triangle_mode == "GET_TRIANGLE_IA":
 				script_get_triangle.append( ("O_GET_TRIANGLE", (data_camera[1], data_camera[2], HAUTEUR_TRIANGLE)) )

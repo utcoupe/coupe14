@@ -13,7 +13,7 @@ TEST_MODE = True #Permet des tester l'IA sans avoir besoin d'être connecté aux
 #====================Enable====================
 ENABLE_TOURELLE =		True
 ENABLE_FLUSSMITTEL = 	True #permet de desactiver Flussmitel
-ENABLE_TIBOT =			False
+ENABLE_TIBOT =			True
 
 #========================================Communication========================================
 PORT_XBEE = 			"/dev/ttyUSB0"
@@ -56,14 +56,14 @@ DELAY_IGNORE_ASSER_BLOCKED = 2000
 
 #====================timeManager====================
 PERIODE_TIME_MANAGER =	100
-END_OF_MATCH = 			89500
+END_OF_MATCH = 			88500
 BEGIN_FUNNY_ACTION =	92000
 END_OF_FUNNY_ACTION = 	94500
 BEGIN_CHECK_COLLISION =	1500
 
 #====================Goal====================
 FINISHED_THRESHOLD = 	50
-OBJECTIF_SEARCH_PERIODE = 1000
+OBJECTIF_SEARCH_PERIODE = 2000
 
 #====================pullData====================
 PULL_SYSTEM_PERIODE = 	10 #période du système de pull en ms

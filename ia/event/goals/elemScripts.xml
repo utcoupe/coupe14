@@ -110,7 +110,6 @@
 		<id_script>10</id_script>
 		<orders>
 			<order>SLEEP 1000</order>
-			<order>A_PWM 10 10 0</order>
 			<order>THEN</order>
 			<order>STEP_OVER</order>
 			<order>GET_TRIANGLE_IA_TORCHE_SCRIPT</order>
