@@ -1,8 +1,8 @@
 %YAML:1.0
 min_size: 3000
-real_min_size: 5000
+real_min_size: 4000
 distort_mode: 2
-epsilon_poly: 4.0000000000000001e-02
+epsilon_poly: 7.0000000000000007e-02
 max_diff_triangle_edge: 50
 use_mask: 0
 mask_name: "mask.jpg"
