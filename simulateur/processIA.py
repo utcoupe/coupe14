@@ -15,9 +15,17 @@ import test
 import main
 from constantes import *
 
+"""
+Drapau qui permet de lancer :
+- l'IA si TEST_MODE = False
+- le programme de test si TEST_MODE = True
+"""
+TEST_MODE = True
+
 class ProcessIA():
 	"""
 	Classe qui va lancer une IA en subprocess.
+	Gère aussi la communication avec les IA lancées via un pipe.
 	"""
 	def __init__(self, color_and_robot_list):
 		self.__color = color_and_robot_list[0]
@@ -39,8 +47,10 @@ class ProcessIA():
 		#communication de data entre l'IA et le simu
 		self.__parent_conn, self.__child_conn = Pipe()
 		#lancement de l'ia
-		self.__process = Process(target=main.startIa, args=(self.__child_conn,self.__color))
-		#self.__process = Process(target=test.testIa, args=(self.__child_conn,self.__color)) #pour les tests
+		if TEST_MODE == False:
+			self.__process = Process(target=main.startIa, args=(self.__child_conn,self.__color))
+		elif TEST_MODE == True :
+			self.__process = Process(target=test.testIa, args=(self.__child_conn,self.__color)) #pour les tests
 		self.__process.start()
 		time.sleep(0.1)
 		#on démarre le thread de lecture des données IA renvoyées à travers le pipe

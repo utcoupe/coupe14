@@ -6,11 +6,11 @@ import math
 
 def testIa(conn, color):
 	"""
-	self.__color = self.__bigrobot.getTeam()
-	if self.__color == RED:
-		conn.send((ADDR_TIBOT_ASSERV,A_GOTO,49,2000,400))
-	elif self.__color == YELLOW:
-		conn.send((ADDR_TIBOT_ASSERV,A_GOTO,36,1000,800))
+	Méthode de test très basique.
+	Permet d'envoyer des ordres au simulateur via le pipe pour les tester.
+	Respecter la structure :
+		conn.send((adress,ordre,args))
+	Avec adress, ordre et args au format texte (avec "").
 	"""
 	time.sleep(1)
 	"""conn.send(("ADDR_FLUSSMITTEL_ASSERV","A_GOTO",(36,800,700)))

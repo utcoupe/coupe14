@@ -8,11 +8,18 @@ sys.path.append(os.path.join(DIR_PATH, "..", "map"))
 #pour importer les constantes des ordres et des robots
 from define import *
 
-from collections import deque
-import time
-
-
 class Communication():
+	"""
+	Cette classe permet de parser les ordres reçus par l'IA.
+	Elle va en effet appeler la méthode qui correspond à l'ordre que l'on veut exécuter.
+	La trame d'un ordre est sous la forme suivante : ADDRESS ORDRE ARGS
+	ADRESS correspond au client que l'on veut appeler (asserv du gros robot, others du petit)
+	ORDRE est le code de l'ordre qu'on veut exécuter.
+	ARGS est un ensemble d'arguments dépendant de l'ordre envoyé. ARGS peut être vide.
+
+	Les constantes de trouvent dans le define de la communication :
+	coupe14/libs/com_C/serial_defines.h
+	"""
 	def __init__(self, bigrobot, minirobot, hokuyo, ia):
 		self.__bigrobot = bigrobot	#objet robot, afin d'envoyer les ordres
 		self.__minirobot = minirobot	#objet robot, afin d'envoyer les ordres

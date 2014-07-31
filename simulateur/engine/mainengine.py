@@ -54,6 +54,10 @@ class Engine:
 				return obj
 		return None
 
+#==================================================
+# Détail des méthodes appelées lors des collisions
+#==================================================
+
 	def __on_collision_gros_feu(self, space, arb):
 		"""
 		Quand le gros robot touche un feu
@@ -190,6 +194,11 @@ class Engine:
 				print("Fresque not found")
 			else:
 				robot.accrocherFresques()
+
+#=====================================================
+# Détail des méthodes du moteur général.
+# Regroupe les appels au moteur graphique et physique
+#=====================================================
 
 	def stop(self):
 		self.e_stop.set()

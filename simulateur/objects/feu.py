@@ -12,6 +12,18 @@ from define import *
 from engine.engineobject import EngineObjectPoly
 
 class Feu(EngineObjectPoly):
+	"""
+	L'objet Feu est un peu particulier. Il a 2 états :
+	- soit debout et il apparait comme un rectangle
+	- soit couché et il apparait comme un triangle (couleur rouge ou jaune suivant le côté où il est tombé)
+	De plus, il apparait sur la map dans 2 positions : verticale (|) ou horizontale (-).
+	Donc pour dessiner les feux sur la map, il faut connaitre leur orientation (horizontale/verticale) et pendant
+	le match leur sens va changer (coucher/debout).
+	De plus, PyGame est fait de telle sorte qu'on ne puisse pas supprimer et recréer un objet de façon dynamique.
+	Il est donc impossible de supprimer le rectangle pour créer un triangle coloré à la place.
+	La solution qui aura été adopté est de créer une extension de couleur jaune ou rouge pour former un triangle,
+	à partir du rectangle noir.
+	"""
 	def __init__(self,engine,posinit, orientation, sens, coucher = False):
 		if (orientation == "vert"): # |
 			points_feu = map(lambda p: mm_to_px(*p),[(0,0),(30,0),(30,140),(0,140)])
@@ -42,6 +54,8 @@ class Feu(EngineObjectPoly):
 			poly_points		= points_feu,
 			layers			= 2
 		)
+
+#on a 4 extensions car 2 couleurs qui peuvent être des 2 côtés du triangle.
 
 		self.triangleRedDroite = EngineObjectPoly(
 			engine 		= engine,
@@ -120,7 +134,8 @@ class Feu(EngineObjectPoly):
 
 	def coucher(self, position_robot, type_bras):
 		"""
-		Permet de coucher le feu sur la map (quand le bras du robot le percute)
+		Permet de coucher le feu sur la map (quand le bras du robot le percute).
+		Concrètement on détermine la couleur du feu suivant la position du robot et le type de bras qu'il utilise.
 		@param position_robot = 'g' ou 'd' (gauche/droite)
 		@param type_bras = 'open' ou 'close'
 		"""
@@ -152,6 +167,9 @@ class Feu(EngineObjectPoly):
 		self.__eteindre_flag = False
 
 	def __addCoucherExtension(self, extension):
+		"""
+		Ajoute l'extension au feu pour montrer qu'il est couché.
+		"""
 		if self.__extension_down is None:
 			self.add_body_extension(extension)
 			self.__extension_down = extension
@@ -174,4 +192,3 @@ class Feu(EngineObjectPoly):
 
 	def __repr__(self):
 		return "Feu %s " % (self.posinit,)
-

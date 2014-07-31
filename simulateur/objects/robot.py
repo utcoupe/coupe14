@@ -15,6 +15,11 @@ from engine.engineobject import EngineObjectPoly
 from .clients import *
 
 class Robot(EngineObjectPoly):
+	"""
+	Cette classe est abstraite. Ses dérivées sont bigrobot et minirobot.
+	Regroupe l'ensemble des méthodes utiles pour l'interaction avec le robot.
+	Crée aussi la forme et la physique d'un robot.
+	"""
 	def __init__(self, *, engine, team, posinit, mass, poly_points,
 				 typerobot, extension_objects=[], colltype):
 		color = 'yellow' if team == YELLOW else 'red'
@@ -29,8 +34,8 @@ class Robot(EngineObjectPoly):
 		)
 
 	#données d'état du robot
-		self.__typerobot = typerobot
-		self.__team = team
+		self.__typerobot = typerobot #BIG ou MINI
+		self.__team = team #RED ou YELLOW
 		self.__goals = []
 		self.__asserv = Asserv(self)
 		self._visio = Visio(self)
@@ -54,7 +59,7 @@ class Robot(EngineObjectPoly):
 		self.__current_team = RED
 		self.__current_robot = BIG
 
-		self.body._set_velocity_func(self._my_velocity_func())
+		self.body._set_velocity_func(self._my_velocity_func()) #voir plus bas pour le détail
 
 	def init(self, engine):
 		self.__engine = engine
@@ -129,15 +134,27 @@ class Robot(EngineObjectPoly):
 		self.body.angle = -a
 
 	def getPositionPixel(self):
+		"""
+		Renvoie x et y du robot en pixel
+		"""
 		return self.body.position[0], self.body.position[1]
 
 	def getPosition(self):
+		"""
+		Renvoie x, y et angle du robot en réel
+		"""
 		return self.getXreal(), self.getYreal(), self.getAreal()
 
 	def getPositionXY(self):
+		"""
+		Renvoie x et y du robot en réel
+		"""
 		return self.getXreal(), self.getYreal()
 
 	def getPositionId(self):
+		"""
+		Renvoie x, y et angle du robot en réel et le dernier ID d'action
+		"""
 		return self.getXreal(), self.getYreal(), self.getAreal(), self.__asserv.getLastIdAction()
 
 	def getLastIdAsserv(self):
@@ -232,7 +249,7 @@ class Robot(EngineObjectPoly):
 	def addGoalOrder(self, numOrdre, arg):
 		"""
 		Méthode appelée depuis communication pour ajouter un goal au robot
-		Lors des appel aux commandes de l'asserv, il faut passer en paramètre
+		Lors des appels aux commandes de l'asserv, il faut passer en paramètre
 		les coordonnées en simulé, pas en réel.
 		@param numOrdre int définit dans define
 		@param args x, y ou a en réel
@@ -254,14 +271,16 @@ class Robot(EngineObjectPoly):
 
 	def _my_velocity_func(self):
 		"""
-		Fonction qui détermine la vitesse des corps.
-		Tous les traitements se font avec les coordonnées du simulateur (pas les réelles)
+		Fonction qui détermine la vitesse du corps dont la fonction est liée.
+		Tous les traitements se font avec les coordonnées du simulateur (pas les réelles).
+		Pour plus de détails, voir la documentation du simulateur et la documentation de pymunk.
 		"""
 		def f(body, gravity, damping, dt):
 			self.body._set_torque(0)
 			self.body._set_angular_velocity(0)
 			if not self.__stop and self.__goals:
 				current_goal = self.__goals[0]
+				#on recherche quel goal est exécuté pour savoir quel déplacement appliquer au robot.
 				if isinstance(current_goal, GoalPOSR):
 					x,y = self.body.position
 					a = self.body.angle
@@ -281,15 +300,17 @@ class Robot(EngineObjectPoly):
 					dy = gy - y
 					d = math.sqrt(dx**2+dy**2)
 					if d < abs(v * dt):
+					#on est très proche de la position finale,donc on "téléporte" le robot à cette position
 						self.body._set_position((gx,gy))
 						removed_goal = self.__goals.pop(0)
 						self.__asserv.setLastIdAction(removed_goal.id_action)
 						self.body._set_velocity((0,0))
 					else:
+					#on est encore loin, donc on recalcule la vitesse à donner au robot pour atteindre son objectif
 						a = math.atan2(dy, dx)
 						vx = abs(v) * math.cos(a)
 						vy = abs(v) * math.sin(a)
-						self.body._set_velocity((vx,vy))
+						self.body._set_velocity((vx,vy)) #on applique la vitesse au robot
 						if v < 0:
 							a += math.pi
 						abot = self.body.angle
@@ -299,10 +320,11 @@ class Robot(EngineObjectPoly):
 							diff = abot - a
 						#print('différence : ', diff)
 						if (abs(diff) < 0.5):
-							#print('angle petit : ', a)
+							#angle très proche, donc on donne l'angle final au robot.
 							self.body._set_angle(a)
 						else:
-							#print('angle grand : ', a)
+							#l'angle d'arrivée du robot est différent de l'angle calculé,
+							#on lui fait exécuter une rotation via un ordre fictif GoalANGLE
 							self.__goals.insert(0, GoalANGLE(-1,a))
 				elif isinstance(current_goal, GoalPWM):
 					if current_goal.start == -1:
@@ -312,12 +334,14 @@ class Robot(EngineObjectPoly):
 						self.__asserv.setLastIdAction(removed_goal.id_action)
 					else:
 						a = self.body.angle
-						v = self.__max_speed * current_goal.pwm / (255*8)
+						#valeur à ajuster suivant la vitesse désirée pour la commande PWM (modifier le 8)
+						diviseur_vitesse = 255*8
+						v = self.__max_speed * current_goal.pwm / diviseur_vitesse
 						vx = v * math.cos(a)
 						vy = v * math.sin(a)
 						self.body._set_velocity((vx,vy))
 				elif isinstance(current_goal, GoalANGLE):
-					self.body._set_velocity((0,0))
+					self.body._set_velocity((0,0)) #impératif sinon le robot aura un mouvement hélicoidale
 					goala = current_goal.a
 					cura = self.body.angle
 					difference_value_1 = (cura - goala)
@@ -345,7 +369,10 @@ class Robot(EngineObjectPoly):
 		return f
 
 	def onEvent(self, event):
-		# selection des teams et des robots
+		"""
+		Gestionnaire des événements claviers.
+		@param event événement sous forme de constante (voir doc de pygame)
+		"""
 		if KEYDOWN == event.type:
 			if KEY_CHANGE_TEAM == event.key:
 				self.__current_team = RED

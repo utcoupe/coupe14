@@ -13,6 +13,12 @@ from objects import robot
 
 
 class MiniRobot(robot.Robot):
+	"""
+	Classe fille de la classe robot.
+	Regroupe les méthodes en lien avec les actions que seul le gros robot peut exécuter.
+	"""
+
+	#définition des données graphiques et physiques
 	def __init__(self, *, engine, posinit, team):
 		#extension pour donner un signe distinctif au robot pour reconnaitre l'avant
 		self.avant = EngineObjectPoly(
@@ -81,6 +87,12 @@ class MiniRobot(robot.Robot):
 			self.__filet = 0
 
 	def ouvrirBras(self, position):
+		"""
+		Actionne le bras du robot du côté voulu par le paramètre position.
+		Le côté du bras dépend aussi de l'orientation du robot.
+		Si un bras différent de celui qui est sorti est appelé, c'est le bras appelé qui sera affiché.
+		@param position int (0 = suppresion du robot; 1 = bras gauche; -1 = bras droit)
+		"""
 		if position == 0:
 			if self.__bras_used is not None:
 				self.remove_body_extension(self.__bras_used)
@@ -103,4 +115,3 @@ class MiniRobot(robot.Robot):
 				self.__bras_used = self.bras_droite
 		else:
 			print('minibot.ouvrirBras mauvaise position du bras')
-

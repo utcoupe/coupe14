@@ -24,7 +24,6 @@ class Hokuyo:
 		return 'pong'
 
 	def adresse (self):
-		#todo adresse via l'enum
 		return 6
 
 	def start(self):
@@ -36,7 +35,7 @@ class Hokuyo:
 	def getHokuyo(self):
 		"""
 		Renvoie la position de tous les robots
-		@return int le temps depuis le lancement du programme en millisecondes
+		@return int le temps depuis le lancement de l'hokuyo en millisecondes
 		@return int position x de notre gros robot
 		@return int position y de notre gros robot
 		@return int position x de notre petit robot
@@ -68,5 +67,3 @@ class Hokuyo:
 		diff_time = current_time - self.__last_time_stamp
 		self.__last_time_stamp = current_time
 		return diff_time
-
-

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
+#ce code n'a pas été utilisé depuis la version 2012 du simulateur.
 
 import threading
 
 from py3irc.mypyirc.mypyircbot import Executer
 
 from .define import *
-
 
 class ShapeCircle:
 	def __init__(self, p, radius, r, g, b):

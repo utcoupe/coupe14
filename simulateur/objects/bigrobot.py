@@ -15,6 +15,12 @@ from objects import robot
 import time
 
 class BigRobot(robot.Robot):
+	"""
+	Classe fille de la classe robot.
+	Regroupe les méthodes en lien avec les actions que seul le gros robot peut exécuter.
+	"""
+
+	#définition des données graphiques et physiques
 	def __init__(self, *, engine, posinit, team):
 		self.bras = EngineObjectPoly(
 			engine 		= engine,
@@ -83,7 +89,8 @@ class BigRobot(robot.Robot):
 
 	def activerVisio(self):
 		"""
-		Active la reconnaissance de triangles dans la zone de portée du bras
+		Active la reconnaissance de triangles dans la zone de portée du bras.
+		Concrètement on crée l'extension bras pendant un laps de temps très court.
 		"""
 		save_pos = self.getPosition()
 		self.add_body_extension(self.bras)
@@ -114,7 +121,7 @@ class BigRobot(robot.Robot):
 	def storeFeu(self, sens):
 		"""
 		Stock un feu dans le robot
-		@param sens int
+		@param sens int détermine si on stocke le feu à l'avant ou à l'arrière du robot
 		"""
 		if sens > 0:
 			self.__nbrFeuAvant += 1

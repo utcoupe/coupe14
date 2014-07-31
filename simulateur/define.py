@@ -11,11 +11,17 @@ from pygame.locals import *
 
 
 
+#=========================================================
+#=== Ces constantes ne concernent QUE le simulateur !! ===
+#=========================================================
+
+
+
 FPS					= 30
-PX_TO_MM			= 4
+PX_TO_MM			= 4 #définit la résolution du simulateur à l'écran
 
 
-
+#type de collision pour identifier les objets
 COLLTYPE_DEFAULT		= 0
 COLLTYPE_WALL			= 1
 COLLTYPE_GROS_ROBOT		= 2
@@ -32,23 +38,14 @@ COLLTYPE_BRAS_OUVRIR	= 12
 COLLTYPE_BRAS_FERMER	= 13
 COLLTYPE_BRAS_PETIT		= 14
 
-YELLOW				= 0
-RED					= 1
+YELLOW		= 0
+RED			= 1
+BIG			= 0
+MINI		= 1
+LEFT		= 0
+RIGHT		= 1
 
-T_VERRE				= 0
-T_CERISE			= 1
-T_BOUGIE			= 2
-T_CADEAU			= 3
-T_FUNNY				= 4
-
-#coeff non modifiés (mais il faut surement ajuster celui pour CD == VERRE dans la simu2013)
-#idem pour le coeff LINGO == CERISE
-COEFF_ENGORGEMENT_CERISE= 0.05 # eq : on peut mettre 25 Cerises avant d'être plein (0.05 * 20 = 1)
-# COEFF_ENGORGEMENT_LINGO	= 0.2
-COEFF_ENGORGEMENT_VERRE = 0.34  # Pour le petit robot, il en prend 2 a la fois.
-
-
-
+#constantes de contrôle du simulateur au clavier
 KEY_CHANGE_TEAM		= K_LSHIFT		# changer d'equipe
 KEY_CHANGE_ROBOT	= K_LCTRL		# changer de robot
 KEY_STOP_RESUME		= K_SPACE		# apppui = stop, relache = resume
@@ -62,12 +59,6 @@ KEY_TELEPORTATION	= K_t			# mode téléportation
 KEY_RECUL			= K_r			# mode marche arrière
 KEY_JACK			= K_j			# jack
 
-BIG			= 0
-MINI		= 1
-
-LEFT		= 0
-RIGHT		= 1
-
 # dimensions du petit robot
 WIDTH_MINI 		= 200
 HEIGHT_MINI 	= 138
@@ -76,8 +67,6 @@ WIDTH_GROS 		= 330
 HEIGHT_GROS 	= 270
 #données du gros robot
 LONGUEUR_BRAS	= 225
-
-#ECART_CENTRE = -65 # ecart par rapport au centre du robot
 
 ################################################
 # CONSTANTES EXTERNES POUR COMMUNICATION
@@ -139,8 +128,9 @@ PWM		= 8
 
 def mm_to_px(*args):
 	"""
+	Convertis une donnée en milimètres vers une donnée en pixels.
 	@param args une liste ou un atom de valeurs ou de positions
-	@param la veleur ou la liste convertie
+	@param la valeur ou la liste convertie
 
 	>>> mm_to_px(4) == int(4/PX_TO_MM)
 	True
@@ -170,6 +160,7 @@ def mm_to_px(*args):
 
 def px_to_mm(*args):
 	"""
+	Convertis une donnée en pixels vers une donnée en milimètres
 	@param args une liste ou un atom de valeurs ou de positions
 	@param la valeur ou la liste convertie
 	"""
@@ -182,13 +173,3 @@ def px_to_mm(*args):
 		return f(args[0])
 	else:
 		return tuple(map(lambda v: f(v), args))
-
-
-
-
-if __name__ == "__main__":
-	import doctest
-	doctest.testmod()
-
-
-

@@ -18,34 +18,36 @@ Pour la version 2013, nous avons utilisé le nouveau protocole de communication 
 @author Florent Thévenet <florent@fthevenet.fr>
 @author Thomas Fuhrmann <tomesman@gmail.com>
 
+Concernant la version 2014, l'ensemble du développement aura été assuré par Thomas FUHRMANN.
+Outre les modifications d'architecture pour s'adapter à la nouvelle IA, le gros des modifications porte sur la GUI,
+et les vitesses de déplacement des robots plus réalistes.
+@author Thomas Fuhrmann <tomesman@gmail.com>
+
 """
+
 
 
 import sys
 import os
+import threading
+from engine import *
+from map import maploader
+from objects import bigrobot, minirobot
+import processIA
+from constantes import *
+from gui import mainGUI
 DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(DIR_PATH, "..", "map"))
 sys.path.append(os.path.join(DIR_PATH, "..", "gui"))
 sys.path.append(os.path.join(DIR_PATH, "../ia", "constantes"))
 
 
-import optparse
-import threading
-import time
-
-from engine import *
-import match
-from map import maploader
-from objects import bigrobot, minirobot
-import processIA
-from constantes import *
-from gui import mainGUI
 
 if __name__ == "__main__":
 
 #====================Activation des IA====================
 		"""
-		Mettre à Flase l'IA qu'on veut désactiver.
+		Mettre à False l'IA qu'on veut désactiver.
 		Ne pas toucher au reste du code.
 		"""
 
@@ -57,7 +59,6 @@ if __name__ == "__main__":
 #=========================================================
 
 		engine = Engine()
-		match = match.Match()
 
 		# robots
 		bigbotRed = bigrobot.BigRobot(engine = engine,
@@ -86,6 +87,11 @@ if __name__ == "__main__":
 
 		robots_red = None
 		robots_yellow = None
+
+		"""
+		Cette partie permet de déterminer quels robots doivent être affichés,
+		en fonction des constantes rentrées dans le fichier de constantes.
+		"""
 
 		if redIA == True:
 			if ENABLE_FLUSSMITTEL == True:

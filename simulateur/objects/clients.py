@@ -3,13 +3,20 @@
 import sys
 import os
 import math
+import time
 DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(DIR_PATH, "..", "define"))
 sys.path.append(os.path.join(DIR_PATH, "..", "engine"))
-
 from define import *
-import math
-import time
+
+
+#=========================================================================
+
+#Regroupe diverses classes utiles pour le fonctionnement du simulateur.
+#Regroupe aussi les clients du robot (asserv, visio, others).
+
+#=========================================================================
+
 
 class GoalPWM:
 	def __init__(self, id_action, pwm, delay):
@@ -60,7 +67,6 @@ class Asserv:
 		return self.__last_id_action_executed
 
 	def adresse(self):
-		#TODO return en fonction de l'enum
 		if self.__robot.getTyperobot == BIG:
 			return 2
 		elif self.__robot.getTyperobot == MINI:
@@ -159,7 +165,11 @@ class Asserv:
 		self.__robot.addGoal(GoalPWM(id_action, pwm_l, delay/1000))
 
 class Visio:
-	"""Émule le programme de visio"""
+	"""
+	Émule le programme de visio.
+	Ne sera pas utilisé dans le simulateur 2014 pour des raisons d'architecture.
+	(la visio est intégrée à l'IA sans passer par le protocole)
+	"""
 
 	def __init__(self, robot):
 		self.__robot = robot
@@ -168,22 +178,12 @@ class Visio:
 		return "visio pong"
 
 	def adresse(self):
-		#TODO return en fonction de l'enum
 		return 3
 
 	def actionBras(self):
 		"""
 		zone dans laquelle le bras du robot peut choper un triangle
 		quand il y a un triangle dans la zone, celui-ci est supprimé
-		"""
-		"""print('robot : ', self.__robot.x(), self.__robot.y(), self.__robot.a())
-		angle_rad = math.radians(self.__robot.a())
-		base_x = self.__robot.x() + math.ceil(WIDTH_GROS/2*math.cos(angle_rad) + HEIGHT_GROS/2*math.sin(angle_rad))
-		base_y = self.__robot.y() - math.ceil(HEIGHT_GROS/2*math.cos(angle_rad) + WIDTH_GROS/2*math.sin(angle_rad))
-		extrem_x = base_x + math.ceil(LONGUEUR_BRAS*math.sin(angle_rad))
-		extrem_y = base_y - math.ceil(LONGUEUR_BRAS*math.cos(angle_rad))
-		hauteur_x = base_x - math.ceil(LONGUEUR_BRAS*math.cos(angle_rad))
-		hauteur_y = base_y + math.ceil(LONGUEUR_BRAS*math.sin(angle_rad))
 		"""
 		self.__robot.add_bras()
 		time.sleep(0.5) #temps où le bras apparaitra
@@ -211,7 +211,6 @@ class Others:
 		return "others pong"
 
 	def adresse(self):
-		#TODO return en fonction de l'enum
 		if self.__robot.getTyperobot == BIG:
 			return 1
 		elif self.__robot.getTyperobot == MINI:
